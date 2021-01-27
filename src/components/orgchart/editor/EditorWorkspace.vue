@@ -79,49 +79,91 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
-             let treeLayout = this.$refs.jointPaper.treeLayout;
-            this.$refs.jointPaper.graph.fromJSON(cells);
-            treeLayout.layout();
-        },
+			let cellsReduce = this.customDepartmentInfor(cells)
+			let treeLayout = this.$refs.jointPaper.treeLayout;
+            this.$refs.jointPaper.graph.fromJSON(cellsReduce);
+			treeLayout.layout();
+			this.getAllDiagramCells()
+		},
+		customDepartmentInfor(cells){
+			let orgChartData = this.$store.state.orgchart.orgChartData
+			let orgchartId = this.$route.params.id	
+			let countUser 
+			let countDepartment
+			let self = this
+			cells.cells.forEach(function(e){
+				if(e.type == 'Symper.Department'){
+					orgChartData[orgchartId].departments.forEach(function(k){
+						if(e.id == k.vizId){
+							self.$store.dispatch('orgchart/getUserByVizId', k)
+							let listUser = self.$store.getters['orgchart/listUserInCurrentNode']
+							countDepartment = self.$store.state.orgchart.listChildInCurrentNode.length - 1
+       						countUser = listUser.length	
+						}
+					})
+					e.markup = e.markup.replace('countUser', countUser)
+					e.markup = e.markup.replace('countDepartment', countDepartment)
+				}
+			})
+			return cells
+		},
         getAllDiagramCells(){
             return this.$refs.jointPaper.graph.toJSON();
         },
         updateCellAttrs(cellId, attrName, value){
-            
             let mapName = {
                 name: '.name/text',
                 border: '.card',
                 managerName: '.manager-name/text',
+                managerEmail: '.manager-email/text',
                 managerAvartar: 'image/xlink:href',
                 userInPositionAvartar: 'image/xlink:href',
                 accountNumberPlus: '.account-number-plus/text',
                 positionCode: '.position-code/text',
                 lastDynamicAttr: '.dynamic-attr-value/text',
                 highlight: '.border-bottom/fill'
-            };
-            let cell = this.$refs.jointPaper.graph.getCell(cellId);
+			};
+			
+			let cell = this.$refs.jointPaper.graph.getCell(cellId);
             if(cell && mapName[attrName]){
                 if(typeof value == 'object'){
                     for(let key in value){
                         cell.attr(mapName[attrName]+'/'+key, value[key]);
                     }
                 }else{
-                    let imgurl = util.addEnvToUrl(appConfigs.apiDomain.fileManagement+'readFileSvg/user_avatar');
-                    if(value.includes(imgUrl)){
-                          cell.attr(mapName[attrName], value,
-                        );
+					let imgurl = appConfigs.apiDomain.fileManagement+'readFileSvg/user_avatar';
+					debugger
+                    if(value.includes(imgurl)){
+						cell.attr(mapName[attrName], value,
+					);
                     }else{
-                           let newValue =   joint.util.breakText(
-                            value, 
-                            {
-                                width: 130,
-                                height: 30
-                            },
-                            { 'font-size': 13 },
-                            { ellipsis: true  }
-                        )
+						if(value && attrName == 'name'){
+							let newValue =   joint.util.breakText(
+									value, 
+									{
+										width: 165,
+										height: 20
+									},
+									{ 'font-size': 13 },
+									{ ellipsis: true  }
+								)
+							cell.attr(mapName[attrName], newValue,
+							);
+						}
+						else if(value){
+ 							let newValue =   joint.util.breakText(
+								value, 
+								{
+									width: 160,
+									height: 20
+								},
+								{ 'font-size': 13 },
+								{ ellipsis: true  }
+							)
                         cell.attr(mapName[attrName], newValue,
                         );
+						}
+                          
                     }
                   
                    
@@ -145,7 +187,11 @@ export default {
 				treeLayout.layout();
 				self.$emit('delete-node')
             });
-            
+            paper.on('element:view', function(elementView, evt, x, y) {
+				setTimeout(function(){
+					self.$emit('cell-contextmenu', elementView.model.id);
+				},300)
+            });
             paper.on('element:add', function(elementView, evt) {
                 evt.stopPropagation();
                 let countDepartment = graph.getCells().filter((el) => {
@@ -309,6 +355,7 @@ export default {
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );
+                this.updateCellAttrs(this.selectingNode.id, 'managerEmail', lastUserInfo.email );
                 this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', avatarUser);
             }else if(this.context == 'position' && this.selectingNode.id != 'SYMPER_HOME_ORGCHART' ){
                 if(userIdList.length == 0){
@@ -400,5 +447,14 @@ export default {
 </script>
 
 <style>
-
+.name{
+	text-transform: uppercase !important;
+}
+.img-manager{
+	height: 35px !important;
+	width: 35px !important;
+}
+.view:hover{
+	border-bottom: 1px solid black;
+}
 </style>

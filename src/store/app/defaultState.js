@@ -137,11 +137,18 @@ const defaultState = {
     orgchartNodes: {},
     // Danh sách tất cả các user trong hệ thống
     allUsers: [],
+    mapIdToUsers: {},
     allBA: [],
     generalNotificationPosition: 'top right',
     userLoadedRoleType: [],
     userOperations: {},
-
+    systemMessaging: {
+        messageObj: {},
+        token: '', // token của firebase
+        topics: {}, // các topic đã đăng ký, {documents: true, workflows: true, }
+    },
+	didRegisterSYQLForMonaco: false,
+	filteredColumns:{}
 };
 
 export default defaultState;

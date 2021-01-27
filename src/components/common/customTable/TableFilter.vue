@@ -1,7 +1,7 @@
 <template>
     <div
         :class="{'symper-table-filter-container elevation-8':true, 'd-none':!showTableFilter}"
-        style="height:450px"
+        style="height:450px ; z-index: 9999"
     >
         <div
             ref="it1"
@@ -161,7 +161,6 @@
 </template>
 
 <script>
-import PerfectScrollbar from "vue2-perfect-scrollbar";
 import { util } from "./../../../plugins/util.js";
 import { getDefaultFilterConfig } from "./defaultFilterConfig.js";
 import Vue from "vue";
@@ -361,7 +360,6 @@ export default {
         };
     },
     components: {
-        // PerfectScrollbar: PerfectScrollbar,
         VuePerfectScrollbar: VuePerfectScrollbar
     },
     props: {
@@ -380,7 +378,7 @@ export default {
                 this.filterConfigs = null;
                 this.filterConfigs = rsl;
             },
-        }
+		},
     },
     computed: {
         // kiểu dữ liệu của cột hiện tại đang được filter

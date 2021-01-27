@@ -32,12 +32,9 @@
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">
         <div class="content-view-details-all-app h-100 w-100">
-            <v-skeleton-loader
-                    ref="skeleton"
-                    v-if="loadingApp"
-                    type="table-tbody"
-                    class="mx-auto w-100 h-100"
-            ></v-skeleton-loader>
+           	<Preloader hidden
+				v-if="loadingApp"   
+			/>
                
             <template v-else  >
                 <v-expansion-panels
@@ -138,22 +135,25 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 import DialogCreateTask from '@/components/myItem/work/DialogCreateTask.vue'
 import MenuConfigTypeView from './MenuConfigTypeView'
+import Preloader from "@/components/common/Preloader"
+import MyApplicationWorker from 'worker-loader!@/worker/application/MyApplication.Worker.js';
+
 export default {
     components:{
         VuePerfectScrollbar,
         ContextMenu,
         DialogCreateTask,
-        MenuConfigTypeView
+		MenuConfigTypeView,
+		Preloader
     },
     computed:{
         listApp(){
             let apps = this.$store.state.appConfig.listApps;
             let rsl = [{},{}];
             let appArr = Object.values(apps);
-
             for(let i = 0; i < appArr.length; i++){
                 rsl[i%2][appArr[i].id] = appArr[i];
-            }
+			}
             return rsl;
         }
     },
@@ -161,14 +161,17 @@ export default {
         currentType:{
             type: Number,
         }
-    },
+	},
+	mounted() {
+		
+	},
     methods:{
         createTask(){
             this.showCreateTask = true
         },
         hideContextMenu(){
             this.$refs.contextMenu.hide()	
-        },
+		},
         rightClickHandler(event,item,type,app){
 			event.stopPropagation();
 			event.preventDefault();
@@ -202,29 +205,12 @@ export default {
             })
             return i
         },
-         getActiveapps(){
-            let self = this
-			appManagementApi.getActiveAppSBS().then(res => {
-				if (res.status == 200) {
-                    for(let e of res.data.listObject){
-                        e.childrenAppReduce = {}
-                        self.$set( self.apps, e.id , e)
-                        self.$set( self.mapIdApp, e.id , {
-                            workflow_definition:{},
-                            document_definition:{},
-                            orgchart:{},
-                            dashboard:{},
-                        })
-                        if(Object.keys(e.childrenApp).length > 0){
-                            self.checkChildrenApp(e.childrenApp,e.id)   
-                        }
-                    }
-                    this.getByAccessControl(self.listIds)
-                    this.$store.commit('appConfig/setListApps', this.apps)
-                    self.loadingApp = false
-                }
-			}).catch((err) => {
-			});
+		getActiveapps(){
+			this.myApplicationWorker.postMessage(
+				{
+					action:'getActiveAppSBS',
+				}
+			);
         },
         checkChildrenApp(data,idApp){
             let self = this
@@ -245,7 +231,7 @@ export default {
                 }
             })
         },
-
+		
         updateChidrenItemToApp(data){
             data.forEach(function(e){
                 e.show = true
@@ -253,7 +239,6 @@ export default {
 			let self = this
             for(let app in this.mapIdApp){
                 for(let typeT in this.mapIdApp[app]){
-
                     if(this.mapIdApp[app][typeT].length > 0){
                         let  obj = {}
                         let arr = []
@@ -276,7 +261,6 @@ export default {
                                         let types = "document_major"
 										self.$set(self.apps[app].childrenAppReduce, types ,obj)
                                     }
-                                  
                                 }else{
                                     obj = util.cloneDeep(self[typeT]);
                                     arr.push(t)
@@ -289,7 +273,6 @@ export default {
                 }
             }
         },
-      
         updateFavoriteItem(array){
             let self = this 
             this.listType.forEach(function(e){
@@ -303,27 +286,42 @@ export default {
 			    }
             })
 			return array
-        },
+		},
+		handlerGetActiveApp(res){
+			let self = this
+			if (res.status == 200) {
+				for(let e of res.data.listObject){
+					e.childrenAppReduce = {}
+					self.$set( self.apps, e.id , e)
+					self.$set( self.mapIdApp, e.id , {
+						workflow_definition:{},
+						document_definition:{},
+						orgchart:{},
+						dashboard:{},
+					})
+					if(Object.keys(e.childrenApp).length > 0){
+						self.checkChildrenApp(e.childrenApp , e.id)   
+					}
+				}
+				this.getItemByAccessControl(self.listIds)
+				this.$store.commit('appConfig/setListApps', this.apps)
+				self.loadingApp = false
+			}
+		},	
         changeFavorite(item,type,app){
             event.stopPropagation()
+			let userId = this.$store.state.app.endUserInfo.id
             let self = this
             self.$store.commit('appConfig/updateSelectingItemType',type)
             if(type == "document_major" || type == "document_category"){
 				type = "document_definition"
 			}
-			let userId = this.$store.state.app.endUserInfo.id
-			if(item.objectIdentifier.includes("document_definition:")){
-				item.id = item.objectIdentifier.replace("document_definition:","")
-			}
-			if(item.objectIdentifier.includes("orgchart:")){
-				item.id = item.objectIdentifier.replace("orgchart:","")
-			}
-			if(item.objectIdentifier.includes("dashboard:")){
-				item.id = item.objectIdentifier.replace("dashboard:","")
-			}
-			if(item.objectIdentifier.includes("workflow_definition:")){
-				item.id = item.objectIdentifier.replace("workflow_definition:","")
-			}
+			let arr = ['document_definition:', 'orgchart:', "dashboard:" , "dashboard:" , "workflow_definition:" ]
+			arr.forEach(function(e){
+				if(item.objectIdentifier.includes(e)){
+					item.id = item.objectIdentifier.replace(e,"")
+				}
+			})
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1,app.id).then(res => {
 					if (res.status == 200){
@@ -336,24 +334,22 @@ export default {
 					if (res.status == 200) {
 						item.type = type;
                         self.$store.commit('appConfig/delFavorite',item)
-                         self.$store.commit('appConfig/updateFavoriteMyAppItem',{appId:app.id,itemId:item.objectIdentifier,value:false})
+						self.$store.commit('appConfig/updateFavoriteMyAppItem',{appId:app.id,itemId:item.objectIdentifier,value:false})
 					}
 				});
             }
         },
         filterObj(value){
            for(let e in this.apps){
-                this.filterItemInApp(e,"document_category",value)
-                this.filterItemInApp(e,"document_major",value)
-                this.filterItemInApp(e,"orgchart",value)
-                this.filterItemInApp(e,"dashboard",value)
-                this.filterItemInApp(e,"workflow_definition",value) 
+                this.filterItemInApp(e, value)
            }
         },
-        filterItemInApp(e, type, value){
-             let self = this
-             if(self.apps[e].childrenAppReduce.hasOwnProperty(type)){
-                self.apps[e].childrenAppReduce[type].item.forEach(function(k){
+        filterItemInApp(e, value){
+			let arr = ['document_category', 'document_major', 'orgchart', 'dashboard', 'workflow_definition']
+			let self = this
+			arr.forEach(function(j){
+				if(self.apps[e].childrenAppReduce.hasOwnProperty(j)){
+                self.apps[e].childrenAppReduce[j].item.forEach(function(k){
                     if(value == ""){
                         k.show = true
                     }
@@ -365,18 +361,16 @@ export default {
                     }
                 })
             }
+			})
         },
 
-		async getByAccessControl(ids){
-			let self = this
-			await appManagementApi.getListObjectIdentifier({
-				pageSize:1000,
-				ids: ids
-			}).then(res=>{
-                    self.updateFavoriteItem(res.data)
-                    self.updateChidrenItemToApp(res.data)
-			}).catch(err=>{
-			})
+		async getItemByAccessControl(ids){
+			this.myApplicationWorker.postMessage({
+				action: 'getItemByAccessControl',
+				data:{
+					ids: ids
+				}
+			});
 		},
         
     },
@@ -412,12 +406,12 @@ export default {
                 icon: 'mdi-lan',
                 title:  this.$t('apps.listType.workflow'),
                 name: 'workflow_definition',
-            },
+			},
+			myApplicationWorker: null,
             panel: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
             listIds: [],
 			mapIdApp:[],
 			childItemReduce:{
-
 			},
             listType : ['orgchart', 'document_definition', 'workflow_definition', 'dashboard'],
             mapIdItem:{
@@ -438,16 +432,33 @@ export default {
         }
     },
     created(){
-        if(!this.listApp[0].length && !this.listApp[1].length){
-           this.getActiveapps()
-        }else{
-            this.loadingApp = false
-        }
+		this.myApplicationWorker = new MyApplicationWorker();
+		let self = this
+		this.myApplicationWorker.addEventListener("message", function (event) {
+			let data = event.data;
+			switch (data.action) {
+				case 'getActiveAppSBS':
+					self.handlerGetActiveApp(data.dataAfter)
+					break;
+				case 'getItemByAccessControl':
+					self.updateFavoriteItem(data.dataAfter.data)
+                    self.updateChidrenItemToApp(data.dataAfter.data)
+					break;
+			
+				default:
+					break;
+			}
+		});
+		if(!Object.keys(this.listApp[0]).length && !Object.keys(this.listApp[1]).length){
+			this.getActiveapps()
+		}else{
+			this.loadingApp = false
+		}
     },
   
     watch:{
         searchItemKey(val){
-                this.filterObj(val)
+			this.filterObj(val)
         }
     }
 }
@@ -489,9 +500,6 @@ export default {
     margin:0px 32px 0px 16px;
     min-height:unset;
     height:50px;
-}
-.view-details-all-app >>> .content-view-details-all-app .v-expansion-panel-header.v-expansion-panel-header--active{
-    /* border-bottom: 1px solid #FF8003; */
 }
 .view-details-all-app >>> .content-view-details-all-app .v-expansion-panel-header__icon{
     margin-right:12px;

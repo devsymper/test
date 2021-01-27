@@ -6,9 +6,11 @@
             :pageTitle="$t('process.list.title')"
             :tableContextMenu="tableContextMenu"
             :containerHeight="containerHeight"
+            :customAPIResult="customAPIResult"
             :getDataUrl="getListUrl"
             :useActionPanel="false"
             :exportLink="exportLink"
+            :autoRefreshTopic="'workflow_definition'"
             :headerPrefixKeypath="'common'"
             :commonActionProps="commonActionProps"
             @on-add-item-clicked="goToCreatePage()"
@@ -23,7 +25,7 @@ import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
 import { deployProcess, deployProcessFromXML, getLastestDefinition } from "./../../components/process/processAction.js";
 import { config } from 'rxjs';
-
+import {taskApi} from './../../api/task.js'
 
 export default {
     data() {
@@ -137,7 +139,35 @@ export default {
                         }
                     }
                 },
-            }
+            },
+             customAPIResult: {
+				reformatData(res){
+					let listKey = [];
+					res.data.listObject.map(x=>listKey.push(x.processKey));
+					res.data.columns.push(
+							{
+								name:'number_instance',
+								title:'number_instance',
+								type:"numeric",
+								noFilter:true
+							},
+					)
+					let listWork = res.data;
+					taskApi.countInstant({keys:JSON.stringify(listKey)}).then(res=>{
+						if (res.status === 200) {
+							for(let i = 0; i<listWork.listObject.length; i++){
+								for(let j =0; j<res.data.length;j++){
+									if(listWork.listObject[i].processKey==res.data[j].key){
+										listWork.listObject[i].number_instance=res.data[j].number_of_process_instance
+									}
+								}
+						}
+						self.$refs.listModels.rerenderTable();
+						}
+					})
+                    return  listWork;
+                } 
+            },
         };
     },
     mounted() {
@@ -146,6 +176,11 @@ export default {
     created() {},
     watch: {},
     methods: {
+		getListKey(res){
+				let listKey = [];
+				res.map(x=>listKey.push(x.processKey));
+				return listKey
+		},
         goToCreatePage(){
             this.$goToPage('/workflow/create',this.$t("process.action.create"));
         },

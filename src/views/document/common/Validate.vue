@@ -3,10 +3,23 @@
     class="card-validate"
     v-show="isShow"
     :style="positionBox">
-        <v-card-title>{{errTitle}}</v-card-title>
-        <v-card-text class="validate-message">
+        <v-card-title> 
             <v-icon class="icon">mdi-information-outline</v-icon>
-            <span>{{errMessage}}</span>
+            
+            {{errTitle}}</v-card-title>
+        <v-card-text class="validate-message">
+            <div>
+                <div v-for="(validate, key) in messageData" :key="key">
+                <div>
+                        <div style="font-weight:500;">{{key}}:</div>
+                        <div v-for="(item, index) in validate" :key="index">
+                            <span v-if="item.isValid">
+                                {{item.msg}}
+                            </span>
+                        </div>
+                </div>
+                </div>
+            </div>
 
         </v-card-text>
         <v-card-actions v-if="isShowAction" style="flex-flow: row-reverse;">
@@ -26,10 +39,6 @@ export default {
             type:String,
             default:"Dữ liệu không hợp lệ"
         },
-        message:{
-            type:String,
-            default:""
-        },
      
         isShowAction:{
             type:Boolean,
@@ -40,16 +49,13 @@ export default {
         title(after){
             this.errTitle = title;
         },
-        message(after){
-            this.errMessage = after
-        }
     },
     data(){
         return {
             isShow:null,
             positionBox:null,
             errTitle:this.title,
-            errMessage:this.message,
+            messageData:null,
         }
     },
     created(){
@@ -68,9 +74,10 @@ export default {
             this.isShow = false;
             this.$emit('after-click-ignore');
         },
-        show(e){
+        show(e ,data){
             this.isShow = true;
             this.calPosition(e);
+            this.messageData = data;
         },
         hide(){
             this.isShow = false;
@@ -80,11 +87,10 @@ export default {
                 this.positionBox = {'top':'50%','left':'50%',transform: 'translate(-50%, -50%)',position: 'fixed',width:'400px'};
             }
             else{
-                if($(e.target).closest('.handsontable').length > 0){
+                if($(e.target).closest('.ag-cell').length > 0){
                     let autoEL = $(this.$el).detach();
                     $(e.target).closest('.wrap-table').append(autoEL);
-                    let edtos = $(e.delegateTarget).offset();
-                    
+                    let edtos = $(e.target).closest('.ag-cell').offset();
                     let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
                     this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
                 }
@@ -111,12 +117,12 @@ export default {
         width: max-content;
     }
     .card-validate >>> .v-card__title{
-        padding: 12px;
+        padding: 6px;
         font-size: 15px !important;
     }
     .card-validate >>> .v-card__text{
         font-size: 13px !important;
-        padding: 0 8px 8px 8px !important;
+        padding: 4px 8px 8px 8px !important;
     }
     .card-validate >>> .mdi-information-outline{
         color: red !important;
@@ -128,5 +134,6 @@ export default {
     .validate-message{
         display: flex;
         align-items: center;
+        border-top: var(--symper-border);
     }
 </style>

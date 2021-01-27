@@ -49,9 +49,6 @@
 								<v-icon style="font-size:60px;padding-left:40px;margin-top:8px;opacity:0.3">
 									mdi-star-off
 								</v-icon>
-								<!-- <v-img
-								:src="urlEmptyApp">
-								</v-img> -->
 							</div>
 						</div>
 					</div>
@@ -121,84 +118,104 @@
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import AppDetail from './AppDetail.vue';
-import {appManagementApi} from './../../api/AppManagement.js';
-import {documentApi} from './../../api/Document';
-import {orgchartApi} from './../../api/orgchart';
-import {dashboardApi} from './../../api/dashboard';
-import BpmnEngine from './../../api/BPMNEngine';
+import {appManagementApi} from '@/api/AppManagement.js';
 import ContextMenu from './ContextMenu.vue'
 import emptyApp from "@/assets/image/empty_app.png";
+import MyApplicationWorker from 'worker-loader!@/worker/application/MyApplication.Worker.js';
 export default {
 	data: function() {
         return {
-		 listAppHeight: '200px',
-		 listFavoriteHeight:'100%',
-		 tab: 'tab-1',
-		 isEndUserCpn:true,
-		 searchKey:"",
-		 listIcon:{
-			 document_definition: 'mdi-file-document-outline',
-			 workflow_definition: 'mdi-lan',
-			 orgchart: 'mdi-widgets-outline',
-			 dashboard: 'mdi-view-dashboard'
-		 },
-		 apps:{},
-		 listFavorite:[],
-		 testListFavorite:[],
-		 loadingFavorite: true,
-		 loadingApp: true,
-		 urlEmptyApp: emptyApp,
-		 arrType:{
-			 document_definition:[],
-			 orgchart:[],
-			 dashboard:[],
-			 workflow_definition:[],
-		 },
-		 title:{
-		 },
-		 mapId:{
-			 orgchart:{
-			 },
-			 document_definition:{
-			 },
-			 dashboard:{
-			 },
-			 workflow_definition:{
-			 }
-		 },
-		 mapIdFavorite:{
-			 orgchart:{
-			 },
-			 document_definition:{
-			 },
-			 dashboard:{
-			 },
-			 workflow_definition:{
-			 }
-		 },
+			listAppHeight: '200px',
+			listFavoriteHeight:'100%',
+			myApplicationWorker: null,
+			tab: 'tab-1',
+			isEndUserCpn:true,
+			searchKey:"",
+			listIcon:{
+				document_definition: 'mdi-file-document-outline',
+				workflow_definition: 'mdi-lan',
+				orgchart: 'mdi-widgets-outline',
+				dashboard: 'mdi-view-dashboard'
+			},
+			apps:{},
+			listFavorite:[],
+			testListFavorite:[],
+			loadingFavorite: true,
+			loadingApp: true,
+			urlEmptyApp: emptyApp,
+			arrType:{
+				document_definition:[],
+				orgchart:[],
+				dashboard:[],
+				workflow_definition:[],
+			},
+			title:{
+			},
+			mapId:{
+				orgchart:{
+				},
+				document_definition:{
+				},
+				dashboard:{
+				},
+				workflow_definition:{
+				}
+			},
+			mapIdFavorite:{
+				orgchart:{
+				},
+				document_definition:{
+				},
+				dashboard:{
+				},
+				workflow_definition:{
+				}
+			},
 		 }
 	},
 	created(){
-            this.getActiveapps()
-			this.getFavorite()
+		this.myApplicationWorker = new MyApplicationWorker()
+		this.getActiveapps()
+		this.getFavorite()
+		let self = this
+		this.myApplicationWorker.addEventListener("message", function (event) {
+			let data = event.data;
+			switch (data.action) {
+				case 'getFavorite':
+					self.handleGetFavorite(data.dataAfter)
+					break;
+				case 'getActiveApp':
+					self.handleGetActiveApp(data.dataAfter)
+					break;
+				case 'getAppDetails':
+					self.handlerGetAppDetals(data.dataAfter)
+					break;
+				case 'getItemByType':
+					self.handlerGetObjectSuccess(data.dataAfter.type,data.dataAfter.res)
+					break;
+				default:
+					break;
+			}
+		});
 	},
 	mounted(){
-		 let thisCpn = this;
-	 		$(document).click(function(e){
-				if(!$(e.target).is('.menu') && !$(e.target).is('.menuItem')){
-					$('.menu').hide()		
+		let thisCpn = this;
+		$(document).click(function(e){
+			if(!$(e.target).is('.menu') && !$(e.target).is('.menuItem')){
+				$('.menu').hide()		
+			}
+		});
+		$(document).click(function(e){
+			if(!$(e.target).is('.context-menu')){
+				$(".context-menu").css("display", "none")
+				if(thisCpn.tab == 'tab-1'){
+					thisCpn.$refs.contextMenu.hide()
+				}else{
+					thisCpn.$refs.appDetails.hideContextMenu()		
 				}
-			});
-			$(document).click(function(e){
-				if(!$(e.target).is('.context-menu')){
-					$(".context-menu").css("display", "none")
-					if(thisCpn.tab == 'tab-1'){
-						thisCpn.$refs.contextMenu.hide()
-					}else{
-						thisCpn.$refs.appDetails.hideContextMenu()		
-					}
-				}
-			})
+			}
+		})
+		
 	},
 	components: {
 		VuePerfectScrollbar,
@@ -215,49 +232,60 @@ export default {
 		listApp(){
             return this.$store.state.appConfig.listApps
 		},
-		
-		
 	},
-	
 	methods:{
-		getActiveapps(){
-			appManagementApi.getActiveApp().then(res => {
-				this.loadingApp = false
-				if (res.status == 200) {
-					this.apps = res.data.listObject
-					// this.$store.commit('appConfig/setListApps', res.data.listObject)
+		handlerGetAppDetals(res){
+			if (res.status == 200) {
+				if(Object.keys(res.data.listObject.childrenApp).length > 0){
+					this.checkChildrenApp(res.data.listObject.childrenApp)
+				}else{
+					this.$store.commit('appConfig/emptyItemSelected')
 				}
-			}).catch((err) => {
-			});
+			}
 		},
-		getFavorite(){
+		getActiveapps(){
+			this.myApplicationWorker.postMessage({
+				action: "getActiveApp"
+			})
+		},
+		handleGetActiveApp(res){
+			this.loadingApp = false
+			if(res.status == 200){
+				this.apps = res.data.listObject
+			}else{
+				this.$snotify({
+					type: "error",
+					title: "Không thể lấy danh sách application"
+				})
+			}
+		},
+		handleGetFavorite(res){
 			this.listFavorite= []
-			let self = this 
-			let userId = this.$store.state.app.endUserInfo.id
-			appManagementApi.getItemFavorite(userId).then(res =>{
-				if (res.status == 200) {
-					res.data.listObject.forEach(function(e){
-						if(e.objectType == 'document_definition'){
-							self.mapIdFavorite.document_definition["document_definition:"+e.objectIdentifier] = e
-						}  
-						if(e.objectType == 'orgchart'){
-							self.mapIdFavorite.orgchart["orgchart:"+e.objectIdentifier] = e
-						}  
-						if(e.objectType == 'workflow_definition'){
-							self.mapIdFavorite.workflow_definition["workflow_definition:"+e.objectIdentifier] = e
-						}  
-						if(e.objectType == 'dashboard'){
-							self.mapIdFavorite.dashboard["dashboard:"+e.objectIdentifier] = e
+			let self = this
+			if (res.status == 200) {
+				res.data.listObject.forEach(function(e){
+					let arr = ['document_definition', 'orgchart', 'workflow_definition', 'dashboard']
+					arr.forEach(function(k){
+						if(e.objectType == k){
+							self.mapIdFavorite[k][k + ":" + e.objectIdentifier] = e
 						}  
 					})
-					this.checkTypeFavorite(res.data.listObject)
-					this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
-					
-				}
-			}).catch((err) => {
-			});
+				})
+				this.checkTypeFavorite(res.data.listObject)
+				this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
+			}
 			this.loadingFavorite = false
 
+		},
+		getFavorite(){
+			let userId = this.$store.state.app.endUserInfo.id
+			this.myApplicationWorker.postMessage({
+				action: "getFavorite",
+				data:{
+					userId: userId
+				}
+			})
+			
 		},
 		clickDetails(item){
 			this.$refs.contextMenu.hide()
@@ -267,53 +295,32 @@ export default {
 			this.title.name = item.name;
 			this.$store.commit("appConfig/updateCurrentAppId",item.id);
 			this.$store.commit("appConfig/updateCurrentAppName",item.name);
-			appManagementApi.getAppDetails(item.id).then(res => {
-				if (res.status == 200) {
-					if(Object.keys(res.data.listObject.childrenApp).length > 0){
-						this.checkChildrenApp(res.data.listObject.childrenApp)
-					}else{
-						this.$store.commit('appConfig/emptyItemSelected')
-					}
+			this.myApplicationWorker.postMessage({
+				action: 'getAppDetails',
+				data:{
+					id: item.id
 				}
-			}).catch((err) => {
-			});
+			})
 			this.tab = 'tab-2'
 		},
 		checkTypeFavorite(data){
 			let self = this
-			self.arrType.document_definition = []
-			self.arrType.orgchart = []
-			self.arrType.dashboard = []
-			self.arrType.workflow_definition = []
+			for(let i in self.arrType){
+				self.arrType[i] = []
+			}
 			data.forEach(function(e){
-				if(e.objectType == 'document_definition'){
-					self.arrType.document_definition.push("document_definition:"+e.objectIdentifier)
-				}
-				if(e.objectType == 'orgchart'){
-					self.arrType.orgchart.push("orgchart:"+e.objectIdentifier)
-				}
-				if(e.objectType == 'dashboard'){
-					self.arrType.dashboard.push("dashboard:"+e.objectIdentifier)
-				}
-				if(e.objectType == 'workflow_definition'){
-					self.arrType.workflow_definition.push("workflow_definition:"+e.objectIdentifier)
-				}
+				let arr = ['document_definition', 'orgchart', 'dashboard', 'workflow_definition']
+				arr.forEach(function(j){
+					if(e.objectType == j){
+						self.arrType[j].push(j + ":" + e.objectIdentifier)
+					}
+				})
 			});
-			if(self.arrType.document_definition.length > 0){
-				let dataDoc = self.arrType.document_definition
-				this.getFavoriteByAccessControl(dataDoc,'document_definition')
-			}
-			if(self.arrType.orgchart.length > 0){
-				let dataOrg = self.arrType.orgchart
-				this.getFavoriteByAccessControl(dataOrg,'orgchart')
-			}
-			if(self.arrType.dashboard.length > 0){
-				let dataRep = self.arrType.dashboard
-				this.getFavoriteByAccessControl(dataRep,'dashboard')
-			}
-			if(self.arrType.workflow_definition.length > 0){
-				let dataW = self.arrType.workflow_definition
-				this.getFavoriteByAccessControl(dataW,'workflow_definition')
+			for(let i in self.arrType){
+				if(self.arrType[i].length > 0){
+					let dataGet = self.arrType[i]
+					self.getFavoriteByAccessControl(dataGet,i)
+				}
 			}
 		},
 		clickBack(){
@@ -358,76 +365,26 @@ export default {
 		},
 		checkChildrenApp(data){
 			let self = this 
-			self.arrType.orgchart = []
-			self.arrType.document_definition = []
-			self.arrType.dashboard = []
-			self.arrType.workflow_definition = []
-			if(data.hasOwnProperty('orgchart')){
-				data.orgchart.forEach(function(e){
-					self.arrType.orgchart.push("orgchart:"+e.id);
-					self.mapId.orgchart["orgchart:"+e.id] = e;
-				})
-				let dataOrg = self.arrType.orgchart;
-				this.getByAccessControl(dataOrg,'orgchart')
+			for(let i in self.arrType){
+				self.arrType[i] = []
 			}
-			if(data.hasOwnProperty('document_definition')){
-				data.document_definition.forEach(function(e){
-					self.arrType.document_definition.push("document_definition:"+e.id);
-					self.mapId.document_definition["document_definition:"+e.id] = e;
+			for(let i in data){
+				data[i].forEach(function(e){
+					self.arrType[i].push(i + ":" + e.id)
+					self.mapId[i][i + ":"+e.id] = e;
 				})
-				let dataDoc = self.arrType.document_definition
-				this.getByAccessControl(dataDoc,'document_definition')
-			}
-			if(data.hasOwnProperty('workflow_definition')){
-				data.workflow_definition.forEach(function(e){
-					self.arrType.workflow_definition.push("workflow_definition:"+e.id);
-					self.mapId.workflow_definition["workflow_definition:"+e.id] = e;
-				})
-				let dataW = self.arrType.workflow_definition
-				this.getByAccessControl(dataW,'workflow_definition')
-			}
-			if(data.hasOwnProperty('dashboard')){
-				data.dashboard.forEach(function(e){
-					self.arrType.dashboard.push("dashboard:"+e.id);
-					self.mapId.dashboard["dashboard:"+e.id] = e;
-				})
-				let dataRep = self.arrType.dashboard
-				this.getByAccessControl(dataRep,'dashboard')
+				let dataGet = self.arrType[i];
+				self.getItemByAccessControl(dataGet,i)
 			}
 		},
-		getByAccessControl(ids,type){
+		getItemByAccessControl(ids,type){
 			let self = this
-			appManagementApi.getListObjectIdentifier({
-				pageSize:50,
-				ids: ids
-			}).then(res=>{
-				if(type == 'orgchart'){
-					this.updateFavoriteItem(self.mapId.orgchart,res.data)
-					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'orgchart'});
+			this.myApplicationWorker.postMessage({
+				action: 'getItemByType',
+				data:{
+					ids: ids,
+					type: type
 				}
-				if(type == 'document_definition'){
-					this.updateFavoriteItem(self.mapId.document_definition,res.data)
-					let arrCategory = []
-					let arrMajor = []
-					res.data.forEach(function(e){
-						if(e.objectType == "1"){
-							arrMajor.push(e)
-						}else if(e.objectType == "2"){
-							arrCategory.push(e)
-						}
-					})
-					this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
-					this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
-				}
-				if(type == 'workflow_definition'){
-					this.updateFavoriteItem(self.mapId.workflow_definition,res.data)
-					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'workflow_definition'});
-				}
-				if(type == 'dashboard'){
-					this.updateFavoriteItem(self.mapId.dashboard,res.data)
-					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'dashboard'});
-				}
-			}).catch(err=>{
 			})
 		},
 		getFavoriteByAccessControl(ids,type){
@@ -436,40 +393,37 @@ export default {
 				pageSize:50,
 				ids: ids
 			}).then(res=>{
-				if(type == 'orgchart'){
-					if(res.data.length > 0){
-						this.updateActionItem(self.mapIdFavorite.orgchart,res.data,'orgchart')
-						res.data.forEach(function(e){
-							self.listFavorite.push(e)
-						})
-					}
-				}
-				if(type == 'document_definition'){
-						if(res.data.length > 0){
-						this.updateActionItem(self.mapIdFavorite.document_definition,res.data,'document_definition')
-						res.data.forEach(function(e){
-							self.listFavorite.push(e)
-						})
-					}
-				}
-				if(type == 'workflow_definition'){
-					if(res.data.length > 0){
-						this.updateActionItem(self.mapIdFavorite.workflow_definition,res.data,'workflow_definition')
-						res.data.forEach(function(e){
-							self.listFavorite.push(e)
-						})
-					}
-				}
-				if(type == 'dashboard'){
-					if(res.data.length > 0){
-						this.updateActionItem(self.mapIdFavorite.dashboard,res.data,'dashboard')
-						res.data.forEach(function(e){
-							self.listFavorite.push(e)
-						})
-					}
-				}
+				self.handlerGetObjectFavorite(type, res)
 			}).catch(err=>{
 			})
+		},
+		handlerGetObjectSuccess(type,res){
+			let self = this
+			this.updateFavoriteItem(self.mapId[type],res.data)
+			if(type == 'document_definition'){
+				let arrCategory = []
+				let arrMajor = []
+				res.data.forEach(function(e){
+					if(e.objectType == "1"){
+						arrMajor.push(e)
+					}else if(e.objectType == "2"){
+						arrCategory.push(e)
+					}
+				})
+				this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
+				this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
+			}else{
+				this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:type});
+			}
+		},
+		handlerGetObjectFavorite(type,res){
+			let self = this
+			if(res.data.length > 0){
+				this.updateActionItem(self.mapIdFavorite[type],res.data,type)
+				res.data.forEach(function(e){
+					self.listFavorite.push(e)
+				})
+			}
 		}
 	}
 
@@ -562,17 +516,12 @@ export default {
 	 width:40px;
 	 height:40px;
 	 margin:12px 8px 14px 16px;
-	 /* padding: 4px; */
-	 /* margin:13px 5px 0px 5px;padding:4px */
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item .v-icon{
 	font-size:45px;
 	padding:12px;
 	opacity: 0.7;
 }
-/* .end-user-popup >>> .list-app-cointaner .list-app-item .v-icon {
-
-} */
 .end-user-popup >>> .list-app-cointaner .list-app-item h5{
 	margin-top: -12px;
 	font: 13px roboto;

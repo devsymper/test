@@ -88,28 +88,7 @@ export default {
         link: "/myitem",
         group: "My work",
     },
-    // lisTaskToDo: {
-    //     title: "Lists to do",
-    //     icon: "mdi-sticker-check-outline",
-    //     group: "My work",
-    //     children: {
-    //         tasks: {
-    //             title: "tasks",
-    //             icon: "mdi-check-all",
-    //             link: "/tasks"
-    //         },
-    //         works: {
-    //             title: "works",
-    //             icon: "mdi-briefcase-check-outline",
-    //             link: "/works"
-    //         },
-    //         myItem: {
-    //             title: "myItem",
-    //             icon: "mdi-format-list-checkbox",
-    //             link: "/myitem"
-    //         },
-    //     }
-    // },
+   
     timeTable: {
         icon: "mdi-calendar-month-outline",
         title: "myWork",
@@ -143,6 +122,12 @@ export default {
         link: '/knowledge',
         group: "Applications"
     },
+    taskManagement: {
+        title: 'Task Management',
+        icon: 'mdi-lock-outline',
+        link: '/task-management',
+        group: "Applications"
+    },
     fileManagement: {
         title: 'File',
         icon: 'mdi-upload-outline',
@@ -159,17 +144,7 @@ export default {
         title: "admin",
         icon: "mdi-cog-transfer-outline",
 		group: "Administrator",
-		children: {
-            list_workflow: {
-                title: "list_workflow",
-                link: "/admin",
-            },
-            list_work: {
-                title: "list_work",
-                link: "/admin/jobs",
-            },
-           
-        }
+		link: "/admin",
     },
     userManager: {
         title: "Account management",
@@ -194,8 +169,8 @@ export default {
         }
     },
     accessManager: {
-        title: "Access Management",
-        icon: "mdi-shield-key-outline",
+        title: "accessControl",
+        icon: "mdi-shield-key",
         group: "Administrator",
         children: {
             permissions: {
@@ -214,7 +189,19 @@ export default {
                 link: "/action-pack"
             },
         }
-    },
+	},
+	access_control: {
+		title: "accessControlBeta",
+        icon: "mdi mdi-shield-key-outline",
+		group: "Administrator",
+		link: "/access-control"
+	},
+	syql_function: {
+		title: "syqlFunction",
+        icon: "mdi mdi-function-variant",
+		group: "Administrator",
+		link: "/syql-manager"
+	},
     application_definition: {
         title: "apps",
         icon: "mdi mdi-widgets-outline",
@@ -257,6 +244,12 @@ export default {
         icon: 'mdi-earth',
 		group: "Setting",
 		link: '/environment-management',
-	}
+    },
+    authen: {
+        title: "Authen",
+        icon: "mdi-account-key",
+        link: "/authen",
+        group: "Setting"
+    }
 
 };

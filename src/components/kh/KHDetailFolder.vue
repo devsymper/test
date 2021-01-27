@@ -4,12 +4,11 @@
     <div class="kh-table kh-sub-table">
       <template>
         <v-data-table
-          :headers="headers"
-          :items="listChildren"
-          :items-per-page="5"
-          :search="skh.search"
-          class="elevation-1 kh-sub-table"
-          
+            :headers="headers"
+            :items="listChildren"
+            :items-per-page="5"
+            :search="skh.search"
+            class="elevation-1 kh-sub-table"
         >
           <template v-slot:[`item.name`]="{ item }">
             <v-list-item-group >
@@ -17,7 +16,7 @@
                 class="kh-list pa-0"
                 dense
                 active-class="v-item--active"
-                @click="doubleClick(item.path,item.id,item.hash)"
+                @dblclick="doubleClick(item.path,item.id,item.hash)"
                 @contextmenu="show($event,item.id,item.name,item.path,item.parent_path,item.hash,item.content)"
               >
                 <!-- <v-icon class="fs-14">mdi-folder</v-icon> -->
@@ -82,6 +81,7 @@
 <script>
 import KHHeader from "./../../components/kh/KHHeader.vue";
 import { knowledgeApi } from "./../../api/kh.js";
+import { event } from 'jquery';
 
 export default {
   data() {
@@ -107,7 +107,8 @@ export default {
               this.name,
               this.parentPath,
               this.content,
-              this.hash
+              this.hash,
+              
             );
           },
           icon: "mdi-border-color"
@@ -170,12 +171,13 @@ export default {
       return root;
     }
   },
-  methods: {
-      setWidthViewFolder(){
-        setTimeout((self) => {
-            self.widthFolder=$(".layout").width() -$(".khSidebar").width();
-        }, 150,this);
-    },
+    methods: {
+ 
+        setWidthViewFolder(){
+            setTimeout((self) => {
+                self.widthFolder=$(".layout").width() -$(".khSidebar").width();
+            }, 150,this);
+        },
     rename(path, id, name, parentPath) {
       let self = this;
       if (id > 0) {
@@ -183,6 +185,7 @@ export default {
         $("#tb" + id).replaceWith(renameInput);
         $("#tb" + id).val(name);
         renameInput.on("blur", function(evt) {
+         
           $(this).replaceWith(
             "<p id=" +
               "tb" +
@@ -229,7 +232,7 @@ export default {
                 .catch(err => {
                   console.log("error from rename document api!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
             }else{
                 $(this).replaceWith(
                 "<p id=" +
@@ -291,7 +294,7 @@ export default {
                 .catch(err => {
                   console.log("error from update folder api!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
             }else{
                 $(this).replaceWith(
                 "<p id="+'tb' +
@@ -322,7 +325,7 @@ export default {
           .catch(err => {
             console.log("error from delete folder user api!!!", err);
           })
-          .always(() => {});
+          .finally(() => {});
       } else {
         knowledgeApi
           .deleteDirectory(path)
@@ -336,7 +339,7 @@ export default {
           .catch(err => {
             console.log("error from delete folder user api!!!", err);
           })
-          .always(() => {});
+          .finally(() => {});
       }
     },
     /**

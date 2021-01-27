@@ -2,7 +2,6 @@
   <div class="w-100 d-flex justify-space-between py-2">
     <div class="pl-3 symper-title" v-if="!sideBySideMode">
       {{headerTitle}}
-      <span class="fs-13" style="color:#00000060">({{$t("myItem.totalTask")}}: {{totalObject}})</span>
     </div>
     <div
       :class="{
@@ -199,9 +198,10 @@
             text
             small
             :disabled="taskObject.name.length == 0 ||
-                                    taskObject.dueDate.length == 0 ||
-                                    taskObject.assignee.length == 0"
+                      taskObject.dueDate.length == 0 ||
+                      taskObject.assignee.length == 0"
             @click="saveTask"
+            :loading="loading"
           >{{$t('common.add')}}</v-btn>
           <v-btn text small @click="dialog = false" class="mr-2">{{$t('common.close')}}</v-btn>
         </v-card-actions>
@@ -215,7 +215,6 @@
 import BPMNEngine from "./../../api/BPMNEngine";
 import icon from "../../components/common/SymperIcon";
 import datePicker from "../../components/common/datePicker";
-import vClickOutside from "v-click-outside";
 import userSelector from "./UserSelector";
 import TaskListFilter from "@/components/tasks/list/TaskListFilter.vue";
 import SymperDocSelect from "@/components/common/symperInputs/SymperDocumentSelect.vue";
@@ -253,11 +252,7 @@ export default {
     TaskListFilter: TaskListFilter,
     "symper-document-selec": SymperDocSelect
   },
-  props: {
-    totalObject:{
-      type:Number,
-      default:0
-    },
+  props: {    
     changeStatusMoreApproval:{
       type:Boolean,
       default:false,
@@ -287,6 +282,7 @@ export default {
   },
   data: function() {
     return {
+      loading:false,
       closeOnClick: true,
       taskStatus: "notDone",
       searchTaskKey: "",
@@ -367,9 +363,6 @@ export default {
       ]
     };
   },
-  directives: {
-    clickOutside: vClickOutside.directive
-  },
   mounted() {
   },
   methods: {
@@ -421,6 +414,7 @@ export default {
         });
     },
     async saveTask() {
+        this.loading=true;
         if (!this.taskObject.assignee) {
             this.$snotifyError(
             {},
@@ -458,14 +452,16 @@ export default {
         }
         data.description = JSON.stringify(description);
         let res = await BPMNEngine.addTask(JSON.stringify(data));
-            if (res.id != undefined) {
+        if (res.id != undefined) {
             this.selectedProcess = null;
             this.dialog = false;
             this.$emit("create-task", res);
             this.$snotifySuccess(this.$t("tasks.created"));
-            } else {
-                this.showError();
-            }
+        } else {
+            this.showError();
+        }
+        this.loading=false;
+
         }
     }
 };

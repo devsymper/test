@@ -36,7 +36,7 @@ let defaultTabConfig = {
     colHeaders: [],
     dataSchema: []
 };
-import { appManagementApi } from '../../../api/AppManagement';
+import { appManagementApi } from '@/api/AppManagement';
 import { HotTable, HotColumn } from "@handsontable/vue";
 import { util } from 'jointjs';
 
@@ -115,6 +115,12 @@ export default {
         tableSettings() {
             let setting = util.cloneDeep({
                 ...this.commonTableSetting,
+                afterChange(changes){
+                    if(changes){
+                        changes.forEach(([row, prop, oldValue, newValue]) => {
+                        });
+                    }
+                }
             });
             // setting.
             return setting;

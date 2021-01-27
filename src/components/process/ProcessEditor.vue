@@ -413,6 +413,7 @@ export default {
                     this.$refs.symperBpmn.changeTaskNodeToUserTaskNode(el.id);
                 }
             }
+            this.removeRedundantAttr();
             let xml = this.$refs.symperBpmn.getXML();
             xml = this.standardXMLToSave(xml);
             console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
@@ -430,14 +431,77 @@ export default {
                 }
             }
             let modelDataAsFlowable = this.getModelData();
+            let relatedDocs = this.getRelatedDocs();
             return {
                 name: modelDataAsFlowable.name,
                 content: xml,
                 description: modelDataAsFlowable.description,
                 version: 1,
                 configValue: JSON.stringify(jsonConfig),
-                processKey: modelDataAsFlowable.key
+                processKey: modelDataAsFlowable.key,
+                relatedDocs: relatedDocs
             };
+        },
+        getRelatedDocs(){
+            let mapNodeIdToDoc = {};
+            let startDocFound = false;
+            for(let nodeId in this.stateAllElements){
+                let node = this.stateAllElements[nodeId];
+                if(node.type == 'UserTask' || node.type == 'Task'){
+                    if(node.attrs.taskAction.value == 'submit' &&  node.attrs.formreference.value){
+                        mapNodeIdToDoc[nodeId] = {
+                            idDoc: node.attrs.formreference.value
+                        };
+                    }else if(node.type == 'Start'){
+                        if(node.attrs.formreference.value){
+                            mapNodeIdToDoc[nodeId] = {
+                                idDoc: node.attrs.formreference.value,
+                                hasStartDoc: true
+                            };
+                            startDocFound = true;
+                        }
+                    }
+                }
+            }
+            if(!startDocFound){
+                let nodesIdHaveStartDoc = this.getNodesHaveStartDoc();
+                for(let nodeId of nodesIdHaveStartDoc){
+                    mapNodeIdToDoc[nodeId].hasStartDoc = true;
+                }
+            }
+            return mapNodeIdToDoc;
+        },
+        getNodesHaveStartDoc(){
+            let allNodes = this.$refs.symperBpmn.getAllNodes();
+            let startNode = allNodes.filter((el) => {
+                return el.$type == "bpmn:StartEvent";
+            })[0];
+            if(startNode){
+                let firstUserTasks = [];
+                this.findFirstUserTask(startNode, firstUserTasks);
+                let rsl = [];
+                for(let node of firstUserTasks){
+                    let nodeAttr = this.stateAllElements[node.id];
+                    if(nodeAttr.attrs.taskAction.value == 'submit' && nodeAttr.attrs.formreference.value){
+                       rsl.push(node.id); 
+                    }
+                }
+                return rsl;
+            }else{
+                return [];
+            }
+        },
+        findFirstUserTask(node, rsl){
+            let nodeId = node.id;
+            let nodeAttr = this.stateAllElements[nodeId];
+            if(nodeAttr.type == 'UserTask' || nodeAttr.type == 'Task'){
+                rsl.push(node);
+                return;
+            }else{
+                for(let link of node.outgoing){
+                    this.findFirstUserTask(link.targetRef, rsl);
+                }
+            }
         },
         standardXMLToSave(xml){
             // &lt;![CDATA[pppppppppppppppppppp]]&gt;
@@ -447,6 +511,26 @@ export default {
             xml = xml.replace(/&lt;\/symper:symper_symper_string_tag&gt;/g,'</symper:symper_symper_string_tag>');
             xml = xml.replace(/&lt;symper:symper_symper_expression_tag&gt;/g,'<symper:symper_symper_expression_tag>');
             xml = xml.replace(/&lt;\/symper:symper_symper_expression_tag&gt;/g,'</symper:symper_symper_expression_tag>');
+
+            // Thêm tag đóng cho signalEvents
+            let signalEvents = xml.match(/<bpmn:signalEventDefinition(.*?)\/>/g);
+            if(signalEvents){
+                for(let item of signalEvents){
+                    let newItem = item.slice(0, item.length - 2) + '></bpmn:signalEventDefinition>';
+                    xml = xml.replace(item, newItem);
+                }
+            }
+
+            // Thêm thuộc tính cancelActivity cho boundaryEvent
+             let boundaryEvents = xml.match(/<bpmn:boundaryEvent(.*?)>/g);
+            if(boundaryEvents){
+                for(let item of boundaryEvents){
+                    if(item.indexOf('cancelActivity="') < 0){
+                        let newItem = item.slice(0, item.length - 1) + ' cancelActivity="true" >'
+                        xml = xml.replace(item, newItem);
+                    }
+                }
+            }
             return xml;
         },
         /**
@@ -458,6 +542,17 @@ export default {
                 let el = this.stateAllElements[elName];
                 if(el.type.includes('Gateway')){
                     this.setFlowsOrderForGateway(el);
+                }
+            }
+        },
+        // Loại bỏ các thuộc tính thừa trong attrs của các object trong diagram để sinh ra xml cho đúng với backend
+        removeRedundantAttr(){
+            let allEls = this.$refs.symperBpmn.getAllNodes();
+            for(let el of allEls){
+                if(el.$type == "bpmn:Collaboration"){
+                    delete el.$attrs.isExecutable;
+                }else if(el.$type == "bpmn:Participant"){
+                    el.processRef.isExecutable = true;
                 }
             }
         },
@@ -656,7 +751,9 @@ export default {
                             if(!mapSaveNodes[lane.id]){
                             }
                             poolToSave.childShapes.push(mapSaveNodes[lane.id]);
-                            this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
+                            if($.isArray(lane.flowNodeRef)){
+                                this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
+                            }
                         }
                     }else{
                         //tự Tạo một đối tượng lane mới do thư viện ko tạo trước
@@ -795,7 +892,7 @@ export default {
                                 attr.value
                             );
                             if(allNodesAttrs[key].needReformatValue){
-                               props[key] = reformatValueToStr(attr.value);
+                               props[key] = reformatValueToStr(props[key]);
                             }
                         } else {
                             props[key] = attr.value ? attr.value : '';
@@ -847,10 +944,10 @@ export default {
                 nodeType = "EventSubProcess";
             }
 
-            nodeType = mapLibNameToFlowableName[nodeType]
+            let transltedNodeType = mapLibNameToFlowableName[nodeType]
                 ? mapLibNameToFlowableName[nodeType]
                 : nodeType;
-            return nodeType;
+            return transltedNodeType;
         },
         handleNodeChangeProps(nodeData) {
             let nodeId = nodeData.id;
@@ -1101,6 +1198,22 @@ export default {
             }else if(nodeData.type == 'ServiceTask'){
                 this.setTaskActionableNodes(nodeData, 'serviceNotificationActionForElement',"serviceTask");
             }
+
+            this.setDefinitionRef(nodeData);
+        },
+        setDefinitionRef(nodeData){
+            let allEls = this.$refs.symperBpmn.getAllNodes();
+
+            let homeId = allEls.filter((el, idx) => {
+                if(el.$type == 'bpmn:Process' || el.$type == "bpmn:Collaboration"){
+                    return true;
+                }
+            })[0]['id'];
+            let homeData = this.getNodeData(homeId, 'BPMNDiagram');
+            let signaldefinitions = this.stateAllElements[homeId].attrs.signaldefinitions;
+            if(nodeData.attrs.signalref){
+                nodeData.attrs.signalref.options = signaldefinitions.getValue(signaldefinitions.value);
+            }
         },
         setItemForSelectProcessModel(){
             this.selectingNode.attrs.callactivitycalledelement.options = this.$store.state.process.allProcessModel;
@@ -1152,7 +1265,13 @@ export default {
             let allEls = this.$refs.symperBpmn.getAllNodes();
             let currBizNode = {};
             let submitTasks = [];
-
+            if(attrName == 'updateForElement'){
+                submitTasks.push({
+                    id: 'DOC_INSTANCE_FROM_STARTING_WORKFLOW',
+                    title: 'Doc instance from starting workflow',
+                    nodeData: {}
+                });
+            }
             allEls.filter((el, idx) => {
                 if(el.$type == 'bpmn:SequenceFlow'){
                     return true;
@@ -1254,6 +1373,10 @@ export default {
                 if(modelData.configValue){
                     this.restoreAttrValueFromJsonConfig(modelData.configValue);
                 }
+                
+                if(this.routeName == "cloneProcess"){
+                    this.createUniqueIdentifyForWorkflow();
+                }
             } catch (error) {
                 this.$snotifyError(
                     error,
@@ -1301,20 +1424,26 @@ export default {
                     }
                     formKeyToNodeIdMap[formKey].push(elName);
                 }
-
+            }
+            this.setColumnsForNodes();
+            this.setInitItemsForFormReferences(formKeyToNodeIdMap);
+        },
+        setColumnsForNodes(){
+            for(let name in this.stateAllElements){
+                let el = this.stateAllElements[name];
                 if(el.type.includes('StartNoneEvent') && el.attrs.formreference.value){
                     this.setControlsForBizKey(el.attrs.formreference.value);
                 }
 
-                if(el.type.includes('UserTask') 
+                if( el.type.includes('UserTask')
                     && el.attrs.taskAction.value == 'approval'){
                     this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.approvalForElement.value]);
                 }
-                 if(el.type.includes('ServiceTask') ){
+                
+                if(el.type.includes('ServiceTask') ){
                     this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.serviceNotificationActionForElement.value]);
                 }
             }
-            this.setInitItemsForFormReferences(formKeyToNodeIdMap);
         },
         async setInitItemsForFormReferences(map){
             let self = this;
@@ -1383,7 +1512,7 @@ export default {
             setTimeout((self) => {
                 let allEls = self.$refs.symperBpmn.getAllNodes();
                 for(let el of allEls){
-                    if(el.$type == "bpmn:Process"){
+                    if(el.$type == "bpmn:Process" || el.$type == "bpmn:Collaboration"){
                         let uniqueId = util.str.randomString(6)+'_'+Date.now();
                         uniqueId = uniqueId.toLowerCase();
                         self.$refs.symperBpmn.updateElementProperties(
@@ -1431,10 +1560,8 @@ export default {
     mounted(){
         this.resetAttrPanelHeight();
         this.calcDiagramHeight();
-        let uniqueId = util.str.randomString(6)+'_'+Date.now();
-        console.log(uniqueId.toLowerCase(), 'uniqueIduniqueIduniqueId');
         
-        if(this.action == 'create' || this.action == 'clone' ){
+        if(this.action == 'create'){
             this.createUniqueIdentifyForWorkflow();
         }
     },

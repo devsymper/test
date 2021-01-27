@@ -161,13 +161,7 @@ export const DEFAULT_POSITION_ATTRS = {
 		y: 5,
 		'font-family': 'Roboto'
 	},
-	'.collapse-expand-circle': {
-		r: CEConfig.radius,
-		fill: '#848484',
-		event: 'element:collapse',
-		// x: shapeSize.width / 2,
-		// y: shapeSize.height + CEConfig.stickHeight
-	},
+	
 	'.expand-text': {
 		x: shapeSize.width / 2 - CEConfig.fontSize / 2 + 2,
 		y: shapeSize.height + CEConfig.stickHeight + CEConfig.fontSize / 2 - 1,
@@ -225,15 +219,6 @@ export const positionMarkup = `<g class="rotatable symper-orgchart-node">
     <g class="btn add orgchart-action">
         <circle class="add"/>
         <text class="add">+</text>
-    </g>
-
-    <g class="btn-collapse-expand-hor">
-        <circle class="collapse-expand-circle"/>
-        <text class="expand-text">+</text>
-    </g>
-    <g class="btn-collapse-expand-ver">
-        <circle class="collapse-expand-circle"/>
-        <text class="expand-text">+</text>
     </g>
 
     <g class="btn remove orgchart-action">

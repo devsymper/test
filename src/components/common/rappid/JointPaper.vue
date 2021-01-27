@@ -67,7 +67,7 @@ export default {
 			model: this.graph,
 			width: this.width,
 			height: this.height,
-            background: '#ffffff',
+            background: '#F1F1F1',
             async: true,
             defaultAnchor: { name: 'modelCenter' },
             defaultConnectionPoint: { name: 'boundary' },
@@ -161,4 +161,8 @@ export default {
 </script>
 
 <style scoped>
+.symper-orgchart-paper >>> svg,
+.symper-orgchart-paper >>> .paper-scroller-background{
+	background-color: #f1f1f1	
+};
 </style>

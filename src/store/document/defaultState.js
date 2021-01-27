@@ -52,17 +52,16 @@ const defaultState = {
             listInputInDocument: {
 
             },
+            documentObjectId:null,
             docStatus: 'init',
             SQLLiteDB: {},
             rootControl: {},
             impactedFieldsList: {},
             impactedFieldsListWhenStart: {},
             rootChangeFieldName: null,
-            //biến phục vụ cho autocomplete trong table
-            currentTableInteractive: null, //chỉ ra table đang được tương tác
             currentControlActive: null, // biến chỉ ra control nào đang active
-            currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
             submitFormulas: null,
+            updateFormulas:null,
             listUser: null,
             localRelated: {},
             workflowVariable: {}, // các tham số của workflow khi submit doc
@@ -81,7 +80,24 @@ const defaultState = {
             readyLoaded: false, // biến đánh dấu công thức đã chạy xong mỗi lần thực thi hay chưa
             listTableRootControl: {}, // biến lưu lại các controk được coi là root trong trong table (trường hợp công thức ko có đầu vào thì là root)
             listControlMappingDatasets: {},
-            controlFormulaInfinity: {}
+            controlFormulaInfinity: {},
+            currentRowChangePivotMode:{
+                tableName:"",
+                key:"",
+                data:{}
+            },
+            /**
+             * lưu các control vi phạm trong submit
+             * key:controlName
+             * value:{ require:{
+             *      isValid:false,
+             *      message:'khong được bỏ trống'
+             * }}
+             */
+            dataInputBeforeChange:{},
+            mapValueToTextAutocompleteInput:{},
+            tableInteractive:null
+            
         }
     },
     detail: {
@@ -106,7 +122,8 @@ const defaultState = {
     },
     documentStyle: {
 
-    }
+	},
+	currentTitle:''
 };
 
 export default defaultState;

@@ -14,6 +14,7 @@
             <div class="sym-document-body">
                 <div class="sym-document-action">
                     <editor-action
+                    ref="actionView"
                     @document-action-save-document="openPanelSaveDocument"
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
@@ -33,10 +34,13 @@
                
             </div>
         </vue-resizable>
-        <div  class="sym-document__side-bar-right">
+        <div class="sym-document__side-bar-right">
             <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
-        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable" :defaultTablePivotConfig="defaultTablePivotConfig"/>
+        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance"
+        @add-columns-table="addColumnTable" 
+        :defaultTablePivotConfig="defaultTablePivotConfig"
+        :defaultTableGroupConfig="defaultTableGroupConfig"/>
         <PrintTableConfig v-if="isConfigPrint" ref="printTableConfig" @config-column-table-print="configColumnTablePrint"/>
         <auto-complete-control v-if="!isConfigPrint" ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel 
@@ -44,7 +48,7 @@
         :instance="keyInstance" 
         ref="saveDocPanel" 
         @check-name-document="checkBeforeDocumentNameChange"
-        @save-doc-action="validateControl"
+        @save-doc-action="validateControlAfterSave"
         @save-form-print-action="saveFormPrint"/>
         
         <FormModal 
@@ -103,6 +107,7 @@ import ControlNameRelated from "./../../views/document/items/ControlNameRelated.
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import MaterialIcon from "@/components/common/MaterialIcon.vue";
 import { GetControlProps,mappingOldVersionControlProps,
+        propsNotChangeForTaskManager,
         mappingOldVersionControlFormulas,getAPropsControl,
         getIconFromType,listControlNotNameProp } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
@@ -134,6 +139,8 @@ import 'tinymce/plugins/preview';
 import 'tinymce/plugins/fullscreen';
 import 'tinymce/plugins/paste';
 import 'tinymce/plugins/hr';
+import 'tinymce/plugins/charmap';
+
                                 
 // biến lưu chiều rộng editor trước khi resize 
 const ALL_CONTROL = "allControl"
@@ -200,13 +207,14 @@ export default {
             plugins: [
             'advlist autolink lists link image table print preview',
             ' fullscreen',
+            'charmap',
             'table paste hr'
             ],
             contextmenu: 'inserttable table | settingtable | dragTable',
             toolbar:
             'undo redo | fontselect fontsizeselect formatselect pageSize| bold italic forecolor backcolor | \
             alignleft aligncenter alignright alignjustify | \
-            bullist numlist indent hr | removeformat  table |  preview margin rotatePage mdiIcon',
+            bullist numlist indent hr | removeformat  table |  preview margin rotatePage mdiIcon |charmap',
             fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
             font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
             valid_elements: '*[*]',
@@ -305,7 +313,10 @@ export default {
                     self.detectBlurEditorEvent(e)
                 });
                 ed.on('keyup', function(e) {
-                    self.keyHandler(e)
+                    self.keyHandler(e, ed)
+                });
+                ed.on('keydown', function(e) {
+                    self.keyDownHandler(e, ed)
                 });
                 ed.on('paste', function(e) {
                     self.handlePasteContent(e);
@@ -328,6 +339,7 @@ export default {
                 self.initEditor()
             },
         });
+        this.handleCloseChrome();
     },
     created() {
         this.currentTabIndex = this.$store.state.app.currentTabIndex;        
@@ -353,9 +365,13 @@ export default {
             let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
             this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
+        const self = this;
         this.$evtBus.$on("before-close-app-tab", (data) => {
             if(this._inactive == true) return;
             if(this.routeName == 'editDocument'){
+                const message = self.$t('document.notification.leavePage');
+                let confirm = window.confirm(message);
+                self.$evtBus.$emit("close-edit-document", confirm);
                 documentApi.setEdittingDocument({id:this.documentId,status:0});
                 clearInterval(this.intervalSetEditting);
             }
@@ -391,7 +407,9 @@ export default {
             intervalSetEditting:null,
             currentTabIndex:null,
             dataPivotTable:{},
-            defaultTablePivotConfig:{}
+            dataGroupTable:{},
+            defaultTablePivotConfig:{},
+            defaultTableGroupConfig:{},
         }
     },
     
@@ -454,7 +472,8 @@ export default {
             for(let docName in data){
                 this.listDocument.push({name:docName,id:data[docName].id,title:data[docName].title});
             }
-        }
+        },
+        
     },
     methods:{
         /**
@@ -472,24 +491,31 @@ export default {
                 }
             })
         },
-        
+        /**
+         * Mở 1 dialog: 
+         * input: type - loại dialog (đánh dấu để kiểm tra lúc accept)
+         */
         showDialogEditor(type,title){
             this.dialog = true;
             this.typeDialog = type;
             this.titleDialog = title;
         },
+        /**
+         * Sự kiện khi ấn accept dialog
+         */
         acceptDialog(){
             this.dialog = false;
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
-            if(this.typeDialog == "baEditting"){
-                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
-            }
+            // if(this.typeDialog == "baEditting"){
+            //     this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
+            // }
         },
 
         /**
-         * Hàm xử lí khi drag control
+         * Hàm xử lí khi drag control trong doc thì cần cập nhật lại state của store khi kéo vào trong table
+         * bao gồm quá trình drag và drop
          */
         handleDragControlInEditor(e){
             this.editorCore.undoManager.add();
@@ -532,9 +558,10 @@ export default {
         },
         /**
          * Hàm xử lí khi paste nội dung vào editor
+         * nếu paste nội dung từ document editor version 1 thì tự động convert các thuộc tính, html...
+         * nếu copy/ paste các control trong doc hiện tại thì tự động nhân bản các thuộc tính (riêng id phải tạo mới) 
          */
         handlePasteContent(e){
-            e.preventDefault();
             var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
             content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
             content = content.replace(/<!--[^>]*-->/g,"");
@@ -542,6 +569,7 @@ export default {
             let contentEl = $(content);
             let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
             if(listControls.length > 0){
+                e.preventDefault();
                 for (let index = 0; index < listControls.length; index++) {
                     const controlEl = listControls[index];
                     let controlId = $(controlEl).attr('id');
@@ -616,7 +644,7 @@ export default {
             }  
         },
         /**
-         * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào doc nao
+         * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào document nào
          */
         checkBeforeControlNameChange(){
             let currentControl = this.editorStore.currentSelectedControl;
@@ -646,6 +674,9 @@ export default {
                 self.$refs.controlNameRelated.showDialog();
             }, 100,this);
         },
+        /**
+         * Hàm callback khi đóng panel check tên control, document liên quan đến các công thức
+         */
         afterClosePanel(from){
             if(from == "document")
             setTimeout((self) => {
@@ -671,6 +702,9 @@ export default {
             localStorage.setItem(HTML_CONTENT,content);
             localStorage.setItem(CODUMENT_PROPS,JSON.stringify(documentProperties));
         },
+        /**
+         * Xóa data ra khỏi local storage
+         */
         deleteLocalStorage(){
             localStorage.removeItem(ALL_CONTROL);
             localStorage.removeItem(HTML_CONTENT);
@@ -701,13 +735,24 @@ export default {
                 }
             }  
         },
+        /**
+         * Xóa control trong doc, xóa luôn trong store
+         */
         deleteControl(){
             let control = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected');
-            this.resetSelectControl()
-            control.remove();
-
+            let currentControl = this.editorStore.currentSelectedControl;
+            if(currentControl.properties.display.isPreventedConfig && currentControl.properties.display.isPreventedConfig.value){
+                this.$snotify({
+                                type: "warn",
+                                title: "Không thể xóa control này"
+                            }); 
+            }
+            else{
+                this.resetSelectControl();
+                control.remove();
+            }
         },
-        // ham tạo dialog của tinymce để cấu hình padding doc
+        // hàm tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){
             let self = this;
                 var left = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-left').slice(0, -2);
@@ -804,7 +849,7 @@ export default {
             }
         },
         /**
-         * Hàm xem trước submit form
+         * Hàm xử lí xem trước submit form
          */
         previewSubmitDocument(){
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
@@ -813,6 +858,7 @@ export default {
             this.prepareDataForPreview(fieldForSubmit);
             this.dataPreviewSubmit = {fields:fieldForSubmit,content:this.editorCore.getContent()}
         },
+        // xử lí dữ liệu để đẩy vào form submit
         prepareDataForPreview(fieldForSubmit){
             for(let controlId in fieldForSubmit){
                 for(let prop in fieldForSubmit[controlId].properties){
@@ -866,7 +912,6 @@ export default {
                     let allControl = this.editorStore.allControl;
                     let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
                     if(Object.keys(controlPrimaryKey).length > 1){
-                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         let allKey = Object.keys(controlPrimaryKey);
                         this.$snotify({
                                         type: "error",
@@ -902,7 +947,6 @@ export default {
                                 
                                 listName.push(name);
                             })
-                            this.$evtBus.$emit('document-editor-save-doc-callback');
                             this.$snotify({
                                             type: "error",
                                             title: "Tên một số control chưa hợp lệ",
@@ -914,7 +958,10 @@ export default {
             }
             
         },
-        
+        /**
+         * Khi ấn lưu doc -> Hàm kiểm tra các control đã đẩy đủ thông tin về tên và tiêu đề hay chưa
+         * nếu chưa thì ko được phép lưu
+         */
         validateControlBeforeSave(allControl,tableId){
             let controlPrimaryKey = {};
             for(let controlId in allControl){
@@ -950,6 +997,7 @@ export default {
         },
         /**
          * Hàm xử lí lấy dữ liệu các công thức để insert vào formulas service trước khi lưu
+         * output: dataPost cho syql service
          */
         getDataToSaveMultiFormulas(listControl){
             let listControlFormulas = {insert:{},update:{}};
@@ -996,8 +1044,6 @@ export default {
            return listControlFormulas;
             
         },
-
-
         setFormulasDataPost(listFormulasUpdate, listFormulas, formulaId, formulaValue, controlName, formulaType){
              if(formulaId != 0){
                 let item = {};
@@ -1040,9 +1086,10 @@ export default {
                         allControl[controlId].properties.dataFlowId.value = allControl[controlId].properties.dataFlowId.value.id;
                     }
                     else if(allControl[controlId].type == 'table'){
-                        if(allId.indexOf(controlId) === -1){
-                            for(let childControlId in allControl[controlId].listFields){
-                                let childControl = allControl[controlId].listFields[childControlId]
+                        if(allId.indexOf(controlId) !== -1){
+                            let listField = allControl[controlId].listFields;
+                            for(let childControlId in listField){
+                                let childControl = listField[childControlId]
                                 if(allId.indexOf(childControlId) === -1){
                                     delete allControl[controlId].listFields[childControlId];
                                     isCheck = true;
@@ -1050,31 +1097,53 @@ export default {
                                 if(!isCheck && childControl.type == 'user'){
                                     allUserControl['user'].push(childControl.properties.name.value)
                                 }
+                                let childControlFormulas = childControl.formulas;
+
+                                for(let formulaType in childControlFormulas){
+
+                                    if(formulaType != 'linkConfig'){
+                                        if(childControlFormulas[formulaType].value.trim() == ""){
+                                            // Khadm thêm việc check có childControlId trong listFields ko
+                                            // phục vụ trong trường hợp BA xóa một cột trong table
+                                            if(allControl[controlId].listFields[childControlId]){
+                                                allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                            }else{
+                                                console.warn("SYMPER DOCUMENT EDITOR ERROR: can not find control with id " + childControlId);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }   
-                }
-                if(!isCheck && allControl[controlId].type == 'user'){
-                    allUserControl['user'].push(allControl[controlId].properties.name.value)
-                }
-                let controlFormulas = allControl[controlId].formulas;
-                for(let formulaType in controlFormulas){
-                    if(formulaType != 'linkConfig'){
-                        if(controlFormulas[formulaType].value.trim() == ""){
-                            allControl[controlId].formulas[formulaType].formulasId = 0;
+                    if(!isCheck && allControl[controlId].type == 'user'){
+                        allUserControl['user'].push(allControl[controlId].properties.name.value)
+                    }
+                    let controlFormulas = allControl[controlId].formulas;
+                    for(let formulaType in controlFormulas){
+                        if(formulaType != 'linkConfig'){
+                            if(controlFormulas[formulaType].value.trim() == ""){
+                                allControl[controlId].formulas[formulaType].formulasId = 0;
+                            }
                         }
                     }
                 }
+                
                 
             }
             return {minimizeControl:allControl,userControls:allUserControl}
             
         },
    
-        // hoangnd: hàm gửi request lưu doc
+        /**
+         * Hàm thực thi api để lưu các công thức và lưu document sau khi check validate hợp lệ
+         * update formulas -> insert formulas -> done -> save document
+         * các công thức thêm mới sẽ được bind ngược lại vào dữ liệu đẩy lên để lưu doc
+         */
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
-            let allControl = minimizeControl.minimizeControl
+            let allControl = minimizeControl.minimizeControl;
+            console.log('allControl',allControl);
             let userControls = minimizeControl.userControls
             let documentProperties = util.cloneDeep(this.sDocumentProp);
             documentProperties = Object.assign({controlInfo:userControls},documentProperties)
@@ -1116,14 +1185,14 @@ export default {
                         }
                     }
                     else{
-                        this.$evtBus.$emit('document-editor-save-doc-callback')
+                        this.$refs.actionView.hideLoading();
                         this.$snotify({
                                 type: "error",
                                 title: "error from formulas serice, can't not save into formulas service!!!",
                                 text: res.message
                             });
                     }
-                }
+                } 
                 else{
                     if(this.routeName == "editDocument"){   //edit doc
                         this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
@@ -1134,8 +1203,9 @@ export default {
                 }
                 
             } catch (error) {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
-                this.$snotify({
+                thisCpn.$refs.actionView.hideLoading();
+                console.log('errorerror',error);
+                thisCpn.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
                             text: error
@@ -1147,8 +1217,14 @@ export default {
          */
         createDocument(dataPost){
             let thisCpn = this;
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
+                dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
+            if(this.dataGroupTable && Object.keys(this.dataGroupTable).length > 0){
+                dataPost['groupConfig'] = JSON.stringify(this.dataGroupTable);
+            }
             documentApi.saveDocument(dataPost).then(res => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1167,25 +1243,28 @@ export default {
                 }
             })
             .catch(err => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 thisCpn.$snotify({
                         type: "error",
                         title: "can not save document",
                     });
             })
-            .always(() => {
+            .finally(() => {
             });
         },
         /**
          * Hàm gọi api edit document
          */
         editDocument(dataPost){
-            if(Object.keys(this.dataPivotTable).length > 0){
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
                 dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
+            if(this.dataGroupTable && Object.keys(this.dataGroupTable).length > 0){
+                dataPost['groupConfig'] = JSON.stringify(this.dataGroupTable);
             }
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1202,12 +1281,12 @@ export default {
                                 if(data.length > 0){
                                     let curBa = data[0];
                                     this.dialog = true;
-                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này";
                                     this.typeDialog = "baEditting";
                                     return false;
                                 }
                             }
-                        }).always({}).catch({})
+                        }).finally({}).catch({})
                     }
                     else{
                         thisCpn.$snotify({
@@ -1221,7 +1300,7 @@ export default {
                 
             })
             .catch(err => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 thisCpn.$snotify({
                     type: "error",
                     title: "error from edit document api",
@@ -1229,22 +1308,24 @@ export default {
 
                 });
             })
-            .always(() => {
+            .finally(() => {
             });
         },
-      
-        validateControl(){
+        /**
+         * hàm validate lại cntrol lần nữa sau khi ấn lưu doc ở modal save doc
+         */
+        validateControlAfterSave(){
+            this.$refs.actionView.showLoading();
             let thisCpn = this;
             let listControlName = [];
             this.listMessageErr = [];
             //check trung ten control
             $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
             if($('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
-                
                 this.saveDocument();
             }
             else{
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                this.$refs.actionView.hideLoading();
                 this.$snotify({
                                 type: "error",
                                 title: "Thông tin control chưa hợp lệ",
@@ -1253,37 +1334,36 @@ export default {
             }
         },
         
-       
-        // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
-        validateFormulasInControl(control,listControlName){
-            // check control Name trong cong thức
-            for(let f in control.formulas){
-                if(control.formulas[f].value != ""){
-                    let formula = control.formulas[f].value;
-                    let controlName = formula.match(/(?<=f.)(\w+)/g);
-                    if(controlName != null)
-                        for(let i = 0; i< controlName.length; i++){
-                            if(listControlName.indexOf(controlName[i]) === -1){
-                                let message = "Không tồn tại control "+controlName[i]+" trong công thức "+f+" của control "+control.properties.name.value;
-                                if(this.listMessageErr.indexOf(message) === -1){
-                                    this.listMessageErr.push(message);
-                                }
-                            }
-                        }
-                }
-                
-            }
-        },
-        // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
+        // hàm xử lí thêm các cột vào trong control table khi lưu ở popup tablesetting
         addColumnTable(data){
             let listRowData = data.listRows;
             let tablePivotConfig = data.tablePivotConfig;
+            let tableGroupConfig = data.tableGroupConfig;
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
             let currentControl = this.editorStore.currentSelectedControl;
-            if(currentControl.properties.name.name.value){
+            if(currentControl.properties.name.name.value && tablePivotConfig){
+                if(!this.dataPivotTable){
+                    this.dataPivotTable = {};
+                }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
+            }
+            else{
+                if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
+                    delete this.dataPivotTable[currentControl.properties.name.name.value];
+                }
+            }
+            if(currentControl.properties.name.name.value && tableGroupConfig){
+                if(!this.dataGroupTable){
+                    this.dataGroupTable = {};
+                }
+                this.dataGroupTable[currentControl.properties.name.name.value] = tableGroupConfig;
+            }
+            else{
+                if(this.dataGroupTable && this.dataGroupTable[currentControl.properties.name.name.value]){
+                    delete this.dataGroupTable[currentControl.properties.name.name.value];
+                }
             }
             let thead = '';
             let tbody = '';
@@ -1291,6 +1371,12 @@ export default {
                 let row = listRowData[i];
                 let type = row.type;
                 let control = GetControlProps(type);
+                if(row.oldProps){
+                    control.properties = row.oldProps;
+                }
+                if(row.formulas){
+                    control.formulas = row.formulas;
+                }
                 control.properties.name.value = row.name;
                 control.properties.title.value = row.title;
                 let controlEl = $(control.html);
@@ -1304,7 +1390,7 @@ export default {
             elements.find('tbody tr').html(tbody);
         },
 
-        // ham drag table trong editor
+        // Hàm hiển thị khung drag table trong editor
         showDragTable(e){
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
             if(elements.is('.s-control-table')){
@@ -1470,17 +1556,25 @@ export default {
                         }
                         let idControl = $(tbody[i].outerHTML).find('.s-control').attr('id');
                         let typeControl = $(tbody[i].outerHTML).find('.s-control').attr('s-control-type');
-                        let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
-                        let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
-                        let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
+                        let controlObj = this.editorStore.allControl[tableId]['listFields'][idControl];
+                        let name = controlObj.properties.name.value;
+                        let title = controlObj.properties.title.value;
+                        let row = {
+                                    columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl, 
+                                    oldProps:controlObj.properties, formulas: controlObj.formulas
+
+                                }
                         listData.push(row)
 
                     }
                 }
                 this.$refs.tableSetting.showDialog();
                 let currentControl = this.editorStore.currentSelectedControl;
-                if(currentControl.properties.name.name.value && this.dataPivotTable[currentControl.properties.name.name.value]){
+                if(currentControl.properties.name.name.value && this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
                     this.defaultTablePivotConfig = this.dataPivotTable[currentControl.properties.name.name.value];
+                }
+                if(currentControl.properties.name.name.value && this.dataGroupTable && this.dataGroupTable[currentControl.properties.name.name.value]){
+                    this.defaultTableGroupConfig = this.dataGroupTable[currentControl.properties.name.name.value];
                 }
                 this.$refs.tableSetting.setListRow(listData);
             }
@@ -1507,6 +1601,16 @@ export default {
                 if(curDataFlow && curDataFlow.length > 0)
                 properties['dataFlowId'].value = curDataFlow[0];
                 properties['dataFlowId'].options = this.listDataFlow;
+            }
+            console.log(properties,'propertiesproperties');
+            if(this.$getRouteName() == 'editDocument' && properties.isPreventedConfig){
+                properties.isPreventedConfig.hidden = true;
+            }
+            if(properties.isPreventedConfig && properties.isPreventedConfig.value){
+                for (let index = 0; index < propsNotChangeForTaskManager.length; index++) {
+                    const prop = propsNotChangeForTaskManager[index];
+                    properties[prop].disabled = true;
+                }
             }
             this.$store.commit(
                 "document/addCurrentControl",
@@ -1562,9 +1666,10 @@ export default {
             
         },
         // hoangnd: hàm nhận sự kiện keyup của editor 
+        // gõ // để mở autocomplete thêm control
         // 191: / để thêm control
         
-        keyHandler(event)
+        keyHandler(event, ed)
         {
             let thisCpn = this;
             if ( event.keyCode == 191 )
@@ -1598,6 +1703,34 @@ export default {
                 }
                 this.lastKeypressTime = thisKeypressTime;
             }
+           
+            
+        },
+         /**
+             * detect keyup delete
+             * không cho xóa các control đã được đánh dấu ko được chỉnh sửa
+             */
+        keyDownHandler(e,ed){
+            if(event.keyCode == 8){
+                let allData = this.editorCore.undoManager.data;
+                let dataDeleted = allData[allData.length - 1];
+                let curNode = $(ed.selection.getNode());
+                let allControlInNode = curNode.find('.s-control:not(.s-control-table .s-control)');
+                for (let index = 0; index < allControlInNode.length; index++) {
+                    let controlEl = $(allControlInNode[index]);
+                    let controlId = controlEl.attr('id');
+                    let controlStore = this.editorStore.allControl[controlId];
+                    if(controlStore.properties.isPreventedConfig && controlStore.properties.isPreventedConfig.value){
+                         this.$snotify({
+                                type: "warn",
+                                title: "Không thể xóa nội dung chứa control hệ thống"
+                            }); 
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            }
+            
         },
         /**
          * Hàm xử lí sự kiên click vào tab bên trên header của control tab/page để chuyển tab
@@ -1762,14 +1895,14 @@ export default {
         /**
          * Hàm nhận sự kiện ném ra từ compon material icon sau khi chọn icon
          */
-        selectedIcon(data){
-            let context = data.context
+         selectedIcon(data){
+            let context = this.$refs.materialIconPicker.getContext()
             if(context == 'toolbar'){
-                 this.editorCore.insertContent('&nbsp;<span class="mdi '+data.icon+'"></span>&nbsp;');
+                 this.editorCore.insertContent('&nbsp;<span class="mdi '+data+'"></span>&nbsp;');
             }
             else{
                 this.currentTabSelectedIcon.removeClass();
-                this.currentTabSelectedIcon.addClass('icon-page mdi '+data.icon);
+                this.currentTabSelectedIcon.addClass('icon-page mdi '+data);
             }
             this.$refs.materialIconPicker.hide()
             
@@ -1823,8 +1956,10 @@ export default {
                 let style = $(value).attr('style');
                 if(type == 'text') type = 'textInput'
                 if(type == 'persent') type = 'percent'
+                if(type == 'datetime') type = 'dateTime'
+                if(type == 'file-upload') type = 'fileUpload'
                 let controlV2 = GetControlProps(type);
-                let controlEl = $(controlV2.html); 
+                let controlEl = $(controlV2.html);
                 var inputid = 's-control-id-' + Date.now();
                 controlEl.attr('id', inputid).attr('style',style);
                 controlEl.replaceAll($(value))
@@ -1862,6 +1997,7 @@ export default {
                         if(type == 'text') type = 'textInput'
                         if(type == 'persent') type = 'percent'
                         if(type == 'file-upload') type = 'fileUpload'
+                        if(type == 'datetime') type = 'dateTime'
                         console.log(type);
                         
                         let childControlV2 = GetControlProps(type);
@@ -1921,7 +2057,7 @@ export default {
 
 
         /**
-         * Hàm set style cho form th lưu trên db
+         * Hàm set style cho form
          */
         setDefaultStyle(defaultStyle){
             if(defaultStyle){
@@ -1938,15 +2074,12 @@ export default {
                     });
                     this.setPageSize(this.contentStyle.width, this.contentStyle.height, this.contentStyle.type)
                 } catch (error) {
-                    
+                    console.warn(error);
                 }
-                
             }
-            
-
         },
         async checkAllowEditDocument(document){
-            let updateTime = new Date(document.updateAt).getTime();
+            let updateTime = new Date(document.lastEditAt).getTime();
             let timeDiff = Date.now() - updateTime;
             if(timeDiff > 4000){
                 /**
@@ -1955,7 +2088,7 @@ export default {
                 documentApi.setEdittingDocument({id:self.documentId});
                 this.intervalSetEditting = setInterval((self) => {
                     documentApi.setEdittingDocument({id:self.documentId});
-                }, 2000,this);
+                }, 3000,this);
                 return true;
             }else{
                 if(Number(document.userEditting) != 0  && this.baInfo && this.baInfo.id != document.userEditting){
@@ -1966,12 +2099,14 @@ export default {
                             if(data.length > 0){
                                 let curBa = data[0];
                                 this.dialog = true;
-                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                this.$refs.actionView.hideSaveBtn(curBa.name);
+                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này.";
                                 this.typeDialog = "baEditting";
                                 return false;
                             }
                         }
                     } catch (error) {
+                        this.$refs.actionView.hideSaveBtn('');
                         return false;
                         console.log(error);
                     }
@@ -1979,16 +2114,16 @@ export default {
             }
             return true;
         },
-        // hàm gọi request lấy thông tin của document khi vào edit doc
+        /**
+         * hàm gọi request lấy thông tin của document khi vào edit doc
+         * Thông tin bao gồm cấu trúc html của doc, các thuộc tính và công thức của control
+         */
         async getContentDocument(){
             if(this.documentId != 0){
                 let res = await documentApi.detailDocument(this.documentId);
-                let checkEditting = await this.checkAllowEditDocument(res.data.document);
-                if(checkEditting == false){
-                    return;
-                }
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
+                        await this.checkAllowEditDocument(res.data.document);
                         this.setDocumentProperties(res.data.document);
                     }
                     let content = res.data.document.content;
@@ -2000,6 +2135,7 @@ export default {
                     }
                     this.editorCore.setContent(content);
                     this.dataPivotTable = res.data.pivotConfig;
+                    this.dataGroupTable = res.data.groupConfig;
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
                         let id = $(this).attr('id')
                         $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '">');
@@ -2042,6 +2178,7 @@ export default {
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
             console.log("ádsadasd",fields);
+            let thisCpn = this;
             for(let controlId in fields){
                 if(!fields[controlId].hasOwnProperty('type')){
                     continue;
@@ -2059,9 +2196,9 @@ export default {
                         if(type == 'dataFlow' && k == 'dataFlowId'){
                             properties[k].value = {id:fields[controlId]['properties'][k]};
                         }
-                        else if(k == 'mapParamsDataflow'){
+                        else if(type == 'dataFlow' && k == 'mapParamsDataflow'){
                             properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
-                            properties[k]['value'] = fields[controlId]['properties']['value'];
+                            properties[k]['value'] = fields[controlId]['properties'][k];
                         }
                         else{
                             if(typeof fields[controlId]['properties'][k] != "object"){
@@ -2078,13 +2215,22 @@ export default {
                     $.each(formulas,function(k,v){
                         if(k == 'linkConfig'){
                             if(fields[controlId]['formulas'][k]){
-                                formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData'];
+                                let configData = fields[controlId]['formulas'][k]['configData'];
+                                if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                    for (let index = 0; index < configData.length; index++) {
+                                        configData[index]['formula']['id'] = 0;
+                                        
+                                    }
+                                }
+                                formulas[k]['configData'] = configData;
                             }
                         }
                         else{
                             if(fields[controlId]['formulas'][k]){
                                 formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
-                                formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                    formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                }
                             }
                             if(k == 'autocomplete'){
                                 formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
@@ -2119,13 +2265,30 @@ export default {
                         })
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
-                                if(listField[childFieldId]['formulas'][k]){
-                                    childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
-                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
+                                if(k == 'linkConfig'){
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        let configData = listField[childFieldId]['formulas'][k]['configData'];
+                                        if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                            for (let index = 0; index < configData.length; index++) {
+                                                configData[index]['formula']['id'] = 0;
+                                                
+                                            }
+                                        }
+                                        childFormulas[k]['configData'] = configData;
+                                    }
                                 }
-                                if(k == 'autocomplete'){
-                                    childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                else{
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0];
+                                        if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                            childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0];
+                                        }
+                                    }
+                                    if(k == 'autocomplete'){
+                                        childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                    }
                                 }
+                                
                             })
                         }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}
@@ -2751,6 +2914,7 @@ export default {
                
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
+                
                 if(!control){
                     this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
                     return;
@@ -2782,10 +2946,6 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,'tabPage');
             }
         },
-
-
-
-
         // ************************* Các hàm xử lí liên quan đến cấu hình in *******************************//
         // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
         configColumnTablePrint(listRowData){
@@ -2846,12 +3006,13 @@ export default {
         },
         // mở modal lưu , edit doc
         saveFormPrint(docProps){
+            this.$refs.actionView.showLoading();
             if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
                 let dataPost = {documentId:this.documentId,title:docProps.title.value,
                                 content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
-                    this.$evtBus.$emit('document-editor-save-doc-callback')
+                    thisCpn.$refs.actionView.hideLoading();
                     if (res.status == 200) {
                         thisCpn.editorCore.remove();
                         thisCpn.$router.push('/documents');
@@ -2869,13 +3030,13 @@ export default {
                     }
                 })
                 .catch(err => {
-                    this.$evtBus.$emit('document-editor-save-doc-callback')
+                    thisCpn.$refs.actionView.hideLoading();
                     thisCpn.$snotify({
                             type: "error",
                             title: "can not save form print document",
                         });
                 })
-                .always(() => {
+                .finally(() => {
                 });
             }
             else{
@@ -2904,7 +3065,7 @@ export default {
                             title: "can not save form print document",
                         });
                 })
-                .always(() => {
+                .finally(() => {
                 });
             }
             
@@ -2966,8 +3127,16 @@ export default {
         },
         beforeCloseSubmit(){
             this.isShowPreviewSubmit = false;
+        },
+         // xử lý khi tắt tab chrome
+        handleCloseChrome(){
+            $(window).on("beforeunload", function(e) {
+                let dialogText = 'Are you sure you want to close the Window?';
+                e.returnValue = dialogText;
+                return dialogText;
+            });
         }
-
+       
     },
     
 }

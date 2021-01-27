@@ -1,6 +1,6 @@
 <template>
   <div class="app-details">
-	  	 <VuePerfectScrollbar :style="{height: listItemHeight}">
+	  	 <PerfectScrollbar :style="{height: listItemHeight}">
 			<div v-for="(itemT,i) in sAppModule" :key="i" class="app-item">
 					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{$t(itemT.title) }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
@@ -14,7 +14,7 @@
 										<template v-slot:activator="{ on, attrs }">
 											<div class="title-document-enduser" 	
 												v-bind="attrs"
-												v-on="on" >
+												v-on="on">
 												<span >{{childItem.title}}</span> 
 											</div>
 										</template>
@@ -31,7 +31,7 @@
 										</template>
 										<span style="font:13px roboto">{{childItem.name}}</span> 
 									</v-tooltip>
-									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
+									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite == true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
 							</li>
 							<li v-else>
@@ -63,14 +63,18 @@
 							</li>
 					</ul>
 			</div>	
-		</VuePerfectScrollbar>
-		<ContextMenu ref="contextMenu" :sideBySide="sideBySide" />	
+		</PerfectScrollbar>
+		<ContextMenu ref="contextMenu" 
+			:sideBySide="sideBySide"
+			:allAppMode="false"
+		/>	
   </div>
 </template>
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './ContextMenu.vue';
 import {appManagementApi} from './../../api/AppManagement.js'
+import PerfectScrollbar from '@/components/common/PerfectScrollBar'
 export default {
  data: function() {
         return {
@@ -115,7 +119,8 @@ export default {
 	},
 	components:{
 		ContextMenu,
-		VuePerfectScrollbar
+		VuePerfectScrollbar,
+		PerfectScrollbar
 	},
 	mounted(){
    },
@@ -194,6 +199,7 @@ export default {
 					}
 				})
 			}
+			 
 			if(listItem.dashboard.item.length > 0){
 				listItem.dashboard.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){

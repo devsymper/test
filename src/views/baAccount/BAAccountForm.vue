@@ -54,12 +54,12 @@ export default {
                     }
                 }
             }else if(this.action == 'updatePassword'){
-                dataToSave.password = this.allInputs.newPassword.value;
+                dataToSave.newPassword = this.allInputs.newPassword.value;
                 dataToSave.oldPassword = this.allInputs.oldPassword.value;
                 dataToSave.confirmNewPassword = this.allInputs.confirmNewPassword.value;
                 let isValidValue = this.validatePassword(dataToSave);
                 if(isValidValue){
-                    let res = await userApi.updateBAAccountPassword(this.itemData.id, dataToSave);
+                    let res = await userApi.changePassBA(dataToSave.oldPassword,dataToSave.newPassword);
                     if(res.status == 200){
                         this.$snotifySuccess("Update BA password successfully");
                     }else{
@@ -86,7 +86,7 @@ export default {
 
         validatePassword(data){
             let rsl = true;
-            if(data.confirmNewPassword != data.password){
+            if(data.confirmNewPassword != data.newPassword){
                 rsl = false;
                 this.$snotifyError({}, "New password not match");
             }

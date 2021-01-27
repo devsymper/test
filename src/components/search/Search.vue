@@ -29,7 +29,7 @@
                     @mousemove="showDotButton(searchItems.indexOf(item))" 
                     class="pl-7 search-menu" 
                     :attrs="attrs">
-                    <SymperAvatar 
+                   <SymperAvatar 
                         v-if="item.type == 'account'" 
                         style="height: 35px!important; width:35px!important; margin-left:-5px" 
                         class="mr-4" :userId="item.userId"/>
@@ -45,7 +45,6 @@
                         style=" margin-left: 0.5rem" 
                             class="item-title" v-html="item.displayName"
                              >
-                            
                         </v-list-item-title>
 
                         <v-list-item-subtitle v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'&&item.type!='account'&&item.type!='knowledge'"
@@ -60,7 +59,10 @@
                             class="item-subtitle" v-html="item.email">
                         </v-list-item-title>
                     </v-list-item-content>
-                    <v-list-item-action v-show="item.enable && item.actions.length>0" class="dot">
+                    <v-list-item-action 
+						v-show="item.actions.length > 0" 
+						class="dot"
+					>
                         <v-menu
                             bottom offset-y 
                             transition="scale-transition" >
@@ -72,9 +74,11 @@
                             </template>
                             <v-list>
                                  <v-list-item-title v-for="(itemsAction,index) in item.actions" :key="index" 
-                                        class="fm fs-13 mt-1 action-button ml-2" style="width:130px!important" 
+                                        class="fm fs-13 mr-1 mt-1 action-button ml-2" style="width:130px!important" 
                                         @click="gotoPage(itemsAction,item.type,item.id,item.displayName)">
-                                             {{$t('objects.listAction.'+itemsAction)}}
+                                             <div  style="cursor: pointer; padding:4px">
+												 {{$t('objects.listAction.'+itemsAction)}}
+											 </div>
                                     </v-list-item-title>
                             </v-list>
                         </v-menu>
@@ -85,18 +89,18 @@
     </v-combobox>
 </template>
 <script>
-import _ from 'lodash';
+import _debounce from 'lodash/debounce';
+import _groupBy from 'lodash/groupBy';
 import SymperAvatar from '../../components/common/SymperAvatar'
 import searchApi from "../../api/search.js";
+import { parseJSON } from 'jquery';
 export default {
     components:{
-        SymperAvatar
+		SymperAvatar,
     },
      data: function () {
         return {
             value: '',
-            syqlId:{},
-            syqlIdInfo:'',
             menu:[],
             searchItemsAll:[],
             searchItems: [],
@@ -134,15 +138,13 @@ export default {
                 },
                 process_definition:{
                 },
-                // syql:{
-                // },
                 application_deninition:{
                 }
             }
         };
     },
      created: function () {
-        this.debouncedGetValueSearch = _.debounce(this.getValueSearch, 250)
+        this.debouncedGetValueSearch = _debounce(this.getValueSearch, 200)
     },
      watch: {
         value(){
@@ -214,12 +216,16 @@ export default {
                                 }else if(data.type=='document_definition'){
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
                                      returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
-                                     // lấy api của tên
+                                }else if(data.type=='document_instance'){
+                                     let description = JSON.parse(JSON.parse(data.values).new);
+                                     returnObjSearch.displayName = data.values?JSON.parse(data.values).document_name:"Không có tên";
+                                     returnObjSearch.description = data.values?description.description:'Chưa điền mô tả';
+                                
                                  }else if(data.type=='workflow_definition'||data.type=="knowledge"){
-                                     returnObjSearch.displayName = data.new.name?data.new.name:"Không có tên";
-                                     returnObjSearch.description = data.new.description?data.new.description:'Chưa điền mô tả';
-                                     // lấy api của tên
-                                }else{
+                                     returnObjSearch.displayName = data.name?data.name:"Không có tên";
+                                     returnObjSearch.description = data.description?data.description:'Chưa điền mô tả';
+                                 }
+                                else{
                                      returnObjSearch.displayName = data.name? data.name:"Không có tên";
                                 }
                                 const keys = Object.keys(data);
@@ -251,10 +257,9 @@ export default {
                                      returnObjSearch.searchField = "Nguồn: "+data.objectType+ " -Ngày bình luận: " + (data.updatedAt?data.updatedAt:data.createdAt);
                                       returnObjSearch.description = "Nguồn: "+data.objectType+ " -Ngày bình luận: " + (data.updatedAt?data.updatedAt:data.createdAt);
                                 }
-                               
                                 return returnObjSearch;
                             })
-                            const groupByType = _.groupBy(normalizedData, 'type');
+                            const groupByType = _groupBy(normalizedData, 'type');
                             const searchData = [];
                             const allData = [];
                             Object.keys(groupByType).forEach(type => {
@@ -266,7 +271,6 @@ export default {
                             })
                             self.searchItemsAll = allData.filter(data=>data.type!='syql'&&data.group!='syql');
                             self.searchItems = searchData.filter(data=>data.type!='syql'&&data.group!='syql');
-                            // debugger
                             self.$store.commit('search/setSearch',  self.searchItems);
                             self.$store.commit('search/setSearchAll', allData);
                             self.$store.commit('search/setCountResult', self.searchItems.filter(x=>x.type).length);
@@ -351,7 +355,7 @@ export default {
     margin-top: 0 !important;
     padding-top: 6px !important;
 }
-.dot:hover{
+.dot{
  color:black;
 }
 .action-button:hover{

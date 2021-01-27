@@ -21,85 +21,85 @@
             ></listHeader>
             <v-divider v-if="!sideBySideMode" ></v-divider>
             <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
-            <v-col cols="12" class="list-tasks pt-0 pb-0">
-                <v-row>
-                <v-col
-                    :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
-                    class="pl-3 fs-13 font-weight-medium"
-                >{{$t("tasks.header.name")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'name')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['name'] && filteredColumns['name']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
+                <v-col cols="12" class="list-tasks pt-0 pb-0">
+                    <v-row>
+                    <v-col
+                        :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
+                        class="pl-3 fs-13 font-weight-medium"
+                    >{{$t("tasks.header.name")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'name')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['name'] && filteredColumns['name']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="2"
+                        v-if="!sideBySideMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("tasks.header.userCreate")}}
+                        <!-- <v-icon @click="showFilterColumn($event,'startTime')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon> -->
+                    </v-col>
+                    <v-col
+                        cols="2"
+                        v-if="!sideBySideMode"
+                        class="fs-13 font-weight-medium"
+                    >
+                        {{$t("tasks.header.createDate")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'startTime')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['startTime'] && filteredColumns['startTime']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="2"
+                        v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("tasks.header.app")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'processDefinitionName')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['processDefinitionName'] && filteredColumns['processDefinitionName']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="1"
+                        v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("tasks.header.status")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'isDone')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['isDone'] && filteredColumns['isDone']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="1"
+                        v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("common.add")}}</v-col>
+                    </v-row>
                 </v-col>
-                <v-col
-                    cols="2"
-                    v-if="!sideBySideMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.userCreate")}}
-                    <!-- <v-icon @click="showFilterColumn($event,'startTime')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon> -->
-                </v-col>
-                <v-col
-                    cols="2"
-                    v-if="!sideBySideMode"
-                    class="fs-13 font-weight-medium"
-                >
-                    {{$t("tasks.header.createDate")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'startTime')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['startTime'] && filteredColumns['startTime']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
-                </v-col>
-                <v-col
-                    cols="2"
-                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.app")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'processDefinitionName')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['processDefinitionName'] && filteredColumns['processDefinitionName']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
-                </v-col>
-                <v-col
-                    cols="1"
-                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.status")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'isDone')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['isDone'] && filteredColumns['isDone']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
-                </v-col>
-                <v-col
-                    cols="1"
-                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("common.add")}}</v-col>
-                </v-row>
-            </v-col>
             </v-row>
             <v-divider></v-divider>
 
             <VuePerfectScrollbar
             v-if="!loadingTaskList"
             @ps-y-reach-end="handleReachEndList"
-            :style="{height: listTaskHeight+'px'}"
+            :style="{height: (listTaskHeight-40)+'px'}"
             >
                 <div
                     v-for="(workGroup, idex) in groupAllProcessInstance"
@@ -129,7 +129,7 @@
                         :style="{
                             minHeight: '50px'
                         }"
-                        @click="selectObject(obj, idx,idex)"
+                        @click="selectObject(obj, idx , idex)"
                         style="border-bottom: 1px solid #eeeeee!important;"
                             
                     >
@@ -230,13 +230,17 @@
                     </v-row>
                 </div>
             </VuePerfectScrollbar>
-            <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
-            <v-skeleton-loader
-            v-if="loadingMoreTask"
-            ref="skeleton"
-            :type="'table-tbody'"
-            class="mx-auto"
-            ></v-skeleton-loader>
+            <preloader 
+                v-if="loadingTaskList"
+                :style="{height: (listTaskHeight - 50)+'px!important'}"
+                class="mx-auto" />
+            <Pagination
+                @on-change-page="getListByPage"
+                @on-change-page-size="getListByPage"
+                :totalVisible="sideBySideMode ? 3 : 7"
+                :showRange="!sideBySideMode"
+                class="mt-2 px-2" :total="totalObject"/>
+      
         </v-col>
         <v-col
             :cols="!sideBySideMode ? 0 : 8"
@@ -267,23 +271,21 @@
 
 <script>
 import BPMNEngine from "@/api/BPMNEngine";
-import icon from "@/components/common/SymperIcon";
 import workDetail from "./WorkDetail";
 import listHeader from "./ListHeader";
-import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../../plugins/util";
 import { appConfigs } from "../../../configs";
 import { taskApi } from "@/api/task.js";
 import TableFilter from "@/components/common/customTable/TableFilter.vue";
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
+import Pagination from "@/components/common/Pagination.vue";
 
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
 } from "@/components/process/processAction";
 import infoUser from "./../InfoUser";
-import ShowListTrashVue from '../../../views/document/trash/ShowListTrash.vue';
 export default {
     computed: {
         fileCountPerTask(){
@@ -295,8 +297,6 @@ export default {
         groupAllProcessInstance() {
             let allUserById = this.$store.getters['app/mapIdToUser'];
             let allPrcess = this.data;
-            console.log("allPrcessallPrcessallPrcess",allPrcess);
-
             const groups = allPrcess.reduce((groups, work) => {
                 let date;
                 work.startUserName = '';
@@ -355,13 +355,12 @@ export default {
     },
     name: "listWork",
     components: {
-        icon: icon,
         listHeader: listHeader,
-        userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         workDetail,
         infoUser,
         TableFilter,
+        Pagination
     },
     watch:{
         sideBySideMode(vl){
@@ -369,7 +368,27 @@ export default {
                 this.$store.dispatch('file/getWaitingFileCountPerObj');
                 this.$store.dispatch('comment/getWaitingCommentCountPerObj');
             }
-        }
+		},
+		groupAllProcessInstance:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				let self = this
+				if(arr.length > 0){
+					if(this.$route.params.processInstanceId){
+						for(let i in self.groupAllProcessInstance){
+							self.groupAllProcessInstance[i].works.forEach(function(e){
+								if(e.id == self.$route.params.processInstanceId){
+									self.selectObject(e, i , i)
+								}
+							})
+						}
+
+					}
+				}
+				
+			}
+		}
     },
     props: {
         compackMode: {
@@ -430,6 +449,7 @@ export default {
     },
     data: function() {
         return {
+            debounceGetData:null,
             data:[],
             page: 1, // trang hiện tại
             pageSize: 50,
@@ -479,7 +499,7 @@ export default {
         };
     },
     created() {
-        this.getData();
+		this.getData();
     },
     mounted() {
         let self = this;
@@ -489,9 +509,15 @@ export default {
                 self.getData();
             })
             .catch(err => {});
-        self.reCalcListTaskHeight();
+		self.reCalcListTaskHeight();
+		
     },
     methods: {
+        getListByPage(data){
+            this.page = data.page;
+            this.pageSize = data.pageSize;
+            this.getData();
+        },
         columnFilter(){
             if (this.tableFilter.currentColumn.name=="isDone") {
                 if(this.tableFilter.currentColumn.colFilter.selectItems.length>0){
@@ -624,7 +650,7 @@ export default {
                     emptyOption = true;
                 }
 
-                //configs.searchKey = this.searchKey;
+                configs.searchKey = this.searchKey;
                 configs.page = configs.page ? configs.page : this.page;
                 configs.pageSize = this.pageSize;
                 configs.formulaCondition = this.conditionByFormula;
@@ -685,9 +711,6 @@ export default {
                 return {};
             }
         },  
-        changeUpdateAsignee(){
-            this.handleTaskSubmited();
-        },
         getDateFormNow(time){
             var today = this.$moment().format('YYYY-MM-DD');
             if (time===today) {
@@ -701,27 +724,27 @@ export default {
             this.$emit("changeObjectType", index);
         },
         handleReachEndList() {
-            if (
-                this.data.length < this.totalObject &&
-                this.data.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
-            ) {
-               // this.myOwnFilter.page += 1;
-                this.page +=1;
-                // if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalWork) {
-                //     this.getWorks();
-                // }
-                this.getData();
-            }
-        },
-        handleTaskSubmited() {
-            this.sideBySideMode = false;
-            this.getData();
+            // if (
+            //     this.data.length < this.totalObject &&
+            //     this.data.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
+            // ) {
+            //     this.page +=1;
+            //     this.getData();
+            // }
         },
         handleChangeFilterValue(data) {
-            for (let key in data) {
-                this.$set(this.myOwnFilter, key, data[key]);
+            // for (let key in data) {
+            //     this.$set(this.myOwnFilter, key, data[key]);
+            // }
+            // this.getData();
+            this.searchKey = data.nameLike;
+            if(this.debounceGetData){
+                clearTimeout(this.debounceGetData);
             }
-            this.getData();
+            this.debounceGetData = setTimeout((self) => {
+				self.page = 1
+                self.getData();
+            }, 300, this);
         },
         reCalcListTaskHeight() {
             this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 85;
@@ -750,17 +773,16 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false, applyFilter = true, lazyLoad = true ) {
+        getData(columns = false, cache = false, applyFilter = true, lazyLoad = true ,showLoading = true) {
             if (this.loadingTaskList || this.loadingMoreTask) {
                 return;
             }
             let self = this;
-            if (this.page == 1) {
-                this.data = [];
+
+            if(showLoading){
                 this.loadingTaskList = true;
-            } else {
-                this.loadingMoreTask = true;
             }
+       
             if (Object.keys(this.tableFilter.allColumn).length==0 ) {
                 this.tableFilter.allColumn["startTime"]=getDefaultFilterConfig();
                 this.tableFilter.allColumn.startTime.sort="desc";
@@ -781,14 +803,13 @@ export default {
                     resData.forEach(function(e){
                         thisCpn.data.push(e)
                     })
-                }else{
                     thisCpn.data = resData;
                 }
 
                 for (let work of resData) {
                     processIden.push('work:'+work.id);
                 }
-            
+
                 this.$store.commit('file/setWaitingFileCountPerObj', processIden);
                 this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
                 this.$store.dispatch('file/getWaitingFileCountPerObj');

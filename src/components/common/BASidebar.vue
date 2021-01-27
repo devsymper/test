@@ -3,6 +3,7 @@
         v-resize="reCalcSidebarHeight" 
         mobile-breakpoint="0" 
         :mini-variant="sapp.collapseSideBar"
+        v-if="true"
         :v-model="true" app>
         <v-list dense nav class="py-0 pr-0 list-item">
             <v-list-item 
@@ -84,7 +85,7 @@
                                     </div>
                                     <v-autocomplete
                                         ref="selectDelegateUser"
-                                         :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251, nudgeLeft:8, nudgeBottom:3}"
+										:menu-props="{ maxHeight:300, minWidth:251,maxWidth:251, nudgeLeft:8, nudgeBottom:3}"
                                         return-object
                                         class="mr-2 ml-2"
                                         full-width
@@ -172,7 +173,7 @@
                         no-action
                         :class="{'menu-group': true , 'menu-group-active': item.active == true }"
                         :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="gotoPage(item)">
+                        @click="handleItemClick(item)">
                        <template v-slot:prependIcon>
                             <v-icon class="ml-1 icon-group">
                                 {{ item.icon }}
@@ -224,7 +225,7 @@
                         link
                         no-action
                         :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="gotoPage(item)">
+                        @click="handleItemClick(item)">
                        <template v-slot:prependIcon>
                            <v-menu 
                                 right offset-y
@@ -293,7 +294,7 @@
                 </div>
                     <v-menu top nudge-top='40' nudge-left='60'>
                     <template v-slot:activator="{ on: menu }">
-                        <v-btn style="margin-left:140px" icon tile v-on="menu">
+                        <v-btn style="position: absolute;right: 10px;" icon tile v-on="menu">
                             <v-icon style="font-size:18px">mdi-cog-outline</v-icon>
                         </v-btn>
                     </template>
@@ -328,7 +329,7 @@
     </v-navigation-drawer>
 </template>
 <script>
-import _ from 'lodash';
+import _groupBy from 'lodash/groupBy';
 import { util } from "./../../plugins/util.js";
 import { userApi } from "./../../api/user.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
@@ -401,7 +402,12 @@ export default {
                 return false
             }
             
-        },
+		},
+		handlerItemClick(item){
+			if(item.children){
+				this.gotoPage(item)
+			}
+		},
         // thêm nhóm cho Menu
         showChangeInfoUser(){
             if(this.sapp.baInfo.id==0){
@@ -413,7 +419,7 @@ export default {
              this.menu = this.userMenuItems;
              let menuItem = [];
              let allMenuItem = [];
-             this.menu =  _.groupBy(this.menu, 'group');
+             this.menu =  _groupBy(this.menu, 'group');
             Object.keys(this.menu).forEach(type => {
                 let name = type;
                 menuItem.push({titleGroup: name });
@@ -438,7 +444,7 @@ export default {
             }, 400, this);
         },
         reCalcSidebarHeight(){
-            this.menuItemsHeight = (util.getComponentSize(this).h - 200)+'px';
+            this.menuItemsHeight = (util.getComponentSize(this).h - 160)+'px';
         },
         logout(){
             util.auth.logout();
@@ -457,7 +463,12 @@ export default {
         },
         goToHome() {
             this.$goToPage("/", "Trang chủ");
-        },
+		},
+		handleItemClick(item){
+			if(!item.children){
+				this.gotoPage(item)
+			}
+		},
         invertSidebarShow() {
             this.showChevIcon =!this.showChevIcon;
             this.$store.commit(

@@ -39,7 +39,7 @@
                             class="pa-0"
                             active-class="v-item--active"
                             dense
-                            @click="doubleClick(item.hash)"
+                            @dblclick="doubleClick(item.hash)"
                             @contextmenu="show($event,item.path,item.name)"
                             >
                             <v-tooltip bottom>
@@ -230,7 +230,7 @@ export default {
         .catch(err => {
           console.log("error from Add folder to treee!!!", err);
         })
-        .always(() => {});
+        .finally(() => {});
     },
     rename(path, name) {
       let self = this;
@@ -284,7 +284,7 @@ export default {
               .catch(err => {
                 console.log("error from update folder api!!!", err);
               })
-              .always(() => {});
+              .finally(() => {});
           } else {
             $(this).replaceWith(
               "<p id=" +
@@ -313,7 +313,7 @@ export default {
         .catch(err => {
           console.log("error from delete folder user api!!!", err);
         })
-        .always(() => {});
+        .finally(() => {});
     },
     convertDate(date) {
       var d = new Date(date),

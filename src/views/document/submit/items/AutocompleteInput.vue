@@ -4,7 +4,7 @@
     v-show="isShowAutoComplete" 
     class="card-autocomplete" :style="positionBox">
         <div v-if="inputType == 'combobox'" class="search-data-input">
-            <input v-model="search" type="text" :placeholder="$t('common.search')">
+            <input v-model="search" type="text" class="sym-small-size sym-style-input" :placeholder="$t('common.search')">
         </div>
         <v-data-table 
         :headers="headers"
@@ -21,10 +21,18 @@
         >
         <template v-slot:item="{ item }">
             <tr @click="handleClickRow(item)" class="active-row" v-if="item.active" style="background: #f0f0f0">
-                <td v-for="(key,value) in item" :key="key+value" :class="{'row-item':true,'d-none':(value == 'active')}">{{ (value != 'active') ? key : '' }}</td>
+                <td v-for="(key,value) in item" 
+                :key="key+value" 
+                :class="{'row-item':true,'d-none':(value == 'active' || value == 'document_object_id')}">
+                    <v-icon v-if="value == 'tmg_icon'" :color="item.tmg_color"> {{ (value != 'active') ? key : '' }}</v-icon>
+                    <span v-else-if="value != 'tmg_color'"> {{ (value != 'active') ? key : '' }}</span>
+                </td>
             </tr>
             <tr @click="handleClickRow(item)" v-else class="row-item">
-                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active' || value == 'checked')}">{{ key }}</td>
+                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active' || value == 'checked'|| value == 'document_object_id')}">
+                    <v-icon v-if="value == 'tmg_icon'" :color="item.tmg_color"> {{ key }}</v-icon>
+                    <span v-else-if="value != 'tmg_color'"> {{ key }}</span>
+                </td>
                 <span class="mdi mdi-check icon-checked" v-if="item.checked"></span>
             </tr>
         </template>
@@ -57,18 +65,34 @@ export default {
             isHideHeader:false,
             search: '',
             inputType:false,
+            controlValueKey:null,
             isSingleSelectCombobox:true,
-            dataSelected:{}
+            dataSelected:{},
+            controlForcusing:null
         }
     },
-   
+    created(){
+        this.$evtBus.$on("document-submit-hide-autocomplete",e=>{
+            this.hide();
+        })
+    },
     methods:{
        
-        show(e){
+        show(e, controlName){
+            this.dataSelected = {}
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
             this.setEvent();
-            // this.search = $(e.target).val();
+            this.controlForcusing = controlName;
+            if(this.inputType == 'combobox'){
+                this.refreshActive();
+            }
+            
+        },
+        refreshActive(){
+            for (let index = 0; index < this.dataTable.length; index++) {
+                delete this.dataTable[index]['checked']
+            }
         },
         setEvent(){
             let thisCpn = this;
@@ -76,7 +100,6 @@ export default {
             this.curInput.on('keydown',function(e){
                 if(thisCpn.dataTable != undefined && thisCpn.dataTable.length > 0){
                     if(e.keyCode == 38){    //len
-                    
                         if(thisCpn.indexActive == 0){
                             return false;
                         }
@@ -102,6 +125,9 @@ export default {
         },
         hide(){
             this.isShowAutoComplete = false;
+            if(this.inputType == 'combobox'){
+                this.refreshActive();
+            }
             this.resetData();
         },
         resetData(){
@@ -110,6 +136,9 @@ export default {
         },
         isShow(){
             return this.isShowAutoComplete;
+        },
+        setControlValueKey(controlValueKey){
+            this.controlValueKey = controlValueKey
         },
         setData(data){
             this.showHeader();
@@ -140,22 +169,16 @@ export default {
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
-            if(e.hasOwnProperty('curTarget')){
-                this.curInput = $(e.curTarget);
+            if($(e.target).closest('.ag-cell').length > 0){
+                this.curInput = $(e.target);
                 let autoEL = $(this.$el).detach();
-                $(e.curTarget).closest('.wrap-table').append(autoEL);
-                let edtos = $(e.curTarget).offset();
-                if(!$(e.curTarget).is('.handsontableInput')){
-                    edtos = $(e.curTarget).closest('td.htAutocomplete.current.highlight').offset();
+                $(e.target).closest('.wrap-table').append(autoEL);
+                let edtos = $(e.target).offset();
+                if($(e.target).closest('.ag-cell')){
+                    edtos = $(e.target).closest('.ag-cell').offset();
                 }
-                if($(e.curTarget).is('div.select-cell')){
-                    edtos = $(e.curTarget).parent().offset();
-                }
-                if($(e.curTarget).is('div.select-cell .select-chervon-bottom')){
-                    edtos = $(e.curTarget).parent().parent().offset();
-                }
-                let tbcos = $(e.curTarget).closest('.wrap-table').find('[s-control-type="table"]').offset();
-                this.positionBox = {'top':edtos.top - tbcos.top + $(e.curTarget).height() +'px','left':edtos.left - tbcos.left+'px'};
+                let tbcos = $(e.target).closest('.wrap-table').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + this.curInput.height() + 3 +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng
             else{
@@ -237,7 +260,14 @@ export default {
                 this.dataTable = [];
                 this.hide();
             }
-            this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
+            if(this.controlValueKey){
+                value = {inputDislay:value, inputValue:item[this.controlValueKey]};
+            }
+            else{
+                value = {inputDislay:value, inputValue:value};
+            }
+            this.curInput.val(value.inputValue);
+            this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey,controlName:this.controlForcusing});
 
         },
         openSubForm(){
@@ -274,7 +304,7 @@ export default {
         position: relative;
     }
     .search-data-input{
-        width: 150px;
+        width: 100%;
         padding: 8px;
     }
     .search-data-input input{

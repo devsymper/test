@@ -68,7 +68,7 @@
                                 <v-icon
                                     class="close-btn float-right "
                                     v-on="on"
-                                    v-clipboard:copy="showableUserInfo['email']"  
+                                    @click="$copyTextToClipboard(showableUserInfo['email'])"  
                                     size="15"
                                     >mdi-content-copy
                                 </v-icon>
@@ -105,21 +105,22 @@
                             v-model="showableUserInfo[key]">
                         </v-text-field>
                     </v-col>
-                    <v-col v-if="!isEditing" >
+                    <v-col v-if="!isEditing"  >
                         <span class="fs-13" >
                             {{showableUserInfo[key]?showableUserInfo[key]:"Đang để trống"}}
                         </span>
                         <v-btn 
-                        icon tile 
-                        class="float-right" 
-                        v-if=" (key == 'email' || key == 'phone')">
+                            x-small
+                            icon tile 
+                            class="float-right" 
+                            v-if=" (key == 'email' || key == 'phone')">
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-icon
                                     style="margin-top:-10px"
                                     class="close-btn float-right mr-3"
                                     v-on="on"
-                                    v-clipboard:copy="showableUserInfo[key]"  
+                                    @click="$copyTextToClipboard(showableUserInfo[key])" 
                                     size="15"
                                     >mdi-content-copy
                                 </v-icon>
@@ -130,7 +131,7 @@
                     </v-col>
                     </v-row>
                 </div>
-                <div class="ml-4" :class="{'mt-2':isEditing}">
+                <div class="ml-4 mt-3" :class="{'mt-2':isEditing}">
                     <div @click="changePass()" class="detail-user-label">
                         {{$t('user.general.personalInfo.pass')}}
                         <v-icon style = "font-size: 16px; margin-top:-2px">mdi-lock-outline</v-icon>
@@ -148,35 +149,41 @@
                 <div>
                     <v-icon class="fs-16">mdi mdi-office-building-outline</v-icon>
                     <span class="fw-430 fs-13 "> 
-                    {{$t('user.myInfo.myPosition')}}
+                    {{$t('user.myInfo.myPosition')}} ( 
+                        <v-btn class="fs-13 fw-430 " style="letter-spacing:0px;" 
+                        @click="viewAllPermission()" text x-small >   
+                            Xem tất cả
+                        </v-btn>)
                     </span>
                 </div>
                 <div 
                     class="pl-4 d-flex mt-1" 
-                    v-if="lazyUserInfo.roles.orgchart.length">
+                    v-if="orgRole.length">
                     <div class="detail-user-label mt-1">
                         {{$t('common.orgchart')}}
                     </div>
                 </div>
-                <div v-for="role in lazyUserInfo.roles.orgchart" :key="role.id">
-                    <div class="ml-5">
+                <div v-for="(role,indx) in orgRole" :key="indx">
+                    <div class="ml-5" v-if="role.name">
                         <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
-                        <!-- <i class="fs-16 mdi mdi-check  indigo--text text--darken-4 mr-1"></i> -->
-                        <v-btn class="font-normal " 
-                            style="margin-bottom:-8px"
+                        <v-btn x-small class="font-normal " 
                             text 
-                            @click="viewUserRole(role.id)" >
-                            <span style="margin-top:-px">
+                            style="letter-spacing:0px;"
+                            @click="viewUserRole(role.id,role.active,role.name)" >
+                            <span>
                                 {{role.name}}
                             </span>
                         </v-btn>
+                         
                     </div>
-                    <div class="text--lighten-2 grey-text pl-6">
-                        {{role.path}}
+                    <div class="ml-5 mt-1" v-else>
+                        <span class="fs-13" style="color:rgb(211, 109, 36)">
+                            {{role.titleGroup}}
+                        </span>
+                    </div>
                     </div>
                 </div>
-                </div>
-                <div class="mt-2" v-if="lazyUserInfo.roles.orgchart.length">
+                <div class="mt-2" v-if="lazyUserInfo.roles.systemRole.length">
                     <div class=" mt-1">
                         <v-icon class="fs-16">mdi mdi-account-tie-outline</v-icon>
                        <span 
@@ -186,25 +193,27 @@
                     </div>
                     <div class="detail-user-value">
                         <div v-for="role in lazyUserInfo.roles.systemRole" :key="role.id">
-                            <!-- <i class="fs-16 indigo--text text--darken-4 mr-1"></i>  -->   
-                            <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
+                            <v-icon class="fs-16 fw-430 ml-5 ">mdi mdi-account-circle-outline</v-icon>
                             <v-btn class="fm fw-400" 
-                                style="margin-bottom:-8px"
                                 text 
-                                @click="viewUserRole(role.id)" >
-                                <span class='fm'>
-                                    <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
+                                x-small
+                                @click="viewUserRole(role.id,role.active,role.name)" >
+                                <span class='fm fs-13'>
                                     {{role.name}}
                                 </span>
                             </v-btn>
                         </div>
                     </div>
                 </div>
+               
             </div>
             </v-col>
             <v-col class="col-md-8" v-if="isViewUserRole">
-                <ViewRoles 
-                    @show-userInfo="showUserInfo()"
+                <ViewRoles
+                    :roleName="roleName"
+                    :viewDetail="isViewDetail"
+                    :permission="lazyUserInfo.roles"
+                    :allRole="lazyUserInfo"
                     :rolesList="role"/>
             </v-col>
         </v-row>
@@ -216,12 +225,12 @@ import SymperAvatar from "@/components/common/SymperAvatar";
 import { appConfigs } from '../../../configs';
 import UploadFile from "./../../../components/common/UploadFile";
 import { util } from '../../../plugins/util';
-import VueClipboard from 'vue-clipboard2';
 import ViewRoles from "../../../views/users/ViewRoles";
 import NotificationChangePass from "./../../../components/notification/notificationChangeFirstPass";
 import Vue from "vue";
 import { userApi } from '../../../api/user';
-Vue.use(VueClipboard)
+import _groupBy from "lodash/groupBy";
+
 export default {
     components: {
         SymperAvatar,
@@ -232,6 +241,8 @@ export default {
     data(){
         return {
             role:[],
+            isViewDetail:false,
+            orgRole:[],
             dialog:false,
             openChangePassForm:false,
             avatarUrl:'',
@@ -266,6 +277,20 @@ export default {
         }
     },
     methods: {
+       
+        checkHasPermission(role){
+            const self = this;
+            userApi.getActionAndObject(role).then(res=>{
+                if (res.status === 200&&res.data.length>0) {
+                    self.orgRole.map(x=>{
+                        x.active = false;
+                        if(x.id==role){
+                            return x.active = true
+                        }
+                    })
+                    }
+                })
+        },
         cancelDialog(){
             this.openChangePassForm=false;
             //this.$refs.changePass.refreshAll();
@@ -286,13 +311,23 @@ export default {
             this.$refs.uploadAvatar.uploadFile();
         },
         showUserInfo(){
-            this.isViewUserRole=false; 
+           // this.isViewUserRole=false; 
             this.$emit('make-small-panel')
         },
-        viewUserRole(role){
-			this.isViewUserRole =! this.isViewUserRole;
-            this.role = role;
-            this.$emit("expand-panel")
+         viewAllPermission(){
+            this.$emit("expand-panel");
+            this.isViewDetail = false;
+            this.isViewUserRole = true;
+        },
+        viewUserRole(role,active,roleName){
+            if(active){
+                this.roleName = roleName;
+                this.isViewDetail = true;
+                this.isViewUserRole = true;
+                this.role = role;
+                this.$emit("expand-panel")
+            }
+		   
 		},  
         saveUserInfo(){
             let self = this;
@@ -305,7 +340,17 @@ export default {
         },
         closePanel(){
             this.$emit('closePanel')
-        }, 
+        },
+        editOrgRole(ogrRole){
+            let nameOrgchart = _groupBy(ogrRole, 'orgchartName');
+            this.orgRole= [];
+            Object.keys(nameOrgchart).forEach(type => {
+                this.orgRole.push({titleGroup: type });
+                nameOrgchart[type].map(x=>x.active=this.checkHasPermission(x.id));
+                this.orgRole.push(...nameOrgchart[type]);
+            })
+
+        },
         reAssignUserInfo(){
             let rsl = {};
             for(let key in this.lazyUserInfo){
@@ -315,6 +360,7 @@ export default {
             }
             this.lazyUserInfo = null;
             this.lazyUserInfo = rsl;
+            this.editOrgRole(rsl.roles.orgchart);
         }
     },
     props: {

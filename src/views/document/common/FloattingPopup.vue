@@ -1,11 +1,10 @@
 <template>
     <div class="s-floatting-popup elevation-6" :style="style" v-show="isShow">
-        <v-tabs height="40" v-model="currentTab" background-color="transparent" grow>
+        <v-tabs height="40" class="pt-2 pl-1 px-1"  v-model="currentTab" background-color="transparent" grow>
             <v-tab v-for="item in tabs" :key="item.name">
                 {{ item.text }}
             </v-tab>
         </v-tabs>
-
         <div style="height: calc(100% - 40px)">
             <v-tabs-items v-model="currentTab" class="h-100">
                 <v-tab-item v-for="item in tabs" :key="item.name" class="h-100 p-2">
@@ -61,37 +60,7 @@ export default {
                 }
             }, 10, this);
         },
-        viewType(vl){
-            if(vl == 'detail'){
-                this.tabs = [
-                    {
-                        text: "Liên kết",
-                        name: 'link',
-                        component: LinkControl
-                    },{
-                        text: "Lịch sử chỉnh sửa",
-                        name: 'trackChange',
-                        component: HistoryControl
-                    },{
-                        text: "Bình luận",
-                        name: 'comment',
-                        component: HistoryControl
-                    },
-                ]
-                this.style.width = '600px';
-                this.style.height = '300px';
-            }else{
-                this.tabs = [
-                    {
-                        text: "Liên kết",
-                        name: 'link',
-                        component: LinkControl
-                    }
-                ];
-                this.style.width = '150px';
-                this.style.height = 'auto';
-            }
-        }
+        
     },
     data() {
         return {
@@ -100,21 +69,7 @@ export default {
         style: {},
         currentTab: 1,
         rowIndex:null,
-        tabs: [
-            {
-                text: "Liên kết",
-                name: 'link',
-                component: LinkControl
-            },{
-                text: "Lịch sử chỉnh sửa",
-                name: 'trackChange',
-                component: HistoryControl
-            },{
-                text: "Bình luận",
-                name: 'comment',
-                component: HistoryControl
-            },
-        ]
+        tabs: []
         };
     },
     computed:{
@@ -128,6 +83,35 @@ export default {
     },
     mounted(){
         this.showTrackChangeComp();
+        if(this.viewType == 'detail'){
+            this.tabs = [
+                {
+                    text: "Liên kết",
+                    name: 'link',
+                    component: LinkControl
+                },{
+                    text: "Lịch sử chỉnh sửa",
+                    name: 'trackChange',
+                    component: HistoryControl
+                },{
+                    text: "Bình luận",
+                    name: 'comment',
+                    component: HistoryControl
+                },
+            ]
+            this.style.width = '600px';
+            this.style.height = '300px';
+        }else{
+            this.tabs = [
+                {
+                    text: "Liên kết",
+                    name: 'link',
+                    component: LinkControl
+                }
+            ];
+            this.style.width = '150px';
+            this.style.height = 'auto';
+        }
     },
     methods: {
         showLinkControl(){
@@ -151,7 +135,9 @@ export default {
             if(rowId != undefined)
             this.rowIndex = rowId;
             this.isShow = true;
-            this.$refs.comp_trackChange[0].computeDataTable()
+            if(this.viewType == 'detail'){
+                this.$refs.comp_trackChange[0].computeDataTable();
+            }
             this.calculatorPositionBox(e, context);
         },
         calculatorPositionBox(e, context) {
@@ -162,6 +148,7 @@ export default {
                 .find(".s-control");
             if ($(e.target).closest(".handsontable").length > 0) {
                 inputOffset = $(e.delegateTarget).offset();
+                input = $(e.delegateTarget)
             }
             //nêu là ngoài bảng
             else {
@@ -174,15 +161,11 @@ export default {
             let cardHeight = $(".s-floatting-popup").height();
             let inputWidth = input.width();
             let top = inputOffset.top - detailFormOffset.top + 26;
-            if(this.viewType == 'detail'){
-                top = top + 30;
-            }
+            this.style.top = top + "px";
             if (cardWidth + leftDiff > detailFormWidth) {
-                this.style.top = top + "px",
-                this.style.left = Math.abs(inputOffset.left + inputWidth - 10 - cardWidth) + "px"
+                this.style.left = Math.abs(leftDiff) + "px"
             } else {
-                this.style.top = top + "px"
-                this.style.left = Math.abs(detailFormOffset.left + leftDiff) + "px"
+                this.style.left = Math.abs(leftDiff) + "px"
             }
             if (
                 window.innerHeight <
@@ -194,18 +177,20 @@ export default {
                 }
                 this.style.top = Math.abs(top1) +"px";
             }
+
+
         }
     }
 };
 </script>
 <style scoped>
 .s-floatting-popup {
-    height: 300px;
+    height: 250px;
     max-height: 500px;
     background: white;
     position: absolute;
     z-index: 200;
-    width: 600px;
+    width: 700px;
 }
 .s-floatting-popup .v-tab{
     font-size: 13px;

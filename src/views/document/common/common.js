@@ -2,13 +2,19 @@ import store from './../../../store';
 import sDocument from './../../../store/document';
 import { util } from '../../../plugins/util';
 
+export const SQLITE_COLUMN_IDENTIFIER = 's_table_id_sql_lite';
 let listNameValueControl = {};
-const checkDbOnly = function(instance, controlName) {
+const checkControlPropertyProp = function(instance, controlName, type) {
     let control = getControlInstanceFromStore(instance, controlName);
-    if (control.controlProperties['isDBOnly'] != undefined &&
-        (control.controlProperties['isDBOnly'].value == "1" ||
-            control.controlProperties['isDBOnly'].value == true ||
-            control.controlProperties['isDBOnly'].value == 1)) {
+    if (control && control.controlProperties[type] && control.controlProperties[type].value) {
+        return control;
+    } else {
+        return false
+    }
+}
+const checkControlFormulaProp = function(instance, controlName, type) {
+    let control = getControlInstanceFromStore(instance, controlName);
+    if (control && control.controlFormulas[type] && control.controlFormulas[type].instance) {
         return control;
     } else {
         return false
@@ -20,6 +26,27 @@ const getControlInstanceFromStore = function(instance, controlName) {
     } else {
         return false
     }
+}
+const minimizeDataAfterRunFormula = function(rs) {
+    let value = "";
+    if(!rs.server){
+        let data = rs.data; 
+        if(data.length > 0){
+            if(!data[0]){
+                value = ""
+            }
+            else{
+                value=data[0].values[0][0];
+            }
+        }
+    }
+    else{
+        let data = rs.data.data;
+        if(data.length > 0){
+            value=data[0][Object.keys(data[0])[0]];
+        }
+    }
+    return value;
 }
 const getControlTitleFromName = function(instance, controlName) {
     let control = getControlInstanceFromStore(instance, controlName);
@@ -61,6 +88,8 @@ const mapTypeToEffectedControl = {
     hidden: "effectedHiddenControl",
     require: "effectedRequireControl",
     validate: "effectedValidateControl",
+    minDate: "effectedMinDateControl",
+    maxDate: "effectedMaxDateControl",
 }
 const currentSelectedControl = function(instance) {
     return getSDocumentEditorStore(instance).currentSelectedControl;
@@ -197,7 +226,8 @@ const checkTitleControl = function(instance) {
 export {
     // handlerRunOtherFormulasControl
     getControlInstanceFromStore,
-    checkDbOnly,
+    checkControlFormulaProp,
+    checkControlPropertyProp,
     checkInTable,
     getControlTitleFromName,
     getControlType,
@@ -205,5 +235,6 @@ export {
     getListInputInDocument,
     checkNameControl,
     checkTitleControl,
-    mapTypeToEffectedControl
+    mapTypeToEffectedControl,
+    minimizeDataAfterRunFormula
 }

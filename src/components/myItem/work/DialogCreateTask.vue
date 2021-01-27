@@ -57,6 +57,7 @@
             taskObject.dueDate.length == 0 ||
             taskObject.assignee.length == 0"
             @click="saveTask"
+            :loading="loading"
           >{{$t('common.add')}}</v-btn>
           <v-btn text small @click="closeDialog" class="mr-2">{{$t('common.close')}}</v-btn>
         </v-card-actions>
@@ -65,7 +66,7 @@
 </template>
 
 <script>
-import userSelector from "./UserSelector";
+import userSelector from "../UserSelector";
 import datePicker from "@/components/common/datePicker";
 import SymperDocSelect from "@/components/common/symperInputs/SymperDocumentSelect.vue";
 import { defaultTaskDescription } from "@/components/process/elementDefinitions/customExtToModel";
@@ -77,11 +78,12 @@ export default {
         showCreateTask:{
             type: Boolean,
             default: false,
-        }
+        },
     },
     data(){
         return{
-             taskObject: {
+            loading:false,
+            taskObject: {
                 name: "",
                 assignee: "",
                 dueDate: "",
@@ -113,6 +115,8 @@ export default {
             }
         },
         async saveTask() {
+            this.loading=true;
+
             if (!this.taskObject.assignee) {
                 this.$snotifyError(
                 {},
@@ -154,6 +158,7 @@ export default {
             } else {
                 this.showError();
             }
+            this.loading=false;
         }
     }
 }

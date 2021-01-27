@@ -34,6 +34,7 @@ import BAAccountForm from "./BAAccountForm.vue";
 import { userApi } from '../../api/user.js';
 
 export default {
+ 
     data() {
         let self = this;
         return {
@@ -118,9 +119,17 @@ export default {
                     name: "update_password",
                     text: this.$t("common.updatePassword"),
                     callback: (row, callback) => {
-                        self.applyDataToForm(row);
-                        self.$refs.listBAAccountList.actionPanel = true;
-                        self.actionOnItem = 'updatePassword';
+                        let idBa = row.id;
+                        let currentIdBa =  self.sapp.baInfo.id;
+                        if(currentIdBa==idBa){
+                            self.applyDataToForm(row);
+                            self.$refs.listBAAccountList.actionPanel = true;
+                            self.actionOnItem = 'updatePassword';
+                        }else{
+                            this.$snotifyError({},"You do not have permission! ");
+                        }
+                        
+                        
                     }
                 },
             }
@@ -129,8 +138,11 @@ export default {
     mounted() {
         this.calcContainerHeight();
     },
-    created() {},
-    watch: {},
+    computed:{
+         sapp() {
+            return this.$store.state.app;
+        },
+    },
     methods: {
         async getDetailSystemRole(id){
             let res = await systemRoleApi.detail(id);

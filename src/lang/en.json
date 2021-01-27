@@ -1,8 +1,12 @@
 {
     "common": {
         "id": "Id",
+        "format_table":"Formatting",
+        "number_instance": "Number of process instance",
         "select_lang": "Select language",
+        "required": "required",
         "KH": "Knowledge Management",
+        "taskManagement": "Task Management",
         "structureManagement": "Structure management",
         "reports": "Reports",
         "workflows": "Workflows",
@@ -16,7 +20,9 @@
         "add": "Add",
         "edit": "Edit",
         "cancel": "Cancel",
-        "update": "Update",
+		"update": "Update",
+		"parameter": "Parameter",
+        "content": "Content",
         "delete": "Delete",
         "refresh": "Refresh",
         "userDeletedName": "User deleted email",
@@ -98,6 +104,10 @@
         "import_excel": "Import excel",
         "isDefault": "Default orgchart",
         "restore": "Restore",
+        "userCreateName": "User Create Name",
+        "userUpdateName": "User Update Name",
+        "createAt": "Create At",
+        "updateAt": "Update At",
         "sidebar": {
             "Setting": "Setting",
             "action_pack": "Action Pack",
@@ -124,6 +134,7 @@
             "apps": "My apps",
             "Account management": "Account manager",
             "Access Management": "Access management",
+            "Task Management": "Task management",
             "Applications": "Applications",
             "Lists to do": "Lists to do",
             "My application": "My application",
@@ -140,9 +151,9 @@
             "listTrashApps": "List trash application",
             "listOrgchart": "List orgchart",
             "listTrashOrgchart": "List trash orgchart",
-			"viewOrgchart": "View orgchart default",
-			"list_workflow":"List Workflow",
-			"list_work":"List Jobs",
+            "viewOrgchart": "View orgchart default",
+            "list_workflow": "List Workflow",
+            "list_work": "List Jobs",
             "environment": "Environment management"
         },
         "system": "System",
@@ -171,13 +182,40 @@
         }
     },
     "table": {
+        "id": "ID",
+        "name": " Service Name",
+        "description": "Description",
+        "lastVersion": "Last Version ",
+        "language": "Language",
+        "status": "Status",
+        "userCreate": "User Create",
+        "userUpdate": "UserUpdate",
+        "createAt": "Create At",
+        "updateAt": "Update At",
+        "versionName": "Version Name",
         "wrap_text_mode": "Wrap text mode",
         "display_density": "Row display density",
         "column_config": "Column configs",
         "freeze_column": "Freeze this column",
         "unfreeze_column": "Don't freeze this column",
         "hide_column": "Hide this column",
-        "show_column": "Show this column",
+		"show_column": "Show this column",
+		"domainName": "Domain name",
+        "serviceIdentifier": "Service identifier",
+        "serviceName": "Service name",
+		"os": "Os",
+		"ip": "IP address",
+		"number_instance": "Number instances",
+		"baCreate": "BA Create",
+		"totalRecord": "Total record",
+		"code": "Code",
+		"userUpdateName": "User update",
+		"parameter": "Parameter",
+		"checkbox": "Checkbox",
+		"userCreateName": "User create",
+		"isDefault":"Default",
+		"lastUpdateAt": "Last update at",
+		"baUpdate": "BA Update",
         "wrap_tex_mode": {
             "wrap": "Wrap",
             "clip": "Clip"
@@ -191,7 +229,10 @@
             "cannot_get_data": "Can not get data from server"
         },
         "success": {
-            "save_config": "Save config successfully!"
+            "save_config": "Save config successfully!",
+            "save_filter": "Save filter table successfully!",
+            "delete_filter": "Save filter table successfully!",
+            "edit_filter": "Save filter table successfully!"
         },
         "filter": {
             "none": "None",
@@ -211,7 +252,12 @@
             "sort_desc": "Sort DESC",
             "clear_filter": "Clear filter",
             "filter_by_value": "Filter by value",
-            "filter_by_condition": "Filter by condition"
+            "filter_by_condition": "Filter by condition",
+            "Delete":"Delete",
+            "Edit":"Edit",
+            "Default":"Default",
+            "Delete Default":"Bỏ mặc định"
+
         }
     },
     "import": {
@@ -239,6 +285,21 @@
             }
         }
     },
+    "authen":{
+        "table":{
+            "title":"Danh sách các server key",
+            "name":"Tên key",
+            "id":"ID",
+            "description":"Mô tả",
+            "serverKey":"Key server",
+            "status":"Trạng thái",
+            "createAt":"Ngày tạo",
+            "updateAt":"Ngày cập nhập",
+            "userCreate":"Người tạo",
+            "userUpdate":"Người cập nhập"
+
+        }
+    },
     "user": {
         "notification": {
             "email_already_exist!": "Email already exist!",
@@ -263,7 +324,7 @@
                 "firstName": "First name",
                 "lastName": "Last name",
                 "displayName": "Display name",
-                "phone": "Phone number"
+				"phone": "Phone number"
             },
             "passwordSetting": {
                 "title": "Password setting",
@@ -370,6 +431,7 @@
         "editPermissionPack": "Edit permission packge",
         "apps": "Apps",
         "contextMenu": {
+            "viewDetails": "View detail",
             "edit": "Edit",
             "grantPermission": "Grant Permission",
             "remove": "Remove"
@@ -417,7 +479,6 @@
         "error": "Error"
     },
     "document": {
-
         "instance": {
             "showlist": {
                 "select": "Selected",
@@ -441,6 +502,7 @@
         "edit": "Edit document",
         "title": "List Document",
         "table": {
+            "allowSubmitOutsideWorkflow": "Allow Submit Outside Workflow",
             "id": "Id",
             "name": "Name",
             "title": "Title",
@@ -487,11 +549,13 @@
                     },
                     "name": "Document name",
                     "title": "Document title",
+                    "updateByWorkflow": "Update by workflow",
                     "fullSize": "Full size Form Submit",
                     "type": "Document type",
                     "note": "Note (Serve for searching)",
                     "titleObject": "Title Object (Serve for display on MyItem, formulas execute on server)",
                     "titlePrint": "Title Form Print",
+                    "formStyle": "Select style",
                     "systemMapping": {
                         "title": "Mapping Doc with System object",
                         "itemTitle": "Select the object to be linked (Can open the Doc record within the system object)",
@@ -556,7 +620,10 @@
                         "history": "History",
                         "comment": "Comment",
                         "has": "Has",
-                        "commentNotResolve": "comment Not Resolve"
+                        "commentNotResolve": "comment Not Resolve",
+						"noComment": "No comment",
+						"listWorks": "Work",
+						"clickToViewListWork": "Click to view work"
                     },
                     "worflowInfo": "Workflow infomation",
                     "userRelated": {
@@ -576,6 +643,8 @@
             }
         },
         "validate": {
+            "emptyNote": "Note must not be blank",
+            "emptyTitleFml": "Title must not be blank",
             "emptyTitle": "Title must not be blank",
             "emptyName": "Name must not be blank",
             "nameNotValid": "Name not valid",
@@ -583,6 +652,9 @@
             "controlNotExist": "Control does not exist, please create new control",
             "docNameExist": "Document name exist",
             "checkNameRelate": "The name of this document can be used in formulas on objects in the system. Select Test to re-check the object"
+        },
+        "notification": {
+            "leavePage": "Are you sure you want to leave this page?"
         }
     },
     "documentObject": {
@@ -743,6 +815,7 @@
         "department": "Department"
     },
     "objectType": {
+        "time_sheet": "Timesheet",
         "Document definition": "Document definition",
         "Document instance": "Document instance",
         "Orgchart": "Orgchart",
@@ -772,6 +845,7 @@
         }
     },
     "objects": {
+        "time_sheet": "Timesheet",
         "document_instance": "Document instance",
         "user": "User",
         "document_definition": "Document definition",
@@ -1131,7 +1205,8 @@
             "showLess": "Show less task related",
             "showMoreFile": "Show more file",
             "quickView": "Quick view",
-            "openTask": "Open task"
+			"openTask": "Open task",
+			"history":"History"
         },
         "alert": {
             "title_aproval": "Action work",
@@ -1140,8 +1215,59 @@
         },
         "unfinished": "Unfinished",
         "totalTask": "Total task",
-        "totalWork": "Total work"
-
+		"totalWork": "Total work",
+		"taskLifeCycle":{
+			"dialog":{
+				"complete":{
+					"header": "Complete task",
+					"description":"Press apply to complete task"
+				},
+				"assign":{
+					"header": "Reassign task",
+					"description":"This work will be assigned to another person to perform, assignee has full control over the work",
+					"workStatus":"Work will assign to"
+				},
+				"claim":{
+					"header": "Claim work",
+					"description":"You will be task owner"
+				},
+				"delegate":{
+					"header": "Delegate task",
+					"description":"This work will be assigned to someone else to perform but will not have the right to complete it"
+				},
+				"unClaim":{
+					"header": "Unclaim task",
+					"description":"This work you received will be removed from your to-do list"
+				},
+				"resolve":{
+					"header": "Resolve task",
+					"description":"This work will be executed and returned to the owner of the job "
+				}
+			},
+			"assignee":"Assignee",
+			"delegateUser":"Delegate user",
+			"assigneePermission":"Assign can view and resolve task",
+			"workDelegated":"This work is delegate to",
+			"owner":"Owner task",
+			"currentStatus":"Current task status",
+			"newStatus": "New task status",
+			"cancel":"Cancel",
+			"corfirm":"Apply",
+			"snackbar":{
+				"title":"Submit document success",
+				"description":"You can get this task done by executing ",
+				"action":"Update the record by selecting "
+			},
+			"notify":{
+				"unClaim":"Unclaim task success",
+				"resolve":"Resolve task success",
+				"claim":"Claim task success",
+				"complete":"Complete task success",
+				"notSubmit":"You must submit task before complete task",
+				"assign": "Assign task success",
+				"delegate": "Delegate task success"
+			}
+		}
     },
     "tasks": {
         "error": {
@@ -1174,7 +1300,8 @@
             "alertDescription": "No description",
             "relatedTask": "RELATED TASK",
             "attachment": "ATTACHMENT FILE",
-            "status":"Status"
+			"status": "Status",
+			"candidateUser":"Candidate user"
 
         },
         "filterOptions": {
@@ -1188,8 +1315,15 @@
         "createTask": {
             "title": "Create task"
         },
-        "claim": "Claim",
-        "created": "Task created",
+		"claim": "Claim",
+        "unClaim": "Un claim",
+        "reAssign": "Re-assign",
+        "delegate": "Delegate",
+        "resolve": "Resolve",
+        "complete": "Complete",
+        "assign": "Assign",
+		"created": "Task created",
+		"action": "Action",
         "relatedPeople": {
             "title": "Related people"
         },
@@ -1258,5 +1392,53 @@
         "reply": "Reply",
         "edited": "Edited",
         "search": "Search"
+    },
+    "taskManagement":{
+        "table":{
+            "name": "Name",
+            "description": "Description",
+            "lead": "Leader",
+            "category": "Category",
+            "createAt":"Create time",
+            "email":"Email",
+            "role":"Role",
+            "workflow":"Workflow",
+            "startDate":"Start date",
+            "releaseDate":"Release date",
+            "unreleased":"Unreleased",
+            "released":"Released",
+            "configField":"Config field"
+        },
+        "listMember":"List member",
+        "listCategory":"List category",
+        "listProject":"List project",
+        "listComponent":"List component",
+        "listVersion":"List version",
+        "listIssueType":"List Issue type",
+        "listWorkflow":"List Workflow",
+        "listPriority":"List Priority",
+        "listActionPack":"List ActionPack",
+        "listPermission":"List Permission",
+        "listIssueComponent":"List Issue in component",
+        "listIssueVersion":"List Issue in version",
+        "detailProject":"Detail project",
+        "requiredField":"Indicates required field",
+        "addPeople":"Add people",
+        "managerRole":"Manager roles",
+        "createRole":"Create role",
+        "dialog":{
+            "removeUser": "You will remove members from this project?",
+            "removeRole": "You will remove role from this rols.",
+            "removeCategory": "You will remove category from this list.",
+            "removeComponent": "You will remove component from this list.",
+            "removeWorkflow": "You will remove workflow from this list.",
+            "removePriority": "You will remove priority from this list.",
+            "removeVersion": "You will remove version from this list."
+
+        },
+        "settingBoard":"Board setting"
+
+
+
     }
 }

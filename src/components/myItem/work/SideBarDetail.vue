@@ -44,6 +44,25 @@
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
 									</td>
 								</tr>
+								<tr>
+									<td>{{$t('document.detail.sidebar.body.general.id')}}</td>
+									<td class="pl-2">
+										{{workInfo.id}}
+									</td>
+									  <v-tooltip bottom>
+										<template v-slot:activator="{ on }">
+											<v-btn  
+												icon
+												tile
+                            					@click="$copyTextToClipboard(workInfo.id)" 
+												class="ml-7"
+												v-on="on" text x-small>
+													<v-icon  x-small>mdi-page-next-outline</v-icon>
+											</v-btn>
+										</template>
+										<span>Sao chép đường dẫn</span>
+									</v-tooltip>
+								</tr>
 							</table>
 						</div>
 					</v-expansion-panel-content>
@@ -164,7 +183,7 @@
 		</VuePerfectScrollbar>
 	</div>
 	<Comment 
-	style="height:calc(100% - 40px)" 
+	style="height:calc(100% - 2px)" 
 	:objectIdentifier="workInfo.id"
 	:objectType="'work'"
 	ref="commentTaskView"
@@ -414,7 +433,7 @@ export default {
 			.catch(err => {
 			console.log("error from delete attachment file!!!", err);
 			})
-			.always(() => {});
+			.finally(() => {});
 		this.dialogAlert = false;
 		},
 		showContentFile(serverPath, name, type, id){
@@ -435,7 +454,7 @@ export default {
 			.catch(err => {
 			console.log("error download file!!!", err);
 			})
-			.always(() => {});
+			.finally(() => {});
 		},
 		actionFileAttachment(e, serverPath, name, type, id){
 			e.preventDefault();
@@ -469,7 +488,14 @@ export default {
 			data.objectIdentifier = this.workInfo.id;
 			data.objectType = "work";
 			this.$store.dispatch("task/getArrFileAttachment", data);
-    	}
+		},
+		onCopySuccess(){
+			this.$snotify({
+				type: 'success',
+				title: "Sao chép thành công",
+			});
+		},
+		
 	},
 	
 

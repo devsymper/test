@@ -41,6 +41,9 @@ const updateCurrentTabIndex = (state, data) => {
 const removeTab = (state, url) => {
     Vue.delete(state.urlToTabTitleMap, url);
 }
+const setFilteredColumns = (state, data) => {
+	Vue.set(state.filteredColumns, data.widgetIdentifier, data.filteredColumns);
+}
 
 /**
  * 
@@ -64,7 +67,16 @@ const setOrgchartNodes = (state, orgchartNodes) => {
 }
 
 const setAllUsers = (state, allUsers) => {
+    mapIdToUsers(state, allUsers);
     Vue.set(state, 'allUsers', allUsers);
+}
+const mapIdToUsers = (state,allusers) => {
+    let map = allusers.reduce((newObj, obj) => {
+        newObj[obj.id] = obj;
+        return newObj
+    },{});
+    Vue.set(state, 'mapIdToUsers', map);
+
 }
 const setAllSymperRoles = (state, allSymperRoles) => {
     Vue.set(state, 'allSymperRoles', allSymperRoles);
@@ -89,7 +101,20 @@ const setAccountType = (state, data) =>{
     // state.accountType = data
     Vue.set(state, 'accountType', data)
 }
+
+/**
+ * 
+ * @param {Object} state 
+ * @param {Object} data đối tượng chứa các value cần set lại cho SystemMessaging
+ */
+const updateSystemMessaging = (state, data) => {
+    for(let key in data ){
+        state.systemMessaging[key] = data[key];
+    }
+}
+
 export {
+    updateSystemMessaging,
     changeCollapseSidebar,
     increaseUnreadNotification,
     decreaseUnreadNotification,
@@ -105,5 +130,6 @@ export {
     setUserActionsForObjects,
     setAllSymperRoles,
     changeStatus,
-    setAccountType
+	setAccountType,
+	setFilteredColumns
 };

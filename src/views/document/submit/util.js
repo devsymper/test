@@ -28,6 +28,10 @@ export default class Util {
         return '<span class="mdi mdi-checkbox-blank-circle  validate-icon" control-title="' + controlTitle + '" title="Không được bỏ trống trường này"></span>'
             // return '<i data-require-sign="' + sign + '" class="fa fa-circle required-markup" title="Bạn phải nhập vào trường này" aria-hidden="true"></i>';
     };
+    static makeRedDot = function() {
+        return '<span class="validate-icon-cell mdi mdi-alert-circle" style="position: absolute;right:8px;top:2px;font-size: 8px;color: red;"></span>'
+            // return '<i data-require-sign="' + sign + '" class="fa fa-circle required-markup" title="Bạn phải nhập vào trường này" aria-hidden="true"></i>';
+    };
     /**
      * Đếm số chữ số tối đa đằng sau dấu phẩy trong dãy các số
      * @param {Array} nums dãy các chữ số
@@ -46,6 +50,14 @@ export default class Util {
         return max;
     }
 
+    static checkTimeValid = function(time){
+        let regex = /^([0-1]?[0-9]|[2][0-3]):([0-5][0-9])(:[0-5][0-9])?$|^([0-1]?[0-9]|[2][0-3]):([0-5][0-9])( [AaPp][Mm])?$/g;
+        let isValid = false;
+        if(regex.test(time)){
+            isValid = true;
+        }
+        return isValid; 
+    }
     static debounce = function(func, wait, immediate) {
         var timeout;
         return function() {
@@ -241,8 +253,8 @@ export default class Util {
         return ext == null ? "" : ext[0];
     }
 
-    static makeErrNoti = function(msg, sign, controlTitle) {
-        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" control-title="' + controlTitle + '" title="' + msg + '"></span>'
+    static makeErrNoti = function(controlName, title = "") {
+        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" control-name="'+controlName+'" msg="'+title+'"></span>'
     }
     static renderInfoBtn = function() {
         return '<span class="mdi mdi-information info-control-btn"></span>'

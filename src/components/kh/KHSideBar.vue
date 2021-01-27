@@ -307,7 +307,7 @@ export default {
                 .catch(err => {
                   console.log("error from Move item to tree!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
             }
             this.statusMove = 3;
             this.oldHashPath = "";
@@ -414,7 +414,7 @@ export default {
                     .catch(err => {
                       console.log("error from Add folder to treee!!!", err);
                     })
-                    .always(() => {});
+                    .finally(() => {});
                 }
 
                 $("div").remove(".new-add-obj");
@@ -487,7 +487,7 @@ export default {
                     .catch(err => {
                       console.log("error from Add doc to treee!!!", err);
                     })
-                    .always(() => {});
+                    .finally(() => {});
                 }
                 $("div").remove(".new-add-obj");
               }
@@ -610,7 +610,7 @@ export default {
             .catch(err => {
               console.log("error from add directory api!!!", err);
             })
-            .always(() => {});
+            .finally(() => {});
         }
       }
     },
@@ -680,7 +680,7 @@ export default {
           .catch(err => {
             console.log("error from delete folder user api!!!", err);
           })
-          .always(() => {});
+          .finally(() => {});
       } else {
         knowledgeApi
           .deleteDirectory(path)
@@ -698,7 +698,7 @@ export default {
           .catch(err => {
             console.log("error from delete folder user api!!!", err);
           })
-          .always(() => {});
+          .finally(() => {});
       }
       //reset lại id và txtnode
       this.id = -1;
@@ -763,7 +763,7 @@ export default {
                 .catch(err => {
                   console.log("error from rename document api!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
             } else {
               $(this).replaceWith(
                 "<p id=" +
@@ -826,7 +826,7 @@ export default {
                 .catch(err => {
                   console.log("error from update folder api!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
             } else {
               $(this).replaceWith(
                 "<p id=" +
@@ -901,7 +901,7 @@ export default {
         .catch(err => {
           console.log("error from delete folder user api!!!", err);
         })
-        .always(() => {});
+        .finally(() => {});
 
       this.id = -1;
       this.path = "";

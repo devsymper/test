@@ -1,5 +1,5 @@
 <template>
-<v-card class="w-100" >
+<v-card class="w-100 log-form" >
     <v-card-title class="pb-1 pt-2 headline lighten-2" primary-title>
         <div class="pb-1 w-100" style="border-bottom: 1px solid lightgrey">
             <span style="font-size:18px">{{$t('timesheet.log_time')}}</span> 
@@ -8,7 +8,8 @@
     <v-card-text class="mt-1 h-65" >
         <span class="label ">{{$t('timesheet.category_task')}}</span>
         <v-row>
-            <div style="width: 275px!important" class="ml-3 mr-1">
+            <div style="width: 275px!important" 
+                class="ml-3 mr-1">
                 <v-autocomplete 
                     style="margin-top:-10px!important; " 
                     :menu-props="{'nudge-top':-10}" 
@@ -20,7 +21,8 @@
                     item-color="white" 
                     background-color="#F7F7F7">
                     <template v-slot:item="data" class="category-task">
-                        <span style='color:black' >{{ data.item }}
+                        <span style='color:black'>
+                            {{ data.item }}
                             <v-icon v-if="data.item === categoryTask " color="success">
                             mdi-check
                             </v-icon>
@@ -42,7 +44,7 @@
          <span class="red--text" v-show="cateError">{{cateError}}</span>
     </v-card-text>
     <!-- lọc user -->
-        <v-card-text  v-if="showSearchForm" class=" h-65 mb-2" >
+        <!-- <v-card-text  v-if="showSearchForm" class=" h-65 mb-2" >
         <span class="label ">Lọc theo nhân viên<span style="color:red"></span></span>
         <v-row class="mt-2">
             <div style="width: 275px!important" class="ml-3 mr-1">
@@ -71,15 +73,17 @@
                <div>
                    <!-- <v-checkbox v-model="checkbox" style="margin-top:2px"></v-checkbox> -->
       <!-- </v-card-text> -->
-            </div>
+            <!-- </div>
         </v-row>
-    </v-card-text>
+    </v-card-text> --> 
      <!-- <v-card-text v-if="showSearchForm" style="margin-top:-15px; margin-bottom:-15px"> -->
        <!-- <v-checkbox v-model="checkbox" :label="'Chưa log'"></v-checkbox> -->
       <!-- </v-card-text> -->
     <!-- lọc user -->
     <v-card-text  class='task-form h-65' style="margin-top:-4px">
-        <span class="label">{{$t('timesheet.task_form')}}<span style="color:red"> *</span></span>
+        <span class="label">{{$t('timesheet.task_logform')}}
+            <span style="color:red"> *</span>
+        </span>
         <v-row style="margin-top:-10px">
             <div style="width: 275px!important" class="ml-3 mr-1">
                 <v-autocomplete 
@@ -125,7 +129,6 @@
                 <v-menu offset-y nudge-top="-10">
                     <template v-slot:activator="{ on }">
                         <input 
-                        readonly
                         v-on="on" 
                         :value="displayDate"
                         class="input-logtime" 
@@ -134,72 +137,53 @@
                         type="text">
                     </template>
                  <!-- date -->
-                 <v-date-picker ref="menu1" class="date-picker" no-title scrollable 
-                 color='orange' v-model="displayDate" nudge-top="-10" :close-on-content-click="false" 
-                 transition="scale-transition" offset-y width="290px" 
-                 :allowed-dates="allowedDates" />
+                 <v-date-picker 
+                        class="date-picker" 
+                        no-title scrollable
+                        color='orange' 
+                        v-model="datePicker" 
+                        nudge-top="-10" 
+                        :close-on-content-click="false" 
+                        transition="scale-transition" 
+                        offset-y width="290px" 
+                       />
                  <!-- date -->
                 </v-menu>
             </div>
-            <div class="duration"> <span class="label">{{$t('timesheet.duration')}}</span>
-                <input type="text" v-model="displayDuration" class="input-logtime"></div>
+            <div class="duration"> 
+                <span class="label">
+                    {{$t('timesheet.duration')}}
+                </span>
+                <input type="text" 
+                    :value="displayDuration" 
+                    @input="caculateDuration" 
+                   
+                    class="input-logtime"></div>
             <div class='start-time'>
-                <span class="label">{{$t('timesheet.start_time')}}<span style="color:red"> *</span> </span>
-                <v-menu 
-                    ref="start-picker"
-                    class='clock'
-                    nudge-left="70" 
-                    nudge-top="-10" 
-                    :close-on-content-click="false" 
-                    nudge-right="40" 
-                    transition="scale-transition" 
-                    offset-y width="100px">
-                    <template v-slot:activator="{ on }">
-                        <input 
-                            type="text" 
-                            v-on="on"
-                            v-model="inputs.startTime" 
-                            class="input-logtime">
-                    </template>
-                    <v-time-picker  
-                        class="clock-time"
-                        width="180px" 
-                        header-color='green lighten-1' 
-                        height="220px" 
-                        scrollable
-                        @click:minute="$refs['start-picker'].save(inputs.startTime)"
-                        v-model="inputs.startTime" >
-                    </v-time-picker>
-                </v-menu>
+                <span class="label">{{$t('timesheet.start_time')}}
+                    <span style="color:red"> *</span> 
+                </span>
+                <v-combobox
+                    :menu-props="{'maxHeight':204,'minWidth':70}" 
+                    style="margin-top:-12px"
+                    background-color="#F7F7F7"
+                    no-filter
+                    v-model="inputs.startTime"
+                    class="category-task" 
+                    :items="listHour"
+                ></v-combobox>
             </div>
             <div style="width: 63px; float: left"> <span class="label">
                 {{$t('timesheet.end_time')}}<span style="color:red">*</span></span>
-                <v-menu 
-                    ref="end-picker"
-                    nudge-top="-10"
-                    nudge-left="100" 
-                   :close-on-content-click="false" 
-                    transition="scale-transition" 
-                    offset-y>
-                    <template v-slot:activator="{ on }">
-                        <input 
-                            type="text" 
-                            id="datepicker"
-                            v-on="on" 
-                            v-model="inputs.endTime" 
-                            class="input-logtime">
-                    </template>
-                    <v-time-picker 
-                        :min="inputs.startTime" 
-                        width="180px" 
-                        height="220px"
-                        header-color='green lighten-1' 
-                        scrollable 
-                        v-model="inputs.endTime" 
-                        @click:minute="$refs['end-picker'].save(inputs.endTime)"
-                       >    
-                    </v-time-picker>
-                </v-menu>
+                <v-combobox
+                        :menu-props="{'maxHeight':204, 'minWidth':70}" 
+                        style="margin-top:-12px"
+                        background-color="#F7F7F7"
+                        no-filter
+                        v-model="inputs.endTime"
+                        class="category-task" 
+                        :items="listHour"
+                ></v-combobox>
             </div>
         </div>
     </v-card-text>
@@ -212,30 +196,36 @@
     </v-card-text>
     <v-card-actions class="pb-5">
         <div class="w-100" style="float:right">
-            <v-btn class='cancel' @click="cancel()">
+            <input class="ml-4 mr-1 mt-1" type="checkbox" id="checkbox" v-model="keepLog">
+            <span class="fs-13" >
+                Thêm liên tục
+            </span>
+            <v-btn text class='cancel' @click="cancel()">
                {{$t('timesheet.cancel')}}
             </v-btn>
-            <v-btn v-if= "update==false&&showLog" color="primary" 
+            <v-btn v-if= "update==false&&showLog" text  
             class="button-logtime"
+            style="color:blue"
              @click="log(1)">
              <span >{{$t('timesheet.log')}}</span> 
              </v-btn>
-              <v-btn v-if= "update==false&&showPlan" color="success" 
+              <v-btn v-if= "update==false&&showPlan" text 
+            style="color:green"
             class="button-logtime"
              @click="log(0)">
              <span >{{$t('timesheet.plan')}}</span> 
              </v-btn>
-               <v-btn v-if= "update&&newEvent.type==1" color="primary" 
+               <v-btn v-if= "update&&newEvent.type==1" text 
             class="button-logtime"
              @click="updatelog(1)">
              <span >{{$t('timesheet.update')}}</span> 
              </v-btn>
-               <v-btn v-if= "update&&newEvent.type==0&&showPlan" color="primary" 
+               <v-btn v-if= "update&&newEvent.type==0&&showPlan" text 
             class="button-logtime"
              @click="updatelog(0)">
              <span >{{$t('timesheet.update')}}</span> 
              </v-btn>
-               <v-btn v-if= "update&&newEvent.type==0&&showLog" color="success" 
+               <v-btn v-if= "update&&newEvent.type==0&&showLog" text 
             class="button-logtime mr-2" style="float:right!important; width: 60px"
              @click="updatelog(1)">
              <span >{{$t('timesheet.log')}}</span> 
@@ -246,24 +236,25 @@
 </template>
 
 <script>
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timesheetApi from '../../api/timesheet';
 import TaskForm from '../timesheet/TaskForm';
-
 
 export default {
     name: 'LogTimeForm',
     props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
     data: () => ({
+        logTimeList:[],
+        keepLog:false,
+        isCaculate:false,
+        datePicker:'',
         date: new Date().toISOString().substr(0, 10),
         isLoading: false,
+        listHour:[],
         dialog: false,
         items: [],
         displayDate: '',
         showLog:false,
         showPlan:false,
-        model: null,
         nameTask:'',
         search: null,
         searchCategory:null,
@@ -271,6 +262,7 @@ export default {
         checkDateUpdate:false,
         task: '',
         desc: '',
+        durationTime:'',
         dateLogMonthView:'',
         listCategory:[],
         type: 'week',
@@ -301,16 +293,21 @@ export default {
          typeCalendar() {
             return this.$store.state.timesheet.calendarType;
         },
-        duration() {
-            let startTime = this.inputs.startTime.split(":");
-            let endTime = this.inputs.endTime.split(":");
-            let hourStart = Number(startTime[0]);
-            let minutesStart = Number(startTime[1]);
-            let hourEnd = Number(endTime[0]);
-            let minutesEnd = Number(endTime[1]);
-            return ((hourEnd * 60 + minutesEnd) - (hourStart * 60 + minutesStart));
+        duration(value) {
+            if(!this.isCaculate){
+                  let startTime = this.inputs.startTime.split(":");
+                    let endTime = this.inputs.endTime.split(":");
+                    let hourStart = Number(startTime[0]);
+                    let minutesStart = Number(startTime[1]);
+                    let hourEnd = Number(endTime[0]);
+                    let minutesEnd = Number(endTime[1]);
+                    return ((hourEnd * 60 + minutesEnd) - (hourStart * 60 + minutesStart));      
+            }else{
+                return this.durationTime
+            }
         },
         displayDuration() {
+            if(!this.isCaculate){
             if (this.duration >= 0) {
                 if (this.duration > 60) {
                     if (this.duration / 60 == 0) {
@@ -327,10 +324,15 @@ export default {
                 } else {
                     return this.duration + "m";
                 }
-                return dayjs(this.event.start).format('HH:mm');
+                return this.$moment(this.event.start).format('HH:mm');
             } else {
                 return '';
             }
+            }
+            else{
+                return this.durationTime
+            }
+            // }
         },
         // displayDate() {
         //     if(this.eventLog.startTime!=undefined){this.getEventLog();};
@@ -338,6 +340,20 @@ export default {
         // }
     },
     watch: {
+        datePicker(){
+            let year = this.datePicker.slice(0,4);
+            let month = Number(this.datePicker.slice(5,7))-1;
+            let date = this.datePicker.slice(8,10);
+            this.newEvent.start = this.$moment(this.newEvent.start).date(date).month(month).year(year).valueOf();
+            this.newEvent.end = this.$moment(this.newEvent.end).date(date).month(month).year(year).valueOf();
+
+            this.inputs.date = this.datePicker;
+            this.displayDate= this.datePicker
+        },
+        durationTime(){
+            this.changeDuration(this.durationTime);
+            //  this.isCaculate = false;
+        },
         updateAPICategory(){
              this.getCategory();
              this.$emit("doneCate")
@@ -383,7 +399,9 @@ export default {
                 }
              }
              else{
-                let taskId = this.task;
+                
+                    let taskId = this.task;
+                 
                 this.findNameTask(this.task);
                 this.getCategoryId(taskId);
              }
@@ -407,41 +425,77 @@ export default {
              else{};
              // this.loadTaskList();
         },
-        model(val) {
-            if (val != null) this.tab = 0
-            else this.tab = null
-        },
         newEvent(val) {
-            this.getAllTask();
-            this.inputs.startTime = val ? dayjs(val.start).format('HH:mm') : "08:00";
-            this.inputs.endTime = val ? dayjs(val.end).format('HH:mm') : "08:40";
-            this.inputs.date = val ? dayjs(val.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
+            this.getAllTask(val.task);
+            this.inputs.startTime = val ? this.$moment(val.start).format('HH:mm') : "08:00";
+            this.inputs.endTime = val ? this.$moment(val.end).format('HH:mm') : "08:40";
+            this.inputs.date = val ? this.$moment(val.date).format('YYYY-MM-DD') : this.$moment().format('YYYY-MM-DD');
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
-            this.task = val.task;
+            this.task = val.task?val.task:getIdTask(val.task);
             this.items.push({name:val.task});
             // hiển thị nút plan và log theo từng giờ
-            let now = dayjs();
-            let dateLog = dayjs(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
-            this.showLog =  dayjs(dateLog).isAfter(now)==true?false:true;
-            this.showPlan = dayjs(dateLog).isAfter(now);
+            let now = this.$moment();
+            let dateLog = this.$moment(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
+            this.showLog =  this.$moment(dateLog).isAfter(now)==true?false:true;
+            this.showPlan = this.$moment(dateLog).isAfter(now);
             this.filterTaskByCategory();
         },
     },
     created(){
         // load lại trang ở màn month
-        let date = this.dateMonth;
-        this.getDateMonth(date);
+        this.generateListHour();
+        this.getDateMonth(this.dateMonth);
         this.getAllTask();
         this.getCategory();
     },
     methods: {
+        // getIdTask(nameTask){
+        //     let id = 0;
+        //    this.logTimeList.map(task=>{
+        //        if(task.task_id==nameTask){
+        //            id = 
+        //        }
+
+        //     })
+        // },
+        formatTime(time){
+            let minutes = 0;
+            let hour = 0;
+            hour = time.includes('h')?time.split('h')[0]:0;
+            minutes = time.includes('h')?time.split('m')[0].split('h')[1]:time.split('m')[0];
+            return hour*60+minutes;
+        },
+        changeDuration(duration){
+            let minutes = 0;
+            let hour = 0;
+            hour = duration.indexOf('h')>-1?duration.split('h')[0]:0;
+            minutes = duration.indexOf('h')>-1?duration.split('m')[0].split('h')[1]:duration.split('m')[0];
+            if(this.inputs.startTime){
+                this.inputs.endTime = this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).add(hour,'h').add(minutes,'m').format("HH:mm")
+            }else{
+                this.input.startTime = this.$moment(this.newEvent.end).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).subtract(hour,'h').subtract(minutes,'m').format("HH:mm")
+            }
+        },
+        caculateDuration(event){
+            this.isCaculate = true;
+            this.durationTime =  event.currentTarget.value;
+            this.changeDuration(this.durationTime);
+            // this.isCaculate = false;
+        },
+        generateListHour(){
+            for(let i=0; i<24; i++) {
+                for(let j=0; j<2; j++) {
+                    this.listHour.push(i + ":" + (j===0 ? "00" : 30*j) );
+                }
+            }
+        },
          findNameTask(id){
              this.nameTask=this.items.filter(x=>x.id==id)[0].name;
              return this.nameTask
         },
-           getCategoryId(taskId){
+        getCategoryId(taskId){
            let cateId = this.items.filter(x=>x.id==taskId)[0].categoryId;
            if(cateId){
                 this.categoryTask = this.getFullNameCategory(cateId)
@@ -458,12 +512,16 @@ export default {
             this.items = [];
            await timesheetApi.getTaskDB()
             .then(res => {
-                self.items.push(...res.data.task);
+             self.items.push(...res.data.task);
                 })
                 .catch(console.log);
-            await timesheetApi.getTask({nameLike:'%'+nameTask+'%'})
+            await timesheetApi.getTask(nameTask)
             .then(res => {
-                self.items.push(...res.data);
+                let name = res.data.listObject;
+                name.map(x=>{
+                    x.name = JSON.parse(x.description).content
+                })
+                self.items.push(...res.data.listObject);
                 })
                 .catch(console.log);
 
@@ -478,18 +536,18 @@ export default {
             this.inputs.description = '';
             this.categoryTask = '';
             this.task ='';
-            let now = dayjs();
-            let dateLog = dayjs(date).format('DD/MMM/YYYY');
-            this.showLog =  dayjs(dateLog).isAfter(now)==true?false:true;
-            this.showPlan = dayjs(dateLog).isAfter(now);
-            this.inputs.date = dayjs(date).format('YYYY-MM-DD')
+            let now = this.$moment();
+            let dateLog = this.$moment(date).format('DD/MMM/YYYY');
+            this.showLog =  this.$moment(dateLog).isAfter(now)==true?false:true;
+            this.showPlan = this.$moment(dateLog).isAfter(now);
+            this.inputs.date = this.$moment(date).format('YYYY-MM-DD')
            
         },
         // đổi giờ thành ngày giờ trong màn hình month
          changeTimeToDate(time){
             let hour = Number(time.split(":")[0]);
             let minutes = Number(time.split(":")[1]);
-            let dateTime = dayjs(this.dateLogMonthView).hour(hour).minute(minutes).format("YYYY-MM-DD HH:mm");
+            let dateTime = this.$moment(this.dateLogMonthView).hour(hour).minute(minutes).format("YYYY-MM-DD HH:mm");
             return dateTime;
         },
         //lấy danh sách category
@@ -524,27 +582,25 @@ export default {
          },
          showCategoryForm(){
              this.$emit("showCategoryForm",{
-                    startTime:this.inputs.startTime,
-                    endTime:this.inputs.endTime,
-                    task: this.findNameTask(this.task),
-                    date: this.inputs.date,
-                    categoryTask: this.categoryTask,
-                    desc: this.inputs.description || ""
-                })
-                this.getEventLog();
+                startTime:this.inputs.startTime,
+                endTime:this.inputs.endTime,
+                task: this.findNameTask(this.task),
+                date: this.inputs.date,
+                categoryTask: this.categoryTask,
+                desc: this.inputs.description || ""
+            })
+            this.getEventLog();
          },
         showTaskForm(){
-                this.$emit("showTaskForm",{
-                    startTime:this.inputs.startTime,
-                    endTime:this.inputs.endTime,
-                    task: this.findNameTask(this.task),
-                    date: this.inputs.date,
-                    categoryTask: this.categoryTask,
-                    desc: this.inputs.description || ""
-                    
-                })
- 
-                this.getEventLog();
+            this.$emit("showTaskForm",{
+                startTime:this.inputs.startTime,
+                endTime:this.inputs.endTime,
+                task: this.findNameTask(this.task),
+                date: this.inputs.date,
+                categoryTask: this.categoryTask,
+                desc: this.inputs.description || ""
+            })
+            this.getEventLog();
         },
         getCategory(){
             let self= this;
@@ -561,12 +617,20 @@ export default {
                 }
                 }).catch(console.log);
         },
+        refreshAll(){
+            this.taskError="";
+            this.cateError = '';
+            this.timeError = "";
+            this.task="";
+            this.nameTask="";
+            this.task="";
+            this.categoryTask="";
+            this.inputs.description="";
+        },
         cancel() {
             this.onCancel();
             this.$emit('cancel');
-            this.taskError = '';
-            this.cateError = '';
-            this.timeError = '';
+            this.refreshAll()
         },
         // type= 0 là plan, 1 là log
         log(type) {
@@ -578,17 +642,16 @@ export default {
             if(this.typeCalendar=="month"){
                 start = this.changeTimeToDate(this.inputs.startTime);
                 end = this.changeTimeToDate(this.inputs.endTime);
-
             }else{
-                start = dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
-                end  = dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
+                start = this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
+                end  = this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
             }
             if (!check){}
             else{
                 timesheetApi.createLogTime({
                     start: start,
                     end: end,
-                    duration: this.duration,
+                    duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
                     task: this.findNameTask(this.task),
                     type: type,
                     date: this.inputs.date,
@@ -598,11 +661,14 @@ export default {
                 .then(res => {
                     if (res.status === 200) {
                         this.onSave();
+                        this.refreshAll();
                         this.$emit('loadMonthView')
                     }
                 })
                 .catch();
-            this.cancel();
+                if(!this.keepLog){
+                    this.cancel();
+                }
             }       
         },
         showError() {
@@ -640,11 +706,14 @@ export default {
             let check = this.checkValidateLogForm();
             if (!check){
             } else {
+                //  let taskId = this.task;
+                let taskId = Number(this.task)?this.task:this.items.filter(x=>x.name==this.task)[1].id;
+               // let test = this.items.filter(x=>x.name==this.task)[0].id;
                 timesheetApi.updateLogTime({
-                        start: dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
-                        end: dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
-                        duration: this.duration,
-                        task: this.findNameTask(this.task),
+                        start: this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
+                        end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
+                        duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
+                        task: this.findNameTask(taskId),
                         type: type,
                         id: this.newEvent.id,
                         date: this.inputs.date,
@@ -661,7 +730,6 @@ export default {
             }
         },
     },
-
 }
 </script>
 
@@ -690,13 +758,14 @@ button {
     height:32px!important;
 }
 .button-logtime{
-   color: white; 
+    font-weight:400;
    width: 70px!important; 
    float:right;
    margin-right:7px;
 }
 .cancel {
     float: right;
+      font-weight:400;
     margin-right: 15px;
     height:32px!important;
     width: 35px !important;
@@ -847,7 +916,12 @@ button {
 
     float: left;
 }
-</style><style>
+
+.log-form ::v-deep .v-input__append-inner{
+    display:none!important
+}
+</style>
+<style>
 .v-calendar-daily__intervals-body{
     width:50px;
 
@@ -893,4 +967,5 @@ button {
     color: black;
     min-height: 30px!important;
 }
+
 </style>

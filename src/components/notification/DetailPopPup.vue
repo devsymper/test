@@ -61,6 +61,7 @@
 <script>
 
 import notification from "./../../api/settingNotification";
+import _groupBy from "lodash/groupBy";
 export default {
     props:['name','objType'],
       data () {
@@ -73,7 +74,7 @@ export default {
             }
     },
     created () {
-    this.getSource();
+        this.getSource();
       this.getAllListChanel(); 
      
      },
@@ -86,7 +87,7 @@ export default {
                     if(newValue[i].subscribed){
                         this.subcribedAllChanel(newValue[i].id,newValue[i].actionName) 
                     }else{
-                          this.unsubcribedAllChanel(newValue[i].id) 
+                        this.unsubcribedAllChanel(newValue[i].id) 
                     }
 
                 }
@@ -116,7 +117,38 @@ export default {
      },
   methods: {
       close(){
+           this.addChanel(),
           this.$emit('close');
+      },
+      findExistChanel(event){
+          let data = {objectType:this.objType,source:this.objType, state:1,event:event};
+           for(let i = 0; i<this.allChanel.length;i++){
+                if(this.allChanel[i].objectType==this.objType&&this.allChanel[i].event==event){
+                    data.receiver=this.allChanel[i].defaultUser,
+                    data.action=this.allChanel[i].action,
+                    data.icon=this.allChanel[i].icon,
+                    data.content=this.allChanel[i].content
+                }
+            }
+            return data
+
+      },
+      addChanel(){
+          for(let i= 0; i<this.items.length;i++){
+              if(this.items[i].subscribed){
+                 let data = this.findExistChanel(this.items[i].actionName);
+                    data.objectType = this.objType+":"+973;
+                    notification.addChanel(data).then(res=>{
+                    if(res.status==200){
+                    }else{
+                        self.$snotify({
+                            type: "error",
+                            title: "Thêm thông báo thất bại",
+                        });
+                    }
+                })
+              }
+          }
       },
        getSource(){
         const self = this;
@@ -134,7 +166,6 @@ export default {
                 }
             }
             return name
-
         },
       unsubcribedAllChanel(id){
         const self = this;
@@ -151,8 +182,6 @@ export default {
                     check = true;
                 }
             }
-
-
         },
       subcribedAllChanel(id,action){
           if(this.checkExistChanel(action)){
@@ -165,6 +194,7 @@ export default {
           }
        
       },
+     
      getAllListChanel(){
         this.items=[];
         const self= this;
@@ -178,7 +208,7 @@ export default {
                     format.push(listModules[i])
                 }
             }
-            let formatListModules = _.groupBy(format, 'objectType');
+            let formatListModules = _groupBy(format, 'objectType');
             let name = Object.keys(formatListModules);
             for(let i=0;i<formatListModules[self.objType].length;i++){
                 self.items.push({

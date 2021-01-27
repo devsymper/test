@@ -1,9 +1,30 @@
 import Control from "./control";
-import moment from "moment-timezone";
-
+import { util } from "@/plugins/util.js";
+import sDocument from './../../../store/document'
+import PivotTable from "./pivot-table";
+import GroupTable from "./GroupTable";
+import {
+    SYMPER_APP
+} from './../../../main.js'
+window.switchTableMode = function(el) {
+    let tableName = $(el).attr('table-name');
+    let viewType = $(el).attr('view-type');
+    let thisListItem = null;
+    if (viewType == 'detail') {
+        thisListItem = util.getClosestVueInstanceFromDom(el, 'detailDocument');
+    } else if (viewType == 'submit') {
+        thisListItem = util.getClosestVueInstanceFromDom(el, 'submitDocument');
+    }
+    if (thisListItem) {
+        thisListItem.$evtBus.$emit('on-switch-pivot-table-mode', { tableName: tableName })
+    }
+}
+window.viewTable = function(el) {
+    SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { isTable: true, tableName: $(el).attr('table-name') })
+}
 export default class TableControl extends Control {
-    constructor(idField, ele, controlProps, curParentInstance) {
-        super(idField, ele, controlProps, curParentInstance);
+    constructor(idField, ele, controlProps, keyInstance) {
+        super(idField, ele, controlProps, keyInstance);
     }
     initTableControl(isPrintView = false) {
 
@@ -13,7 +34,7 @@ export default class TableControl extends Control {
          */
         this.tableInstance = null;
         this.tablePrint = null;
-        this.pivotTable = null;
+        this.agDataTable = null;
         this.isPrintView = isPrintView;
         /**
          * tên các control nằm trong control này, mặc định là null, nếu control là table thì mới có giá trị là {'tên control':true}
@@ -21,8 +42,32 @@ export default class TableControl extends Control {
         this.listInsideControls = null;
         this.controlInTable = {};
         this.mapControlToIndex = {};
+        this.tableMode = this.controlProperties.tableView.value;
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
-
+    }
+    setPivotTableConfig(config){
+        if(this.tableMode == 'Pivot'){
+            this.pivotTableConfig = config;
+            this.agDataTable = new PivotTable(
+                this,
+                this.name,
+                this.id,
+                this.pivotTableConfig,
+                this.keyInstance
+            );
+        }
+    }
+    setGroupTableConfig(config){
+        if(this.tableMode == 'Group'){
+            this.groupTableConfig = config;
+            this.agDataTable = new GroupTable(
+                this,
+                this.name,
+                this.id,
+                this.groupTableConfig,
+                this.keyInstance
+            );
+        }
     }
     renderInfoButtonInRow(linkControl) {
         if (linkControl) {
@@ -34,31 +79,47 @@ export default class TableControl extends Control {
                     let curColIndex = this.tableInstance.colName2Idx[controlLink];
                     for (let key in listLinkInCol) {
                         let rowIdx = key.replace(/linkConfig_(.+)_/g, "");
-                        rowIdx = Number(rowIdx)
-                        this.tableInstance.validateValueMap[rowIdx + "_" + curColIndex] = {
+                        rowIdx = Number(rowIdx);
+                        let cellPos = rowIdx + "_" + curColIndex;
+                        this.tableInstance.addToValueMap(cellPos, {
                             type: 'linkControl',
-                        };
+                        })
                     }
                 }
             }
         }
     }
     renderTable() {
+        let viewType = sDocument.state.viewType[this.keyInstance];
+        if ((viewType == 'submit' || viewType == "update") && !this.agDataTable) {
+            this.ele.parent().append('<span onclick="viewTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
+        }
         if (this.isPrintView) {
-            this.ele.attr('table-id', this.ele.attr('id'));
-            this.ele.removeAttr('id');
-            this.ele.find('table').addClass('table-print');
-            this.ele.find('table tbody').empty();
-            this.tablePrint.render();
+            if(this.agDataTable){
+                this.agDataTable.render();
+            }
+            else{
+                this.ele.attr('table-id', this.ele.attr('id'));
+                this.ele.removeAttr('id');
+                this.ele.find('table').addClass('table-print');
+                this.ele.find('table tbody').empty();
+                this.tablePrint.render();
+            }
         } else {
             this.tableInstance.render();
-            if(this.pivotTable){
-                this.pivotTable.render();
+            if(this.agDataTable){
+                this.agDataTable.render();
+                if(this.tableMode == 'Pivot'){
+                    let switchTableButton = $(`<button onclick="switchTableMode(this)" view-type="`+viewType+`" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
+                    this.ele.before(switchTableButton);    
+                }
+                this.switchTable();
+            }
+            if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
+                this.ele.closest('.wrap-table').css({ 'display': 'none' })
             }
             this.ele.detach().hide();
-
         }
-
     }
     /**
      * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
@@ -109,10 +170,29 @@ export default class TableControl extends Control {
                 tr += '</tr>';
                 bodyHtml += tr;
             }
-            this.ele.find('table tbody').append(bodyHtml);
-            this.ele.find('table').attr('contenteditable', 'false')
+            if (!this.agDataTable) {
+                this.ele.find('table tbody').append(bodyHtml);
+                this.ele.find('table').attr('contenteditable', 'false');
+            }
+            let dataTable = [];
+            let rowLength = data[Object.keys(data)[0]].length;
+            for (let index = 0; index < rowLength; index++) {
+                let rowData = {};
+                for (let i = 0; i < Object.keys(data).length; i++) {
+                    let key = Object.keys(data)[i];
+                    let control = this.controlInTable[key];
+                    if (control && control.type == 'date') {
+                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                    }
+                    rowData[key] = data[key][index];
+                }
+                dataTable.push(rowData)
+            }
+            if (this.agDataTable) {
+                this.agDataTable.setData(dataTable)
+            }
         } else {
-            if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1){
+            if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
                 return;
             }
             let dataTable = [];
@@ -123,26 +203,51 @@ export default class TableControl extends Control {
                     let key = Object.keys(data)[i];
                     let control = this.controlInTable[key];
                     if (control && control.type == 'date') {
-                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
                     }
                     rowData[key] = data[key][index];
                 }
                 dataTable.push(rowData)
 
             }
-
-            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
-                dataTable.push({})
+            if(this.agDataTable){
+                this.agDataTable.setData(dataTable);
             }
-            this.tableInstance.tableInstance.loadData(dataTable);
-            setTimeout((self) => {
-                self.tableInstance.tableInstance.render();
-            }, 100, this);
+            else{
+                this.tableInstance.setData(dataTable, false);
+                setTimeout((self) => {
+                    self.tableInstance.tableInstance.render();
+                    SYMPER_APP.$evtBus.$emit('document-on-table-change', {
+                        data: self.tableInstance.tableInstance.getSourceData(),
+                        tableName: self.name
+                    });
+                }, 100, this);
+            }
+            
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
             }
+            
 
         }
+    }
+    switchTable() {
+        if (this.tableMode == 'Flat') {
+            this.tableInstance.show();
+            this.tableInstance.tableInstance.render();
+            if (this.agDataTable) {
+                this.agDataTable.hide();
+            }
+        } else {
+            this.tableInstance.hide();
+            if (this.agDataTable) {
+                this.agDataTable.show();
+            }
+
+        }
+    }
+    isInsertRow(){
+        return this.controlProperties.isInsertRow.value
     }
 
 }

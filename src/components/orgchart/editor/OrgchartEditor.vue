@@ -67,17 +67,17 @@
                 </v-tooltip>
               <div style="flex-grow:1">
                     <v-btn
-                    v-if="action != 'view' && context == 'department'"
-                    class="float-right mr-1"
-                    style=""
-                    @click="saveOrgchart"
-                    small
-                    depressed
-                    color="primary"
-                >
-                    <v-icon class="mr-2" primary>mdi-content-save</v-icon>
-                    {{$t('common.save')}}
-                </v-btn>
+						v-if="action != 'view' && context == 'department'"
+						class="float-right mr-1"
+						style=""
+						@click="saveOrgchart"
+						small
+						depressed
+						color="primary"
+					>
+						<v-icon class="mr-2" primary>mdi-content-save</v-icon>
+						{{$t('common.save')}}
+					</v-btn>
               </div>
             </div>
             <div v-if="loadingDiagramView" style="
@@ -162,6 +162,7 @@ import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
 import { permissionApi } from '../../../api/permissionPack';
 import {documentApi} from "@/api/Document.js"
+import { event } from 'jquery';
 
 
 export default {
@@ -368,7 +369,7 @@ export default {
             }
         },
         handleConfigUserSelectChange(listUserIds){
-            this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
+			this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
             if(this.context == 'department'){
 				this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
 				let allNodes = this.$refs.positionDiagram.getAllNode()
@@ -435,6 +436,10 @@ export default {
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
                 if(res.status == 200){
+					this.$store.commit('orgchart/setDataOrgchartSideBySide',{
+						orgchartId: res.data.orgchart.id,
+						object:res.data
+					})
                     this.$refs.editorWorkspace.createFirstVizNode()
                     let savedData = res.data;
                     let departments = this.correctDiagramDisplay(savedData.orgchart.content);
@@ -587,7 +592,7 @@ export default {
                     self.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(self.typeView);
 
                 }, 200, this);
-            }
+			}
         },
         createFirstVizNode(){
 			return this.$refs.editorWorkspace.createFirstVizNode();
@@ -736,7 +741,9 @@ export default {
                     let allPos = self.$store.state.orgchart.editor[dpm.positionDiagramCells.instanceKey].allNode;
                     let resAllPos = []
                     posNodeIds.forEach(function(e){
-                        resAllPos[e] = allPos[e]
+						if(allPos[e]){
+                       		 resAllPos[e] = allPos[e]
+						}
                     })
                     for(let posId in resAllPos){
                         let attr = allPos[posId].commonAttrs;
@@ -917,10 +924,7 @@ export default {
             }
         },
         handleConfigValueChange(data){
-            if(data.name = "mappingDoc"){
-                this.selectedDoc = data.data
-            }
-            let cellId = this.selectingNode.id;
+			let cellId = this.selectingNode.id;
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
             }else if(cellId == SYMPER_HOME_ORGCHART && this.context == 'position'){
@@ -928,6 +932,9 @@ export default {
             }else if(this.context == 'position' && data.name == 'code'){
                 let content = data.data ? (this.$t('common.code') + ' : '+ data.data) : '';
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'positionCode', content);
+			}
+			if(data.name = "mappingDoc"){
+                this.selectedDoc = data.data
             }
         },
         changeDepartmentName(newName, idDepartment = false){
@@ -1094,11 +1101,18 @@ export default {
 .symper-orgchart-paper .link-tools,
 .symper-orgchart-paper .marker-vertex-group,
 .symper-orgchart-view .symper-orgchart-paper .orgchart-action {
-    display: none!important;
+    display: block !important;
+}
+.symper-orgchart-view  .line-action{
+    display: none !important;
 }
 
 .symper-orgchart-active-editor .symper-orgchart-paper .orgchart-action {
-    display: none;
+    display: block!important;
+}
+.symper-orgchart-active-editor .show-infor-department,
+.symper-orgchart-active-editor .show-infor-user{
+    display: none !important;
 }
 
 .symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {
@@ -1113,4 +1127,5 @@ export default {
 .diagram-vertical .btn-collapse-expand-hor{
     display: none;
 }
+
 </style>

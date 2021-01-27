@@ -23,7 +23,8 @@ export default {
     data(){
         return {
             listObject:[],
-            countComponentDetail:0
+            countComponentDetail:0,
+            formSize:{}
         }
     },
     props:{
@@ -52,7 +53,8 @@ export default {
         }
     },
     methods:{
-        afterLoaded(){
+        afterLoaded(formSize){
+            this.formSize = formSize;
             if(!this.isAlwaysPrint){
                 return;
             }
@@ -75,35 +77,52 @@ export default {
             for (const node of [...document.querySelectorAll('link, style')]) {
             stylesHtml += node.outerHTML;
             }
+            let contentHeight = $('.content-scroll')[0].scrollHeight;
             let cstyle = `<style type="text/css">
                          @media print {
                                 html, body{
-                                height:100%;
+                                height:`+contentHeight+`px;
                                 width:100%;
+                          
+                                }
+                                .ag-root-wrapper, .ag-root-wrapper-body, .ag-root, .ag-body-viewport, .ag-center-cols-container, .ag-center-cols-viewport, .ag-center-cols-clipper, .ag-body-horizontal-scroll-viewport, .ag-virtual-list-viewport{
+                                    height: 100% !important;
+                                    overflow: hidden !important;
+                                    display: flex !important;
+                                    width: auto !important;
+                                }
+                                .ag-root-wrapper.ag-layout-print, .ag-root-wrapper.ag-layout-print .ag-root-wrapper-body, .ag-root-wrapper.ag-layout-print .ag-root, .ag-root-wrapper.ag-layout-print .ag-body-viewport, .ag-root-wrapper.ag-layout-print .ag-center-cols-container, .ag-root-wrapper.ag-layout-print .ag-center-cols-viewport, .ag-root-wrapper.ag-layout-print .ag-center-cols-clipper, .ag-root-wrapper.ag-layout-print .ag-body-horizontal-scroll-viewport, .ag-root-wrapper.ag-layout-print .ag-virtual-list-viewport{
+                                        height: unset !important;
+                                        width: auto !important;
+                                        overflow: unset !important;
+                                        display: block !important;
+
+                                }
+                                .ag-center-cols-viewport{
+                                        border-top: 1px solid #dde2eb !important;
+                                }
+                                @page{
+                                    margin-bottom :`+this.formSize['padding-bottom']+`;
+                                    margin-top :`+this.formSize['padding-top']+`;
+                                    margin-right :`+this.formSize['padding-right']+`;
+                                    margin-left :`+this.formSize['padding-left']+`;
+                                }
+                                tr    { page-break-inside:avoid; page-break-after:always;}
+                                thead { display:table-header-group }
+                                tfoot { display:table-footer-group }
+                                .wrap-print-multiple table{
+                                    width:100% !important;
+                                    height:100% !important;
+                                }
+                                .wrap-print-multiple{
+                                    width:100%;
+                                    height:100% !important;
                                 }
                             }
-                            .wrap-print-multiple table{
-                                width:100% !important;
-                                 page-break-inside:avoid;
+                             .content-print-document{
+                                padding: 0 !important;
                             }
-                            .wrap-print-multiple{
-                                width:100%;
-                                 page-break-inside:avoid;
-                            }
-                            .sym-form-Detail{
-                                overflow:hidden;
-                                page-break-inside:avoid;
-                                page-break-before: always;
-                                page-break-after: always;
-                            }
-                           
-                            table { page-break-inside:auto }
-                            tr    { page-break-inside:avoid; page-break-after:auto }
-                            thead { display:table-header-group }
-                            tfoot { display:table-footer-group }
-                        }
-                        
-
+                            
                     </style>`
                      stylesHtml += cstyle;
             // Open the print window
@@ -121,7 +140,7 @@ export default {
             WinPrint.focus(); // necessary for IE >= 10*/
             setTimeout(() => {
                 WinPrint.print();
-                WinPrint.close();
+                // WinPrint.close();
             }, 1000);
            
             

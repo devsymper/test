@@ -7,19 +7,29 @@
         right
         :style="{width: tableDisplayConfig.width+'px','z-index':'7'}"
     >
-        <div class="title">
-            <div>
-                {{$t('common.list_config')}}
-                <v-icon
-                    class="close-btn float-right"
-                    @click="tableDisplayConfig.show = false"
-                >mdi-close</v-icon>
-            </div>
-            
-            <!-- <div class="pb-2 justify-space-between d-flex mt-2" v-if="showActionPanelInDisplayConfig">
+    <div>
+        <v-icon
+            class="close-btn float-right"
+            @click="handlerCloseClick">
+            mdi-close
+        </v-icon>
+    </div>
+     <v-tabs v-model="tab" color="orange" grow style="flex-grow: 0">
+        <v-tab href="#tab-1" class="tab">
+            <span class="fs-12"> {{$t('common.list_config')}}</span>
+          
+        </v-tab>
+         <v-tab href="#tab-2" class="tab">
+             <span class="fs-12"> {{$t('common.format_table')}}</span>
+        </v-tab>
+    </v-tabs>
+      <v-tabs-items v-model="tab" style="flex-grow: 1">
+        <v-tab-item :key="1" :value="'tab-' + 1" class="tab-item" style="flex-grow: 1">
+            <div class="title">
+            <div class="pb-2 justify-space-between d-flex mt-2" v-if="showActionPanelInDisplayConfig">
                 <div class="subtitle-2">{{$t('common.always_show_sidebar')}}</div>
                 <v-switch style="height: 25px" v-model="tableDisplayConfig.value.alwaysShowSidebar" class="float-right pt-0 mt-0" ></v-switch>
-            </div> -->
+            </div>
             <div class="pb-2">
                 <div class="subtitle-2">{{$t('table.wrap_text_mode')}}</div>
                 <div>
@@ -68,12 +78,12 @@
                         :name="!tableDisplayConfig.drag ? 'flip-list' : null"
                     >
                         <div
-                            class="fs-13 column-drag-pos"
+                            class="fs-13 column-drag-pos pl-2"
                             v-for="(column,idx) in tableColumnsClone"
-                            :key="column.data"
+                            :key="column.data ? column.data : column.field"
                         >
                             <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
-                            <span class="fw-400">{{columnTitle(column.columnTitle)}}</span>
+                            <span class="fw-400">{{column.headerName ? columnTitle(column.headerName) : columnTitle(column.columnTitle)}}</span>
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
                                     <v-btn
@@ -87,10 +97,10 @@
                                     >
                                         <v-icon
                                             size="18"
-                                        >{{column.symperFixed ? 'mdi-roller-skate-off': 'mdi-roller-skate'}}</v-icon>
+                                        >{{!column.symperFixed ? 'mdi-roller-skate': 'mdi-roller-skate-off'}}</v-icon>
                                     </v-btn>
                                 </template>
-                                <span>{{ column.symperFixed ? $t('table.unfreeze_column') : $t('table.freeze_column') }}</span>
+                                <span>{{ !column.symperFixed ? $t('table.freeze_column') : $t('table.unfreeze_column') }}</span>
                             </v-tooltip>
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
@@ -105,59 +115,85 @@
                                     >
                                         <v-icon
                                             size="18"
-                                        >{{column.symperHide ? 'mdi-eye-off-outline': 'mdi-eye-outline'}}</v-icon>
+                                        >{{!column.symperHide ? 'mdi-eye-outline': 'mdi-eye-off-outline'}}</v-icon>
                                     </v-btn>
                                 </template>
                                 <span
                                     class="fw-400"
-                                >{{ column.symperHide ? $t('table.show_column') : $t('table.hide_column') }}</span>
+                                >{{ !column.symperHide ? $t('table.hide_column') : $t('table.show_column') }}</span>
                             </v-tooltip>
                         </div>
                     </transition-group>
                 </draggable>
             </div>
         </div>
-        <template v-slot:append>
-            <div class="w-100 pt-2">
-                <v-btn
-                    :loading="savingConfigs"
-                    small
-                    color="primary"
-                    @click="saveTableDisplayConfig()"
-                    class="float-right"
-                >
-                    <v-icon class="mr-2">mdi-content-save-outline</v-icon>
-                    {{$t('common.save')}}
-                </v-btn>
-            </div>
-        </template>
+        <div class="w-100" style="flex-grow: 1">
+            <v-btn
+                :loading="savingConfigs"
+                small
+                color="primary"
+                @click="saveTableDisplayConfig()"
+                class="float-right"
+            >
+                <v-icon class="mr-2">mdi-content-save-outline</v-icon>
+                {{$t('common.save')}}
+            </v-btn>
+        </div>
+        </v-tab-item>
+         <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
+            <ConditionalFormatting
+                @change-format="changeFormat"
+                :rowData="rowData"
+                :conditionalFormat="conditionalFormat"
+                :tableColumns="tableColumns"
+                @change-apply="changeApply"
+                @save="saveConditionalFormatting"
+                :headerPrefixKeypath='headerPrefixKeypath'/>
+        </v-tab-item>
+        </v-tabs-items>
     </v-navigation-drawer>
 </template>
 
 <script>
 import { appConfigs } from "./../../../configs.js";
 import draggable from "vuedraggable";
+import ConditionalFormatting from "./ConditionalFormatting";
 import { util } from '../../../plugins/util';
 export default {
     components: {
         draggable,
+        ConditionalFormatting
     },
     watch: {
         tableColumns: {
             deep: true,
             handler(){
-                this.tableColumnsClone = util.cloneDeep(this.tableColumns);
+				this.tableColumnsClone = util.cloneDeep(this.tableColumns);
+				this.$emit('re-render')
             }
         }
     },
     data(){
         return {
+            tab:null,
             savingConfigs: false,
             tableColumnsClone: []
         }
     },
     computed: {},
     props: {
+        conditionalFormat:{
+             type: Array,
+                default(){
+                    return []
+                }
+        },
+        rowData:{
+             type: Array,
+                default(){
+                    return []
+                }
+        },
         tableDisplayConfig: {
             type: Object,
             default(){
@@ -180,12 +216,25 @@ export default {
         }
     },
     methods: {
+        changeFormat(data){
+             this.$emit('change-format',data)
+        },
+        changeApply(data){
+            this.$emit('change-apply',data)
+        },
+        saveConditionalFormatting(data){
+            this.$emit('save-conditional-formatting',data);
+        },
         saveTableDisplayConfig(){
             this.$emit('save-list-display-config');
         },
         resetTableColumnsData(){
             // this.tableColumnsClone = util.cloneDeep(this.tableColumns);
-        },
+		},
+		handlerCloseClick(){
+			this.tableDisplayConfig.show = false
+			this.$emit('re-render')
+		},
         handleStopDragColumn(){
             this.$emit('drag-columns-stopped', this.tableColumnsClone);
         },
@@ -195,7 +244,6 @@ export default {
         getDataTypeIcon(type) {
             return appConfigs.dataTypeIcon[type];
         },
-        
         columnTitle(title) {
             let prefix = this.headerPrefixKeypath;
             prefix =
@@ -217,5 +265,13 @@ export default {
 
 .column-drag-pos[draggable="true"] {
     background-color: #ffe6d2;
+}
+.column-drag-pos{
+	border: 1px solid lightgray;
+	padding-left: 2px;
+}
+.v-label {
+    font-size:13px!important;
+    color:black!important
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="view-applications-wrapper h-100 w-100">
-        <ViewDetailsAllApp ref="ViewDetailsAllApp" v-if="viewSideBySide == false"  :currentType="currentType" />
+        <ViewDetailsAllApp v-show="!viewSideBySide" ref="ViewDetailsAllApp" v-if="viewSideBySide == false"  :currentType="currentType" />
         <ViewSideBySideApp ref="ViewSideBySideApp" v-else  />
   </div>
 </template>

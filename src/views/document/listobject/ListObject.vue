@@ -1,30 +1,34 @@
 <template>
     
     <div class="h-100 w-100 list-object-component">
+		<AutocompleteDoc 
+			style="position:absolute; top: 12px ; left: 170px"
+			@change="handleChange"
+		/>
         <list-items
-        :getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/objects'"
-        :exportLink="sDocumentManagementUrl+'documents/'+docId+'/export-excel'" 
-        :useDefaultContext="false"
-        :tableContextMenu="tableContextMenu"
-        :pageTitle="$t('documentObject.title')"
-        :containerHeight="containerHeight"
-        :actionPanelWidth="actionPanelWidth"
-        :actionPanelType="'elastic'"
-        :showActionPanelInDisplayConfig="true"
-        :showExportButton="true"
-        :showImportButton="true"
-        :isTablereadOnly="false"
-        :conditionByFormula="formulasInput.formula.value"
-        @after-open-add-panel="submitDocument"
-        @data-get="afterGetData"
-        @before-keydown="afterRowSelected"
-        @after-cell-mouse-down="afterRowSelected"
-        @after-selected-row="afterSelectedRow"
-        @row-selected="afterCellSelection"
-        :commonActionProps="commonActionProps"
-        :customAPIResult="customAPIResult"
-        ref="listObject"
-    >
+			:getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/objects'"
+			:exportLink="sDocumentManagementUrl+'documents/'+docId+'/export-excel'" 
+			:useantext="false"
+			:tableContextMenu="tableContextMenu"
+			:pageTitle="$t('documentObject.title')"
+			:containerHeight="containerHeight"
+			:actionPanelWidth="actionPanelWidth"
+			:actionPanelType="'elastic'"
+			:showActionPanelInDisplayConfig="true"
+			:showExportButton="true"
+			:showImportButton="false"
+			:isTablereadOnly="false"
+			:conditionByFormula="formulasInput.formula.value"
+			@after-open-add-panel="submitDocument"
+			@data-loaded="afterGetData"
+			@before-keydown="afterRowSelected"
+			@after-cell-mouse-down="afterRowSelected"
+			@after-selected-row="afterSelectedRow"
+			@row-selected="afterCellSelection"
+			:commonActionProps="commonActionProps"
+			:customAPIResult="customAPIResult"
+			ref="listObject"
+		>
         <div slot="right-panel-content" class="h-100">
             <div v-if="isDeleteMultiple" class="h-100">
                 <div class="d-flex">
@@ -47,6 +51,11 @@
                 <v-btn small @click="showDialog" class="delete-record-btn">
                     <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
                 </v-btn>
+                <!-- test -->
+                 <v-btn small @click="deleteAll" class="delete-all-record-btn">
+                    <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.deleteAll')}}
+                </v-btn>
+                <!-- test -->
             </div>
             <div v-else>
                 <div class="panel-header" v-if="actionOnRightSidebar == 'detail'">
@@ -99,9 +108,6 @@
                             <span>{{$t('document.instance.showlist.update')}}</span>
                         </v-tooltip>
                     </div>
-                    <v-btn small @click="showDialog" class="delete-record-btn">
-                        <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
-                    </v-btn>
                 </div>
                 <div  v-else-if="actionOnRightSidebar == 'update'">
                     <span class="title float-left">
@@ -217,7 +223,7 @@ import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
 import Detail from './../detail/Detail.vue';
 import DocumentSubmit from "@/views/document/submit/Submit.vue";
-
+import AutocompleteDoc from './AutocompleteDoc'
 export default {
     components: {
         "list-items": ListItems,
@@ -227,10 +233,12 @@ export default {
         BottomSheet,
         PrintView,
         DocumentSubmit,
-        FormTpl
+		FormTpl,
+		AutocompleteDoc
 
     },
     data(){
+		let self = this
         return {
             sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             dialog:false,
@@ -244,24 +252,30 @@ export default {
             },
             customAPIResult:{
                 reformatData(res){
-                    let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
-                    let listObject = res.data.listObject;
-                    // if(Object.keys(thisCpn.recordSelected).length > 0){
-                    //     for (let index = 0; index < listObject.length; index++) {
-                    //         let row = listObject[index];
-                    //         let rowChecked = Object.values(thisCpn.recordSelected).filter(r=>{
-                    //             return r.document_object_id == row.document_object_id
-                    //         })
-                    //         if(rowChecked.length > 0){
-                    //             listObject[index]['checkbox_select_item'] = true;
-                    //         }
-                    //     }
-                    // }
-                    return{
-                        columns:res.data.columns,
-                        listObject:res.data.listObject,
-                        total:res.data.listObject.length,
-                    }
+					if(res.status == 200){
+						res.data.columns.forEach(function(e){
+							if(e.type == "richtext"){
+								e.cellRenderer = function(params) {
+									let content = ""
+									let rtf = params.value
+									if(rtf){
+										rtf = rtf.replace(/\\par[d]?/g, "");
+										rtf = rtf.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
+										content = rtf.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim()
+									}
+									return '<span>'+content+'</span>'
+								}
+							}					
+						})
+						return{
+							columns:res.data.columns,
+							listObject:res.data.listObject,
+							total:res.data.total,
+						}
+					}else{
+						return {}
+					}
+					
                 }
             },
             docId:parseInt(this.$route.params.id),
@@ -338,7 +352,7 @@ export default {
                         })
                         .catch(err => {
                         })
-                        .always(() => {});
+                        .finally(() => {});
                     },
                 },
                 detail: {
@@ -410,7 +424,7 @@ export default {
         documentApi.getListPrintConfig(this.docId).then(res=>{
             thisCpn.listTabletItem = res.data.listObject;
             thisCpn.listTabletItem[0].activeSb = true;
-        }).catch(err => {}).always(() => {});
+        }).catch(err => {}).finally(() => {});
     },
     activated(){
         if(this.$refs.listObject && this.$refs.listObject.isShowCheckedRow()){
@@ -425,9 +439,37 @@ export default {
         }
     },
     methods:{
-         onDocumentUpdateSuccess(){
-            this.actionOnRightSidebar = 'detail';
+		convertToPlain(rtf) {
+			return "<span>value</span>"
+			
+		},
+        deleteAll(){
+            let dataDoc = {
+                type:'all',
+                documentId:this.docId
+            };
+            const self = this;
+            documentApi.deleteAll(dataDoc).then(res=>{
+                if (res.status == 200) {
+                    self.$snotify({
+                        type: "success",
+                        title: "Delete all success!"
+                    });  
+                }
+                else{
+                    self.$snotify({
+                        type: "error",
+                        title: res.message
+                    });  
+                }
+            })
         },
+        onDocumentUpdateSuccess(){
+            this.actionOnRightSidebar = 'detail';
+		},
+		handleChange(docId){
+			this.docId = docId
+		},
         updateCurrentRecord(){
             this.actionOnRightSidebar = 'update';
         },
@@ -459,7 +501,7 @@ export default {
             })
             .catch(err => {
             })
-            .always(() => {});
+            .finally(() => {});
         },
         showDialog(){
             this.dialog = true;
@@ -557,20 +599,19 @@ export default {
         },
         afterRowSelected(data){
             if(this.$refs.listObject.isShowSidebar()){
-                let documentObject = data.rowData;
-                let cell = data.cell;
+                let documentObject = data.data;
                 let event = data.event;
-                if(cell.col == 0 && this.$refs.listObject.isShowCheckedRow()){
+                if(this.$refs.listObject.isShowCheckedRow()){
                     return;
-                }
+				}
                 if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
                     if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
                         return
-                    }
+					}
                     this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
                     this.$refs.listObject.openactionPanel();
                     this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
-                    this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+					this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
                 }
             }
             
@@ -598,18 +639,18 @@ export default {
             }
         },
         afterSelectedRow(dataSelected){
-            this.countRecordSelected = Object.keys(dataSelected).length;
+            this.countRecordSelected = dataSelected.length;
             this.recordSelected = dataSelected; 
         },
         /**
          * Ấn để in các bản ghi đã chọn
          */
         printSelected(){
-            if(Object.keys(this.recordSelected).length == 0){
+            if(this.recordSelected.length == 0){
                 this.$snotify({
-                            type: "info",
-                            title: "Vui lòng chọn bản ghi để in"
-                        }); 
+					type: "info",
+					title: "Vui lòng chọn bản ghi để in"
+				}); 
                 return;
             }
             this.hideBottomSheet();
@@ -635,7 +676,7 @@ export default {
          */
         afterCellSelection(rowData){
             this.actionOnRightSidebar = 'detail';
-            this.currentRowData = rowData;
+			this.currentRowData = rowData;
         }
     }
 }
@@ -648,15 +689,18 @@ export default {
         color: #757575;
         margin-top: -3px;
     }
+	.list-object-component{
+		position: relative
+	}
     .panel-header .mdi:hover{
         color: rgba(0,0,0 / 0.6);
     }
     .panel-body{
-        height: calc(100vh - 55px);
+        height: calc(100vh - 95px);
     }
-    .panel-body >>> .wrap-content-detail{
+    /* .panel-body >>> .wrap-content-detail{
         height: calc(100vh - 65px) !important;
-    }
+    } */
     .right-action{
         margin-left: auto;
         font-size: 15px;
@@ -715,6 +759,11 @@ export default {
         position: absolute;
         bottom: 16px;
         right: 16px;
+    }
+    .delete-all-record-btn{
+        position: absolute;
+        bottom: 16px;
+        right: 106px;
     }
 
 </style>

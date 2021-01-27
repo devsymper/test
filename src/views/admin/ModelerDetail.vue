@@ -25,6 +25,7 @@
 					<v-btn
 						tile 
 						icon
+						v-show="tab == 'tab-1'"
 						x-small
 						class="mr-2"
 						@click="handleZoomOut"
@@ -35,6 +36,7 @@
 						tile 
 						icon
 						x-small
+						v-show="tab == 'tab-1'"
 						class="mr-2"
 						@click="handleZoomIn"
 					>
@@ -44,6 +46,7 @@
 						tile 
 						icon
 						x-small
+						v-show="tab == 'tab-1'"
 						class="mr-2"
 						@click="handleFocus"
 					>
@@ -51,40 +54,21 @@
 					</v-btn>
 				</div>
 			</div>
-			<v-tabs
-			v-model="tab"
-			v-show="false"
-			>
-			</v-tabs>
-			<v-tabs-items v-model="tab">
-				<v-tab-item
-				value='tab-1'
-				>
-					<symper-bpmn
-						@node-clicked="handleNodeSelected"
-						@node-changed="handleNodeChangeProps"
-						ref="symperBpmn"
-						:height="diagramHeight"
-						:width="600"
-						:diagramXML="diagramXML"
-						:customModules="customRender"
-					></symper-bpmn>
-				</v-tab-item>
-				<v-tab-item
-				value='tab-2'
-				>
-					 <symper-bpmn
-						@node-clicked="handleNodeSelected"
-						@node-changed="handleNodeChangeProps"
-						ref="symperBpmn"
-						:height="diagramHeight"
-						:width="600"
-						:diagramXML="diagramXML"
-						:customModules="customRenderHeatMap"
-					></symper-bpmn>
-				</v-tab-item>
-			</v-tabs-items>
-           
+				<symper-bpmn
+					v-show="tab == 'tab-1'"
+					@node-clicked="handleNodeSelected"
+					@node-changed="handleNodeChangeProps"
+					ref="symperBpmn"
+					:height="diagramHeight"
+					:width="600"
+					:diagramXML="diagramXML"
+					:customModules="customRender"
+				></symper-bpmn>
+				<ModelerWithHeatMap 
+				 	v-show="tab == 'tab-2'"
+					:tab="tab"
+					:handleAction="handleAction"
+				/>
         </div>
 
     </div>
@@ -107,7 +91,8 @@ import Api from "@/api/api.js";
 import { appConfigs } from '@/configs';
 import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
 import CustomRenderProcessCount from '@/components/process/CustomRenderProcessCount'
-import CustomRenderHeatMap from '@/components/process/CustomRenderHeatMap'
+import ModelerWithHeatMap from "./ModelerWithHeatMap"
+import {cleanXMLBeforeRenderInEditor} from "@/components/process/processAction.js";
 
 const apiCaller = new Api('');
 
@@ -176,12 +161,15 @@ export default {
             this.diagramHeight = window.innerHeight - 400;
 		},
 		handleZoomOut(){
+			this.handleAction = 'handleZoomOut'
             this.$refs.symperBpmn.zoomOut();
 		},
 		handleZoomIn(){
+			this.handleAction = 'handleZoomIn'
             this.$refs.symperBpmn.zoomIn();
 		},
 		handleFocus(){
+			this.handleAction = 'handleFocus'
             this.$refs.symperBpmn.focus();
 		},
 		
@@ -1234,10 +1222,6 @@ export default {
                 this.$refs.symperBpmn[ac]();
             }
         },
-        cleanXMLBeforeRender(xml){
-            xml = xml.replace(/<symper:(.*?)<\/symper:(.*?)>/g,''); // Loại bỏ toàn bộ các thẻ của symper
-            return xml;
-        },
         /**
          * Lấy data từ server và áp dụng data này để hiển thị lên process
          */
@@ -1245,7 +1229,7 @@ export default {
             try {
                 let modelData = await bpmnApi.getModelData(idProcess);
                 modelData = modelData.data;
-                let xml = this.cleanXMLBeforeRender(modelData.content);
+                let xml = cleanXMLBeforeRenderInEditor(modelData.content);
                 let afterRender = await this.$refs.symperBpmn.renderFromXML(xml);
                 if(modelData.configValue){
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
@@ -1257,7 +1241,8 @@ export default {
                     this.$t("process.editror.err.get_xml")
                 );
             }
-        },
+		},
+	
         restoreAttrValueFromJsonConfig(jsonStr){
 			let processTracking = this.$store.state.admin.currentTrackingProcess
 			let self = this
@@ -1438,6 +1423,7 @@ export default {
     data() {
         return {
 			tab:'tab-1',
+			handleAction: "",
             instanceKey: null, // key của instance hiện tại
             attrPannelHeight: "300px", // chiều cao của panel cấu hình các element
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
@@ -1447,12 +1433,6 @@ export default {
                 {
                     __init__: ["customRenderer"],
                     customRenderer: ["type", CustomRenderProcessCount]
-                }
-            ],
-			customRenderHeatMap: [
-                {
-                    __init__: ["customRenderer"],
-                    customRenderer: ["type", CustomRenderHeatMap]
                 }
             ],
             diagramHeight: 300,
@@ -1504,7 +1484,7 @@ export default {
         "form-tpl": FormTpl,
 		VuePerfectScrollbar,
 		CustomRenderProcessCount,
-		CustomRenderHeatMap
+		ModelerWithHeatMap
     },
     props: {
         // Hành động cho editor này, nhận một trong các giá trị: create, edit, view, clone
@@ -1570,16 +1550,16 @@ export default {
 	},
 	watch:{
 		processId(val){
-			this.instanceKey = Date.now();
-			this.$store.commit(
-				"process/initInstance",
-				this.instanceKey
-			);
-			this.$store.dispatch("app/getAllOrgChartData");
-			this.$store.dispatch("app/getAllUsers");
-			this.$store.dispatch("process/getLastestProcessDefinition");
-			this.$store.dispatch('process/getAllDefinitions');
-			// this.applySavedData(this.processId)
+			this.tab = 'tab-1'
+			// this.instanceKey = Date.now();
+			// this.$store.commit(
+			// 	"process/initInstance",
+			// 	this.instanceKey
+			// );
+			// this.$store.dispatch("app/getAllOrgChartData");
+			// this.$store.dispatch("app/getAllUsers");
+			// this.$store.dispatch("process/getLastestProcessDefinition");
+			// this.$store.dispatch('process/getAllDefinitions');
 			this.applySavedData(val);
 		},
 		tab(){
@@ -1592,9 +1572,8 @@ export default {
 			this.$store.dispatch("app/getAllUsers");
 			this.$store.dispatch("process/getLastestProcessDefinition");
 			this.$store.dispatch('process/getAllDefinitions');
-			this.applySavedData(this.processId)
+			this.applySavedData(this.processId);
 		}
-
 	}
 };
 </script>

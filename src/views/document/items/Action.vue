@@ -27,7 +27,19 @@
                 </span>
                 </template>
             </v-btn>
-
+            <div v-else-if="item.isBaInfo" style="font-weight: 500;">
+                
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-icon   small  style="font-size:18px;background: #e6e6e6;border-radius: 50%;padding: 2px;">mdi-incognito</v-icon>
+                            {{item.text}}
+                        </div>
+                        
+                    </template>
+                    <span>BA {{item.text}} đang sửa Document này</span>
+                </v-tooltip>
+            </div>
             <v-list-item-title v-else>
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
@@ -39,6 +51,7 @@
                  
             </v-list-item-title>
         </v-list-item>
+
     </v-list>
 </template>
 <script>
@@ -48,11 +61,6 @@ export default {
             let checkControlItem = { text: 'Kiểm tra Control', icon: 'mdi-puzzle-check' ,action:'check-control'};
             this.items.splice(5,0,checkControlItem);
         }
-        this.$evtBus.$on("document-editor-save-doc-callback", locale => {
-            if(this._inactive == true) return;
-            this.isLoadingSaveDoc = false;
-        });
-        
     },
     data(){
         return {
@@ -75,15 +83,21 @@ export default {
     methods:{
         action(type){
             if(type == 'save-document' && this.isLoadingSaveDoc == false){
-                this.isLoadingSaveDoc = true;
                 this.$emit('document-action-'+type);
             }
             else if(type != 'save-document'){
                 this.$emit('document-action-'+type);
             }
         },
+        hideSaveBtn(baInfo){
+            this.items.pop();
+            this.items.push({ isBaInfo: true, text: baInfo})
+        },
         hideLoading(){
             this.isLoadingSaveDoc = false;
+        },
+        showLoading(){
+            this.isLoadingSaveDoc = true;
         }
     },
 }

@@ -3,12 +3,14 @@
 		<div style="display:flex;">
 			<span style="font-size:15px;">{{$t('document.detail.sidebar.heading')}}</span>
 		</div>
-
 		<v-divider></v-divider>
-
 		<VuePerfectScrollbar style="calc(100% - 62px);">
             <div class="control-info">
                     <table class="w-100">
+                        <tr>
+                            <td style="width:40%;">ID Document</td>
+                            <td>{{documentInfo.id}}</td>
+                        </tr>
                         <tr>
                             <td style="width:40%;">Tiêu đề Document</td>
                             <td>{{documentInfo.title}}</td>
@@ -18,13 +20,32 @@
                             <td>{{controlInfo.name}}</td>
                         </tr>
                         <tr>
-
+                            <td style="width:70px">Kiểu control:</td>
+                            <td>{{controlInfo.type}}</td>
+                        </tr>
+                        <tr>
                             <td>Tiêu đề control: </td>
                             <td>{{controlInfo.title}}</td>
                         </tr>
                         <tr>
                            <td>Người tạo control: </td>
                             <td>{{controlInfo.userUpdate}}</td>
+                        </tr>
+                         <tr>
+                            <td style="width:40%;">BA tạo</td>
+                            <td>{{documentInfo.baCreate}}</td>
+                        </tr>
+                        <tr>
+                            <td style="width:40%;">BA cập nhật</td>
+                            <td>{{documentInfo.baUpdate}}</td>
+                        </tr>
+                          <tr>
+                            <td style="width:40%;">Thời gian tạo</td>
+                            <td>{{documentInfo.createAt}}</td>
+                        </tr>
+                          <tr>
+                            <td style="width:40%;">Thời gian cập nhật</td>
+                            <td>{{documentInfo.updateAt}}</td>
                         </tr>
                     </table>
             </div>
@@ -84,7 +105,7 @@ export default {
             effectedControl:{},
             inputControl:{},
             controlNameTrace:null,
-            controlInfo:{name:"",title:"",userUpdate:""}
+            controlInfo:{name:"",title:"",userUpdate:"",type:''}
         }
     },
     computed:{
@@ -175,6 +196,7 @@ export default {
                 this.controlInfo.name = curControl.name;
                 this.controlInfo.title = curControl.title;
                 this.controlInfo.userUpdate = curControl.lastUserUpdate;
+                this.controlInfo.type = curControl.type;
             }
         },
         

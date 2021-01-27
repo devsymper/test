@@ -19,7 +19,7 @@ const systemRoutes = [{
         path: "/",
         name: "home",
         component: () =>
-            import ('../views/Home.vue')
+            import ('../views/taskManagement/home/Index.vue')
     },
     {
         path: "/login",
@@ -29,6 +29,24 @@ const systemRoutes = [{
         },
         component: () =>
             import ('../views/Login.vue'),
+    },
+    {
+        path: "/login/reset-pass",
+        name: "login",
+        meta: {
+            layout: "content-only"
+        },
+        component: () =>
+            import ('../views/ResetPass.vue'),
+    },
+    {
+        path: "/login/forgot-pass",
+        name: "login",
+        meta: {
+            layout: "content-only"
+        },
+        component: () =>
+            import ('../views/ForgotPass.vue'),
     },
     {
         path: "/symper-hidden-redirect-component",
@@ -71,7 +89,6 @@ let routes = autoImportRouteModules();
 for (let item of routes) {
     mapUrlToComponents[item.path] = item.component;
 }
-console.log(mapUrlToComponents, 'mapUrlToComponentsmapUrlToComponentsmapUrlToComponentsmapUrlToComponentsmapUrlToComponents');
 routes = routes.concat(systemRoutes);
 
 

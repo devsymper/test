@@ -34,6 +34,12 @@ export const adminApi = {
 			testHeader
 		)
 	},
+	deleteTask(id){
+		return bpmneApi.delete(appConfigs.apiDomain.bpmne.historyInstancesDel+'/'+id ,
+			{},
+			testHeader
+		)
+	},
 	stopProcessDefinition(id){
 		return bpmneApi.put(appConfigs.apiDomain.bpmne.definitions+'/'+id,
 			JSON.stringify({
@@ -57,4 +63,15 @@ export const adminApi = {
 	getTimerJobDetail(id){
 		return bpmneApi.get(appConfigs.apiDomain.bpmne.timerJob+'/'+id, {},testHeader )
 	},
+	getStartUserName(ids){
+		return workflowExtendApi.post('variables/query', {
+			names: 'symper_user_id_start_workflow',
+			processInstanceIds: ids,
+			page:1,
+			pageSize:1000
+		})
+	},
+	getListProcessInstances(id){
+		return workflowExtendApi.get(id+'/process-instances')
+	}
 }

@@ -38,11 +38,14 @@
                     @click="openDateTimePicker($event,inputInfo)"
                     v-if="inputInfo.isDateTime"
                 ></i>
-                <i
+                  <i
                     :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name, 'd-none':(inputInfo.activeTab && inputInfo.activeTab=='orgchart' )}"
                     @click="openLargeValueEditor(inputInfo, name)"
                     v-if="(!inputInfo.isConfigAutocomplete && inputInfo.type == 'script') || inputInfo.type == 'userAssignment'"
                 ></i>
+                <!-- @abc(inputInfo) -->
+                <configTime  @value="changeValue" :cronTabValue="inputInfo.value" v-if="(inputInfo.title=='Time cycle (cron)')">
+                </configTime>
                 <i
                     :class="{'mdi mdi-function float-right input-item-func': true, 'active':inputInfo.activeTab == 'script'}"
                     @click="changeAssignmentType(inputInfo, name, 'script')"
@@ -82,7 +85,7 @@
                     :class="'sym-small-size sym-style-input d-inline-block '+(inputInfo.classes ? inputInfo.classes : '') "
                     :key="name"
                     single-line
-                    :disabled="viewOnly"
+                    :disabled="inputInfo.disabled || viewOnly"
                     v-bind="getInputProps(inputInfo)"
                     v-model="inputInfo.value"
                     :append-icon="(inputInfo.appendIcon) ? inputInfo.appendIcon : ''"
@@ -106,6 +109,7 @@
                     handleChangeInputValue(inputInfo, name,data);
                 }"
                  v-if="inputInfo.isConfigCustom && inputInfo.isConfigAutocomplete"/>
+                 
              </transition>
             <div class="error-message" v-if="inputInfo.validateStatus && !inputInfo.validateStatus.isValid">
                 {{inputInfo.validateStatus.message}}
@@ -154,10 +158,7 @@
                 ></formula-editor>
             </template>
         </symper-drag-panel>
-
         <datetime-picker ref="dateTimePicker" @apply-datetime="appendValueToSciptEditor" :position="currentPointer"></datetime-picker>
-
-
     </div>
 </template>
 <script>
@@ -167,13 +168,16 @@ import {
     VCheckbox,
     VRadio,
     VSwitch,
-    VTextarea
+    VTextarea,
+    VColorPicker
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
+import ConfigTime from "./../common/ConfigTime.vue";;
 import LinkConfig from "./../../views/document/sideright/items/LinkConfig.vue";
 import FormAutoComplete from "./../../views/document/sideright/items/FormAutoComplete";
 import FormulaEditor from "./../formula/editor/FormulaEditor";
 import DateFormat from "./../common/DateFormat";
+import Editor from "./../common/editor/Editor";
 import NumberFormat from "./../common/NumberFormat";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
@@ -182,6 +186,7 @@ import OrgchartSelector from "./../user/OrgchartSelector";
 import DateTimePicker from './../common/DateTimePicker.vue';
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
+import SymperListCombobox from "./../common/symperInputs/SymperListCombobox";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 import SymperDefaultControlDocument from "@/components/common/symperInputs/SymperDefaultControlDocument.vue";
 
@@ -235,6 +240,17 @@ const inputTypeConfigs = {
             };
         }
     },
+    color: {
+        tag: "v-color-picker",
+        props(config) {
+            return {
+                label: config.title,
+                'dot-size':"17",
+                'mode':"hexa",
+                'swatches-max-height':"116"
+            };
+        }
+    },
     textarea: {
         tag: "v-textarea",
         props(config) {
@@ -283,6 +299,35 @@ const inputTypeConfigs = {
                 data: config.value,
                 minSpareRows: 1
             };
+        }
+    },
+    combobox: {
+        tag: "SymperListCombobox",
+        props(config) {
+            let props = {
+                columns: config.columns,
+                data: config.value,
+                multipleSelection: config.multipleSelection,
+                showId: config.hasOwnProperty('showId') ? config.showId : true,
+                isSelectionChip:(config.isSelectionChip == false) ? false : true,
+                value: config.value
+                
+            };
+            if(config.onSearch){
+                props.onSearch  = config.onSearch;
+            }
+            if(config.properties){
+                props.properties = config.properties
+            }
+
+            if(config.textKey){
+                props.textKey = config.textKey;
+            }
+
+            if(config.valueKey){
+                props.valueKey = config.valueKey;
+            }
+            return props;
         }
     },
     autocomplete: {
@@ -345,14 +390,6 @@ const inputTypeConfigs = {
             }
         }
     },
-    color:{
-        tag:"symper-color-picker",
-        props(config){
-            return{
-                value:config.value
-            }
-        }
-    },
     defaultControlDocument:{
         tag:"default-control-document",
         props(config){
@@ -360,18 +397,35 @@ const inputTypeConfigs = {
                 docId: config.docId
             }
         }
+    },
+    configTime:{
+        tag: "configTime",
+        props(config) {
+            return {
+                label: config.title,
+            };
+        }
+    },
+    editor:{
+        tag: "symper-editor",
+        props(config) {
+            return {
+                label: config.title,
+            };
+        }
     }
+
 };
 export default {
     name:"formTpl",
     created(){
-        this.setActiveTabForUserAssignment();
+		this.setActiveTabForUserAssignment();
     },
     watch: {
         allInputs: {
             immediate: true,
             deep: true,
-            handler(){
+            handler(arr){
                 this.setActiveTabForUserAssignment();
             }
         }
@@ -397,6 +451,14 @@ export default {
         };
     },
     methods: {
+        changeValue(value){
+            let crobTab = '';
+            for(let i = 0; i<value.length;i++){
+                crobTab += value[i]+" ";
+            };
+            // let tes1= crobTab;
+             this.allInputs['timercycledefinition'].value=crobTab;
+        },
         /**
          * hoangnd:
          * Hàm chuyển giữa 2 kiểu config của autocomplete tự động
@@ -523,10 +585,10 @@ export default {
             if(this.isShowDebugMode){
                 this.hideDebugMode();
             }
-            let info = this.largeFormulaEditor;
-            setTimeout((self) => {
-                self.largeFormulaEditor.name = '';
-            }, 500, this);
+            // let info = this.largeFormulaEditor;
+            // setTimeout((self) => {
+            //     self.largeFormulaEditor.name = '';
+            // }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
             this.$set(this.largeFormulaEditor, "data", inputInfo);
@@ -656,11 +718,13 @@ export default {
     },
     components: {
         VTextField,
+        VColorPicker,
         VSelect,
         VCheckbox,
         VRadio,
         VSwitch,
         VTextarea,
+        "configTime":ConfigTime,
         "v-tree-validate": TreeValidate,
         "s-link-config": LinkConfig,
         "v-autocomplete-auto": FormAutoComplete,
@@ -675,7 +739,10 @@ export default {
         SymperListAutocomplete,
         "datetime-picker" : DateTimePicker,
         SymperColorPicker: SymperColorPicker,
-        "default-control-document":SymperDefaultControlDocument
+        "default-control-document":SymperDefaultControlDocument,
+        'symper-editor':Editor,
+        SymperListCombobox
+
 
     }
 };

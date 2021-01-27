@@ -31,6 +31,11 @@ export default {
         let moddle = bpmnModeler.get('moddle');
         let modeling = bpmnModeler.get('modeling');
         let attrValue = attr.value;
+        
+        if (attr.hasOwnProperty('getValueForXML')) {
+            attrValue = attr.getValueForXML(attr.value);
+        }
+
         for (let item of attrValue) {
             let canAdd = false;
             for (let key in item) {
@@ -66,9 +71,8 @@ export default {
         if (nodeAllAttrs.hasOwnProperty('getValueForXML')) {
             value = nodeAllAttrs.getValueForXML(attr.value);
         }
-        console.log(attrName, value, value !== '');
 
-        if (value !== '' && attrName != 'overrideid') {
+        if (attrName != 'overrideid') {
             let objToUpdate = {};
             if (typeof value != 'number' && typeof value != 'string') {
                 value = JSON.stringify(value);
@@ -77,11 +81,18 @@ export default {
             if (nodeAllAttrs.toXMLExtend) {
                 toXMLname = nodeAllAttrs.toXMLExtend.name;
             }
-            objToUpdate[toXMLname] = value;
-            if (el.businessObject) {
-                clearEmptyAttr(el.businessObject);
-                // el.businessObject.$attrs[attrName] = value;
-                modeling.updateProperties(el, objToUpdate);
+
+            if(value !== ''){
+                objToUpdate[toXMLname] = value;
+                if (el.businessObject) {
+                    clearEmptyAttr(el.businessObject);
+                    // el.businessObject.$attrs[attrName] = value;
+                    modeling.updateProperties(el, objToUpdate);
+                }
+            }else{
+                if(toXMLname.includes('skipExpression')){
+                    delete el.businessObject.skipExpression;
+                }
             }
         }
     },
@@ -192,17 +203,21 @@ export default {
     },
 
     conditionExpressionMethod(el, elKey, attr, bpmnModeler, attrName) {
-
-        if (el.businessObject && attr.value.trim() != '') {
+        if (el.businessObject) {
             let moddle = bpmnModeler.get('moddle');
             let bizObj = el.businessObject;
             let elTagName = attr.toXML.name;
 
-            let newEl = moddle.create("bpmn:FormalExpression");
-            newEl['xsi:type'] = "tFormalExpression";
-            newEl.text = "<![CDATA[" + attr.value + "]]>";
-            newEl.body = "<![CDATA[" + attr.value + "]]>";
-            bizObj[elTagName] = newEl;
+            if(attr.value.trim() != ''){
+                let value = attr.value.replace(/\n|\r\n/g,' ');
+                let newEl = moddle.create("bpmn:FormalExpression");
+                newEl['xsi:type'] = "tFormalExpression";
+                newEl.text = "<![CDATA[" + value + "]]>";
+                newEl.body = "<![CDATA[" + value + "]]>";
+                bizObj[elTagName] = newEl;
+            }else if(bizObj[elTagName]){
+                delete bizObj[elTagName];
+            }
         }
     },
     // giống với formPropertyMethod
@@ -239,5 +254,28 @@ export default {
         modeling.updateProperties(el, {
             extensionElements
         });
+    },
+    signalRefMethod(el, elKey, attr, bpmnModeler, attrName){
+        let moddle = bpmnModeler.get('moddle');
+        let bizEl = el.businessObject;
+
+        if(attr.value && attr.value.trim()){
+            let signal = moddle.create('bpmn:Signal');
+            signal.id = attr.value;
+            signal.name = attr.value;
+            bizEl.eventDefinitions[0].signalRef = signal;
+        }
+    },
+
+    pushConditionTagToXML(el, elKey, attr, bpmnModeler, attrName){
+        let moddle = bpmnModeler.get('moddle');
+        let bizEl = el.businessObject;
+        if(attr.value && attr.value.trim()){
+            let eventDefinitions = moddle.create('bpmn:ConditionalEventDefinition');
+            let expression = moddle.create('bpmn:Expression');
+            expression.body = attr.value.trim().replace(/\n|\r\n/g,' ');
+            eventDefinitions.condition = expression;
+            bizEl.eventDefinitions = [eventDefinitions];
+        }
     }
 }

@@ -23,7 +23,6 @@
                     'media',
                     'image',
                     'quickbars',
-                    'paste',
                     'advcode',
                     'table',
                     'fullscreen',
@@ -34,10 +33,13 @@
                     block_formats: 'Paragraph=p;Header 1=h1;Header 2=h2;Header 3=h3;Header 4=h4;Header 5=h5;Header 6=h6',
                     fontsize_formats: '7pt 8pt 9pt 10pt 11pt 12pt 13pt 14pt 16pt 18pt 24pt 36pt 48pt',
                     paste_data_images: true,
+                    powerpaste_word_import:'merge',
                     images_upload_url: apiUploadImage,
+                    external_plugins: {
+                      'powerpaste': 'https://www.revistacontinente.com.br/public/gwm/js/tinymce/plugins/powerpaste/plugin.min.js' // plugin này đã lưu trữ trữ trong resource/tiny-mce
+                    },
                     quickbars_insert_toolbar: false,
                     quickbars_selection_toolbar: ' addHandsonTableBtn | bold italic underline strikethrough | fontselect fontsizeselect formatselect |numlist bullist checklist| forecolor backcolor casechange| blockquote quicklink| alignleft aligncenter alignright alignjustify| codesample | outdent indent quickimage media| emoticons | table',
-                    media_live_embeds: true,
                     font_formats:
                         'Lato Black=lato; Roboto=roboto;Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Oswald=oswald; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats',
                     content_style:
@@ -51,7 +53,7 @@
                         });
                     },
                     init_instance_callback: function(editor) {
-                    getData()
+                        getData()
                     },
              
                 }"
@@ -74,7 +76,6 @@ import KHAddSizeTable from "./../../components/kh/KHAddSizeTable.vue";
 import KHHandsonTable from "./../../components/kh/KHHandsonTable.vue";
 import { SYMPER_APP } from "./../../main.js";
 import { appConfigs } from "./../../configs.js";
-
 export default {
   data() {
     let self = this;
@@ -120,7 +121,7 @@ export default {
             .catch(err => {
               console.log("error from edit doc!!!", err);
             })
-            .always(() => {});
+            .finally(() => {});
         }
       } else {
         if (this.content != null) {
@@ -138,7 +139,7 @@ export default {
             .catch(err => {
               console.log("error add document backup!!!", err);
             })
-            .always(() => {});
+            .finally(() => {});
         }
         this.captureImage();
       }
@@ -167,7 +168,7 @@ export default {
             .catch(err => {
               console.log("error add document backup!!!", err);
             })
-            .always(() => {});
+            .finally(() => {});
         }
         this.$store.commit("kh/changeStatusBackup", false);
       }

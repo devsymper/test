@@ -20,8 +20,8 @@
                  :treeData="true"
                  :animateRows="true"
                  :enableRangeSelection="true"
-                 :allowContextMenuWithControlKey="true"
                  :groupDefaultExpanded="groupDefaultExpanded"
+				 :getContextMenuItems="getContextMenuItems"
                  :frameworkComponents="frameworkComponents"
                  :modules="modules"
                  :getDataPath="getDataPath"
@@ -41,7 +41,6 @@ import ImageRenderer from './ImageRenderer';
 import CheckBoxRenderer from './CheckBoxRenderer';
 import Vue from "vue";
 
-
 export default {
     props:{
         tableHeight: {
@@ -53,7 +52,9 @@ export default {
             type:Array,
             default: function () { return [] }
         },
-        
+        getContextMenuItems:{
+			type: Function
+		},
         // Data để đổ vào table: dựa theo định dạng của ag grid
         rowData:{
             type:Array,
@@ -135,14 +136,13 @@ export default {
         this.autoGroupColumnDef = { minWidth: 100 };
         this.gridOptions = {};
         this.gridOptions.rowHeight = 20.5;
-        this.columns = this.allColumns;
+		this.columns = this.allColumns;
         this.rowDataTable = this.rowData;
         this.autoGroupColumnDef = {
             editable:this.editable,
             field:'name',
             headerName: 'Tên',
             minWidth: this.minWidth,
-
             cellRendererParams: this.cellRendererParams,
             valueSetter: function(params){
                 let x = util.cloneDeep(params.newValue)
@@ -174,7 +174,7 @@ export default {
     },  
     methods:{
         cellContextMenu(params,x){
-             params.event.preventDefault()
+			params.event.preventDefault()
             params.event.stopPropagation()
             this.$emit('on-cell-context-menu', params)
         },
@@ -189,7 +189,7 @@ export default {
             rowNode.setDataValue(key,value);
             this.gridOptions.api.refreshCells({columns:[key]});
         },
-        autoSizeAll(skipHeader) {
+        autoSizeAll(skipHeader){
             var allColumnIds = [];
             this.gridOptions.columnApi.getAllColumns().forEach(function(column) {
                 allColumnIds.push(column.colId);

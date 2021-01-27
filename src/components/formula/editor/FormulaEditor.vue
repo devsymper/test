@@ -1,15 +1,17 @@
 <template>
     <div class="h-100 w-100"  >
         <div class="d-flex" :style="{height: height}">
-            <code-editor
+            <SymperMonacoEditor
                 ref="edtScript" 
                 v-model="lazyValue" 
                 @init="editorInit"
-                lang="sql" 
-                theme="chrome" 
+                @blur="$emit('blur', {})"
+                @on-change-selection="getInputParams"
                 width="100%" 
-                :height="height">
-            </code-editor>
+                :height="height"
+                :listKeyworks="listKeyworks"
+                :options="editorOptions">
+            </SymperMonacoEditor>
             <div class="debug-input-view" v-if="showDebugView">
                 <p>{{$t('formulasEditor.inputParams')}}</p>
                 <VuePerfectScrollbar :style="{height: 'calc(100% - 30px)','padding-right': '12px'}">
@@ -44,7 +46,6 @@
                     @grid-ready="onGridReady"
                     class="ag-theme-balham mt-2"
                     :columnDefs="columnDefs"
-                    
                     :rowData="rowData">
                 </AgGridVue>
                 
@@ -59,8 +60,6 @@
     </div>
 </template>
 <script>
-import 'brace';
-import 'brace/ext/language_tools';
 import customMode from './customFormula';
 import defaultKeywords from "./defaultKeywords";
 import { documentApi } from "./../../../api/Document";
@@ -69,11 +68,13 @@ import AgDataTable from "./../../../components/common/agDataTable/AgDataTable.vu
 import Pagination from './../../../components/common/Pagination'
 import Formulas from '../../../views/document/submit/formulas';
 import {AgGridVue} from "ag-grid-vue";
-import ClientSQLManager from '../../../views/document/submit/clientSQLManager';
+import FormulasWorker from 'worker-loader!@/worker/document/submit/Formulas.Worker.js';
+
+import SymperMonacoEditor from "./SymperMonacoEditor";
 export default {
     created(){
         this.$store.dispatch('document/setListDocuments');
-        ClientSQLManager.createDB(this.instance);
+        this.formulasWorker = new FormulasWorker();
     },
     data(){
         return {
@@ -89,7 +90,10 @@ export default {
             totalRecord:0,
             debugStatus:null,
             timeRequest:0,
-            cacheDataInput:{}
+            cacheDataInput:{},
+            formulasWorker:null,
+            keyInstance:Date.now(),
+            startTimeDebug:0
         }
     },
     beforeMount() {
@@ -99,14 +103,29 @@ export default {
     mounted(){
         let self = this;
         if(this.disabled){
-            this.$refs.edtScript.editor.setReadOnly(true);
+            this.$refs.edtScript.setReadOnly();
         }
-
-        this.$refs.edtScript.editor.on('blur', () => {
-            self.$emit('blur', {});
+        this.formulasWorker.addEventListener("message", function (event) {
+            let data = event.data;
+            switch (data.action) {
+                case 'afterRunFormulasSuccess':
+                    let res = data.dataAfter.res;
+                    self.handleAfterRunFormula(res)
+                    break;
+                default:
+                break;
+            }
         });
     },
     computed: {
+        editorOptions(){
+            return {
+                lineNumbers: this.simpleMode ? 'off' : 'on',
+                minimap: {
+                    enabled: this.simpleMode ? false : true
+                }
+            }
+        },
         lazyValue:{
             get(){
                 return this.value;
@@ -154,11 +173,11 @@ export default {
         }
     },
     components : {
-        'code-editor': require('vue2-ace-editor'),
         VuePerfectScrollbar,
         'data-table' : AgDataTable,
         Pagination,
-        AgGridVue
+        AgGridVue,
+        SymperMonacoEditor
     },
     props:{
         value: {
@@ -192,6 +211,13 @@ export default {
     methods:{
         toggleDebugView(){
             this.showDebugView = !this.showDebugView;
+            if(this.showDebugView){
+                this.formulasWorker.postMessage({action:'createSQLiteDB',data:{keyInstance:this.keyInstance}});
+                this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: {name:'temp',value:''}, value:'', keyInstance:this.keyInstance, type:'submit'}})
+            }
+            else{
+                this.formulasWorker.postMessage({action:'closeDB',data:{keyInstance:this.keyInstance}});
+            }
             this.debugResultHeight = "calc(100% - "+this.height+" - 30px)"
             this.inputViewHeight = this.height;
             this.columnDefs = [];
@@ -199,77 +225,19 @@ export default {
             this.totalRecord = 0;
             this.debugStatus = null;
         },
-        async handleEditorInput(formula){
-            let pos = this.$refs.edtScript.editor.getCursorPosition();
-            let range = this.$refs.edtScript.editor.session.getLine(pos.row).slice(0,pos.column);
-
-            let lastWord = range.slice(
-                range.lastIndexOf(' ') + 1
-            );
-
-            let doc = this.listAllDocs[lastWord];
-            if(doc && !doc.allFields){
-                let docInfo = await documentApi.detailDocument(doc.id);
-                if(docInfo.status == 200){
-                    this.$set(doc, 'allFields', docInfo.data.fields);
-                }
-            }
-        },
         editorInit(edt){
-            require('brace/ext/language_tools'); //language extension prerequsite...
-            require('brace/mode/html')  ;              
-            require('brace/mode/sql')  ;  //language
-            require('brace/mode/less');
-            require('brace/theme/chrome');
-            edt.setOptions({
-                useWorker: true,
-                enableBasicAutocompletion: true,
-                enableSnippets: true,
-                showPrintMargin: false,
-                enableLiveAutocompletion: true,
-                indentedSoftWrap: false,
-                showGutter: !this.simpleMode,
-            });
-            this.customAceEditorSetting(edt);
-            this.setSelectionEvent(edt)
-        },
-        
-        customAceEditorSetting(editor) {
-            let langTools = ace.acequire("ace/ext/language_tools");
-            let self = this;
-            editor.getSession().setUseWrapMode(true);
-            let staticWordCompleter = {
-                identifierRegexps: [/[a-zA-Z_0-9\.\$\-\u00A2-\uFFFF]/],
-                getCompletions: function(editor, session, pos, prefix, callback) {
-                    callback(null, self.autocompleteWords);
-                },
-                getDocTooltip: (item) => {
-                }
-            }
-            langTools.setCompleters([staticWordCompleter]);
         },
         onFocus(){
-            this.$refs.edtScript.editor.focus();
-        },
-        /**
-         * Hoangnd
-         * Hàm nhận sự kiện thay đổi selection(bôi đen text) trên editor để tìm các tham số đầu vào cho việc debug
-         */
-        setSelectionEvent(edt){
-            let selection = edt.selection;
-            let self = this;
-            selection.on("changeSelection", function(){
-                if(!self.showDebugView){
-                    return;
-                }
-                self.getInputParams()
-            })
+            this.$refs.edtScript.focus();
         },
         getInputParams(){
+            if(!this.showDebugView){
+                return;
+            }
             this.allInput = {};
-            let selectionText = this.$refs.edtScript.editor.getSelectedText();
+            let selectionText = this.$refs.edtScript.getSelectedText();
             if(!selectionText){
-                selectionText = this.$refs.edtScript.editor.getValue();
+                selectionText = this.$refs.edtScript.getValue();
             }
             if(selectionText.length > 0){
                 let dataInput = selectionText.match(/(?<={)[A-Za-z0-9_]+(?=})/gi);
@@ -286,9 +254,9 @@ export default {
         executeFormulas(){
             this.timeRequest = 0;
             this.error = null;
-            let selectionText = this.$refs.edtScript.editor.getSelectedText();
+            let selectionText = this.$refs.edtScript.getSelectedText();
             if(!selectionText){
-                selectionText = this.$refs.edtScript.editor.getValue();
+                selectionText = this.$refs.edtScript.getValue();
             }
             if(!selectionText){
                 return;
@@ -300,49 +268,58 @@ export default {
                 dataInput[input] = this.allInput[input].value;
                 this.cacheDataInput[input] = this.allInput[input].value;
             }
-            let start = Date.now();
-            formulas.handleBeforeRunFormulas(dataInput).then(rs=>{
-                self.debugStatus = {status:true,message:this.$t('formulasEditor.success')};
-                self.rowData = [];
-                self.columnDefs = [];
-                if(rs.server){
-                    let data = rs.data.data;
-                    let err = rs.data.lastErrorMessage;
-                    if(err){
-                        self.debugStatus = {status:false,message:this.$t('formulasEditor.error')};
-                        self.error = err;
-                    }
-                    self.handleDataToTable(data);
+            this.startTimeDebug = Date.now();
+            this.formulasWorker.postMessage({action:'runFormula',data:
+                {
+                    dataInput:dataInput,
+                    formulaInstance:formulas, 
+                    controlName:'temporary', 
+                    keyInstance:this.keyInstance
                 }
-                else{
-                    let columns = rs.data[0].columns;
-                    let values = rs.data[0].values;
-                    self.totalRecord = values.length;
-                    for (let index = 0; index < columns.length; index++) {
-                        let col = columns[index];
-                        self.columnDefs.push( {headerName: col, field: col, resizable: true });
-                    }
-                    for (let k = 0; k < values.length; k++) {
-                        let rowVal = values[k];
-                        let row = {};
-                        for (let i = 0; i < rowVal.length; i++) {
-                            let cellVal = rowVal[i];
-                            row[columns[i]] = cellVal;
-                        }
-                        self.rowData.push(row);
-                    }
-                    self.agApi.sizeColumnsToFit();
+            })
+           
+        },
+        handleAfterRunFormula(rs){
+            this.debugStatus = {status:true,message:this.$t('formulasEditor.success')};
+            this.rowData = [];
+            this.columnDefs = [];
+            if(rs.server){
+                let data = rs.data.data;
+                let err = rs.data.lastErrorMessage;
+                if(err){
+                    this.debugStatus = {status:false,message:this.$t('formulasEditor.error')};
+                    this.error = err;
                 }
-                
-                let end = Date.now();
-                self.timeRequest = end-start;
-                if(self.timeRequest >= 1000){
-                    self.timeRequest = Math.round(((end-start)/1000) * 100) / 100 + 's'
-                }   
-                else{
-                    self.timeRequest = self.timeRequest + 'ms';
+                this.handleDataToTable(data);
+            }
+            else{
+                let columns = rs.data[0].columns;
+                let values = rs.data[0].values;
+                this.totalRecord = values.length;
+                for (let index = 0; index < columns.length; index++) {
+                    let col = columns[index];
+                    this.columnDefs.push( {headerName: col, field: col, resizable: true });
                 }
-            });
+                for (let k = 0; k < values.length; k++) {
+                    let rowVal = values[k];
+                    let row = {};
+                    for (let i = 0; i < rowVal.length; i++) {
+                        let cellVal = rowVal[i];
+                        row[columns[i]] = cellVal;
+                    }
+                    this.rowData.push(row);
+                }
+                this.agApi.sizeColumnsToFit();
+            }
+            
+            let end = Date.now();
+            this.timeRequest = end-this.startTimeDebug;
+            if(this.timeRequest >= 1000){
+                this.timeRequest = Math.round(((end-this.startTimeDebug)/1000) * 100) / 100 + 's'
+            }   
+            else{
+                this.timeRequest = this.timeRequest + 'ms';
+            }
         },
         handleDataToTable(data){
             let firstRow = data[0];

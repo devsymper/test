@@ -7,6 +7,10 @@ const defaultState = {
 	listApps:{},
 	selectingItemType: '',
 	activeChildItem: '',
+	param: {
+		title: ""
+	},
+	listAppsSideBySide:{},
 	listItemSelected: {
 		workflow_definition: {
 			icon: 'mdi-lan',
@@ -17,7 +21,6 @@ const defaultState = {
 		document_category:{
 			icon : 'mdi-file-document-outline',
 			title: "Danh mục",
-			// this.$t('apps.listType.documents')
 			name:  'document_category',
 			item:[
 				
@@ -26,7 +29,6 @@ const defaultState = {
 		document_major:{
 			icon : 'mdi-file-edit-outline',
 			title: "Chứng từ",
-			// title: this.$t('apps.listType.documents'),
 			name:  'document_major',
 			item:[
 

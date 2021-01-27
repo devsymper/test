@@ -391,8 +391,6 @@ const setDefaultSubmitStore = (state, params) => {
         impactedFieldsList: {},
         impactedFieldsListWhenStart: {},
         rootChangeFieldName: null,
-        currentTableInteractive: null,
-        currentControlAutoComplete: null,
         submitFormulas: null,
         listUser: null,
         localRelated: {},
@@ -412,7 +410,15 @@ const setDefaultSubmitStore = (state, params) => {
         readyLoaded: false,
         listTableRootControl: {},
         listControlMappingDatasets: {},
-        controlFormulaInfinity: {}
+        controlFormulaInfinity: {},
+        currentRowChangePivotMode:{
+            tableName:"",
+            key:"",
+            data:{}
+        },
+        dataInputBeforeChange:{},
+        mapValueToTextAutocompleteInput:{},
+        tableInteractive:null
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
@@ -518,17 +524,20 @@ const setAllDocuments = (state, docs) => {
     }, {});
     Vue.set(state, 'listAllDocument', docs);
 }
+/**
+ * Hàm lưu lại dữ liệu của autocomplete
+ * @param {*} state 
+ * @param {*} params 
+ */
 const cacheDataAutocomplete = (state, params) => {
-    let controlName = params.controlName
-    let header = params.header
-    let cacheData = params.cacheData
-    let object = { header: header, cacheData: cacheData }
+    let controlName = params.controlName;
+    let header = params.header;
+    let cacheData = params.cacheData;
+    let object = { header: header, cacheData: cacheData };
     let instance = params.instance;
     if (state.submit[instance]['autocompleteData'].hasOwnProperty(controlName)) {
         Vue.set(state.submit[instance]['autocompleteData'][controlName]['cacheData'], Object.keys(cacheData)[0], Object.values(cacheData)[0]);
-        if (state.submit[instance]['autocompleteData'][controlName]['header'].length == 0) {
-            Vue.set(state.submit[instance]['autocompleteData'][controlName], 'header', header);
-        }
+        Vue.set(state.submit[instance]['autocompleteData'][controlName]['header'],  Object.keys(header)[0], Object.values(header)[0]);
     } else {
         Vue.set(state.submit[instance]['autocompleteData'], controlName, object);
     }
@@ -566,8 +575,28 @@ const deleteControlTemplate = (state, params) => {
 const setDetailTrackChange = (state, params) => {
     Vue.set(state.detail[params.instance], 'trackChange', params.data);
 }
+const setCurrentTitle = (state, data) => {
+    Vue.set(state, 'currentTitle', data);
+}
 
+/**
+ * 
+ * Lưu các giá trị cho control autocomplete, 
+ * tại các control autocomplete được cấu hình hiển thị 1 kiểu, giá trị lưu 1 kiểu
+ * @param {*} state 
+ * @param {*} params 
+ */
 
+const setAutocompleteValueToText = (state, params) => {
+    let key = params.key;
+    let value = params.value;
+    let controlName = params.controlName;
+    let instance = params.instance;
+    if(!state.submit[instance].mapValueToTextAutocompleteInput[controlName]){
+        Vue.set(state.submit[instance].mapValueToTextAutocompleteInput, controlName, {});
+    }
+    Vue.set(state.submit[instance].mapValueToTextAutocompleteInput[controlName], key, value);
+}
 
 export {
     addControl,
@@ -604,6 +633,8 @@ export {
     deleteControlTemplate,
     setDetailTrackChange,
     updateDataForLinkControl,
-    updateDocumentState
+    updateDocumentState,
+    setCurrentTitle,
+    setAutocompleteValueToText
 
 };

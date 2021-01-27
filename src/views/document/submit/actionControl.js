@@ -1,12 +1,11 @@
 import Control from "./control";
 import { documentApi } from './../../../api/Document.js';
-import sDocument from './../../../store/document'
-import { userApi } from './../../../api/user.js';
 import store from './../../../store';
-import moment from "moment-timezone";
+import { SYMPER_APP } from './../../../main.js'
+
 export default class ActionControl extends Control {
-    constructor(idField, ele, controlProps, curParentInstance, value) {
-        super(idField, ele, controlProps, curParentInstance, value);
+    constructor(idField, ele, controlProps, keyInstance, value) {
+        super(idField, ele, controlProps, keyInstance, value);
     }
     render() {
         if (this.type == 'approvalHistory') {
@@ -18,7 +17,15 @@ export default class ActionControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'submitFormulas',
                     value: formulas,
-                    instance: this.curParentInstance
+                    instance: this.keyInstance
+                });
+            }
+            if (this.controlFormulas.hasOwnProperty('update')) {
+                let formulas = this.controlFormulas.update.instance;
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'updateFormulas',
+                    value: formulas,
+                    instance: this.keyInstance
                 });
             }
         } else {
@@ -49,7 +56,7 @@ export default class ActionControl extends Control {
                                                             <span> </span>  <img src="https://file.symper.vn/readFile/user_avatar_` + user.id + `" style="    height: 18px;
                                                             border-radius: 50%;
                                                             width: 18px;
-                                                            margin-bottom: -4px;"> <strong>` + user.displayName + `</strong> <span>Thực hiện <span style="font-weight:500;">` + approvalHistory.actionTitle + "</span> " + moment(approvalHistory.createAt).fromNow() + ` ( ` + approvalHistory.createAt + ` )</span>
+                                                            margin-bottom: -4px;"> <strong>` + user.displayName + `</strong> <span>Thực hiện <span style="font-weight:500;">` + approvalHistory.actionTitle + "</span> " + SYMPER_APP.$moment(approvalHistory.createAt).fromNow() + ` ( ` + approvalHistory.createAt + ` )</span>
                                                         </div>`
                                 console.log("asdsadsad#D", thisCpn);
                                 thisCpn.ele.append(item)
@@ -64,7 +71,7 @@ export default class ActionControl extends Control {
                 .catch(err => {
 
                 })
-                .always(() => {});
+                .finally(() => {});
         } else {
             this.ele.remove();
         }

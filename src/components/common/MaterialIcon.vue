@@ -23,7 +23,7 @@
                         cols="2" 
                         class="pt-0 pb-0 text-center single-icon" 
                         v-for="icon in listIconToShow" :key="icon"
-                        @click="selectIcon(icon,'icon')"
+                        @click="selectIcon(icon)"
                     >
                         <v-icon class="headline">{{icon}}</v-icon>
                     </v-col>
@@ -42,6 +42,14 @@ export default {
         VuePerfectScrollbar
     },
     props: {
+        /**
+         * Đánh dấu biến này bằng true khi nhúng compon này vào compon khác mà muốn nó luôn hiển thị
+         * nếu ở dạng popup thì mặc định là false
+         */
+        alwaysShow:{
+            type:Boolean,
+            default:false
+        },
         defaultIcon: {
             type: String,
             default: "",
@@ -67,6 +75,7 @@ export default {
             default:false
         }
     },
+    
     data: function() {
         return {
             listIcon: `
@@ -221,7 +230,7 @@ export default {
                 mdi-weather-windy,mdi-weather-windy-variant,mdi-web,mdi-webcam,mdi-weight,mdi-weight-kilogram,mdi-whatsapp,mdi-wheelchair-accessibility,mdi-white-balance-auto,
                 mdi-white-balance-incandescent,mdi-white-balance-irradescent,mdi-white-balance-sunny,mdi-wifi,mdi-wii,mdi-wikipedia,mdi-window-close,mdi-window-closed,
                 mdi-window-maximize,mdi-window-open,mdi-window-restore,mdi-windows,mdi-wordpress,mdi-worker,mdi-xbox,mdi-xbox-controller,
-                mdi-xbox-controller-off,mdi-xda,mdi-xml,mdi-yeast,mdi-yelp,mdi-youtube-play,mdi-zip-box`,
+                mdi-xbox-controller-off,mdi-xda,mdi-xml,mdi-yeast,mdi-yelp,mdi-youtube-play,mdi-zip-box,mdi-format-title,mdi-priority-high,mdi-select-group,mdi-script-text-outline`,
             listIconToShow: [],
             tab: null,
             items: [
@@ -231,7 +240,7 @@ export default {
             ],
             searchIconKeyword: null,
             link: null,
-            isShow:false,
+            isShow:this.alwaysShow,
             context:""
         }
     },
@@ -263,12 +272,14 @@ export default {
                 this.listIconToShow = listIcons.slice(0, 150);
             }
         },
-        selectIcon(icon,type='img') {
-			// console.log(icon);
-            this.$emit("selected", {icon: icon.trim(),type:type,context:this.context});
+        selectIcon(icon) {
+            this.$emit("selected", icon.trim());
         },
         setContext(ctx){
             this.context = ctx
+        },
+        getContext(){
+            return this.context;
         },
         show(position){
             this.isShow = true;

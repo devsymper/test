@@ -4,13 +4,13 @@
             dense
             open-all
             :items="treeData"
-            class="tree-view"
+            class="tree-view mb-2"
             ref="tree"
             style="
             overflow:hidden;padding-bottom:8px"
         >
                 <template v-slot:append="{ item }">
-                    <div v-if="!item.condition" class="tree-item-slot">
+                    <div v-if="!item.condition" class="tree-item-slot mt-2">
                         <v-icon class="btn-delete-item-condition" @click="deleteConditionItem(item)">mdi mdi-close</v-icon>
                         <v-autocomplete
                             :items="listColumn"
@@ -123,6 +123,7 @@ export default {
             treeData: [
                 {
                     id:1,
+                    nodeType:'group',
                     name: 'AND',
                     root: true,
                     condition:true,

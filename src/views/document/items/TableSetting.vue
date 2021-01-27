@@ -5,8 +5,9 @@
         width="800"
         scrollable
         style="overflow:hidden;"
+        
         >
-        <v-card height="600">
+        <v-card height="600" :id="'dialog-editor-'+instance">
             <v-card-title class="s-card-title">
                  <v-tabs
                     class="s-tabs"
@@ -28,41 +29,45 @@
                  <v-tabs-items v-model="tab">
                     <v-tab-item>
                         <div id="setting-control-table" class="setting-control-table">
-                            <div class="content-setting-control-table scroll-thin">
-                                <v-simple-table fixed-header height="100%" >
-                                    <template v-slot:default>
-                                        <thead>
-                                            <tr>
-                                                <th class="text-left">Thông tin cột</th>
-                                                <th class="text-center">Loại control</th>
-                                                <th class="text-left">Tên control</th>
-                                                <th class="text-left">Tiêu đề control</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="table-body-drag">
-                                            <s-row-table-setting
-                                            v-for="row in listRows"
-                                            :key="row.key"
-                                            :row="row"
-                                            @remove-row="removeRow"
-                                            />
-                                        </tbody>
+                            <div class="content-setting-control-table">
+                                <v-data-table hide-default-footer :headers="headers" fixed-header height="100%" >
+                                    <template v-slot:body>
+                                        <draggable
+                                                :list="listRows"
+                                                tag="tbody"
+                                                :animation="200"
+                                                >
+                                                <s-row-table-setting
+                                                    v-for="row in listRows"
+                                                    :key="row.key"
+                                                    :row="row"
+                                                    @remove-row="removeRow"
+                                                    />
+                                                
+                                                <!-- the row will go here -->
+                                            </draggable>
                                     </template>
-                                </v-simple-table>
+                                </v-data-table>
+                                 
                                 
                             </div>
                         </div>
                     </v-tab-item>
                      <v-tab-item>
                         <div class="setting-pivot">
-                            <VuePerfectScrollbar style="height: 425px;width: 300px;">
+                            <VuePerfectScrollbar style="height: 476px;width: 300px;">
                                 <div class="s-title">Control</div>
                                 <div class="list-columns">
-                                    <div class="column-item" v-for="(item,index) in listRows" :data-index="index" :key="index" draggable :style="{display:(item.disable) ? 'none':''}">
-                                        {{item.name}} -- {{item.title}} 
-                                        
-                                    </div>
+                                    <draggable
+                                            :list="listRowsForPivot"
+                                            :animation="200"
+                                            group="control-pivot"
+                                            >
+                                        <div class="column-item" v-for="(item,index) in listRowsForPivot" :data-index="index" :key="index">
+                                            {{item.name}} -- {{item.title}} 
+                                        </div>
+                                    </draggable>
+                                    
                                 </div>
                             </VuePerfectScrollbar>
                             
@@ -70,31 +75,114 @@
                                 <div class="s-title">Rows</div>
                                 <VuePerfectScrollbar class="s-scroll">
                                     <div class="detail-pivot-setting__rows">
-                                        <div class="column-row-item" v-for="(item,index) in tablePivotConfig.rows" :key="index" >
-                                            {{item.name}} -- {{item.title}}
-                                            <span class="mdi mdi-close" @click="deleteItem('rows', index, item)"></span>
-                                        </div>
+                                        <draggable
+                                            :list="tablePivotConfig.rows"
+                                            :animation="200"
+                                            group="control-pivot"
+                                            class="h-100"
+                                            >
+                                            <div class="column-row-item" v-for="(item,index) in tablePivotConfig.rows" :key="index" >
+                                                {{item.name}} -- {{item.title}}
+                                                <!-- <span class="mdi mdi-close" @click="deleteItem('rows', index, item)"></span> -->
+                                            </div>
+                                        </draggable>
                                     </div>
                                 </VuePerfectScrollbar>
                                 <div class="s-title">Columns</div>
                                 <VuePerfectScrollbar class="s-scroll">
                                    <div class="detail-pivot-setting__cols">
-                                       <div class="column-col-item" v-for="(item,index) in tablePivotConfig.cols" :key="index" >
-                                            {{item.name}} -- {{item.title}}
-                                            <span class="mdi mdi-close" @click="deleteItem('cols', index, item)"></span>
-                                        </div>
+                                       <draggable
+                                            :list="tablePivotConfig.cols"
+                                            :animation="200"
+                                            group="control-pivot"
+                                            class="h-100"
+                                            >
+                                            <div class="column-col-item" v-for="(item,index) in tablePivotConfig.cols" :key="index" >
+                                                {{item.name}} -- {{item.title}}
+                                                <!-- <span class="mdi mdi-close" @click="deleteItem('cols', index, item)"></span> -->
+                                            </div>
+                                       </draggable>
+                                       
                                     </div>
                                 </VuePerfectScrollbar>
                                 <div class="s-title">Values</div>
                                 <VuePerfectScrollbar class="s-scroll">
                                    <div class="detail-pivot-setting__values">
-                                       <div class="column-value-item" v-for="(item,index) in tablePivotConfig.values" :key="index" >
-                                            {{item.name}} -- {{item.title}}
-                                            <span class="mdi mdi-close" @click="deleteItem('values', index, item)"></span>
-                                        </div>
+                                       <draggable
+                                            :list="tablePivotConfig.values"
+                                            :animation="200"
+                                            group="control-pivot"
+                                            class="h-100"
+                                            >
+                                            <div class="column-value-item" v-for="(item,index) in tablePivotConfig.values" :key="index" >
+                                                {{item.name}} -- {{item.title}}
+                                                <!-- <span class="mdi mdi-close" @click="deleteItem('values', index, item)"></span> -->
+                                            </div>
+                                       </draggable>
+                                       
                                     </div>
                                 </VuePerfectScrollbar>
                                 
+                            </div>
+                        </div>
+                    </v-tab-item>
+                    <v-tab-item>
+                        <div class="d-flex">
+                            <VuePerfectScrollbar style="height: 476px;width: 300px;">
+                                <div class="s-title">Control</div>
+                                <div class="list-columns">
+                                    <draggable
+                                            :list="listRowsForGroup"
+                                            :animation="200"
+                                            group="control-group"
+                                            >
+                                            <div class="column-item" v-for="(item,index) in listRowsForGroup" :data-index="index" :key="index">
+                                                {{item.name}} -- {{item.title}} 
+                                            </div>
+                                    </draggable>
+                                    
+                                </div>
+                            </VuePerfectScrollbar>
+                            <div class="group-config">
+                                <div class="s-title">Rows</div>
+                                <VuePerfectScrollbar class="s-scroll" style="height:125px">
+                                    <draggable
+                                            :list="tableGroupConfig.rows"
+                                            :animation="200"
+                                            group="control-group"
+                                            class="h-100 p-2"
+                                            >
+                                        <div class="column-row-item" v-for="(item,index) in tableGroupConfig.rows" :key="index" >
+                                            {{item.name}} -- {{item.title}}
+                                        </div>
+                                    </draggable>
+                                </VuePerfectScrollbar>
+                                <div class="s-title">Columns</div>
+                                <VuePerfectScrollbar class="s-scroll" style="height:125px">
+                                    <draggable
+                                            :list="tableGroupConfig.cols"
+                                            :animation="200"
+                                            group="control-group"
+                                            class="h-100 p-2"
+                                            >
+                                        <div class="column-row-item" v-for="(item,index) in tableGroupConfig.cols" :key="index" >
+                                            {{item.name}} -- {{item.title}}
+                                        </div>
+                                    </draggable>
+                                </VuePerfectScrollbar>
+                                <div class="s-title">Values</div>
+                                <VuePerfectScrollbar class="s-scroll" style="height:125px">
+                                    <draggable
+                                        :list="tableGroupConfig.values"
+                                        :animation="200"
+                                        group="control-group"
+                                        class="h-100 p-2"
+                                        >
+                                        <div class="column-value-item" v-for="(item,index) in tableGroupConfig.values" :key="index" >
+                                            {{item.name}} -- {{item.title}}
+                                        </div>
+                                       </draggable>
+                                </VuePerfectScrollbar>
                             </div>
                         </div>
                     </v-tab-item>
@@ -155,14 +243,15 @@
 </template>
 <script>
 import TableSettingRow  from "./TableSettingRow.vue";
+import draggable from "vuedraggable";
 import { str } from "./../../../plugins/utilModules/str.js"
-import Sortable from 'sortablejs';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-let sortable = null;
+import { util } from '../../../plugins/util';
 export default {
     components:{
         's-row-table-setting' : TableSettingRow,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        draggable
     },
     props:{
         defaultRow:{
@@ -172,6 +261,9 @@ export default {
             type:Number
         },
         defaultTablePivotConfig:{
+            type:Object
+        },
+        defaultTableGroupConfig:{
             type:Object
         }
     },
@@ -187,17 +279,27 @@ export default {
             deep:true,
             immediate:true,
             handler:function(vl){
-                if(Object.keys(vl).length > 0 )
-                this.tablePivotConfig = vl;
+                if(Object.keys(vl).length > 0 ){
+                    this.tablePivotConfig.cols = (vl.cols) ? vl.cols : [];
+                    this.tablePivotConfig.rows = (vl.rows) ? vl.rows : [];
+                    this.tablePivotConfig.values = (vl.values) ? vl.values : [];
+                }
+                
             }
         },
-        tab(vl){
-            if(vl >= 1){
-                setTimeout((self) => {
-                    self.makeDrag();
-                }, 500,this);
+        defaultTableGroupConfig:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                if(Object.keys(vl).length > 0 ){
+                    this.tableGroupConfig.cols = (vl.cols) ? vl.cols : [];
+                    this.tableGroupConfig.rows = (vl.rows) ? vl.rows : [];
+                    this.tableGroupConfig.values = (vl.values) ? vl.values : [];
+                }
+                
             }
-        }
+        },
+     
     },
     computed:{
         editorStore(){  
@@ -207,86 +309,32 @@ export default {
     data(){
         return {
             listRows:[],
+            listRowsForGroup:[],
+            listRowsForPivot:[],
             isShowTableSetting:false,
             prefixName:"",
             tab: null,
             items: [
-            'Cài đặt chung', 'Pivot table',
+            'Cài đặt chung', 'Pivot table','Group table',
             ],
-            tablePivotConfig:{rows:[],cols:[],values:[]}
+            tablePivotConfig:{rows:[],cols:[],values:[]},
+            tableGroupConfig:{rows:[],cols:[],values:[]},
+            isSetDrag:false,
+            headers: [
+                {
+                    text: 'Thông tin cột',
+                    align: 'start',
+                    value: 'columnName',
+                },
+                { text: 'Loại control', value: 'type' },
+                { text: 'Tên control', value: 'name' },
+                { text: 'Tiêu đề control', value: 'title' },
+                { text: '', value: '' },
+            ],
         }
     },
-    created(){
-        
-    },
     methods:{
-        makeDrag(){
-            let self = this;
-            let controlInd = null;
-            $('.column-item').on('dragstart',function(e){
-                controlInd = $(e.target).attr('data-index');
-                let data = self.listRows[controlInd];
-                e.originalEvent.dataTransfer.setData("control", JSON.stringify(data));
-            })
-           
-            $('.detail-pivot-setting__rows')
-            .on('dragover', false) 
-            .on('drop', function (event) {
-                var e;
-                if (event.isTrigger)
-                    e = triggerEvent.originalEvent;
-                else
-                    var e = event.originalEvent;
-                try {
-                    var control = e.dataTransfer.getData('control');
-                    if(self.tablePivotConfig.rows.length < 2){
-                        control = JSON.parse(control);
-                        self.listRows[controlInd].disable = true;
-                        self.tablePivotConfig.rows.push(control)
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-                return false;
-            });
-            $('.detail-pivot-setting__cols')
-            .on('dragover', false) 
-            .on('drop', function (event) {
-                var e;
-                if (event.isTrigger)
-                    e = triggerEvent.originalEvent;
-                else
-                    var e = event.originalEvent;
-                try {
-                    var control = e.dataTransfer.getData('control');
-                    if(self.tablePivotConfig.cols.length < 2){
-                        control = JSON.parse(control);
-                        self.listRows[controlInd].disable = true;
-                        self.tablePivotConfig.cols.push(control);
-                    }
-                } catch (error) {
-                    console.log(error);                    
-                }
-                return false;
-            });
-            $('.detail-pivot-setting__values')
-            .on('dragover', false) 
-            .on('drop', function (event) {
-                var e;
-                if (event.isTrigger)
-                    e = triggerEvent.originalEvent;
-                else
-                    var e = event.originalEvent;
-                try {
-                    var control = e.dataTransfer.getData('control');
-                    control = JSON.parse(control);
-                    self.tablePivotConfig.values.push(control)
-                } catch (error) {
-                    
-                }
-                return false;
-            });
-        },
+       
         deleteItem(type, index, item){
             this.tablePivotConfig[type].splice(index,1);
             for (let i = 0; i < this.listRows.length; i++) {
@@ -306,9 +354,19 @@ export default {
         },
         setListRow(listRows){
             this.listRows = listRows;
-            this.setOnDrag();
+            this.listRowsForGroup = util.cloneDeep(listRows);
+            this.listRowsForPivot = util.cloneDeep(listRows);
+            this.listRowsForPivot = this.listRowsForPivot.reduce((arr,obj) =>{
+                arr.push({name:obj.name,title:obj.title,type:obj.type});
+                return arr;
+            },[]);
+            this.listRowsForGroup = this.listRowsForGroup.reduce((arr,obj) =>{
+                arr.push({name:obj.name,title:obj.title,type:obj.type});
+                return arr;
+            },[]);
         },
         showDialog(){
+            this.tablePivotConfig = {rows:[],cols:[],values:[]}
             this.isShowTableSetting = true
         },
         hideDialog(){
@@ -316,7 +374,6 @@ export default {
         },
         addNewRow(){
             this.listRows.push({columnName :'', name:'',type:'',title:'',key:'s-control-id'+Date.now()})
-            this.setOnDrag();
         },
         removeRow(row){
             this.listRows.splice(this.listRows.findIndex(v => v.key === row.key), 1);
@@ -327,7 +384,14 @@ export default {
         saveTable(){
             this.filterRowNotExistType();
             if(this.listRows.length > 0){
-                this.$emit("add-columns-table",{listRows:this.listRows, tablePivotConfig:this.tablePivotConfig});
+                let dataEmit = {listRows:this.listRows};
+                if(this.tablePivotConfig.rows.length > 0 || this.tablePivotConfig.cols.length > 0 || this.tablePivotConfig.values.length > 0){
+                    dataEmit['tablePivotConfig'] = this.tablePivotConfig;
+                }
+                if(this.tableGroupConfig.rows.length > 0 || this.tableGroupConfig.cols.length > 0){
+                    dataEmit['tableGroupConfig'] = this.tableGroupConfig;
+                }
+                this.$emit("add-columns-table",dataEmit);
             }
             this.listRows = [];
             this.hideDialog()
@@ -338,33 +402,6 @@ export default {
                 return row.type != ''
             })
         },
-        //update lại listrow khi drop
-        dragReorder (oldIndex, newIndex) {
-            const movedItem = this.listRows.splice(oldIndex, 1)[0]
-            this.listRows.splice(newIndex, 0, movedItem)
-        },
-        // drag row
-        setOnDrag(){
-            setTimeout((self) => {
-                var el = $('#table-body-drag')[0];
-                if(self.sortable == null)
-                self.sortable = Sortable.create(
-                    el,
-                    {
-                        draggable: "#setting-control-table #rowDrag",
-                        handle: '#setting-control-table .sortHandle',
-                        animation: 150,
-                        easing: "cubic-bezier(1, 0, 0, 1)",
-                        sort: true,  // sorting inside list
-                        delay: 0,
-                        onEnd: function (/**Event*/evt) {
-                            var itemEl = evt.item;  // dragged HTMLElement
-                            self.dragReorder(evt.oldIndex,evt.newIndex);
-                        },
-                    }
-                ) 
-            }, 500, this);
-        }
     },
 }
 </script>
@@ -394,6 +431,9 @@ export default {
         width: calc(100% - 300px);
         height: 425px;
     }
+    .group-config{
+        width: calc(100% - 300px);
+    }
     .list-columns{
         font-size: 13px;
     }
@@ -409,8 +449,14 @@ export default {
         padding: 4px;
         font-size: 13px;
     }
-    .s-scroll{
+    .detail-pivot-setting .s-scroll{
         height:130px;
+        border: var(--symper-border);
+        margin:4px;
+        border-radius:4px;
+    }
+    .group-config .s-scroll{
+        height:200px;
         border: var(--symper-border);
         margin:4px;
         border-radius:4px;
