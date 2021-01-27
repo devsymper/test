@@ -351,7 +351,7 @@ export default {
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
-            let avatarUser = util.addEnvToUrl(appConfigs.apiDomain.fileManagement+"readFileSvg/user_avatar_")+lastUserInfo.id
+            let avatarUser = appConfigs.apiDomain.fileManagement+"readFileSvg/user_avatar_"+lastUserInfo.id
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );
