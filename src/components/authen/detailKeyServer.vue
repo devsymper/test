@@ -37,7 +37,6 @@ export default {
   },
   methods: {
     save(){
-        debugger
          if(!this.detailKey.idRole){
              this.createRole()
          }else{
