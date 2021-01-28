@@ -12,6 +12,7 @@
 			 <div>
 				<v-text-field
 					@input="bindToSearchkey"
+                    :value="searchValue"
 					class="d-inline-block mr-2 sym-small-size"
 					single-line
 					v-if="showSearchBox"
@@ -890,6 +891,7 @@ export default {
     data(){
 		let self = this;
         return {
+            searchValue:'',
             typeDelete:'',
             isNotiSuccess:false,// có hoặc không hiển thị thông báo khi lưu thành công 
             conditionalFormat:[],
@@ -1085,7 +1087,6 @@ export default {
         },
         applyConditionFormat(listSelectedCondition){
             // this.applyConfigFormat(listSelectedCondition);
-            this.isNotiSuccess = false;
             this.listSelectedCondition.map(data=>{
                 this.setSelectedConditional(data)
 
@@ -1115,7 +1116,6 @@ export default {
                 this.getData();
         },
          disApplyConfigFormat(index){
-            this.isNotiSuccess = false
             let listSelectedCondition = [];
             this.listSelectedCondition.map(data=>{
                  if(data!=index){
@@ -1167,7 +1167,6 @@ export default {
         },
           // lưu cấu hình formatting Table
         deleteConfigFormat(index){
-            this.isNotiSuccess = false
             this.conditionIndex = index;
             this.typeDelete = 'formatTable';
             this.showDelPopUp = true;
@@ -1178,6 +1177,8 @@ export default {
             this.selectedFilterName = '';
             this.closeBtnFilter = false;
             this.isClose=false;
+            this.searchValue = '';
+            this.searchKey = "";
             //set lại trạng thái không filter
             this.tableFilter.allColumn={}
             this.getData();
@@ -1186,7 +1187,6 @@ export default {
         },
         // xử lý gán tất cả các biến trước khi gửi data
         saveUiConfig(){
-            this.notiSuccess = false;
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
             tableConfig.detail.filter = this.listFilters;
@@ -1214,8 +1214,10 @@ export default {
             if(this.listFilters&&this.listFilters.length>0){
                 this.listFilters.map((fil,i)=>{
                     if(fil.isDefault){
+                        this.searchValue=fil.searchKey?fil.searchKey:''
                         this.selectedFilterName = fil.name;
                         this.closeBtnFilter = true;
+                        this.searchKey = this.searchValue;
                         this.tableFilter.allColumn = fil.columns;
                         this.getData();
                         this.closeBtnFilter = true;
@@ -1231,14 +1233,14 @@ export default {
                 }
             })
             this.saveUiConfig();
-            this.isNotiSuccess = false;
         },
         unsetDefaultFilter(filterIdx){
             this.listFilters[filterIdx].isDefault= false;
-            this.isNotiSuccess = false;
             this.saveUiConfig();
         },
         editFilter(filterIdx){
+            this.searchValue=this.listFilters[filterIdx].searchKey?this.listFilters[filterIdx].searchKey:'';
+            this.searchKey = this.searchValue;
             this.addFilter = true;
             this.filterName = this.listFilters[filterIdx].name;
             this.isUpdateFilter= true;
@@ -1246,7 +1248,6 @@ export default {
         },
         
         deleteFilter(filterIdx){
-            this.isNotiSuccess = false
             this.showDelPopUp = true;
             this.contentDelete =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
             this.deleteFilterIdx = filterIdx;
@@ -1266,6 +1267,8 @@ export default {
         },
        setTable(filterIdx){
             this.closeBtnFilter = true;
+            this.searchValue = this.listFilters[filterIdx].searchKey?this.listFilters[filterIdx].searchKey:'';
+            this.searchKey = this.searchValue;
             this.selectedFilterName = this.listFilters[filterIdx].name;
             let filter = this.listFilters;
             this.tableFilter.allColumn = this.listFilters[filterIdx].columns;
@@ -1278,15 +1281,18 @@ export default {
             if(!this.isUpdateFilter){
                 this.listFilters.push({
                     name:this.filterName,
+                    searchKey:this.searchKey,
                     isDefault: false,
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
             }else{
                 this.listFilters[this.filterIdx].name = this.filterName;
+                this.listFilters[this.filterIdx].searchKey = this.searchKey;
                 this.listFilters[this.filterIdx].columns = this.tableFilter.allColumn;
                 this.notiFilter = this.$t("table.success.edit_filter");
             }
+            this.isNotiSuccess = true;
             this.saveUiConfig()
         },
 		getAllData(){
@@ -1575,11 +1581,12 @@ export default {
                         })
                     })
 
-                    this.gridOptions.api.setColumnDefs(this.columnDefs);
+                    // this.gridOptions.api.setColumnDefs(this.columnDefs);
 
                  }
                 // xử lý phần format conditional
                 this.conditionalFormat = res.savedConfigs.conditionalFormat?res.savedConfigs.conditionalFormat:[];
+                // this.gridOptions.api.setColumnDefs(this.columnDefs);
 
 			}
 		},
@@ -1594,6 +1601,8 @@ export default {
             if(res.status==200){
                 this.addFilter = false;
                 this.filterName = '';
+                this.searchKey = '';
+                this.searchValue = '';
                   if(notiSuccess){
                     this.$snotify({
                     type: "success",
