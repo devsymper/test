@@ -1162,6 +1162,7 @@
 			"title-show-list-trash": "List trash dataflow"
 		},
 		"dataset":{
+			"title-add":"Name of Dataset",
 			"title-show-list": "Danh sách dataset",
 			"title-show-list-trash": "Danh sách dataset đã xóa"
 		},

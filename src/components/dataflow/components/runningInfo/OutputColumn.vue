@@ -7,19 +7,21 @@
 		>
 
 		</v-text-field>
-		<ag-grid-vue
-			:style="{
-				width: '100%',
-				height: tableHeight + 'px',
-			}"
-			:class="{ 'ag-theme-balham': true }"
-			:defaultColDef="defaultColDef"
-			:gridOptions="gridOptions"
-			:columnDefs="columnDefs"
-			:rowData="tableData"
-			@cell-context-menu="cellContextMenu"
-		>
-		</ag-grid-vue>
+		<div class="ml-2 mr-2">
+			<ag-grid-vue
+				:style="{
+					width: '100%',
+					height: tableHeight + 'px',
+				}"
+				:class="{ 'ag-theme-balham': true }"
+				:defaultColDef="defaultColDef"
+				:gridOptions="gridOptions"
+				:columnDefs="columnDefs"
+				:rowData="tableData"
+				@cell-context-menu="cellContextMenu"
+			>
+			</ag-grid-vue>
+		</div>
 	</div>
 </template>
 
