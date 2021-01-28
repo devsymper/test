@@ -5,13 +5,14 @@
 			v-model="selectedValues"
 			:multiple="cellView.displayOptions.selectionType == 'multiple'"
 			:items="data"
+			:search-input.sync="searchKey"
 			solo
 			small-chips
 			class="report-filter"
 			:item-text="selectedCol.as"
 			:item-value="selectedCol.as"
-			@change="handleChangeFilterValue"
 			:loading="loading"
+			@change="handleChangeFilterValue"
 		>
 			<template v-slot:selection="data">
 				<div class="custom-selected-display">
@@ -29,6 +30,7 @@ export default {
 		return {
 			selectedValues: [],
 			loading: false,
+			searchKey: ""
 		};
 	},
 	watch: {
@@ -39,6 +41,22 @@ export default {
 				this.loading = false;
 			},
 		},
+		searchKey(query){
+			if (query !== '') {
+				this.loading = true;
+				if (this.filterAction) {
+					clearTimeout(this.filterAction);
+				}
+				this.filterAction = setTimeout(
+					(self, query) => {
+						self.$emit('change-query-drop-list-filter', { cellId: self.cellId, query: query });
+					},
+					400,
+					this,
+					query
+				);
+			}
+		}
 	},
 	methods: {
 		handleChangeFilterValue(values) {
@@ -53,23 +71,6 @@ export default {
 				this.cellView.selectedValues[vl] = true;
 			}
 			this.$emit('change-droplist-filter-value', this.cellId);
-		},
-		remoteMethod(query) {
-			if (query !== '') {
-				this.loading = true;
-				if (this.filterAction) {
-					clearTimeout(this.filterAction);
-				}
-
-				this.filterAction = setTimeout(
-					(thisCpn, query) => {
-						// SDashboardEditor.$emit('change-query-drop-list-filter', { cellId: thisCpn.cellId, query: query });
-					},
-					400,
-					this,
-					query
-				);
-			}
 		},
 	},
 	props: ['data', 'selectionType', 'selectedCol', 'cellId', 'cellView'],
@@ -93,6 +94,7 @@ export default {
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }
+
 .v-menu__content >>> .v-icon {
 	font-size: 16px !important;
 }
@@ -106,5 +108,11 @@ export default {
 }
 .v-list-item__action {
 	margin: unset ;
+}
+.v-list .v-list-item .v-list-item__action{
+	margin-right: 10px;
+}
+.v-simple-checkbox .v-icon{
+	font-size: 16px;
 }
 </style>
