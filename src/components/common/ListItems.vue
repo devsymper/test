@@ -893,6 +893,7 @@ export default {
         return {
             searchValue:'',
             typeDelete:'',
+            countColumnResized:0,
             isNotiSuccess:false,// có hoặc không hiển thị thông báo khi lưu thành công 
             conditionalFormat:[],
             listSelectedCondition:[],//list cấu hình điều kiện được chọn
@@ -900,15 +901,14 @@ export default {
 			gridApi: null,
             closeBtnFilter:false,
             isUpdateFilter:false,
-            widthColumns:[],
+            widthColumns:[],// lưu cấu hình độ rộng của các cột showlist
             isClose:true,
             listFilters:[],
             notiFilter:'',
             conditionIndex :-1,
             deleteFilterIdx:0,
             contentDelete:"",
-            showDelPopUp:false,
-            filterContent:"",
+            showDelPopUp:false,// hiển thị pop up xác nhận xóa
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -1171,7 +1171,6 @@ export default {
             this.typeDelete = 'formatTable';
             this.showDelPopUp = true;
             this.contentDelete =" Xóa định dạng "+this.conditionalFormat[index].nameGroup+" khỏi danh sách các định dạng";
-            
         },
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
@@ -1198,6 +1197,7 @@ export default {
                 data: tableConfig
 			})
         },
+        // action khi kéo cột showlist
         columnResized(){
             this.widthColumns=[];
             this.gridOptions.columnApi.columnController.allDisplayedColumns.map(column=>{
@@ -1206,10 +1206,14 @@ export default {
                     width: column.actualWidth
                 })
             })
-           this.saveUiConfig(); 
-           
+            // this.saveUiConfig();
+            this.countColumnResized+=1;
+             if(this.countColumnResized>2){
+                this.saveUiConfig();
+                this.countColumnResized=0;
+            }
         },
-    
+        //
         getDefaultFilter(){
             if(this.listFilters&&this.listFilters.length>0){
                 this.listFilters.map((fil,i)=>{
