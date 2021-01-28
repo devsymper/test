@@ -161,6 +161,7 @@
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on:tooltip }">
                                         <v-btn
+                                            @click="isClose=true"
                                             depressed
                                             small
                                             v-if="showFilter"
@@ -252,6 +253,7 @@
 				:gridOptions="gridOptions"
                 :getContextMenuItems="getContextMenuItems"
 				:columnDefs="columnDefs"
+                @columnResized="columnResized()"
 				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
 				:frameworkComponents="frameworkComponents"
@@ -669,8 +671,9 @@ export default {
 		
 	},
 	created(){
+        this.listItemsWorker = new ListItemsWorker()
+		this.restoreTableDisplayConfig();
         let self = this;
-     
 		this.$evtBus.$on('list-items-ag-grid-on-change-checkbox',data=>{
             self.$set(data.data, 'checked', true)
 			if(!self.allRowChecked.includes(data.data)){
@@ -681,12 +684,14 @@ export default {
 			}
 			self.$emit('after-selected-row',self.allRowChecked)
         })
-		this.listItemsWorker = new ListItemsWorker()
+        
+      
+        
         this.listItemsWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
                 case 'getData':
-					self.handlerGetData(data.dataAfter)
+                    self.handlerGetData(data.dataAfter)
 					break;
                 case 'customGetData':
 					self.handleCustomGetData(data.dataAfter)
@@ -703,13 +708,13 @@ export default {
                 case 'saveTableDisplayConfig':
 					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
                     break;
-                case 'saveFilter':
+                case 'saveUiConfig':
                     if(self.isNotiSuccess){
-                        self.handlerSaveFilter(data.dataAfter, true)
+                        self.handleSaveUiConfig(data.dataAfter, true)
                     }else{
-                        self.handlerSaveFilter(data.dataAfter, false)
+                        self.handleSaveUiConfig(data.dataAfter, false)
                     }
-                break;
+                    break;
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
                          if(self.flexColumns){
@@ -721,7 +726,17 @@ export default {
 						if(e.cellStyle){
 							eval("e.cellStyle = " + e.cellStyle)
 						}
-					})
+                    })
+                     data.dataAfter.map(column=>{
+                        self.widthColumns.map(c=>{
+                            if(c){
+                                if(column.field==c.colId){
+                                    column.width=c.width
+                                }
+                            }
+                        
+                        })
+                    })
                     self.columnDefs = data.dataAfter;
                     if(self.conditionalFormat&&self.conditionalFormat.length>0){
                         if(self.listSelectedCondition.length==0){
@@ -734,9 +749,8 @@ export default {
                 default:
                     break;
             }
-		});
-		this.getData();
-		this.restoreTableDisplayConfig();
+        });
+        this.getData();
         // this.getDefaultFilter();
 	},
 	computed:{
@@ -813,7 +827,8 @@ export default {
 					this.showNoRowsOverlay()
 				}
 			}
-		},
+        },
+        
 		columnDefs:{
 			deep: true,
 			immediate: true,
@@ -876,13 +891,15 @@ export default {
 		let self = this;
         return {
             typeDelete:'',
-            isNotiSuccess:true,// có hoặc không hiển thị thông báo khi lưu thành công 
+            isNotiSuccess:false,// có hoặc không hiển thị thông báo khi lưu thành công 
             conditionalFormat:[],
             listSelectedCondition:[],//list cấu hình điều kiện được chọn
             listId:[],// chứa list Id của table
 			gridApi: null,
             closeBtnFilter:false,
             isUpdateFilter:false,
+            widthColumns:[],
+            isClose:true,
             listFilters:[],
             notiFilter:'',
             conditionIndex :-1,
@@ -1036,7 +1053,7 @@ export default {
         handleAddFilter(data){
             if(data.type=='save'){
                 this.filterName = data.filterName
-                this.saveFilter()
+                this.checkIsAddFilter()
             }else{
                 this.addFilter = false;
             }
@@ -1077,6 +1094,10 @@ export default {
             this.saveConditionalFormatting(this.conditionalFormat);
             this.getData();
         },
+         saveConditionalFormatting(data){
+             this.conditionalFormat = data;
+             this.saveUiConfig();
+        },
         changeFormat(data){
             switch(data.type){
                 case 'view':
@@ -1107,7 +1128,7 @@ export default {
              this.listSelectedCondition = listSelectedCondition;
             //  this.getData();
          },
-  
+        // xử lý format màu trong table
         handleConditionalFormat(data){
             const self = this;
                 data.map(column=>{
@@ -1141,25 +1162,10 @@ export default {
                 })
             return data;
         },
-        // applyConfigFormat(index){
-        //     this.conditionIndex = index;
-        // },
         editConfigFormat(index){
             this.conditionIndex = index;
         },
           // lưu cấu hình formatting Table
-        saveConditionalFormatting(data){
-            let tableConfig =  this.getTableDisplayConfigData();
-            tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.listFilters;
-            tableConfig.detail.conditionalFormat = data;
-            tableConfig.detail= JSON.stringify(tableConfig.detail);
-              this.listItemsWorker.postMessage({
-                action: 'saveFilter',
-                data: tableConfig
-			})
-           
-        },
         deleteConfigFormat(index){
             this.isNotiSuccess = false
             this.conditionIndex = index;
@@ -1171,20 +1177,48 @@ export default {
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
             this.closeBtnFilter = false;
+            this.isClose=false;
             //set lại trạng thái không filter
             this.tableFilter.allColumn={}
             this.getData();
+           
+
+        },
+        // xử lý gán tất cả các biến trước khi gửi data
+        saveUiConfig(){
+            this.notiSuccess = false;
+            let tableConfig =  this.getTableDisplayConfigData();
+            tableConfig.detail = JSON.parse(tableConfig.detail);
+            tableConfig.detail.filter = this.listFilters;
+            tableConfig.detail.conditionalFormat = this.conditionalFormat;
+            tableConfig.detail.widthColumns = this.widthColumns;
+            tableConfig.detail= JSON.stringify(tableConfig.detail);
+            this.listItemsWorker.postMessage({
+                action: 'saveUiConfig',
+                data: tableConfig
+			})
+        },
+        columnResized(){
+            this.widthColumns=[];
+            this.gridOptions.columnApi.columnController.allDisplayedColumns.map(column=>{
+                this.widthColumns.push({
+                    colId:column.colId,
+                    width: column.actualWidth
+                })
+            })
+           this.saveUiConfig(); 
+           
         },
     
         getDefaultFilter(){
-            
             if(this.listFilters&&this.listFilters.length>0){
                 this.listFilters.map((fil,i)=>{
                     if(fil.isDefault){
                         this.selectedFilterName = fil.name;
                         this.closeBtnFilter = true;
                         this.tableFilter.allColumn = fil.columns;
-                        this.getData()
+                        this.getData();
+                        this.closeBtnFilter = true;
                     }
                 })
             }
@@ -1196,13 +1230,13 @@ export default {
                     fil.isDefault=false;
                 }
             })
-            this.sendFilterWorker();
-            this.notiFiltert("table.success.save_filter");
+            this.saveUiConfig();
+            this.isNotiSuccess = false;
         },
         unsetDefaultFilter(filterIdx){
             this.listFilters[filterIdx].isDefault= false;
-            this.sendFilterWorker();
-            this.notiFilter = this.$t("table.success.save_filter");
+            this.isNotiSuccess = false;
+            this.saveUiConfig();
         },
         editFilter(filterIdx){
             this.addFilter = true;
@@ -1221,7 +1255,7 @@ export default {
             if(this.typeDelete=='filter'){
                 let filter = this.listFilters.filter((item,idx)=>idx!=this.deleteFilterIdx);
                 this.listFilters = filter;
-                this.sendFilterWorker();
+                this.saveUiConfig();
                 this.notiFilter = this.$t("table.success.delete_filter");
             }else{
                 this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=this.conditionIndex)
@@ -1240,7 +1274,7 @@ export default {
         addFilterConfig(){
             this.addFilter = true;
         },
-        saveFilter(){
+        checkIsAddFilter(){
             if(!this.isUpdateFilter){
                 this.listFilters.push({
                     name:this.filterName,
@@ -1253,18 +1287,7 @@ export default {
                 this.listFilters[this.filterIdx].columns = this.tableFilter.allColumn;
                 this.notiFilter = this.$t("table.success.edit_filter");
             }
-            this.sendFilterWorker()
-        },
-        sendFilterWorker(){
-            let tableConfig =  this.getTableDisplayConfigData();
-            tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.listFilters;
-            tableConfig.detail.conditionalFormat = this.conditionalFormat;
-            tableConfig.detail= JSON.stringify(tableConfig.detail);
-            this.listItemsWorker.postMessage({
-                action: 'saveFilter',
-                data: tableConfig
-            })
+            this.saveUiConfig()
         },
 		getAllData(){
 			return this.rowData
@@ -1506,14 +1529,14 @@ export default {
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
 				}
-			})
+            })
 			this.listItemsWorker.postMessage({
 				action: 'getTableColumns',
 				data:{
 					column: data.columns,
 					forcedReOrder: false,
 					savedOrderCols: self.savedTableDisplayConfig,
-					filteredColumns: self.filteredColumns
+                    filteredColumns: self.filteredColumns,
 				}
 			})
 			this.hideOverlay()
@@ -1534,14 +1557,29 @@ export default {
 				}
 				this.savedTableDisplayConfig = res.savedConfigs.columns;
 				if(res.columnDefs){
-                    this.columnDefs = res.columnDefs,
+					this.columnDefs = res.columnDefs
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
                 this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
                 this.getDefaultFilter()
+                //xử lý set độ rộng cho cột
+                this.widthColumns = res.savedConfigs.widthColumns?res.savedConfigs.widthColumns:[];
+                if(this.widthColumns){
+                    this.columnDefs.map(column=>{
+                        // column.width='1000'
+                        this.widthColumns.map(c=>{
+                            if(column.field==c.colId){
+                                column.width=c.width
+                            }
+                        })
+                    })
+
+                    this.gridOptions.api.setColumnDefs(this.columnDefs);
+
+                 }
                 // xử lý phần format conditional
-                this.conditionalFormat = res.savedConfigs.conditionalFormat;
+                this.conditionalFormat = res.savedConfigs.conditionalFormat?res.savedConfigs.conditionalFormat:[];
 
 			}
 		},
@@ -1552,11 +1590,11 @@ export default {
 				title: this.$t("table.success.save_config")
 			})
         },
-        handlerSaveFilter(res, notiSuccess = true){
+        handleSaveUiConfig(res, notiSuccess = true){
             if(res.status==200){
                 this.addFilter = false;
                 this.filterName = '';
-                if(notiSuccess){
+                  if(notiSuccess){
                     this.$snotify({
                     type: "success",
                     title: 'Thành công'	})
@@ -1568,7 +1606,6 @@ export default {
             }
         },
 		reRender(){
-            // this.agApi.refreshCells();
              this.agApi.redrawRows();
 		},
 		searchAutocompleteItems(vl){
