@@ -1206,14 +1206,12 @@ export default {
                     width: column.actualWidth
                 })
             })
-            this.saveUiConfig();
-            // this.countColumnResized+=1;
-            //  if(this.countColumnResized==this.widthColumns.length){
-            //     this.saveUiConfig();
-            //     this.countColumnResized=0;
-            // }
-           
-           
+            // this.saveUiConfig();
+            this.countColumnResized+=1;
+             if(this.countColumnResized>2){
+                this.saveUiConfig();
+                this.countColumnResized=0;
+            }
         },
         //
         getDefaultFilter(){
