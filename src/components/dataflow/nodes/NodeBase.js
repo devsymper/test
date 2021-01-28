@@ -24,6 +24,9 @@ export default class NodeBase {
         this.configs = defaultConfig;
     }
 
+    getType(){
+        return this.type;
+    }
+    
     process(){}
-
 }
