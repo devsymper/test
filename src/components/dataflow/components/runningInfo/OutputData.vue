@@ -42,7 +42,7 @@ export default {
 	props: {
 		containerHeight: {
 			type: Number,
-			default: 400,
+			default: 300,
 		},
 	},
 	data() {
