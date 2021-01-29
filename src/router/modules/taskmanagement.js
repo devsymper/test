@@ -1,5 +1,11 @@
 export default [
     {
+        path: "/task-management/home",
+        name: "taskManagerHome",
+        component: () =>
+            import ('../../views/taskManagement/home/Index.vue')
+    },
+    {
         path: "/task-management",
         name: "taskManagerHome",
         component: () =>
@@ -89,6 +95,14 @@ export default [
                 path: "projects/:id/issue-link",
                 meta:{group:'projectSetting'},
                 name: "issueLink",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/issueLink/List.vue')
+                }
+            },
+            {
+                path: "projects/:id/create-filter",
+                meta:{group:'projectSetting'},
+                name: "createFilter",
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/issueLink/List.vue')
                 }

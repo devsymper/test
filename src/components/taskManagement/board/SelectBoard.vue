@@ -71,7 +71,6 @@
 </template>
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import { taskManagementApi } from "@/api/taskManagement.js";
 import FormTpl from "@/components/common/FormTpl.vue";
 import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
 
@@ -164,7 +163,7 @@ export default {
             console.log("ádasdasdsa",e);
         },
         onItemClick(item){
-            this.$evtBus.$emit("selected-item-board", item);
+            this.$emit("selected-item-board", item);
             this.hide();
         },
         handleAddBoard(){

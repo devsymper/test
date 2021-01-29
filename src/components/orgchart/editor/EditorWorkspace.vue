@@ -132,7 +132,8 @@ export default {
                         cell.attr(mapName[attrName]+'/'+key, value[key]);
                     }
                 }else{
-					let imgurl = util.addEnvToUrl(appConfigs.apiDomain.fileManagement+'readFileSvg/user_avatar');
+					let imgurl = appConfigs.apiDomain.fileManagement+'readFileSvg/user_avatar';
+					debugger
                     if(value.includes(imgurl)){
 						cell.attr(mapName[attrName], value,
 					);
@@ -188,9 +189,9 @@ export default {
 				self.$emit('delete-node')
             });
             paper.on('element:view', function(elementView, evt, x, y) {
-				  self.$emit('cell-contextmenu', elementView.model.id);
-				  evt.stopPropagation()
-				  evt.preventDefault()
+				setTimeout(function(){
+					self.$emit('cell-contextmenu', elementView.model.id);
+				},300)
             });
             paper.on('element:add', function(elementView, evt) {
                 evt.stopPropagation();
@@ -351,7 +352,7 @@ export default {
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
-            let avatarUser = util.addEnvToUrl(appConfigs.apiDomain.fileManagement+"readFileSvg/user_avatar_")+lastUserInfo.id
+            let avatarUser = appConfigs.apiDomain.fileManagement+"readFileSvg/user_avatar_"+lastUserInfo.id
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );

@@ -13,6 +13,7 @@
                 :instanceKey="instanceKey"/>
             
             <DataflowWorkspace
+                ref="dataflowWorkspace"
                 :instanceKey="instanceKey"
                 :action="action"
                 style="flex-grow: 1;"
@@ -51,12 +52,43 @@ import DataflowSidebarConfig from "@/components/dataflow/components/DataflowSide
 import DataflowToolBar from "@/components/dataflow/components/DataflowToolBar.vue";
 import DataflowWorkspace from "@/components/dataflow/components/DataflowWorkspace.vue";
 import VueResizable from 'vue-resizable';
+import DataflowEditorWorker from 'worker-loader!@/worker/dataflow/DataflowEditor.Worker.js';
 
 export default {
+    created(){
+        this.dataflowEditorWorker = new DataflowEditorWorker();
+        this.listenFromWorker();
+        this.getDataflowInfo();
+    },
     mounted(){
     },
     methods: {
-        
+        restoreDataflowData(data){
+            let graphData = data.graph;
+            this.$refs.dataflowWorkspace.restoreGraphDisplay(graphData);
+        },
+        getDataflowInfo(){
+            if(this.idObject){
+                this.dataflowEditorWorker.postMessage({
+                    action: 'getDataflowInfo',
+                    data: {
+                        id: this.idObject 
+                    }
+                });
+            }
+        },
+        listenFromWorker(){
+            let self = this;
+            this.dataflowEditorWorker.addEventListener("message", function (event) {
+                let data = event.data;
+                let action = data.action;
+                if(self[action]){
+                    self[action](data.data);
+                } else {
+                    console.error(` action ${action} not found `);
+                }
+            });
+        },
     },
     data(){
         return {
@@ -66,7 +98,7 @@ export default {
         };
     },
     computed: {
-
+ 
     },
     components: {
         DataflowToolBar,

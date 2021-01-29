@@ -28,7 +28,7 @@ export default {
             this.$refs.preLoaderView.show();
         }
     },
-    
+ 
 };
 </script>
 

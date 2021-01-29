@@ -1,13 +1,14 @@
 <template>
     <div class="w-100 " style="height: calc(100% - 41px)">
         <div class="w-100 h-100">
-            <iframe ref="dashboardItems" class="w-100 h-100" :src="(url) ? url :'https://bi.symper.vn/#/dashboard/'+dashboardId+'/view'" frameborder="0"></iframe>
+            <iframe ref="dashboardItems" class="w-100 h-100" :src="(url) ? url : getUrl(dashboardId)" frameborder="0"></iframe>
         </div>
     </div>
 </template>
 
 <script>
 import { dashboardApi } from "@/api/dashboard.js";
+import { util } from '../../plugins/util';
 export default {
     watch: {
         dashboardTab(){
@@ -21,7 +22,9 @@ export default {
         this.dashboardId = this.$route.params.id;
     },
     methods: {
-          
+        getUrl(dashboardId){
+            return util.addEnvToUrl('https://bi.symper.vn/#/dashboard/'+dashboardId+'/view');
+        }
     },
     data(){
         return {

@@ -23,8 +23,8 @@ window.viewTable = function(el) {
     SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { isTable: true, tableName: $(el).attr('table-name') })
 }
 export default class TableControl extends Control {
-    constructor(idField, ele, controlProps, curParentInstance) {
-        super(idField, ele, controlProps, curParentInstance);
+    constructor(idField, ele, controlProps, keyInstance) {
+        super(idField, ele, controlProps, keyInstance);
     }
     initTableControl(isPrintView = false) {
 
@@ -53,7 +53,7 @@ export default class TableControl extends Control {
                 this.name,
                 this.id,
                 this.pivotTableConfig,
-                this.curParentInstance
+                this.keyInstance
             );
         }
     }
@@ -65,7 +65,7 @@ export default class TableControl extends Control {
                 this.name,
                 this.id,
                 this.groupTableConfig,
-                this.curParentInstance
+                this.keyInstance
             );
         }
     }
@@ -90,9 +90,9 @@ export default class TableControl extends Control {
         }
     }
     renderTable() {
-        let viewType = sDocument.state.viewType[this.curParentInstance];
+        let viewType = sDocument.state.viewType[this.keyInstance];
         if ((viewType == 'submit' || viewType == "update") && !this.agDataTable) {
-            this.ele.parent().append('<span onclick="viewTable(this)" table-name="' + this.name + '" instance="' + this.curParentInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
+            this.ele.parent().append('<span onclick="viewTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
         }
         if (this.isPrintView) {
             if(this.agDataTable){

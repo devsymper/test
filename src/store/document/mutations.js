@@ -417,7 +417,8 @@ const setDefaultSubmitStore = (state, params) => {
             data:{}
         },
         dataInputBeforeChange:{},
-        mapValueToTextAutocompleteInput:{}
+        mapValueToTextAutocompleteInput:{},
+        tableInteractive:null
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
