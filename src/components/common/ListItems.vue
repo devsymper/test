@@ -1054,8 +1054,17 @@ export default {
 		},
         handleAddFilter(data){
             if(data.type=='save'){
-                this.filterName = data.filterName
-                this.checkIsAddFilter()
+                this.filterName = data.filterName;
+                 if(!this.checkExistNameFilter()){
+                    this.checkIsAddFilter()
+                    this.saveUiConfig()
+                }else{
+                    this.$snotify({
+                        type: "error",
+                        title: this.$t("table.error.name_exist")
+                    })
+                }
+               
             }else{
                 this.addFilter = false;
             }
@@ -1286,6 +1295,7 @@ export default {
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
+                
             }else{
                 this.listFilters[this.filterIdx].name = this.filterName;
                 this.listFilters[this.filterIdx].searchKey = this.searchKey;
@@ -1293,7 +1303,17 @@ export default {
                 this.notiFilter = this.$t("table.success.edit_filter");
             }
             this.isNotiSuccess = true;
-            this.saveUiConfig()
+           
+        },
+        checkExistNameFilter(){
+            let check = false;
+            this.listFilters.map(filter=>{
+                if(filter.name==this.filterName)
+                {
+                   check = true; 
+                }
+            })
+            return check
         },
 		getAllData(){
 			return this.rowData
