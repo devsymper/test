@@ -173,19 +173,10 @@ export default {
 			let data = event.data;
             switch (data.action) {
                 case 'handleDeleteActionPack':
-					debugger
-					if(data.dataAfter.length){
-						debugger
-						data.dataAfter.forEach(function(e){
-
-							if(e == 'success'){
-								self.$snotifySuccess("Xóa thành công")
-							}else{
-								self.$snotifyError("Có lỗi xảy ra")
-							}
-						})
-					}
-					self.$refs.listActionPack.refreshList();
+					self.$snotifySuccess("Xóa thành công")
+					setTimeout(function(e){
+						self.$refs.listActionPack.refreshList();
+					}, 1000)
 					break;
                
                 default:

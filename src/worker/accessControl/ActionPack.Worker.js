@@ -12,7 +12,6 @@ self.onmessage = async function (event) {
             postMessage({action:'getAppInActionPack', dataAfter : getAppInActionPackRes})
             break;
         case 'deleteActionPack':
-			debugger
 			let deleteActionPackRes = await deleteActionPack(data.ids);
             postMessage({action:'handleDeleteActionPack', dataAfter : deleteActionPackRes})
             break;
@@ -42,23 +41,15 @@ export const getAppInActionPack = async function(str) {
 }
 export const deleteActionPack = async function(ids) {
 	let arr = []
-	debugger
 	ids.forEach(async function(e){
 		let res = await permissionApi.deleteActionPackById(e);
-		debugger
 		if(res.status == 200){
 			arr.push('success')
 		}else{
 			arr.push('error')
 		}
 	})
-	debugger
 	return arr
-	// if(res.status == 200){
-	// 	return 'success'
-	// }else{
-	// 	return 'error'
-	// }
 }
 export const updateActionPack = async function(data) {
 	let res = await permissionApi.updateActionPack(data.dataActionPack.id , data.dataActionPack.dataToSave);
