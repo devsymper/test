@@ -22,7 +22,10 @@ export default class ReportFilter extends ReportBase {
 				"items":["alignment","bgColor","fontColor","show","textSize","titleText"]
 			},
 		}
-        super('filter', symperId, columnSettingKeys, styleKeys);
+		super('filter', symperId, columnSettingKeys, styleKeys);
+		this.viewConfigs.selectedValues = {}
+		this.viewConfigs.disSelectedValues = {}
+		this.sharedConfigs.queryKey = ""
 	}
 	translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
 		let output = TranslatorHelper.Charts.filter(data.data , rawConfig.setting , rawConfig.style , 1 , extraData)

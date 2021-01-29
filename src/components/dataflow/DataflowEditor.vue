@@ -23,7 +23,7 @@
                 ref="dataflowRunningInfo"
                 class="border-top-1"
                 :min-height="100"
-                :height="200"
+                :height="330"
                 :max-height="500"
                 :active="['t']"
             >
