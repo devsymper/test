@@ -1647,7 +1647,7 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
 			}
-			let widgetIdentifier = this.getWidgetIdentifier()
+			let widgetIdentifier = this.getRouteIdentifier()
 			this.$store.commit('app/setFilteredColumns', {filteredColumns: this.filteredColumns, widgetIdentifier: widgetIdentifier})
 
 		},
@@ -2054,8 +2054,15 @@ export default {
             }else{
                 widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             }
-             widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
-            // this.widgetIdentifier = this.$route.path;
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            return widgetIdentifier;
+		},
+		rerenderTable(){
+			this.agApi.sizeColumnsToFit()
+		},
+		getRouteIdentifier(){
+			let widgetIdentifier =  this.$route.path;
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
             return widgetIdentifier;
 		},
 		getTableDisplayConfigData(){
