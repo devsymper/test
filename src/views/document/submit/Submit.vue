@@ -41,7 +41,7 @@
             >
                 <template slot="drag-panel-content">
                     <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
-                    <filter-input @save-input-filter="saveInputFilter" @search-data="searchDataFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
+                    <filter-input :keyInstance="keyInstance" @save-input-filter="saveInputFilter" @search-data="searchDataFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
                 </template>
             </sym-drag-panel>
             <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
@@ -746,7 +746,7 @@ export default {
             this.$refs.inputFilter.setControlName(e.controlName);
             this.runInputFilterFormulas(e.controlName);
             this.$refs.symDragPanel.show();
-            this.$refs.inputFilter.setFormulas(e.formulas,e.controlName);
+            this.$refs.inputFilter.setFormulas(e.formulas);
             
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
@@ -2488,7 +2488,6 @@ export default {
          */
         runInputFilterFormulas(controlName,search=""){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
-            let controlId = controlInstance.id
             let allFormulas = controlInstance.controlFormulas;
             if(allFormulas.hasOwnProperty('list')){
                 if(allFormulas['list'].hasOwnProperty('instance')){
@@ -2623,22 +2622,23 @@ export default {
          *  Hàm xử lí dứ liệu sau khi chạy công thức
          */
         handleAfterRunFormulas(res,controlName,formulaType){
+
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-            if(formulaType == 'autocomplete' || formulaType == 'list'){
+            let controlId = controlInstance.id;
+            if(controlInstance.type == 'inputFilter'){
+                this.$refs.inputFilter.setData(res.data.data);
+            }
+            else if(formulaType == 'autocomplete' || formulaType == 'list'){
                 let titleControl = (controlInstance) ? controlInstance.title : "";
                 this.setDataForControlAutocomplete(res,controlName,titleControl);
                 return;
             }
-            let controlId = controlInstance.id;
             let value = minimizeDataAfterRunFormula(res)
             if(formulaType === 'formulasDefaulRow'){
                 this.$store.commit("document/updateDataToTableControlRoot",{instance:this.keyInstance,value:value,controlName:controlName,tableName:controlInstance.inTable});
                 return;
             }
-            if(controlInstance.type == 'inputFilter'){
-                this.$refs.inputFilter.setData(controlId,controlName,res.data.data);
-                
-            }
+           
             else if(controlInstance.type == 'table'){
                 if(formulaType=='formulas'){
                     this.setDataToTable(controlId,res.data)

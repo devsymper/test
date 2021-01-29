@@ -825,10 +825,11 @@ export default class SymperTable {
             let listRootTable = sDocument.state.submit[this.tableInstance.keyInstance]['listTableRootControl'];
             if (listRootTable.hasOwnProperty(this.tableInstance.tableName)){
                 let rowDataFromRoot = util.cloneDeep(listRootTable[this.tableInstance.tableName]['defaultRow']);
-                for (let index = 0; index < rowDataFromRoot.length; index++) {
-                    let cellValue = rowDataFromRoot[index];
-                    rowData[0][cellValue[1]] = cellValue[2];
-                    
+                if(rowDataFromRoot){
+                    for (let index = 0; index < rowDataFromRoot.length; index++) {
+                        let cellValue = rowDataFromRoot[index];
+                        rowData[0][cellValue[1]] = cellValue[2];
+                    }
                 }
                 rowData[0].s_table_id_sql_lite = Date.now();
             }
