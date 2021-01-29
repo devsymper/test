@@ -249,7 +249,7 @@
 				width: '100%',
 				height:tableHeight+ 'px',
 			}"
-				:class="{'ag-theme-balham': true}"
+				:class="{'ag-theme-balham': true,'ag-list-items-table':true}"
 				:defaultColDef="defaultColDef"
 				:gridOptions="gridOptions"
                 :getContextMenuItems="getContextMenuItems"
@@ -2135,29 +2135,29 @@ export default {
 	-ms-user-select: none; 
 	user-select: none; 
 }
-.symper-list-items >>> .ag-header{
+.symper-list-items .ag-list-items-table >>> .ag-header{
 	border: unset !important;
 }
-.symper-list-items >>> .ag-row{
+.symper-list-items .ag-list-items-table >>> .ag-row{
 	border-radius: 4px;
 }
-.symper-list-items >>> .ag-row:hover{
+.symper-list-items .ag-list-items-table >>> .ag-row:hover{
 	border-radius: 4px;
 }
-.symper-list-items >>> .ag-theme-balham .ag-cell{
+.symper-list-items .ag-list-items-table >>> .ag-cell{
 	line-height: unset !important
 }
-.symper-list-items >>> .ag-header {
+.symper-list-items .ag-list-items-table >>> .ag-header {
 	height: 28px !important;
 	min-height: unset !important;
 	background-color: #ffffff !important;
 	border-top: 1px solid lightgray !important;
 	border-bottom: 1px solid lightgray !important;
 }
-.symper-list-items >>> .ag-theme-balham .ag-header-row {
+.symper-list-items .ag-list-items-table >>> .ag-header-row {
     height: 24px !important;
 }
-.symper-list-items >>> .ag-row-selected{
+.symper-list-items .ag-list-items-table >>> .ag-row-selected{
 	background-color: #DBE7FE !important;
 }
 .symper-list-items >>> .clip-text .ag-cell{
