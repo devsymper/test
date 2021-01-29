@@ -254,7 +254,8 @@
 				:gridOptions="gridOptions"
                 :getContextMenuItems="getContextMenuItems"
 				:columnDefs="columnDefs"
-                @columnResized="columnResized()"
+                @dragStopped="columnResized()"
+                @columnResized="resize()"
 				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
 				:frameworkComponents="frameworkComponents"
@@ -1049,6 +1050,9 @@ export default {
             })
             return result;
         },
+        resize(){
+
+        },
 		customBtnClick(i){
 			this.customHeaderBtn[i].callback()
 		},
@@ -1206,12 +1210,7 @@ export default {
                     width: column.actualWidth
                 })
             })
-            // this.saveUiConfig();
-            this.countColumnResized+=1;
-             if(this.countColumnResized>2){
-                this.saveUiConfig();
-                this.countColumnResized=0;
-            }
+            this.saveUiConfig();
         },
         //
         getDefaultFilter(){
