@@ -1,3 +1,5 @@
+import { util } from "../../plugins/util";
+
 let commonProps = {
     "module": "dashboard",
     "resource": "dashboard",

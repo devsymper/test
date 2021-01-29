@@ -1,7 +1,7 @@
 <template>
     <div class="h-100 w-100 d-flex justify-center task-style"> 
         <DocumentSubmit 
-            v-if="showDoTaskComponent && (action == 'submit' || action=='update') && statusTask == 'notSubmit'"
+            v-if="showDoTaskComponent && ((action == 'submit'  && statusTask == 'notSubmit' ) || action=='update')"
             ref="submitComponent"
 			:showSnackbarSuccess="false"
             :docId="Number(docId)"

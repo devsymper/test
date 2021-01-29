@@ -431,14 +431,77 @@ export default {
                 }
             }
             let modelDataAsFlowable = this.getModelData();
+            let relatedDocs = this.getRelatedDocs();
             return {
                 name: modelDataAsFlowable.name,
                 content: xml,
                 description: modelDataAsFlowable.description,
                 version: 1,
                 configValue: JSON.stringify(jsonConfig),
-                processKey: modelDataAsFlowable.key
+                processKey: modelDataAsFlowable.key,
+                relatedDocs: relatedDocs
             };
+        },
+        getRelatedDocs(){
+            let mapNodeIdToDoc = {};
+            let startDocFound = false;
+            for(let nodeId in this.stateAllElements){
+                let node = this.stateAllElements[nodeId];
+                if(node.type == 'UserTask' || node.type == 'Task'){
+                    if(node.attrs.taskAction.value == 'submit' &&  node.attrs.formreference.value){
+                        mapNodeIdToDoc[nodeId] = {
+                            idDoc: node.attrs.formreference.value
+                        };
+                    }else if(node.type == 'Start'){
+                        if(node.attrs.formreference.value){
+                            mapNodeIdToDoc[nodeId] = {
+                                idDoc: node.attrs.formreference.value,
+                                hasStartDoc: true
+                            };
+                            startDocFound = true;
+                        }
+                    }
+                }
+            }
+            if(!startDocFound){
+                let nodesIdHaveStartDoc = this.getNodesHaveStartDoc();
+                for(let nodeId of nodesIdHaveStartDoc){
+                    mapNodeIdToDoc[nodeId].hasStartDoc = true;
+                }
+            }
+            return mapNodeIdToDoc;
+        },
+        getNodesHaveStartDoc(){
+            let allNodes = this.$refs.symperBpmn.getAllNodes();
+            let startNode = allNodes.filter((el) => {
+                return el.$type == "bpmn:StartEvent";
+            })[0];
+            if(startNode){
+                let firstUserTasks = [];
+                this.findFirstUserTask(startNode, firstUserTasks);
+                let rsl = [];
+                for(let node of firstUserTasks){
+                    let nodeAttr = this.stateAllElements[node.id];
+                    if(nodeAttr.attrs.taskAction.value == 'submit' && nodeAttr.attrs.formreference.value){
+                       rsl.push(node.id); 
+                    }
+                }
+                return rsl;
+            }else{
+                return [];
+            }
+        },
+        findFirstUserTask(node, rsl){
+            let nodeId = node.id;
+            let nodeAttr = this.stateAllElements[nodeId];
+            if(nodeAttr.type == 'UserTask' || nodeAttr.type == 'Task'){
+                rsl.push(node);
+                return;
+            }else{
+                for(let link of node.outgoing){
+                    this.findFirstUserTask(link.targetRef, rsl);
+                }
+            }
         },
         standardXMLToSave(xml){
             // &lt;![CDATA[pppppppppppppppppppp]]&gt;

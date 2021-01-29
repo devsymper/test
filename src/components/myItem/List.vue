@@ -168,7 +168,9 @@
                                     <div 
                                         v-if="sideBySideMode" 
                                         :class="obj.dueDateClass" 
-                                        style="height: 8px;width: 8px; display: inline-block; border-radius: 50%; margin-top: 8px; margin-left: 3px">
+                                        style="height: 8px;width: 8px; display: inline-block; border-radius: 50%; margin-top: 8px; margin-left: 3px" 
+										:style="{'background-color': obj.dueDateClass }"	
+									>
                                     </div>
                                 </v-col>
                                 <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" :class="{'colName':sideBySideMode==true}" class="pa-1">
@@ -250,7 +252,7 @@
                                 >
                                     <div class="pt-3">
                                         <v-chip
-                                            :class="obj.dueDateClass"
+											:color="obj.dueDateClass"
                                             text-color="white"
                                             style="border-radius:4px"
                                             x-small
@@ -929,17 +931,39 @@ export default {
             e.dueDateFromNow = e.dueDate ? this.$moment(e.dueDate).fromNow() : '';
         },
         getDueDateInfo(obj){
-            let overDue = this.checkTimeDueDate(obj);
+			let overDue = this.checkTimeDueDate(obj);
             if(obj.endTime){
                 return {
-                    class: 'task-done' ,
+                    class: 'success' ,
                     text: this.$t('common.done'),
                 }
             }else if(obj.createTime && !overDue){
-                return {
-                    class: 'task-to-do' ,
-                    text: this.$t('myItem.unfinished'),
-                }
+				if(!obj.delegation){
+					if(obj.assignee){
+						return {
+							class: 'orange' ,
+							text: this.$t('tasks.assign'),
+						}
+					}else{
+						return {
+							class: 'primary' ,
+							text: this.$t('tasks.unAssign'),
+						}
+					}
+				}else{
+					if(obj.delegation == "PENDING"){
+						return {
+							class: '#8E2D8C' ,
+							text: this.$t('tasks.delegate'),
+						}
+					}else{
+						return {
+							class: 'orange' ,
+							text: this.$t('tasks.assign'),
+						}
+					}
+				}
+				
             }else{
                 return {
                     class: 'task-over-due' ,

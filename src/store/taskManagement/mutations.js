@@ -32,7 +32,7 @@ const setAllStatusCategory = (state, allStatusCategory) => {
 const setAllStatus = (state, allStatus) => {
     Vue.set(state, 'allStatus', allStatus);
 }
-const setListStautsInProject = (state, data) => {
+const setListStatusInProject = (state, data) => {
     Vue.set(state.listStatusInProjects, data.key , data.data);
 }
 const setListRoleUserInProject = (state, data) => {
@@ -287,8 +287,25 @@ const removePriorityToStore = (state, id) => {
 const addToTaskManagementStore = (state, data) =>{
     let key = data.key;
     let value = data.value;
-    console.log(value,'value');
     Vue.set(state, key, value)
+}
+/**
+ * Hàm đánh dấu các thay đổi trong kanban board từ đó load lại data cần thiết cho kanban
+ * @param {*} state 
+ * @param {*} params 
+ */
+const updateCheckBoardChange = (state, params) => {
+    let oldData = state.checkBoardChange;
+    let value = params.value;
+    oldData = oldData.concat(value)
+    Vue.set(state, 'checkBoardChange', oldData)
+}
+const removeCheckBoardChange = (state, params) => {
+    let oldData = state.checkBoardChange;
+    let value = params.value;
+    let index = oldData.indexOf(value);
+    oldData.splice(index,1);
+    Vue.set(state, 'checkBoardChange', oldData)
 }
 export {
     setAllCategory,
@@ -321,7 +338,7 @@ export {
     removePriorityToStore,
     updatePriorityToStore,
     setAllStatus,
-    setListStautsInProject,
+    setListStatusInProject,
     setListStatusInColumnBoard,
     setListDocumentConfigFieldIssue,
     setListIssueTypeInProjects,
@@ -338,5 +355,6 @@ export {
     setListIssueInSprintProject,
     updateSprintToListInStore,
     setListDataSprintAfterAfterMapIssue,
-
+    updateCheckBoardChange,
+    removeCheckBoardChange
 };

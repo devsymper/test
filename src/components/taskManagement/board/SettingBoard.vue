@@ -1,7 +1,7 @@
 <template>
     <div class="w-100 h-100">
         <div class="d-flex">
-            <div class="symper-title pt-2 pl-2" style="height:40px">Setting for {{infoBoard.name}}</div>
+            <div class="symper-title pt-2 pl-2" style="height:40px">Cài đặt thông tin cho {{infoBoard.name}}</div>
         
         </div>
         <div  style="height:calc(100% - 40px); width:100%; background:#333">
@@ -12,13 +12,13 @@
                     <v-icon class="fs-15" left>
                     mdi-image-filter-tilt-shift
                     </v-icon>
-                    General
+                    Thông tin chung
                 </v-tab>
                 <v-tab class="fs-13">
                     <v-icon class="fs-15" left>
                     mdi-format-columns
                     </v-icon>
-                    Columns
+                    Cột
                 </v-tab>
 
                 <v-tab-item>
@@ -28,8 +28,6 @@
                 </v-tab-item>
                 <v-tab-item class="tab-column">
                     <column-setting
-                        :listColumn="listColumn"
-                        :listStatusColumn="listStatusColumn"
                         class="h-100 column-setting"
                     />
                 </v-tab-item>
@@ -49,18 +47,6 @@ export default {
             type:Object,
             default() {
                 return {};
-            }
-        },
-        listColumn:{
-            type:Array,
-            default() {
-                return [];
-            }
-        },
-        listStatusColumn:{
-            type:Array,
-            default() {
-                return [];
             }
         },
     },

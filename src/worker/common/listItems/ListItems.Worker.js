@@ -11,6 +11,10 @@ self.onmessage = async function (event) {
 			let getDataRes = await getData(data);
             postMessage({action:'getData', dataAfter : getDataRes})
             break;
+        case 'customGetData':
+			let customGetDataRes = await getData(data);
+            postMessage({action:'customGetData', dataAfter : customGetDataRes})
+            break;
         case 'getItemForValueFilter':
 			let getItemForValueFilterRes = await getItemForValueFilter(data.dataConfig);
             postMessage({action:'getItemForValueFilter', dataAfter : getItemForValueFilterRes})
@@ -30,7 +34,11 @@ self.onmessage = async function (event) {
         case 'getTableColumns':
 			let getTableColumnsRes = await getTableColumns(data.column , data.forcedReOrder , data.savedOrderCols, data.filteredColumns);
             postMessage({action:'getTableColumns', dataAfter : getTableColumnsRes})
-            break;
+			break;
+		case 'saveUiConfig':
+			let saveUiConfigRes = await saveUiConfig(data);
+			postMessage({action:'saveUiConfig', dataAfter : saveUiConfigRes})
+			break;
         default:
             break;
     }
@@ -58,6 +66,7 @@ export const getItemForValueFilter = function(dataConfig){
 			}
 			resolve(obj);
 		}
+		dataConfig.searchKey = ""
 		prepareFilterAndCallApi(dataConfig.columns , false, true, success, dataConfig.options, dataConfig);
 	})
 	
@@ -190,4 +199,8 @@ export const getTableColumns = function(columns, forcedReOrder = false , savedOr
 	} else {
 		return Object.values(colMap);
 	}
+}
+export const saveUiConfig = async function(data){
+	let res = await uiConfigApi.saveUiConfig(data)
+	return res
 }

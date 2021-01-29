@@ -7,6 +7,9 @@ export const systemRoleApi = {
     create(data) {
         return moduleApi.post("system-role", data);
     },
+    getRole(){
+        return moduleApi.get("system-role");
+    },
     update(id, data) {
         return moduleApi.put('system-role/' + id, data);
     },

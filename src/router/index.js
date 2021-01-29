@@ -89,7 +89,6 @@ let routes = autoImportRouteModules();
 for (let item of routes) {
     mapUrlToComponents[item.path] = item.component;
 }
-console.log(mapUrlToComponents, 'mapUrlToComponentsmapUrlToComponentsmapUrlToComponentsmapUrlToComponentsmapUrlToComponents');
 routes = routes.concat(systemRoutes);
 
 

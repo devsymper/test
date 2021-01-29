@@ -88,8 +88,11 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		'ref-y': 0,
 		'ref': '.card',
 		event: 'element:add',
-		cursor: 'pointer'
+		cursor: 'pointer',
+		width: 100,
+		height: 100
 	},
+
 	'.btn.view': {
 		'ref-dx': 0,
 		'ref-y': 0,
@@ -263,6 +266,13 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		event:"visiblePainted",
 		text: '+'
 	},
+	'.button-add-delete': {
+		stroke: '#FFFFFF',
+		strokeWidth: 0.1,
+		event:"visiblePainted",
+		x: -4,
+		y: 5,
+	},
 	'.expand-text': {
 		x: shapeSize.width / 2 - CEConfig.fontSize / 2 + 2,
 		y: shapeSize.height + CEConfig.stickHeight + CEConfig.fontSize / 2 - 1,
@@ -316,9 +326,9 @@ export const departmentMarkup =
                 <rect class="border-bottom"/>
             </g>
 			<line x1="10" y1="90" x2="240" y2="90" style="stroke:rgb(153,153,153);stroke-width:0.5" />
-            <g class="btn add orgchart-action">
-				<line class="line-action" x1="-20" y1="105" x2="-10" y2="105" style="stroke:rgb(36,98,36);stroke-width:1" />
-				<line class="line-action" x1="-15" y1="110" x2="-15" y2="100" style="stroke:rgb(36,98,36);stroke-width:1" />
+			<g class=" btn add orgchart-action">
+				<line class="line-action" x1="-20" y1="105" x2="-10" y2="105" style="stroke:rgb(36,98,36);stroke-width:4" />
+				<line class="line-action" x1="-15" y1="110" x2="-15" y2="100" style="stroke:rgb(36,98,36);stroke-width:4" />
             </g>
             <g class="btn view orgchart-action">
                 <text class="view">Chi tiết</text>
@@ -332,8 +342,8 @@ export const departmentMarkup =
 				<text class="buttonSign"></text>
 			</g>
 			<g class="btn remove orgchart-action">
-				<line class="line-action" x1="-40" y1="100" x2="-30" y2="110" style="stroke:rgb(247,0,0);stroke-width:1" />
-				<line class="line-action" x1="-40" y1="110" x2="-30" y2="100" style="stroke:rgb(247,0,0);stroke-width:1" />
+				<line class="line-action" x1="-40" y1="100" x2="-30" y2="110" style="stroke:rgb(247,0,0);stroke-width:4" />
+				<line class="line-action" x1="-40" y1="110" x2="-30" y2="100" style="stroke:rgb(247,0,0);stroke-width:4" />
 			</g>
 		
 			<g class="btn show-infor-user">

@@ -54,6 +54,7 @@ export default {
         },
         onClick(item){
             this.$router.push('/task-management/projects/'+item.id+'/kanban-board');
+            this.$evtBus.$emit('task-manager-change-project');
         },
         handleViewAll(){
             this.$router.push('/task-management/projects');
