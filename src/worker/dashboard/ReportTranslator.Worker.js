@@ -74,25 +74,24 @@ var handler = {
 
         let condition = cell.rawConfigs.condition;
 
-        // comment lại do chưa dùng đến
         /**Phát hiện drop list filter để giới hạn các giá trị hiển thị cho lựa chọn */
-        // if (this.isDropListFilter(cell)) {
-        //     let cond = [];
-        //     for (let item of condition) {
-        //         cond.push(item);
-        //     }
+        if (this.isDropListFilter(cell)) {
+            let cond = [];
+            for (let item of condition) {
+                cond.push(item);
+            }
 
-        //     let col = columnsSetting['value'][0];
-        //     if (col) {
-        //         let condCol = Object.assign({}, col);
-        //         condCol.cond = {
-        //             type: "contains",
-        //             val: cell.viewConfigs.queryKey
-        //         };
-        //         cond.push(condCol);
-        //     }
-        //     condition = cond;
-        // }
+            let col = columnsSetting['value'][0];
+            if (col) {
+                let condCol = Object.assign({}, col);
+                condCol.cond = {
+                    type: "contains",
+                    val: cell.sharedConfigs.queryKey
+                };
+                cond.push(condCol);
+            }
+            condition = cond;
+        }
 
         let sortData = this.getSortData(cell);
 
