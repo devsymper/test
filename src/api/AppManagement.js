@@ -10,7 +10,7 @@ let trashApi = new Api(appConfigs.apiDomain.trash);
 // var formulasApi = new Api(appConfigs.apiDomain.formulasService)
 export const appManagementApi = {
 	addApp(data) {
-		return coreApi.post("application", data);
+		return coreApi.post("application", data, {}, {contentType: 'application/json'});
 	},
 	deleteApp(id) {
 		return coreApi.delete('application/' + id)
@@ -25,7 +25,7 @@ export const appManagementApi = {
 		return coreApi.get('application-active/side-by-side')
 	},
 	updateApp(data) {
-		return coreApi.put("application", data)
+		return coreApi.put("application", data, {}, {contentType: 'application/json'})
 	},
 	addFavoriteItem(userId, objectIdentifier, objectType, action, appId) {
 		return coreApi.post('app-item-favorite', {
