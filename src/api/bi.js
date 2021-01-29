@@ -29,5 +29,8 @@ export const biApi = {
 		let searchParam = searchKey != "" ? 'search='+searchKey+"&" : ""
 		return api.get('relations?' + searchParam + 'page=1&pageSize='+ pageSize)
 	},
+	getDatasetColumn(id){
+		return api.get('datasets/' + id + '/columns')
+	}
 	
 };

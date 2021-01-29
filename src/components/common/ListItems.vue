@@ -1022,7 +1022,7 @@ export default {
 		 // hoangnd: thêm cột checkbox
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
-            this.columnDefs.unshift(
+            this.columnDefs.push(
 				{ 
 					headerName: 'Chọn', 
 					field: 'checkbox', 

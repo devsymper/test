@@ -11,9 +11,16 @@ onmessage = function (event) {
 
 var handler = {
 	async getAllDataset(){
-		let res =  biApi.getAllDataset()
+		let res = await biApi.getAllDataset()
 		self.postMessage({
 			action: 'handleGetAllDataset',
+			data: res
+		})
+	},
+	async getDatasetColumns(data){
+		let res = await biApi.getDatasetColumn(data.id)
+		self.postMessage({
+			action: 'handleGetDatasetColumns',
 			data: res
 		})
 	},
