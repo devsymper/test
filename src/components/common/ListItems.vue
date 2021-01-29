@@ -254,7 +254,8 @@
 				:gridOptions="gridOptions"
                 :getContextMenuItems="getContextMenuItems"
 				:columnDefs="columnDefs"
-                @columnResized="columnResized()"
+                @dragStopped="columnResized()"
+                @columnResized="resize()"
 				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
 				:frameworkComponents="frameworkComponents"
@@ -894,6 +895,7 @@ export default {
             filterIdx:0,
             searchValue:'',
             typeDelete:'',
+            countColumnResized:0,
             isNotiSuccess:false,// có hoặc không hiển thị thông báo khi lưu thành công 
             conditionalFormat:[],
             listSelectedCondition:[],//list cấu hình điều kiện được chọn
@@ -901,15 +903,14 @@ export default {
 			gridApi: null,
             closeBtnFilter:false,
             isUpdateFilter:false,
-            widthColumns:[],
+            widthColumns:[],// lưu cấu hình độ rộng của các cột showlist
             isClose:true,
             listFilters:[],
             notiFilter:'',
             conditionIndex :-1,
             deleteFilterIdx:0,
             contentDelete:"",
-            showDelPopUp:false,
-            filterContent:"",
+            showDelPopUp:false,// hiển thị pop up xác nhận xóa
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -1050,6 +1051,9 @@ export default {
             })
             return result;
         },
+        resize(){
+
+        },
 		customBtnClick(i){
 			this.customHeaderBtn[i].callback()
 		},
@@ -1181,7 +1185,6 @@ export default {
             this.typeDelete = 'formatTable';
             this.showDelPopUp = true;
             this.contentDelete =" Xóa định dạng "+this.conditionalFormat[index].nameGroup+" khỏi danh sách các định dạng";
-            
         },
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
@@ -1208,6 +1211,7 @@ export default {
                 data: tableConfig
 			})
         },
+        // action khi kéo cột showlist
         columnResized(){
             this.widthColumns=[];
             this.gridOptions.columnApi.columnController.allDisplayedColumns.map(column=>{
@@ -1216,10 +1220,9 @@ export default {
                     width: column.actualWidth
                 })
             })
-           this.saveUiConfig(); 
-           
+            this.saveUiConfig();
         },
-    
+        //
         getDefaultFilter(){
             if(this.listFilters&&this.listFilters.length>0){
                 this.listFilters.map((fil,i)=>{
@@ -1668,7 +1671,7 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
 			}
-			let widgetIdentifier = this.getWidgetIdentifier()
+			let widgetIdentifier = this.getRouteIdentifier()
 			this.$store.commit('app/setFilteredColumns', {filteredColumns: this.filteredColumns, widgetIdentifier: widgetIdentifier})
 
 		},
@@ -2075,8 +2078,15 @@ export default {
             }else{
                 widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             }
-             widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
-            // this.widgetIdentifier = this.$route.path;
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            return widgetIdentifier;
+		},
+		rerenderTable(){
+			this.agApi.sizeColumnsToFit()
+		},
+		getRouteIdentifier(){
+			let widgetIdentifier =  this.$route.path;
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
             return widgetIdentifier;
 		},
 		getTableDisplayConfigData(){
