@@ -108,6 +108,11 @@ let reportColumnSettingItems = {
         hasAgg:false,
         slot:'1',
     },
+    assignee:{
+        name: 'Assignee',
+        hasAgg:false,
+        slot:'1',
+    },
     id:{
         name: 'Task id',
         hasAgg:false,

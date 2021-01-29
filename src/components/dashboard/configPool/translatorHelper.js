@@ -133,9 +133,7 @@ export const TranslatorHelper = {
 			let chartData = TranslatorHelper.getTreeMapData(groupCol, detailCol, valueCol, data, colors);
 			let rsl = {
 				chart: {
-					type: 'treemap',
-					height: extraData.size.h,
-					width: extraData.size.w,
+					type: 'treemap'
 				},
 				// tooltip: {
 				// 	formatter: function() {
