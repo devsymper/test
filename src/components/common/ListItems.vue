@@ -891,6 +891,7 @@ export default {
     data(){
 		let self = this;
         return {
+            filterIdx:0,
             searchValue:'',
             typeDelete:'',
             isNotiSuccess:false,// có hoặc không hiển thị thông báo khi lưu thành công 
@@ -1253,7 +1254,9 @@ export default {
             this.addFilter = true;
             this.filterName = this.listFilters[filterIdx].name;
             this.isUpdateFilter= true;
+            this.tableFilter.allColumn = this.listFilters[filterIdx].columns;
             this.filterIdx = filterIdx;
+            this.getData()
         },
         
         deleteFilter(filterIdx){
@@ -1280,6 +1283,7 @@ export default {
             this.searchKey = this.searchValue;
             this.selectedFilterName = this.listFilters[filterIdx].name;
             let filter = this.listFilters;
+            this.filterIdx = filterIdx;
             this.tableFilter.allColumn = this.listFilters[filterIdx].columns;
             this.getData()
         },
@@ -1307,8 +1311,9 @@ export default {
         },
         checkExistNameFilter(){
             let check = false;
+            let filterName = this.listFilters[this.filterIdx].name?this.listFilters[this.filterIdx].name:'';
             this.listFilters.map(filter=>{
-                if(filter.name==this.filterName)
+                if(filter.name==this.filterName&&filterName!=this.filterName)
                 {
                    check = true; 
                 }
