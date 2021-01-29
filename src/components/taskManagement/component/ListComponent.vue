@@ -30,7 +30,8 @@
                     @click:row="handleClickRow"
                 >
                     <template v-slot:[`item.name`]="{ item }">
-                        <span class="name-title">{{item.name}}</span>
+                        <v-icon class="fs-16">mdi-hexagon-multiple-outline</v-icon>
+                        <span class="name-title pl-2">{{item.name}}</span>
                     </template>
                     <template v-slot:[`item.user`]="{ item }">
                         <infoUser class="userInfo fs-13" :userId="item.userCreate" :roleInfo="{}" />

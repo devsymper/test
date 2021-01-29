@@ -41,11 +41,11 @@ AutoCompleteCellEditor.prototype.init = function(params) {
         }
         let self = this;
         this.eInput.addEventListener('keyup', function(e){
-            params.value = e.target.value
+            params.value = e.target.value;
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                 e: e,
                 controlName: self.controlName,
-                rowIndex:[self.params.rowIndex]
+                rowIndex:[params.node.id]
             })
         } );
     }
@@ -68,12 +68,6 @@ AutoCompleteCellEditor.prototype.afterGuiAttached = function() {
     
 };
 
-AutoCompleteCellEditor.prototype.keyUpEventListener = function(e, controlName) {
-    SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-        e: e,
-        controlName: controlName
-    })
-}
 AutoCompleteCellEditor.prototype.getValue = function() {
     if(this.eInput){
         return this.eInput.value;

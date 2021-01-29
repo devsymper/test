@@ -29,7 +29,7 @@ DateCellRenderer.prototype.init = function(params) {
         }
         this.eGui.innerHTML = div;
         this.eGui.classList.add('ag-input-date');
-        this.eGui.addEventListener('click', function(e){
+        this.eGui.addEventListener('dblclick', function(e){
             let event = e;
             if(event.target.classList.contains('validate-icon')){
                 return false;
@@ -47,5 +47,8 @@ DateCellRenderer.prototype.getGui = function(params) {
 }
 
 DateCellRenderer.prototype.destroy = function(params) {
-    this.eGui.removeEventListener('click', (event));
+    if(this.eGui && params && !params.node.rowPinned){
+        this.eGui.removeEventListener('dblclick', (event));
+    }
+    
 }

@@ -2,6 +2,7 @@
     "common": {
 		"ok": "OK",
         "id": "Id",
+        "format_table":"Formatting",
         "number_instance": "Number of process instance",
         "select_lang": "Select language",
 		"dblclick": "Double click to rename",
@@ -213,6 +214,9 @@
         "unfreeze_column": "Don't freeze this column",
         "hide_column": "Hide this column",
 		"show_column": "Show this column",
+		"domainName": "Domain name",
+        "serviceIdentifier": "Service identifier",
+        "serviceName": "Service name",
 		"os": "Os",
 		"ip": "IP address",
 		"number_instance": "Number instances",
@@ -240,7 +244,10 @@
             "cannot_get_data": "Can not get data from server"
         },
         "success": {
-            "save_config": "Save config successfully!"
+            "save_config": "Save config successfully!",
+            "save_filter": "Save filter table successfully!",
+            "delete_filter": "Save filter table successfully!",
+            "edit_filter": "Save filter table successfully!"
         },
         "filter": {
             "none": "None",
@@ -260,7 +267,12 @@
             "sort_desc": "Sort DESC",
             "clear_filter": "Clear filter",
             "filter_by_value": "Filter by value",
-            "filter_by_condition": "Filter by condition"
+            "filter_by_condition": "Filter by condition",
+            "Delete":"Delete",
+            "Edit":"Edit",
+            "Default":"Default",
+            "Delete Default":"Bỏ mặc định"
+
         }
     },
     "import": {
@@ -286,6 +298,21 @@
                 "viewDetail": "Detail",
                 "download": "Download Excel"
             }
+        }
+    },
+    "authen":{
+        "table":{
+            "title":"Danh sách các server key",
+            "name":"Tên key",
+            "id":"ID",
+            "description":"Mô tả",
+            "serverKey":"Key server",
+            "status":"Trạng thái",
+            "createAt":"Ngày tạo",
+            "updateAt":"Ngày cập nhập",
+            "userCreate":"Người tạo",
+            "userUpdate":"Người cập nhập"
+
         }
     },
     "user": {

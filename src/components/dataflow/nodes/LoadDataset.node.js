@@ -5,6 +5,6 @@ export default class LoadDataset extends NodeBase {
         let defaultConfig = {
             
         };
-        super(symperId, 'load', defaultConfig);
+        super(symperId, 'Load', defaultConfig);
     }
 }

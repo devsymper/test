@@ -8,6 +8,7 @@
 		"inputAddPlaceholder": "Thêm giá trị",
 		"placeholder-search": "Tìm kiếm",
 		"dblclick": "Click đúp để đổi tên",
+        "format_table":"Định dạng",
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
@@ -43,7 +44,7 @@
         "search": "Tìm kiếm",
         "note": "Ghi chú",
         "quickSearch": "Tìm nhanh",
-        "list_config": "Cấu hình danh sách",
+        "list_config": "Cấu hình",
         "save": "Lưu",
         "confirm": "Xác nhận",
         "check": "Kiểm tra",
@@ -117,6 +118,7 @@
         "createAt": "Thời gian tạo",
         "updateAt": "Thời gian cập nhật",
         "sidebar": {
+            "Authen": "Authen",
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
             "Notification": "Thông báo",
@@ -220,6 +222,9 @@
         "environmentIdentifier": "Định danh môi trường",
         "environmentName": "Tên môi trường",
         "unfreeze_column": "Bỏ cố định cột này",
+        "domainName": "Tên domain",
+        "serviceIdentifier": "Định danh service",
+        "serviceName": "Tên service",
         "hide_column": "Ẩn cột này",
 		"show_column": "Hiện cột này",
 		"processKey": "Process Key",
@@ -258,7 +263,10 @@
             "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
         },
         "success": {
-            "save_config": "Lưu cấu hình hiển thị thành công!"
+            "save_config": "Lưu cấu hình hiển thị thành công!",
+            "save_filter": "Lưu bộ lọc cho table thành công!",
+            "delete_filter": "Xóa bộ lọc cho table thành công!",
+            "edit_filter": "Cập nhật bộ lọc cho table thành công!"
         },
         "filter": {
             "none": "Không chọn",
@@ -278,7 +286,11 @@
             "sort_desc": "Sắp xếp giảm dần",
             "clear_filter": "Xóa bộ lọc",
             "filter_by_value": "Lọc bởi giá trị",
-            "filter_by_condition": "Lọc bởi điều kiện"
+            "filter_by_condition": "Lọc bởi điều kiện",
+            "Delete":"Xóa",
+            "Edit":"Cập nhật",
+            "Default":"Để mặc định",
+            "Delete Default":"Bỏ mặc định"
         }
     },
     "admin": {
@@ -332,6 +344,37 @@
             }
         }
     },
+    "authen":{
+        "table":{
+            "title":"Danh sách các server key",
+            "name":"Tên key",
+            "id":"ID",
+            "description":"Mô tả",
+            "serverKey":"Key server",
+            "status":"Trạng thái",
+            "createAt":"Ngày tạo",
+            "updateAt":"Ngày cập nhập",
+            "userCreate":"Người tạo",
+            "userUpdate":"Người cập nhập"
+        },
+        "view":{
+            "add_title":"Thêm key server",
+            "update_title":"Cập nhật key server",
+            "delete_title":"Xóa key server",
+            "view_title":"Chi tiết key server",
+            "save":"Tạo key",
+            "key_name":"Tên key",
+            "key_description":"Mô tả",
+            "key_status":"Trạng thái",
+            "update":"Cập nhật"
+        },
+        "notify":{
+            "success":" thành công",
+            "error":" thất bại",
+            "error_get_role":"Không thể lấy danh sách quyền"
+        }
+    },
+    
     "user": {
         "notification": {
             "email_already_exist!": "Email đã tồn tại!",

@@ -108,9 +108,6 @@
                             <span>{{$t('document.instance.showlist.update')}}</span>
                         </v-tooltip>
                     </div>
-                    <v-btn small @click="showDialog" class="delete-record-btn">
-                        <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
-                    </v-btn>
                 </div>
                 <div  v-else-if="actionOnRightSidebar == 'update'">
                     <span class="title float-left">
@@ -241,6 +238,7 @@ export default {
 
     },
     data(){
+		let self = this
         return {
             sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             dialog:false,
@@ -254,13 +252,30 @@ export default {
             },
             customAPIResult:{
                 reformatData(res){
-                    let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
-                    let listObject = res.data.listObject;
-                    return{
-                        columns:res.data.columns,
-                        listObject:res.data.listObject,
-                        total:res.data.total,
-                    }
+					if(res.status == 200){
+						res.data.columns.forEach(function(e){
+							if(e.type == "richtext"){
+								e.cellRenderer = function(params) {
+									let content = ""
+									let rtf = params.value
+									if(rtf){
+										rtf = rtf.replace(/\\par[d]?/g, "");
+										rtf = rtf.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
+										content = rtf.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim()
+									}
+									return '<span>'+content+'</span>'
+								}
+							}					
+						})
+						return{
+							columns:res.data.columns,
+							listObject:res.data.listObject,
+							total:res.data.total,
+						}
+					}else{
+						return {}
+					}
+					
                 }
             },
             docId:parseInt(this.$route.params.id),
@@ -424,6 +439,10 @@ export default {
         }
     },
     methods:{
+		convertToPlain(rtf) {
+			return "<span>value</span>"
+			
+		},
         deleteAll(){
             let dataDoc = {
                 type:'all',
@@ -677,11 +696,11 @@ export default {
         color: rgba(0,0,0 / 0.6);
     }
     .panel-body{
-        height: calc(100vh - 55px);
+        height: calc(100vh - 95px);
     }
-    .panel-body >>> .wrap-content-detail{
+    /* .panel-body >>> .wrap-content-detail{
         height: calc(100vh - 65px) !important;
-    }
+    } */
     .right-action{
         margin-left: auto;
         font-size: 15px;

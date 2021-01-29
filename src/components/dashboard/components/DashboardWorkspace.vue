@@ -131,7 +131,6 @@
             </div>
         </v-tab>
     </v-tabs>
-
 </div>  
 </template>
 

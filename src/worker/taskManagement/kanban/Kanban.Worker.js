@@ -6,15 +6,8 @@ self.onmessage = async function (event) {
     let action = workerDataReceive.action;
     let data = workerDataReceive.data;
 	switch (action) {
-        case 'getListBoard':
-            if (data) {
-                taskManagementApi.getListBoardInProject(data).then(res => {
-                    if(res['status'] == 200 && res['data']){
-                        postMessage({action:'getListBoard', dataAfter : res})
-                    }
-                });
-            }
-            break;
+        
+        
         case 'getUserInProject':
             if (data) {
                 taskManagementApi.getUserInProject(data).then(res => {
@@ -33,7 +26,7 @@ self.onmessage = async function (event) {
                     dataPost['documentId'] = issueType.documentId;
                 }
                 
-                dataControl.tmg_status_id = data.status.statusId;
+                dataControl.tmg_status_id = data.status.id;
                 dataControl.tmg_status_category_id = data.status.statusCategoryId;
                 dataControl.tmg_status = data.status.name;
                 dataPost['documentObjectWorkflowObjectId'] = "";
@@ -108,15 +101,7 @@ self.onmessage = async function (event) {
                 });
             }
             break; 
-        case 'getDetailProject':
-            if (data) {
-                taskManagementApi.getDetailProject(data).then(res => {
-                    if(res['status'] == 200 && res['data']){
-                        postMessage({action:'getListDocumentIdsInProject', dataAfter : res})
-                    }
-                });
-            }
-            break;
+       
         case 'getListStatusInProject':
             if (data) {
                 taskManagementApi.getListStatusInProject(data).then(res => {
@@ -239,6 +224,79 @@ self.onmessage = async function (event) {
                 });
             }
             break;
+        case 'getDetailBoard':
+            if (data.boardId) {
+                let res = await taskManagementApi.getDetailBoard(data.boardId)
+                if(res['status'] == 200){
+                    let listNewColumn = {};
+                    let backLogColumn = {};
+                    let listColumn = res.data.listColumn;
+                    if(!data.allStatus){
+                        let allStatusRes = await taskManagementApi.getListStatusInProject(data.projectId)
+                        if(allStatusRes['status'] == 200 && allStatusRes['data']){
+                            data.allStatus = allStatusRes.data.listObject;
+                            postMessage({action:'getListStatusInProject', dataAfter : {projectId:data.projectId,data:allStatusRes.data.listObject}})
+                        }
+                    }
+                    for (let index = 0; index < listColumn.length; index++) {
+                        let column = listColumn[index];
+                        if(column.tmg_is_backlog == 0){
+                            if(!listNewColumn[column.tmg_column_id]){
+                                listNewColumn[column.tmg_column_id] = {
+                                    id:column.tmg_column_id,
+                                    name:column.tmg_column_name,
+                                    isBacklog:column.tmg_is_backlog == 1,
+                                    isHidden:column.tmg_is_hidden  == 1,
+                                    statusInColumn:[]
+                                }
+                            }
+                            let statusItem = {name:column.tmg_status_name, color:column.tmg_color,id: column.tmg_status_id,nodeId:null,tasks:[]};
+                            let fullInfoStatus = data.allStatus.find(el => el.statusId == column.tmg_status_id);
+                            if(fullInfoStatus){
+                                statusItem['nodeId'] = fullInfoStatus.nodeId;
+                                statusItem['taskLifeCircleName'] = fullInfoStatus.taskLifeCircleName;
+                                statusItem['taskLifeCircleId'] = fullInfoStatus.taskLifeCircleId;
+                                statusItem['statusRoleId'] = fullInfoStatus.statusRoleId;
+                                statusItem['statusCategoryId'] = fullInfoStatus.statusCategoryId;
+                                statusItem['roleIds'] = fullInfoStatus.roleIds;
+                            }
+                            listNewColumn[column.tmg_column_id].statusInColumn.push(
+                                statusItem
+                            )
+                        }
+                        else{
+                            if(!backLogColumn[column.tmg_column_id]){
+                                backLogColumn[column.tmg_column_id] = {
+                                    id:column.tmg_column_id,
+                                    name:column.tmg_column_name,
+                                    isBacklog:column.tmg_is_backlog == 1,
+                                    isHidden:column.tmg_is_hidden == 1,
+                                    statusInColumn:[]
+                                }
+                            }
+                            let statusItem = {name:column.tmg_status_name, color:column.tmg_color,id: column.tmg_status_id,nodeId:null,tasks:[]};
+                            let fullInfoStatus = data.allStatus.find(el => el.statusId == column.tmg_status_id);
+                            if(fullInfoStatus){
+                                statusItem['nodeId'] = fullInfoStatus.nodeId;
+                                statusItem['taskLifeCircleName'] = fullInfoStatus.taskLifeCircleName;
+                                statusItem['taskLifeCircleId'] = fullInfoStatus.taskLifeCircleId;
+                                statusItem['statusRoleId'] = fullInfoStatus.statusRoleId;
+                                statusItem['statusCategoryId'] = fullInfoStatus.statusCategoryId;
+                                statusItem['roleIds'] = fullInfoStatus.roleIds;
+                            }
+                            backLogColumn[column.tmg_column_id].statusInColumn.push(
+                                statusItem
+                            )
+                        }
+                    }
+                    postMessage({action:'getDetailBoard', dataAfter : {listNewColumn:listNewColumn,backLogColumn:backLogColumn}})
+                    
+                }else{
+                    postMessage({action:'actionError'})
+                }
+               
+            }
+            break;
         case 'handleAddSprint':
             if (data) {
                 taskManagementApi.addSprintForBoard(data).then(res => {
@@ -302,11 +360,143 @@ self.onmessage = async function (event) {
 
             }
             break;
+        case 'checkUpdateTaskToKanban':
+            if (data) {
+                let checkUpdateIssue = checkUpdateIssueToKanban(data);
+                if (checkUpdateIssue) {
+                    postMessage({action:'updateTaskToKanban', dataAfter:checkUpdateIssue.data})
+                }
+            }
+            break;
+        case 'checkUpdateTaskInSprint':
+            if (data) {
+                let checkUpdateIssueSprint = funcCheckUpdateIssueSprint(data);
+                if (checkUpdateIssueSprint) {
+                    postMessage({action:'pushTaskInSprint', dataAfter:checkUpdateIssueSprint.data})
+                }
+            }
+            break;
+        case 'checkUpdateTaskInBacklog':
+            if (data) {
+                let checkUpdateIssueBacklog = checkUpdateIssueToBacklog(data);
+                if (checkUpdateIssueBacklog) {
+                    postMessage({action:'updateTaskInBacklog', dataAfter:checkUpdateIssueBacklog.data})
+                }
+            }
+            break;
+        case 'setDataForFilter':
+            if (data) {
+                let dataReturnFilter = getOptionFilterKanban(data);
+                if (dataReturnFilter) {
+                    postMessage({action:'setDataForFilter', dataAfter:dataReturnFilter})
+                }
+            }
+            break;
         default:
             break;
     }
 };
 
+function funcCheckUpdateIssueSprint(data){
+    let dataSprintAfterMapIssue = data.dataSprintAfterMapIssue;
+    let issue = data.issue;
+    let dataRes ={};
+    let sprint = dataSprintAfterMapIssue.find(ele => ele.id == issue.tmg_sprint_id);
+    if (sprint) {
+        issue = getMoreInfoForTask(issue,data)
+        sprint.tasks.unshift(issue);
+        dataRes.data = dataSprintAfterMapIssue;
+        return dataRes;
+    }else{
+        return null;
+    }
+ 
+
+}
+function getOptionFilterKanban(data){
+    let dataRes ={};
+    let allUser = data.allUser;
+    let allStatusInProject = data.allStatusInProject;
+    let allPriority = data.allPriority;
+    let issueType = data.issueType;
+    let userInProject = data.userInProject;
+    let optionStatus = data.optionStatus;
+    let optionUser = data.optionUser;
+    let optionPriority = data.optionPriority;
+    let optionIssueType = data.optionIssueType;
+    if (userInProject.length > 0 && allUser.length >0) {
+        for (let i = 0; i < userInProject.length; i++) {
+            let user=allUser.find(ele => ele.id == userInProject[i].userId );
+            if (user) {
+                optionUser.push({name:user.displayName,id:user.id})
+            }
+        }
+        dataRes.optionUser = optionUser;
+    }
+    if (allStatusInProject && allStatusInProject.length > 0) {
+        for (let i = 0; i < allStatusInProject.length; i++) {
+            optionStatus.push({name:allStatusInProject[i].name,id:allStatusInProject[i].statusId})
+        }
+        dataRes.optionStatus = optionStatus;
+    }
+    if (allPriority.length > 0) {
+        for (let i = 0; i < allPriority.length; i++) {
+            optionPriority.push({name:allPriority[i].name,id:allPriority[i].id})
+        }
+        dataRes.optionPriority = optionPriority;
+    }
+    if (issueType.length > 0) {
+        for (let i = 0; i < issueType.length; i++) {
+            optionIssueType.push({name:issueType[i].name,id:issueType[i].id})
+        }
+        dataRes.optionIssueType = optionIssueType;
+    }
+
+    return dataRes;
+}
+function checkUpdateIssueToBacklog(data){
+    let projectId = data.projectId;
+    let dataSend = data.dataSend;
+    let issue = data.issue;
+    let dataRes ={};
+    if (issue.tmg_project_id == projectId) {
+        if (dataSend.statusInColumn && dataSend.statusInColumn.length > 0 ) {
+            let status = dataSend.statusInColumn.find(ele => ele.statusId == issue.tmg_status_id);
+            if (status) {
+                issue = getMoreInfoForTask(issue,data);
+                status.tasks.unshift(issue);
+                dataRes.data = dataSend;
+                return dataRes;
+
+            }else{
+                return null;
+            }
+        }
+    }
+    return null;
+}
+function checkUpdateIssueToKanban(data){
+    let projectId = data.projectId;
+    let listColumn = data.listColumn;
+    let issue = data.issue;
+    let dataRes = {};
+    if (issue.tmg_project_id == projectId) {
+        for (let i = 0; i < listColumn.length; i++) {
+            if (listColumn[i].statusInColumn && listColumn[i].statusInColumn.length > 0) {
+                let listStatusInColumn = listColumn[i].statusInColumn;
+                for (let j = 0; j < listStatusInColumn.length; j++) {
+                    let status = listStatusInColumn[j];
+                    if (status.id == issue.tmg_status_id) {
+                        status.tasks.unshift(issue);
+                        dataRes.data = listColumn;
+                        return dataRes;
+                    }            
+                }
+            }            
+        }
+    }
+    return null;
+}
 function groupIssueInSprint(data){
     let listSprintInBoard = data.listSprintInBoard;
     let listAllIssueInSprint = data.listAllIssueInSprint;
@@ -328,38 +518,32 @@ function groupIssueInSprint(data){
 
 
 async function setLiskTaskBackLog(data){
-    let documentIds = data.allIssueTypeInProject.reduce((arr,obj)=>{
+    let documentIds = data.listIssueType.reduce((arr,obj)=>{
         if(!arr.includes(obj.documentId)){
             arr.push(obj.documentId)
         }
         return arr
     },[])
     data.filter.ids = JSON.stringify(documentIds);
-
+    let backLogData = data.backLogData;
     let allTask = await documentApi.getListObjectByMultipleDocument(data.filter)
     allTask = allTask['data']['listObject'];
-    let column = data.columnBacklog;
-    if (data.listStatus.length > 0 ) {
-        for (let i = 0; i < data.listStatusColumn.length; i++) {
-            let statusId = data.listStatusColumn[i].statusId;
-            let taskLifeCircleId = data.listStatusColumn[i].taskLifeCircleId;
-            let item = data.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
-            if (item) {
-                let taskInStatus = allTask.filter(task=>{
-                    return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId;
-                });
-                if (taskInStatus.length > 0) {
-                    for (let j = 0; j < taskInStatus.length; j++) {
-                        getMoreInfoForTask(taskInStatus[j],data);
-                    }
+    if (data.allStatus.length > 0 ) {
+        for (let i = 0; i < backLogData.statusInColumn.length; i++) {
+            let statusId = backLogData.statusInColumn[i].id;
+            let taskLifeCircleId = backLogData.statusInColumn[i].taskLifeCircleId;
+            let taskInStatus = allTask.filter(task=>{
+                return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId;
+            });
+            if (taskInStatus.length > 0) {
+                for (let j = 0; j < taskInStatus.length; j++) {
+                    getMoreInfoForTask(taskInStatus[j],data);
                 }
-                item['tasks'] = taskInStatus;
-                column.statusInColumn.push(item);
+                backLogData.statusInColumn[i]['tasks'] = taskInStatus
             }
         }  
     }
-
-    return column;
+    return backLogData;
 }
 
 function  getMoreInfoForTask(issue,data){
@@ -418,25 +602,17 @@ async function setLiskTask(data){
     let allTask = await documentApi.getListObjectByMultipleDocument(data.filter)
     allTask = allTask['data']['listObject'];
     let columns = data.listColumn;
-    if (data.listStatus.length > 0 ) {
-        for (let i = 0; i < data.listStatusColumn.length; i++) {
-            let idColumn = data.listStatusColumn[i].columnId;
-            let statusId = data.listStatusColumn[i].statusId;
-            let taskLifeCircleId = data.listStatusColumn[i].taskLifeCircleId;
-            let item = data.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
-            if (item) {
-                let taskInStatus = allTask.filter(task=>{
-                    return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId ;
-                })
-                item['tasks'] = taskInStatus;
-                let column = columns.find(ele => ele.id == idColumn);
-                if (column) {
-                    column.statusInColumn.push(item);
-                }
-            }
-        }  
+    for (let index = 0; index < columns.length; index++) {
+        let column = columns[index];
+        for (let i = 0; i < column.statusInColumn.length; i++) {
+            let status = column.statusInColumn[i];
+            let taskInStatus = allTask.filter(task=>{
+                return task.tmg_status_id == status.id;
+            })
+            status['tasks'] = taskInStatus;
+        }
+        
     }
-
     return columns;
 }
 
