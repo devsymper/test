@@ -254,7 +254,8 @@
 				:gridOptions="gridOptions"
                 :getContextMenuItems="getContextMenuItems"
 				:columnDefs="columnDefs"
-                @columnResized="columnResized()"
+                @dragStopped="columnResized()"
+                @columnResized="resize()"
 				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
 				:frameworkComponents="frameworkComponents"
@@ -1049,6 +1050,9 @@ export default {
             })
             return result;
         },
+        resize(){
+
+        },
 		customBtnClick(i){
 			this.customHeaderBtn[i].callback()
 		},
@@ -1206,12 +1210,7 @@ export default {
                     width: column.actualWidth
                 })
             })
-            // this.saveUiConfig();
-            this.countColumnResized+=1;
-             if(this.countColumnResized>2){
-                this.saveUiConfig();
-                this.countColumnResized=0;
-            }
+            this.saveUiConfig();
         },
         //
         getDefaultFilter(){
@@ -1647,7 +1646,7 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
 			}
-			let widgetIdentifier = this.getWidgetIdentifier()
+			let widgetIdentifier = this.getRouteIdentifier()
 			this.$store.commit('app/setFilteredColumns', {filteredColumns: this.filteredColumns, widgetIdentifier: widgetIdentifier})
 
 		},
@@ -2054,8 +2053,15 @@ export default {
             }else{
                 widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             }
-             widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
-            // this.widgetIdentifier = this.$route.path;
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            return widgetIdentifier;
+		},
+		rerenderTable(){
+			this.agApi.sizeColumnsToFit()
+		},
+		getRouteIdentifier(){
+			let widgetIdentifier =  this.$route.path;
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
             return widgetIdentifier;
 		},
 		getTableDisplayConfigData(){
