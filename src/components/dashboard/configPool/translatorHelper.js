@@ -179,7 +179,7 @@ export const TranslatorHelper = {
 		 * @param {Object} columns Cấu hình các cột
 		 * @param {Object} style Cấu hình hiển thịs
 		 */
-		filter(data, columns, style, ratio) {
+		filter(data, columns, style, ratio, extraData) {
 			let selectedColum = columns.value.selectedColums[0];
 			selectedColum = selectedColum ? selectedColum : {};
 
@@ -187,7 +187,8 @@ export const TranslatorHelper = {
 				selectionMode: style.selectionControl.children.selectionMode.value,
 				data: data,
 				selectionType: style.selectionControl.children.selectionType.value,
-				itemStyle: TranslatorHelper.getStyleItemsInConfig(style.filterItem.children, 'px', ratio)
+				itemStyle: TranslatorHelper.getStyleItemsInConfig(style.filterItem.children, 'px', ratio),
+				size: extraData.size
 			};
 			
 			

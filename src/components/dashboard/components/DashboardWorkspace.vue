@@ -322,8 +322,9 @@ export default {
         translateReportConfig(cellId, changeType = 'data'){
             // các loại change data hợp lệ
             let validChangeType = {
-                data: true,
-                style: true
+                data: true, // khi thay đổi ảnh hưởng tới dữ liệu cuẩ report
+				style: true, // khi thay đổi cấu hình style của report (ko ảnh hưởng tới dữ liệu)
+				autocomplete: true // khi gõ trong filter của droplist để lấy danh sách các item cần thiết
             };
             let cell = this.dashboardConfig.allCellConfigs[cellId];
             if(!validChangeType[changeType]){
@@ -336,7 +337,7 @@ export default {
             }
 
             let reportSize = this.getReportWraperSize(cellId);
-            if(changeType != 'style'){
+            if(changeType != 'style' && changeType != 'autocomplete'){
                 cell.viewConfigs.loadingData = true;
             }
 

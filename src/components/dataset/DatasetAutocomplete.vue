@@ -2,8 +2,9 @@
 	<div class="dataset-autocomplete">
 		<v-autocomplete
 			v-model="listDatasetSelected"
-			:items="listDatasets"
-			multiple
+			:items="listDataset"
+			:search-input.sync="searchKey"
+			:multiple="isMultiple"
 			solo
 			hide-selected
 			:placeholder="$t('common.searchPlaceholder')"
@@ -41,12 +42,13 @@ export default {
 			default(){
 				return []
 			}
+		},
+		isMultiple:{
+			type: Boolean,
+			default: true
 		}
 	},
 	computed:{
-		listDatasetCpt(){
-			return this.listDataset
-		}
 	},
 	created(){
 		let self = this
@@ -56,11 +58,12 @@ export default {
 			let action = data.action;
 			if(action == 'searchDatasetRes'){
 				self.searchCache[data.data.searchKey] = data.data.res.data.listObject
-				// self.$set(self , 'listDataset', data.data.res.data.listObject)
+				self.$set(self , 'listDataset', data.data.res.data.listObject)
 			}else if(action == 'handleGetAllDataset'){
 				self.$set(self, 'listDataset', data.res.data.listObject)
 			}
 		});
+		this.searchDataset()
 	},
 	data(){
 		return {
@@ -81,18 +84,17 @@ export default {
 			})
 		},
 		searchDataset(){
-			// let val = this.searchKey
-			// if(this.searchCache[val]){
-			// 	this.$set(this, 'listDataset',  this.searchCache[val] )
-			// }else{
-			// 	this.dashboardDatasetWorker.postMessage({
-			// 		action: 'searchDataset',
-			// 		data:{
-			// 			searchKey: val
-			// 		}
-			// 	})
-			// }
-			
+			let val = this.searchKey
+			if(this.searchCache[val]){
+				this.$set(this, 'listDataset',  this.searchCache[val] )
+			}else{
+				this.dashboardDatasetWorker.postMessage({
+					action: 'searchDataset',
+					data:{
+						searchKey: val
+					}
+				})
+			}
 		},
 		hanldeChange(value){
 			this.$emit('dataset-selector', value)

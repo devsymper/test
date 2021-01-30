@@ -9,15 +9,18 @@
             :cellView="cellConfigs.viewConfigs"
             v-if="selectedCol.type == 'date'">
         </date-filter>
-        <select-filter 
-            @change-filter-value="handleChangeFilterValue"
-            :data="displayOptions.data"
-            :selectionType="displayOptions.selectionType"
-            :selectedCol="selectedCol"
-            :cellId="cellConfigs.sharedConfigs.cellId"
-            :cellView="cellConfigs.viewConfigs"
-            v-else-if="selectedCol.type != 'number'">
-        </select-filter>
+		<VuePerfectScrollbar v-else-if="selectedCol.type != 'number'" :style="{height: menuItemsHeight}" >
+			<select-filter 
+				@change-filter-value="handleChangeFilterValue"
+				:data="displayOptions.data"
+				:selectionType="displayOptions.selectionType"
+				:selectedCol="selectedCol"
+				:cellId="cellConfigs.sharedConfigs.cellId"
+				:cellView="cellConfigs.viewConfigs"
+			>
+			</select-filter>
+		</VuePerfectScrollbar>
+      
         <div class="pl-3 pr-3" v-else>
             <div style="margin-bottom: -10px" class="filter-base">
                 <v-text-field
@@ -54,6 +57,7 @@
     <div v-else-if="displayOptions.selectionMode == 'dropList'">
         <drop-list-filter 
             @change-droplist-filter-value="handleChangeFilterValue"
+			@change-query-drop-list-filter="handleChangeQuery"
             :data="displayOptions.data"
             :selectedCol="selectedCol"
             :cellId="cellConfigs.sharedConfigs.cellId"
@@ -67,6 +71,7 @@ import SliderFilter  from "@/components/dashboard/components/filter/SliderFilter
 import HorizontalFilter  from "@/components/dashboard/components/filter/HorizontalFilter";
 import DateFilter  from "@/components/dashboard/components/filter/DateFilter";
 import DropListFilter  from "@/components/dashboard/components/filter/DropListFilter";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 
 export default {
@@ -80,10 +85,23 @@ export default {
     methods:{
         handleChangeFilterValue(cellId){
             // SDashboardEditor.applyFilterFromCell(cellId);
-        }
+		},
+		handleChangeQuery(data){
+			this.cellConfigs.sharedConfigs.queryKey = data.query
+			this.$evtBus.$emit('bi-report-change-display', {
+				id: data.cellId,
+				type: 'autocomplete'
+			});
+		}
     },
-    created(){
-    },
+	created(){
+		this.menuItemsHeight = this.cellConfigs.viewConfigs.displayOptions.size.h +"px"
+	},
+	watch:{
+		'cellConfigs.viewConfigs.displayOptions.size.h'(val){
+			this.menuItemsHeight = val +"px"
+		}
+	},
     computed:{
         selectedCol(){
             let col = this.cellConfigs.rawConfigs.setting.value.selectedColums;
@@ -106,14 +124,17 @@ export default {
         }
     },
     data(){
-        return {}
+        return {
+			menuItemsHeight: '100%'
+		}
     },
     components:{
         'select-filter': SelectFilter,
         'slider-filter': SliderFilter,
         'horizontal-filter': HorizontalFilter,
         'date-filter': DateFilter,
-        'drop-list-filter': DropListFilter,
+		'drop-list-filter': DropListFilter,
+		VuePerfectScrollbar
     }
 }
 </script>

@@ -1344,6 +1344,7 @@
 			"title-show-list-trash": "Danh sách dataflow đã xóa"
 		},
 		"dataset":{
+			"title-add":"Tên Dataset",
 			"title-show-list": "Danh sách dataset",
 			"title-show-list-trash": "Danh sách dataset đã xóa"
 		},
