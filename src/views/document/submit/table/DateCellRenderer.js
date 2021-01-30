@@ -15,17 +15,17 @@ DateCellRenderer.prototype.init = function(params) {
             }
         }
         control.optionValues['Require'] = {};
-        control.optionValues['Require'][params.rowIndex] = {
+        control.optionValues['Require'][params.node.id] = {
             isValid:false
         }
         let validateEle = ((control.isRequiredControl() && !params.value) || 
-        (control.optionValues['Validate'] && control.optionValues['Validate'][params.rowIndex]
-        && control.optionValues['Validate'][params.rowIndex].isValid)) ? control.makeErrNoti(params.rowIndex) : '';
+        (control.optionValues['Validate'] && control.optionValues['Validate'][params.node.id]
+        && control.optionValues['Validate'][params.node.id].isValid)) ? control.makeErrNoti(params.node.id) : '';
         let div = `<div style="position:relative;height:100%;width:100%;">` + value + validateEle+`
                         <span style="position: absolute;right:8px;top:2px;font-size: 14px;color: #ababab;" class="mdi mdi-calendar"></span>
                     </div>`
-        if(control.isRequiredControl()){
-            control.optionValues['Require'][params.rowIndex] = {
+        if(control.isRequiredControl() && !params.value){
+            control.optionValues['Require'][params.node.id] = {
                 isValid:true,
                 msg:'Không được bỏ trống trường thông tin '+control.title
             }

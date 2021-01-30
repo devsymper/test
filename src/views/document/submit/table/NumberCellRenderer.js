@@ -14,18 +14,18 @@ NumberCellRenderer.prototype.init = function(params) {
         text = numbro(Number(text)).format(control.controlProperties.formatNumber.value)
         console.log(control,'controlcontrol');
         control.optionValues['Require'] = {};
-        control.optionValues['Require'][params.rowIndex] = {
+        control.optionValues['Require'][params.node.id] = {
             isValid:false
         }
         if(!text){
             let validateEle = ((control.isRequiredControl() && !params.node.rowPinned) || 
-            (control.optionValues['Validate'] && control.optionValues['Validate'][params.rowIndex] && 
-            control.optionValues['Validate'][params.rowIndex].isValid)) ? control.makeErrNoti(params.rowIndex) : '';
+            (control.optionValues['Validate'] && control.optionValues['Validate'][params.node.id] && 
+            control.optionValues['Validate'][params.node.id].isValid)) ? control.makeErrNoti(params.node.id) : '';
             if(validateEle){
                 text = "";
             }
             if(control.isRequiredControl()){
-                control.optionValues['Require'][params.rowIndex] = {
+                control.optionValues['Require'][params.node.id] = {
                     isValid:true,
                     msg:'Không được bỏ trống trường thông tin '+control.title
                 }
