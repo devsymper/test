@@ -153,6 +153,11 @@ let reportColumnSettingItems = {
         name: 'Dependency',
         slot:'1',
     },
+    documentObjectId:{
+        hasAgg:false,
+        name: 'DocumentObjectId',
+        slot:'1',
+    }
 };
 
 /**

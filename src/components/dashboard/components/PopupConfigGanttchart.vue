@@ -12,27 +12,15 @@
             <v-tabs vertical class="tab-config fs-13">
                 <v-tab class="s-tab">
                     <v-icon left>
-                    mdi-account
+                    mdi-gradient
                     </v-icon>
                     Task submit
                 </v-tab>
                 <v-tab class="s-tab">
                     <v-icon left>
-                    mdi-lock
-                    </v-icon>
-                    Create item action
-                </v-tab>
-                <v-tab class="s-tab">
-                    <v-icon left>
-                    mdi-access-point
+                    mdi-pencil-outline
                     </v-icon>
                     Update item action
-                </v-tab>
-                <v-tab class="s-tab">
-                    <v-icon left>
-                    mdi-access-point
-                    </v-icon>
-                    Delete item action
                 </v-tab>
                 <v-tab-item class="s-item fs-13">
                     <span>Lựa chọn doc submit</span>
@@ -46,31 +34,21 @@
                     <VuePerfectScrollbar >
                         <v-list dense>
                             <v-list-item
-                                v-for="item in listDocumentSelected"
+                                v-for="item in listDocumentSubmitTask"
                                 :key="item.id"
                             >
                                 <div class="w-100">
                                     <span>{{item.title}}</span>
-                                    <v-icon class="fs-14" style="float: right;padding-top: 4px;">mdi-close</v-icon>
+                                    <v-icon @click.prevent.stop="removeDocSelected(item)" class="fs-14" style="float: right;padding-top: 4px;">mdi-close</v-icon>
                                 </div>
                             </v-list-item>
                         </v-list>
                     </VuePerfectScrollbar>
                 </v-tab-item>
                 <v-tab-item class="s-item fs-13">
-                        <p>
-                        Etiam ut purus mattis mauris sodales aliquam. Ut varius tincidunt libero. Aenean viverra rhoncus pede. Duis leo. Fusce fermentum odio nec arcu.
-                        </p>
-                </v-tab-item>
-                <v-tab-item class="s-item fs-13">
-                        <p>
-                        Fusce a quam. Phasellus nec sem in justo pellentesque facilisis. Nam eget dui. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. In dui magna, posuere eget, vestibulum et, tempor auctor, justo.
-                        </p>
-                </v-tab-item>
-                <v-tab-item class="s-item fs-13">
-                        <p>
-                        Fusce a quam. Phasellus nec sem in justo pellentesque facilisis. Nam eget dui. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. In dui magna, posuere eget, vestibulum et, tempor auctor, justo.
-                        </p>
+                        <form-tpl 
+                            :allInputs="formulaUpdateTask"
+                        />
                 </v-tab-item>
             </v-tabs>
         </v-card-text>
@@ -80,8 +58,9 @@
                 color="blue darken-1"
                 text
                 :loading="isLoading"
+                @click="saveConfig"
             >
-                {{$t("common.save")}}
+                Chọn
             </v-btn>
             <v-btn
             color="red darken-1"
@@ -100,13 +79,16 @@ import SymperListAutocomplete from '../../common/symperInputs/SymperListAutocomp
 import GanttchartWorker from 'worker-loader!@/worker/dashboard/ganttchart/Ganttchart.Worker.js';
 import { util } from '../../../plugins/util';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import FormTpl from '../../common/FormTpl.vue';
 
 export default {
     components: { 
         SymperListAutocomplete,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        FormTpl
     },
     data(){
+        let self = this;
         return{
             ganttchartWorker:null,
             isLoading:false,
@@ -117,7 +99,19 @@ export default {
                 pageSize: 30,
                 distinct: true
             },
-            listDocumentSelected:[],
+            formulaUpdateTask: {
+                formulaValue : { 
+                    title: "Formula",
+                    type: "script",
+                    value: self.cellConfigs.rawConfigs.extra.formulaUpdateTask ? self.cellConfigs.rawConfigs.extra.formulaUpdateTask : '' ,
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                    }
+                },
+            },        
         }
     },
     props: {
@@ -126,6 +120,12 @@ export default {
                 return {}
             }
         },
+        listDocumentSubmitTask:{
+            type: Array,
+            default(){
+                return []
+            }
+        }
     },
     computed:{
         allDoc(){
@@ -133,6 +133,27 @@ export default {
         }
     },
     methods:{
+        removeDocSelected(item){
+            let obj = this.listDocumentSubmitTask.find(data => data.id === item.id)
+            var index = this.listDocumentSubmitTask.indexOf(obj);
+            if (index > -1) {
+                this.listDocumentSubmitTask.splice(index, 1);
+            }
+        },
+        saveConfig(){
+            let arrDocId = [] ;
+            if (this.listDocumentSubmitTask.length > 0) {
+                for (let i = 0; i < this.listDocumentSubmitTask.length; i++) {
+                    arrDocId.push(this.listDocumentSubmitTask[i].id);
+                }
+                this.$set(this.cellConfigs.rawConfigs.extra,"ganttDocIdSelected",arrDocId);
+            }
+
+            if (this.formulaUpdateTask.formulaValue.value) {
+                this.$set(this.cellConfigs.rawConfigs.extra,"formulaUpdateTask",this.formulaUpdateTask.formulaValue.value);
+            }
+            this.isShow = false;
+        },
         show(){
             this.isShow=true;
         },
@@ -143,7 +164,13 @@ export default {
         },
         selectItem(data){
             let docId = data.value;
-            this.listDocumentSelected.push(data.items.find(ele => ele.id == docId));
+            if (this.listDocumentSubmitTask.length > 0) {
+                let item = this.listDocumentSubmitTask.find(ele => ele.id == docId);
+                if (item) {
+                    return;
+                }
+            }
+            this.listDocumentSubmitTask.push(data.items.find(ele => ele.id == docId));
         },
         getListDocument(filter = null){
             this.ganttchartWorker.postMessage({
@@ -173,6 +200,7 @@ export default {
         this.ganttchartWorker = new GanttchartWorker();
         this.listenFromWorker();
         this.getListDocument();
+        
     }
 }
 </script>

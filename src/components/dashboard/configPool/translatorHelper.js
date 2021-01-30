@@ -746,6 +746,9 @@ export const TranslatorHelper = {
 					item[name] = convertDateToTimestamp(data[i][columns[name].selectedColums[0].as]);
 				}
 				else if(name == "duration" && data[i][columns[name].selectedColums[0].as]){
+					if (columns['end'] && data[i][columns['end'].selectedColums[0].as]) {
+						continue;
+					}
 					if (!timestart) {
 						timestart = convertDateToTimestamp(data[i][columns["start"].selectedColums[0].as]);
 						let endDate = timestart+Number(data[i][columns[name].selectedColums[0].as])*1000 * 60 * 60 * 24;

@@ -91,7 +91,7 @@ let ReportGroupConfig = {
 		}
 	},
 	Group4:{
-		columnSettingKeys: ['legend','name','assignee','start','end','duration','completed','milestone','id','parent','dependency','tooltips' ],
+		columnSettingKeys: ['legend','name','assignee','start','end','duration','completed','milestone','id','parent','dependency','tooltips','documentObjectId' ],
 		styleKeys: {
 			// "legend":{
 			// 	"title":"Legend",

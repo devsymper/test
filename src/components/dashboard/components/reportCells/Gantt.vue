@@ -1,14 +1,20 @@
 <template>
     <ganttchart-base 
+        ref="ganttchartBase"
         :cellConfigs="cellConfigs"
         :isView="isView"
+        :taskSeleted="taskSeleted"
+        :listDocumentSubmitTask="listDocumentSubmitTask"
         @dragDrop-gantt="dragDrop"
+        @remove-task="removeTask"
+        @selected-gantt="selectedGantt"
+        @unselected-gantt="unselectedGantt"
         @save-update-gantt="saveUpdate"
     />
 </template>
 
 <script>
-import { util } from '../../../../plugins/util';
+import { util } from '@/plugins/util';
 import GanttchartBase from './GanttchartBase.vue';
 import GanttchartWorker from 'worker-loader!@/worker/dashboard/ganttchart/Ganttchart.Worker.js';
 
@@ -30,10 +36,43 @@ export default {
         return{
             ganttchartWorker:null,
             listItemChange:[],
+            taskSeleted:{},
+            listDocumentSubmitTask:[],
+            filter:{
+                filter:[
+                    {
+                        column : "id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : [],
+                            }
+                        ],
+                    },
+                ],
+                page: 1,
+                pageSize: 30,
+                distinct: true
+            },
             fomular:"ref(update doc_test_data_gantt_chart set  start_date = '{start}', end_date = '{end}' where task_id = '{id}')",
         }
     },
     methods:{
+        removeTask(task){
+            this.ganttchartWorker.postMessage({
+                action: 'ganttChartRemoveTask',
+                data:{
+                    task: task
+                }
+            });
+        },
+        ganttChartRemoveTaskAfter(){
+            this.$evtBus.$emit('bi-report-change-display', {
+                type: 'data',
+                id: this.cellConfigs.sharedConfigs.cellId
+            });
+        },
         dragDrop(e){
             let task = e.target.options;
             if (this.listItemChange.length == 0) {
@@ -47,6 +86,14 @@ export default {
                     }                    
                 }
                 this.listItemChange.push(task);
+            }
+        },
+        selectedGantt(e){
+            this.taskSeleted = e.target.options;
+        },
+        unselectedGantt(e){
+            if (this.taskSeleted && this.taskSeleted.id == e.target.options.id) {
+                this.taskSeleted = {};
             }
         },
         saveUpdate(){
@@ -73,11 +120,24 @@ export default {
                         data:str
                     }
                 });
+            }else{
+                this.$refs.ganttchartBase.hideLoading();
             }
             
         },
         saveUpdateGanttAfter(){
-            console.log("update successsss");
+            this.$refs.ganttchartBase.hideLoading();
+            this.$evtBus.$emit('bi-report-change-display', {
+                type: 'data',
+                id: this.cellConfigs.sharedConfigs.cellId
+            });
+            this.$snotifySuccess('Update task complete!');
+        },
+        haveErrorUpdateGantt(data){
+            this.$snotifyError('Error', 'Have error! Error showed in console');
+            console.log('Info update:',data.dataError);
+            this.$refs.ganttchartBase.hideLoading();
+
         },
         listenFromWorker(){
             let self = this;
@@ -91,19 +151,27 @@ export default {
                 }
             });
         },
-        // getRawConfigSelected(){
-        //     let columns = this.cellConfigs.rawConfigs.setting;
-        //     for (let key in columns) {
-        //        if (columns[key].selectedColums.length > 0) {
-        //            this.columnSelected[key] = columns[key];
-        //        }
-        //     }
-        // },
+        getListDocumentSubmitTask(){
+            if (this.cellConfigs.rawConfigs.extra.ganttDocIdSelected && this.cellConfigs.rawConfigs.extra.ganttDocIdSelected.length > 0) {
+                this.filter.filter[0].conditions[0].value = this.cellConfigs.rawConfigs.extra.ganttDocIdSelected;
+                this.ganttchartWorker.postMessage({
+                    action: 'getListDocumentSubmitTaskBefor',
+                    data:{
+                        filter: this.filter
+                    }
+                });
+            }
+        },
+        getListDocumentSubmitTaskAfter(data){
+            this.listDocumentSubmitTask = data.listDocument;
+        }
+ 
 
     },
     created(){
         this.ganttchartWorker = new GanttchartWorker();
         this.listenFromWorker();
+        this.getListDocumentSubmitTask();
     }
 }
 </script>
