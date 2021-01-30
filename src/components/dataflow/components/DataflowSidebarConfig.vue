@@ -14,46 +14,63 @@
 				<PeriodTimeConfig />
 			</div>
 		</div>
-		<NodeConfig
-			@dataset-selected="handleDatasetSelected"
-		/>
-		<DatasetColumnSelector  :rowData="rowData" />
+		<component 
+			:is="nodeConfigTag"
+			:nodeData="selectingNode">
+		</component>
 	</div>
 </template>
 
 <script>
-import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
-import NodeConfig from '@/components/dataflow/components/NodeConfig'
 import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
 import FormTpl from "@/components/common/FormTpl.vue";
-import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/DashboardDataset.Worker.js';
+import { autoLoadNodeClasses } from "@/components/dataflow/configPool/dataflowConfig.js";
+import _cloneDeep from "lodash/cloneDeep";
+
+
+let mapTypeToNodeClass = autoLoadNodeClasses();
+function autoImportDataflowNodeConfig() {
+    var context = require.context('@/components/dataflow/components/configs', true, /\.(vue)$/);
+    var comps = {};
+    let filename = '';
+    context.keys().forEach((filePath) => {
+        filename = filePath.match(/[^\\/:*?"<>|\r\n]+$/)[0].replace('.vue', '');
+        comps[filename] = context(filePath).default;
+    });
+    return comps;
+}
+var nodeConfigComps = autoImportDataflowNodeConfig();
+
 
 export default {
+	props: {
+        instanceKey: {
+            defaul: ''
+        },
+        action: {
+            defaul: 'view'
+        },
+	},
 	components:{
+		...nodeConfigComps,
+
 		FormTpl,
 		PeriodTimeConfig,
-		NodeConfig,
-		DatasetColumnSelector
-	},
-	created(){
-		this.dashboardDatasetWorker = new DashboardDatasetWorker()
-		this.listenFromWorker()
 	},
 	computed:{
-		rowData(){
-			if(this.allDatasetColumn[this.currentId]){
-				debugger
-				return this.allDatasetColumn[this.currentId]
-			}else{
-				return []
-			}
+		nodeConfigTag(){
+			let currentNode = this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
+			let currentClassName = mapTypeToNodeClass[currentNode.type].name;
+			return currentClassName;
+		},
+		selectingNode(){
+			this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
 		}
 	},
 	data(){
 		return {
 			dashboardDatasetWorker: null,
 			allDatasetColumn:{},
-			currentId:0,
 			allInputs:{
 				name: {
 					"title": this.$t('common.name'),
@@ -85,37 +102,7 @@ export default {
 		}	
 	},
 	methods:{
-		listenFromWorker(){
-			let self = this;
-            this.dashboardDatasetWorker.addEventListener("message", function (event) {
-                let data = event.data;
-                let action = data.action;
-                if(self[action]){
-                    self[action](data.data);
-                } else {
-                    console.error(` action ${action} not found `);
-                }
-            });
-		},
-		handleGetDatasetColumns(data){
-			if(data.status == 200){
-				this.$set(this.allDatasetColumn, this.currentId, data.data.columns[this.currentId])
-			}else{
-				this.$snotifyError("Không thể lấy danh sách column")
-			}
-		},
-		handleDatasetSelected(params){
-			this.currentId = params.id
-			if(!this.allDatasetColumn[params.id]){
-				this.dashboardDatasetWorker.postMessage({
-					action: 'getDatasetColumns',
-					data:{
-						id: params.id
-					}
-				})
-			}
-			
-		}
+		
 	}
 }
 </script>

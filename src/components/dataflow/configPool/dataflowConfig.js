@@ -1,12 +1,14 @@
+import HomeConfig from '@/components/dataflow/nodes/HomeConfig.node.js';
 /**
  * File phục vụ cho việc lấy các cấu hình mặc định của dashboards
  */
 export const getDefaultDataflowConfig = function(){
-    return {
-        homeConfig: {}, // chứa cấu hình chung của dataflow
+    let rsl = {
         selectedWidget: {}, // chứa cấu hình của Widget đang được lựa, cấu trúc giống như cấu trúc class NodeBase
-        allWidget: {} // chứa danh sách tất cả các cấu hình của các Widget trong dataflow
+        allWidget: {}  // chứa danh sách tất cả các cấu hình của các Widget trong dataflow
     }
+    rsl.allWidget.home = new HomeConfig();
+    return rsl;
 } 
 
 var loadedClasses = {}; // map các class đã được map với key là 
@@ -23,7 +25,7 @@ export const autoLoadNodeClasses = function () {
         context.keys().forEach((filePath) => {
             reportClass = context(filePath).default;
             obj = new reportClass();
-            rsl[obj.getType()] = reportClass;
+            rsl[obj.type] = reportClass;
         });
         loadedClasses = rsl;
         return rsl;

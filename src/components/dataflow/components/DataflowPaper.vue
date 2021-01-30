@@ -30,7 +30,8 @@ export default {
             wrapper: {
                 height: '300px',
                 width: '500px'
-            }
+            },
+            selectingNode: null
         }
     }, 
 	name: 'DataflowPaper',
@@ -253,10 +254,12 @@ export default {
             let items = [];
 
             for (let type in mapTypeToNodeClass) {
-                let s = new joint.shapes.app[type]({
-                    size: { width: 45, height: 45 },
-                });
-                items.push(s);
+                if(joint.shapes.app[type]){
+                    let s = new joint.shapes.app[type]({
+                        size: { width: 45, height: 45 },
+                    });
+                    items.push(s);
+                }
             }
             stencil.render().load(items);
         },
@@ -290,6 +293,14 @@ export default {
             let self = this;
 
             paper.on('cell:pointerdown', (cellView, evt, x, y) => {
+                let node = cellView.model;
+                if (node.attributes.type == 'app.Link') {
+                    return;
+                }
+                self.disSelectNode(self.selectingNode);
+                self.highlightNode(node);
+                self.showRemoveButton(node.id);
+                self.selectingNode = node;
                 self.$emit('node-selected', {id: cellView.model.id});
             });
 
@@ -303,6 +314,8 @@ export default {
                 // }
             });
             paper.on('blank:pointerclick', (cellView, evt, x, y) => {
+                this.disSelectNode(this.selectingNode);
+                self.selectingNode = null;
                 self.$emit('paper-selected');
             });
             graph.on('remove', function(cell, collection, opt) {
@@ -411,15 +424,32 @@ export default {
         disSelectNode(node) {
             this.unHighlightNode(node);
         },
-        unHighlightNode(node) {
+        highlightNode(node, mode = 'select') {
             if (node.model) {
                 node = node.model
             }
-            if (node.attr) {
-                node.attr('.symper-widget-frame/stroke', wg.normalWidgetBorderColor);
-                node.attr('.symper-widget-frame/strokeWidth', 1);
+            let color = '';
+            if (mode == 'select') {
+                color = DISPLAY_CONFIGS.highlightWidBordergetColor;
+            } else {
+                color = 'red';
             }
-            this.hideRemoveButton(node.id);
+            if (node.attr) {
+                node.attr('.symper-widget-frame/stroke', color);
+                node.attr('.symper-widget-frame/strokeWidth', 2);
+            }
+        },
+        unHighlightNode(node) {
+            if(node){
+                if (node.model) {
+                    node = node.model
+                }
+                if (node.attr) {
+                    node.attr('.symper-widget-frame/stroke', DISPLAY_CONFIGS.normalWidgetBorderColor);
+                    node.attr('.symper-widget-frame/strokeWidth', 1);
+                }
+                this.hideRemoveButton(node.id);
+            }
         },
         showRemoveButton(idNode) {
             $(".joint-cell[model-id=" + idNode + "]").find('.symper-widget-remove').removeClass('d-none');

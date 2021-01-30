@@ -59,7 +59,7 @@ export const registerNodeDisplay =  function(){
                 width: DISPLAY_CONFIGS.width,
                 stroke: 'black',
                 strokeWidth: 1,
-                fill: 'white'
+                fill: 'white',
             },
             '.symper-widget-frame': {
                 height: DISPLAY_CONFIGS.height,
@@ -185,15 +185,17 @@ export const registerNodeDisplay =  function(){
         }]
     };
     for (let type in mapTypeToNodeClass) {
-        let customttr = _cloneDeep(defaultAttrs);
-        let customProp = _cloneDeep(prototypeProps);
-        customttr.attrs['.symper-widget-image'].xlinkHref = require('@/../public/img/dataflow/' + type + '.svg');
-        customttr.attrs.root.title = type;
-        customttr.attrs['.symper-widget-label'].text = makeTextBreak(type);
-        if (type === 'Load') {
-            customttr.ports.items.splice(1, 1)
+        if(type != 'home'){
+            let customttr = _cloneDeep(defaultAttrs);
+            let customProp = _cloneDeep(prototypeProps);
+            customttr.attrs['.symper-widget-image'].xlinkHref = require('@/../public/img/dataflow/' + type + '.svg');
+            customttr.attrs.root.title = type;
+            customttr.attrs['.symper-widget-label'].text = makeTextBreak(type);
+            if (type === 'Load') {
+                customttr.ports.items.splice(1, 1)
+            }
+            joint.shapes.standard.Image.define('app.' + type, customttr, customProp);
         }
-        joint.shapes.standard.Image.define('app.' + type, customttr, customProp);
     }
     joint.shapes.standard.Link.define('app.Link', {
         z: 0,

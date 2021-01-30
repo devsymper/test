@@ -37,7 +37,9 @@
             :width="sidebarWidth"
             @resize:end="handleResizePane"
         >
-            <DataflowSidebarConfig/>
+            <DataflowSidebarConfig
+                :instanceKey="instanceKey"
+                :action="action"/>
         </vue-resizable>
     </div>
 </template>
@@ -49,17 +51,33 @@ import DataflowToolBar from "@/components/dataflow/components/DataflowToolBar.vu
 import DataflowWorkspace from "@/components/dataflow/components/DataflowWorkspace.vue";
 import VueResizable from 'vue-resizable';
 import DataflowEditorWorker from 'worker-loader!@/worker/dataflow/DataflowEditor.Worker.js';
-
+import { getDefaultDataflowConfig } from "@/components/dataflow/configPool/dataflowConfig.js";
 export default {
     created(){
         this.dataflowEditorWorker = new DataflowEditorWorker();
         this.listenFromWorker();
         this.getDataflowInfo();
+        this.initData();
     },
     mounted(){
         this.calcWorkspaceHeight();
     },
     methods: {
+        initData(){
+            let defaultData = getDefaultDataflowConfig();
+            let data = {
+                ...defaultData,
+            }
+            this.$store.commit('dataflow/setDataflowConfig', {
+                instanceKey: this.instanceKey,
+                data
+            });
+
+            this.$store.commit('dataflow/setSelectingWidget', {
+                instanceKey: this.instanceKey,
+                id: 'home'
+            }); 
+        },
         calcWorkspaceHeight(){
             this.workspaceHeight = $(this.$el).height() - (40 + this.runningInfoHeight)            
         },
@@ -73,8 +91,7 @@ export default {
             let graphData = data.graph;
             this.$refs.dataflowWorkspace.restoreGraphDisplay(graphData);
             setTimeout((self) => {
-                debugger
-                this.$refs.dataflowWorkspace.center();
+                self.$refs.dataflowWorkspace.center();
             }, 0, this);
         },
         getDataflowInfo(){

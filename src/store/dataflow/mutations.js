@@ -2,5 +2,11 @@ import { getNewCellConfigLayout } from "@/components/dashboard/configPool/cellLa
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
 import { SYMPER_APP } from "./../../main.js";
 
-export {
-};
+export const setDataflowConfig = function(state, data){
+    Vue.set(state.allDataflow, data.instanceKey, data.data);
+}
+
+export const setSelectingWidget = function(state, data){
+    let nodeData = state.allDataflow[data.instanceKey].allWidget[data.id];
+    Vue.set(state.allDataflow[data.instanceKey], 'selectedWidget', nodeData);
+}

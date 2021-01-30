@@ -1,6 +1,10 @@
 <template>
 <div >
-    <dataflow-paper :height="height" ref="dataflowPaper"/>
+    <dataflow-paper 
+        :height="height" 
+        ref="dataflowPaper"
+        @node-selected="selectNode"
+    />
 </div>
 </template>
 
@@ -11,6 +15,9 @@ export default {
         DataflowPaper
     },
     methods: {
+        selectNode(data){
+            let cellId = data.id;
+        },
         center(){
             this.$refs.dataflowPaper.center();
         },

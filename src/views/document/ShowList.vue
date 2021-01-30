@@ -385,7 +385,6 @@ export default {
     },
     methods:{
         async repeatedSubmit(){
-            debugger
             let defData = await getLastestDefinition(this.proccessRow, true);
             if(defData.data[0]){
                 this.$refs.listDocument.openactionPanel();

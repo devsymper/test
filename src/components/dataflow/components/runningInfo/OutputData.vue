@@ -1103,7 +1103,6 @@ export default {
 					icon: 'mdi-microsoft-excel',
 					title: self.$t('common.export_excel'),
 					callback(){
-						debugger
 					}
 				}
 			},
