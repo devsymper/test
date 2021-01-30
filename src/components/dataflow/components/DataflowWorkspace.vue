@@ -1,6 +1,6 @@
 <template>
-<div>
-    <dataflow-paper ref="dataflowPaper"/>
+<div >
+    <dataflow-paper :height="height" ref="dataflowPaper"/>
 </div>
 </template>
 
@@ -11,6 +11,9 @@ export default {
         DataflowPaper
     },
     methods: {
+        center(){
+            this.$refs.dataflowPaper.center();
+        },
         restoreGraphDisplay(grapData){
             for(let nodeId in grapData.nodes){
                 this.$refs.dataflowPaper.addNodeToWorkspace(grapData.nodes[nodeId]);
@@ -24,6 +27,9 @@ export default {
         },
         instanceKey: {
             default: ''
+        },
+        height: {
+            default: 250
         },
     },
     mounted(){

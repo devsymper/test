@@ -78,7 +78,7 @@ export default {
 				cancel:{
 					title: this.$t('common.cancel'),
 					icon: 'mdi-close',
-					callBack(){
+					callback(){
 						self.showDialog = false
 						self.$emit("cancel", self.originDatasetIds)
 					}
@@ -86,7 +86,7 @@ export default {
 				select:{
 					title: this.$t('common.ok'),
 					icon: 'mdi-check',
-					callBack(){
+					callback(){
 						self.showDialog = false
 						self.$emit('list-dataset-selected', self.value)
 					}

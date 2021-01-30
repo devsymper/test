@@ -1,8 +1,6 @@
 <template>
-    <div class="symper-datafow-editor d-flex h-100 w-100" ref="dataflowEditor">
-        <div class="d-flex flex-column" :style="{
-            width: 'calc(100% - 400px)'
-        }">
+    <div class="symper-datafow-editor h-100 w-100 position-relative" ref="dataflowEditor">
+        <div class="d-inline-block workspace-left-pane" ref="workspaceLeftPane">
             <DataflowToolBar 
                 class="border-bottom-1"
                 :style="{
@@ -13,19 +11,18 @@
                 :instanceKey="instanceKey"/>
             
             <DataflowWorkspace
+                :height="workspaceHeight"
                 ref="dataflowWorkspace"
                 :instanceKey="instanceKey"
                 :action="action"
-                style="flex-grow: 1;"
             />
 
             <vue-resizable
                 ref="dataflowRunningInfo"
-                class="border-top-1"
-                :min-height="100"
-                :height="330"
-                :max-height="500"
+                class="border-top-1 dataflow-running-info bg-white"
+                :height="runningInfoHeight"
                 :active="['t']"
+                @resize:end="handleResizeBottomPane"
             >
                 <DataflowRunningInfo
                     :instanceKey="instanceKey"
@@ -35,11 +32,10 @@
         </div>
         <vue-resizable
             ref="dataflowSidebarConfig"
-            class="border-left-1 d-block"
-            :min-width="200"
-            :width="400"
-            :max-width="700"
-            :active="['b']"
+            class="border-left-1 h-100 bg-white dataflow-sidebar-config"
+            :active="['l']"
+            :width="sidebarWidth"
+            @resize:end="handleResizePane"
         >
             <DataflowSidebarConfig/>
         </vue-resizable>
@@ -61,11 +57,25 @@ export default {
         this.getDataflowInfo();
     },
     mounted(){
+        this.calcWorkspaceHeight();
     },
     methods: {
+        calcWorkspaceHeight(){
+            this.workspaceHeight = $(this.$el).height() - (40 + this.runningInfoHeight)            
+        },
+        handleResizePane(eventName,left,top,width,height){
+            $(this.$refs.workspaceLeftPane).css('width', $(this.$refs.dataflowEditor).width() - $(this.$refs.dataflowSidebarConfig.$el).width());
+        },
+        handleResizeBottomPane(eventName,left,top,width,height){
+            this.workspaceHeight =  $(this.$el).height() - (40 + $(this.$refs.dataflowRunningInfo.$el).height());
+        },
         restoreDataflowData(data){
             let graphData = data.graph;
             this.$refs.dataflowWorkspace.restoreGraphDisplay(graphData);
+            setTimeout((self) => {
+                debugger
+                this.$refs.dataflowWorkspace.center();
+            }, 0, this);
         },
         getDataflowInfo(){
             if(this.idObject){
@@ -92,6 +102,8 @@ export default {
     },
     data(){
         return {
+            runningInfoHeight: 200,
+            workspaceHeight: 250,
             contentWidth: "calc(100% - 350px)",
             sidebarWidth: 350,
             instanceKey: Date.now(),
@@ -120,5 +132,24 @@ export default {
 </script>
 
 <style>
+.workspace-left-pane {
+    width: calc(100% - 350px);
+    height: 100%;
+}
 
+.dataflow-sidebar-config {
+    left: unset!important;
+    position: absolute!important;
+    right: 0px;  
+    top: 0px!important;
+    max-width: 600px!important;
+}
+
+.dataflow-running-info {
+    min-height: 10%;
+    max-height: 80%;
+    position: absolute!important;
+    bottom: 0!important;
+    top: unset!important;
+}
 </style>
