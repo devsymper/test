@@ -1,7 +1,7 @@
 <template>
      <v-list dense class="px-2">
         <v-list-item dense class="filter-menu fs-13" v-for="(item,key) in filter" :key="key">
-            <v-list-item-content style="margin-left:-29px!important" @click="setTable(key)">
+            <v-list-item-content style="margin-left:-29px!important" @click="selectFilter(key)">
                 <v-list-item-title  class="col-md-10 fw-400" style="margin-top:-5px">
                     <span class="ml-2" >{{item.name}}</span>
                 </v-list-item-title>
@@ -57,8 +57,8 @@ export default {
     addFilter(){
         this.$emit('add-filter-config');
     },
-    setTable(filterIdx){
-        this.$emit('set-table',filterIdx)
+    selectFilter(filterIdx){
+        this.$emit('select-filter',filterIdx)
     },
     selectActionFilter(actionIdx,filterIdx){
         let data ={
