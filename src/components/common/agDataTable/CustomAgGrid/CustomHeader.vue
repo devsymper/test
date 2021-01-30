@@ -29,7 +29,6 @@ export default {
 	},
 	methods: {
 		checkFilterCol(col){
-			debugger
 			if(Object.keys(this.filteredColumns).length > 0 ){
 				if(this.filteredColumns[col]){
 					return true

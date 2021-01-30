@@ -60,25 +60,17 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
-import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
-import { setDataForPropsControl } from "./../../../components/document/dataControl";
 import BasicControl from "./../submit/basicControl";
-import  TableControl from "./../submit/tableControl.js"
 import  ActionControl from "./../submit/actionControl.js"
 import LayoutControl from "./../submit/layoutControl";
-import  Table from "./../submit/table.js"
-import  TablePrint from "./../print/PrintTable"
-import './../submit/customControl.css'
 import { getSDocumentSubmitStore,getControlInstanceFromStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
 import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
-import PivotTable from "./../submit/pivot-table";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import tinymce from 'tinymce/tinymce';
-import { util } from '../../../plugins/util.js';
 import ControlRelationWorker from 'worker-loader!@/worker/document/submit/ControlRelation.Worker.js';
 import TableControl1 from '../submit/tableControl1.js';
 
@@ -207,7 +199,7 @@ export default {
                             "document/addControl", { id: controlId, props: listControlToStore[controlId], instance: thisCpn.keyInstance }
                         );
 					}
-                    thisCpn.processHtml(thisCpn.contentDocument);
+                    thisCpn.processHtml();
                     // thisCpn.controlRelationWorker.terminate();
                     break;
                 default:
@@ -460,11 +452,11 @@ export default {
                             { name: name, control: control ,instance: this.keyInstance}
                         );
         },
-        processHtml(content,isPrint = false) {
+        processHtml() {
             var allInputControl = $("#sym-Detail-" + this.keyInstance +" .content-document").find(
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
-            if(isPrint){
+            if(this.isPrint){
                 allInputControl = $("#sym-Detail-" + this.keyInstance +" .content-print-document").find(
                     ".s-control:not(.bkerp-input-table .s-control)"
                 );
@@ -528,6 +520,7 @@ export default {
                                 thisCpn.keyInstance,
                                 (this.dataPivotTable) ? this.dataPivotTable[controlName] : {},
                                 (this.dataGroupTable) ? this.dataGroupTable[controlName] : {},
+                                this.isPrint
                             );
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
