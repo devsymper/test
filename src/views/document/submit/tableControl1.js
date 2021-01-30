@@ -21,8 +21,8 @@ window.traceTable = function(el) {
     SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { isTable: true, tableName: $(el).attr('table-name') })
 }
 export default class TableControl1 extends Control {
-    constructor(idField, ele, controlProps, curParentInstance,pivotConfig= {},groupConfig = {}, isPrintView = false) {
-        super(idField, ele, controlProps, curParentInstance);
+    constructor(idField, ele, controlProps, keyInstance,pivotConfig= {},groupConfig = {}, isPrintView = false) {
+        super(idField, ele, controlProps, keyInstance);
          /**
          * Chứa instance của table, mặc địn là null, control có type là table mới khác null
          */
@@ -43,10 +43,10 @@ export default class TableControl1 extends Control {
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
     }
     renderTable() {
-        this.tableInstance = new SymperTable(this, this.curParentInstance, this.groupConfig, this.pivotConfig, this.formulasWorker);
-        let viewType = sDocument.state.viewType[this.curParentInstance];
+        this.tableInstance = new SymperTable(this, this.keyInstance, this.groupConfig, this.pivotConfig, this.formulasWorker);
+        let viewType = sDocument.state.viewType[this.keyInstance];
         if ((viewType == 'submit' || viewType == "update") && !this.agDataTable) {
-            this.ele.parent().append('<span onclick="traceTable(this)" table-name="' + this.name + '" instance="' + this.curParentInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
+            this.ele.parent().append('<span onclick="traceTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
         }
         if (this.isPrintView) {
             if(this.agDataTable){
@@ -141,9 +141,6 @@ export default class TableControl1 extends Control {
                 this.agDataTable.setData(dataTable)
             }
         } else {
-            if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
-                return;
-            }
             let dataTable = [];
             let rowLength = data[Object.keys(data)[0]].length;
             for (let index = 0; index < rowLength; index++) {
@@ -159,18 +156,10 @@ export default class TableControl1 extends Control {
                 dataTable.push(rowData)
 
             }
-            if(this.agDataTable){
-                this.agDataTable.setData(dataTable);
-            }
-            else{
-                this.tableInstance.setData(dataTable, false);
-            }
-            
+            this.tableInstance.setData(dataTable);
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
             }
-            
-
         }
     }
     switchTable() {

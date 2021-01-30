@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { util } from '../../plugins/util';
 export default {
     methods: {
         /**
@@ -41,7 +42,7 @@ export default {
     computed: {
         embedLink(){
             if(this.dataflowId){
-                return "https://bi.symper.vn/#/dataflow/"+this.dataflowId+"/embed"
+                return util.addEnvToUrl("https://bi.symper.vn/#/dataflow/"+this.dataflowId+"/embed")
             }else{
                 return ''
             }

@@ -69,7 +69,6 @@
 
 <script>
 import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
-import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	props:{
 		showDialog:{
@@ -141,7 +140,9 @@ export default {
 			let type = self.currentObjectType
 			let arr = []
 			for(let i in self.listItemSelected){
-				arr.push(self.listItemSelected[i].id)
+				let id = self.listItemSelected[i].id ? self.listItemSelected[i].id : self.listItemSelected[i].document_object_id
+				arr.push(id)
+				
 			}
 			let ids = {
 				"ids":arr

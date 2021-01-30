@@ -47,5 +47,8 @@ DateCellRenderer.prototype.getGui = function(params) {
 }
 
 DateCellRenderer.prototype.destroy = function(params) {
-    this.eGui.removeEventListener('dblclick', (event));
+    if(this.eGui && params && !params.node.rowPinned){
+        this.eGui.removeEventListener('dblclick', (event));
+    }
+    
 }

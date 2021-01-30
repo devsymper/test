@@ -170,8 +170,21 @@ export default {
                 }
                 projects[i].categoryName=categoryName;
             }
-            console.log("project",projects);
             return projects;
+        },
+        allCategory(){
+            return this.$store.state.taskManagement.allCategory;
+        }
+    },
+    watch:{
+        allCategory:{
+            deep: true,
+            immediate: true,
+            handler(newVl) {
+                if (newVl.length > 0) {
+                    this.setCategorySelect(newVl);
+                }
+            },
         }
     },
     data(){
@@ -439,21 +452,16 @@ export default {
         handleCreate(){
             this.dialogCreate=true;
         },
-        setCategorySelect(){
-            setTimeout((self) => {
-                let category = this.$store.state.taskManagement.allCategory;
-                category = category.reduce((arr, obj)=>{
-                    let newObj = {text:obj.name,value:obj.id};
-                    arr.push(newObj);
-                    return arr
-                },[]);
-                self.dataProjectProps.categories.options = category;
-            }, 500,this);
+        setCategorySelect(allCategory){
+            let categorys = allCategory;
+            categorys = categorys.reduce((arr, obj)=>{
+                let newObj = {text:obj.name,value:obj.id};
+                arr.push(newObj);
+                return arr
+            },[]);
+            this.dataProjectProps.categories.options = categorys;
         }
     },
-    created(){
-        this.setCategorySelect();
-    }
   
 }
 </script>

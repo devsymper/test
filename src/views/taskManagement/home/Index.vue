@@ -53,6 +53,8 @@ export default {
                     action:'getAllPriority',
                     data:null
                 });
+            }else{
+                this.getData();
             }
         },
         getAllProject(){
@@ -61,6 +63,8 @@ export default {
                     action:'getAllProject',
                     data:null
                 });
+            }else{
+                this.getAllIssueType();
             }
         },
         getAllIssueType(){
@@ -69,6 +73,8 @@ export default {
                     action:'getAllIssueType',
                     data:null
                 });
+            }else{
+                this.getAllStatus();
             }
         },
         getAllStatus(){
@@ -77,13 +83,14 @@ export default {
                     action:'getAllStatus',
                     data:null
                 });
+            }else{
+                this.getAllPriority();
             }
         },
 
     },  
     created(){
       	this.homeWorker = new HomeWorker();
-        this.getAllProject();
         let self = this;
         this.homeWorker.addEventListener("message", function (event) {
 			let data = event.data;
@@ -135,6 +142,9 @@ export default {
             }
         });
     },
+    activated(){
+        this.getAllProject();
+    }
 
 
 }

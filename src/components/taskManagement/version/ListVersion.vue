@@ -30,7 +30,8 @@
                     @click:row="handleClickRow"
                 >
                     <template v-slot:[`item.name`]="{ item }">
-                        <span class="name-title fs-13">{{item.name}}</span>
+                        <v-icon class="fs-16">mdi-shield-check-outline</v-icon>
+                        <span class="name-title fs-13 pl-2">{{item.name}}</span>
                     </template>
                     <template v-slot:[`item.status`]="{ item }">
                         <v-chip class="px-2" style="border-radius:4px" v-if="item.status == 0" color="#0760D9" text-color="white" x-small>{{$t('taskManagement.table.unreleased')}}</v-chip>

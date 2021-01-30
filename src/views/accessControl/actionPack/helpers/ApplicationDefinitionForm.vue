@@ -65,7 +65,6 @@ export default {
 		}
 	},
 	props:{
-		
 		listApp:{
 			type: Array,
 			default(){

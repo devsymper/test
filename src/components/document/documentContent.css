@@ -63,7 +63,32 @@ div.ag-root {
 .sym-form-submit .s-control-datetime,
 .sym-form-submit .s-control-month,
 .sym-form-submit .s-control-time,
-.sym-form-submit .s-control-number {
+.sym-form-submit .s-control-number 
+.wrap-content-detail .s-control-tracking-value,
+.wrap-content-detail .s-control-approval-history,
+.wrap-content-detail .s-control-report,
+.wrap-content-detail .s-control-file-upload,
+.wrap-content-detail .s-control-reset,
+.wrap-content-detail .s-control-draf,
+.wrap-content-detail .s-control-submit,
+.wrap-content-detail .s-control-text,
+.wrap-content-detail .s-control-select,
+.wrap-content-detail .s-control-document,
+.wrap-content-detail .s-control-phone,
+.wrap-content-detail .s-control-email,
+.wrap-content-detail .s-control-currency,
+.wrap-content-detail .s-control-radio,
+.wrap-content-detail .s-control-color,
+.wrap-content-detail .s-control-percent,
+.wrap-content-detail .s-control-hidden,
+.wrap-content-detail .s-control-user,
+.wrap-content-detail .s-control-filter,
+.wrap-content-detail .s-control-date,
+.wrap-content-detail .s-control-datetime,
+.wrap-content-detail .s-control-month,
+.wrap-content-detail .s-control-time,
+.wrap-content-detail .s-control-number 
+{
     width: auto;
     height: 25px;
     font-size: 11px;
@@ -72,7 +97,9 @@ div.ag-root {
     outline: 0!important;
 }
 
-.sym-form-submit .s-control:not(.s-control-table):not(button):not(.page-item) {
+.sym-form-submit .s-control:not(.s-control-table):not(button):not(.page-item), 
+.wrap-content-detail .s-control:not(.s-control-table):not(button):not(.page-item) 
+{
     display: inline-block;
     /* background: rgb(233, 236, 239); */
     min-width: 50px;
@@ -86,18 +113,28 @@ div.ag-root {
 
 .sym-form-submit .s-control-reset,
 .sym-form-submit .s-control-draft,
-.sym-form-submit .s-control-submit {
+.sym-form-submit .s-control-submit, 
+.wrap-content-detail .s-control-reset,
+.wrap-content-detail .s-control-draft,
+.wrap-content-detail .s-control-submit
+{
     padding: 5px 8px;
 }
 
-.sym-form-submit .s-control-checkbox {
+.sym-form-submit .s-control-checkbox,
+.wrap-content-detail .s-control-checkbox 
+{
     min-width: unset !important;
     height: unset !important;
 }
 
 .sym-form-submit .s-control-user,
 .sym-form-submit .s-control-select,
-.sym-form-submit .s-control-document {
+.sym-form-submit .s-control-document, 
+.wrap-content-detail .s-control-user,
+.wrap-content-detail .s-control-select,
+.wrap-content-detail .s-control-document 
+{
     width: 120px;
 }
 
@@ -105,7 +142,9 @@ div.ag-root {
     border: 1px solid red !important;
 }
 
-.sym-form-submit .s-control-label {
+.sym-form-submit .s-control-label,
+.wrap-content-detail .s-control-label
+ {
     font-size: 11px;
     color: gray;
     border: 1px solid #e9ecef;
@@ -114,7 +153,9 @@ div.ag-root {
     background: white;
 }
 
-.sym-form-submit .s-control-table {
+.sym-form-submit .s-control-table, 
+.wrap-content-detail .s-control-table 
+{
     width: 100%;
     text-align: left;
     border-collapse: collapse;
@@ -563,6 +604,11 @@ button:hover {
     padding-left: 6px !important;
     padding-right: 6px !important;
 }
+
+.sym-form-submit .ag-theme-alpine .ag-ltr .ag-header-select-all,
+.sym-form-Detail .ag-theme-alpine .ag-ltr .ag-header-select-all {
+    margin-left: 29px;
+}
 .sym-form-submit .ag-theme-alpine .ag-header-cell, .ag-theme-alpine .ag-header-group-cell,
 .sym-form-Detail .ag-theme-alpine .ag-header-cell, .ag-theme-alpine .ag-header-group-cell {
     padding-left: 6px !important;
@@ -618,8 +664,8 @@ button:hover {
     color: #212529 !important;
     font-weight: 500;
 }
-.sym-form-submit .ag-theme-alpine .ag-row:not(.ag-row-group-expanded),
-.sym-form-Detail .ag-theme-alpine .ag-row:not(.ag-row-group-expanded) {
+.sym-form-submit .ag-theme-alpine .ag-row:not(.ag-row-group-expanded):not(.ag-row-selected),
+.sym-form-Detail .ag-theme-alpine .ag-row:not(.ag-row-group-expanded):not(.ag-row-selected) {
     background: white !important;
 }
 .sym-form-submit .ag-row.ag-row-group.ag-row-group-expanded,
@@ -745,4 +791,22 @@ button:hover {
     display: inline-block;
     width: 100%;
     height: 100%;
+}
+
+
+.select-table-bottom{
+    margin: 0 -6px;
+}
+.select-table-bottom select {
+    position: relative;
+    padding: 0 6px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 90%;
+}
+.select-table-bottom select option{
+    padding: 4px 6px;
+}
+.select-table-bottom select:focus{
+    outline: none;
 }

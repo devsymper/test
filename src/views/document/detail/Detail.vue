@@ -1,9 +1,6 @@
 <template>
     <div style="overflow:hidden;position: relative;"
-        :class="{
-            'document-form-style-custom-1' :true,
-            'wrap-content-detail':true
-        }"
+        :class="globalClass"
     >
         <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
@@ -187,10 +184,15 @@ export default {
             defaultData:{},
             dataPivotTable:{},
             dataGroupTable:{},
+            globalClass:null,
+
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
+         this.globalClass = {
+            'wrap-content-detail':true,
+        }
     },
     mounted(){
         let thisCpn = this;
@@ -304,7 +306,7 @@ export default {
                 if(after.docObjId){
                     this.docObjId = Number(after.docObjId);
                     this.documentSize = after.docSize;
-                    this.loadDocumentObject(this.isPrint);z
+                    this.loadDocumentObject(this.isPrint);
                 }
             }
         },
@@ -353,7 +355,17 @@ export default {
                     }
                     this.documentSize = '21cm';
                     let contentPrintCss = {};
-                    contentPrintCss = {'margin':'auto'}
+                    contentPrintCss = {'margin':'auto'};
+                    if(docDetailRes.data.document.formStyle){
+                        let style = JSON.parse(docDetailRes.data.document.formStyle);
+                        if(!style['globalClass']){
+                            style['globalClass'] = 'document-form-style-default'
+                        }
+                        this.globalClass[style['globalClass']] = true;
+                    }
+                    else{
+                        this.globalClass['document-form-style-default'] = true;
+                    }
                     if(docDetailRes.data.document.formSize){
                         this.formSize = JSON.parse(docDetailRes.data.document.formSize);
                         if(this.formSize){
@@ -459,7 +471,6 @@ export default {
             }
             // let listTableIns = [];
             let thisCpn = this;
-            console.log(this.sDocumentEditor.allControl,'this.sDocumentEditor.allControl');
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
@@ -467,7 +478,6 @@ export default {
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let idField = this.sDocumentEditor.allControl[id].id;
                     let valueInput = this.sDocumentEditor.allControl[id].value;
-                    console.log(valueInput,'valueInputvalueInput');
                     if(controlType == "submit" || controlType == "reset" || controlType == "draft"){
                         $(allInputControl[index]).remove()
                     }
@@ -537,17 +547,10 @@ export default {
                                 controlInTable[childControlName] = childControl;
                             });
                             tableControl.controlInTable = controlInTable;
-                            // if(this.dataPivotTable && this.dataPivotTable[controlName]){
-                            //     tableControl.setPivotTableConfig(this.dataPivotTable[controlName]);
-                            // }
-                            // if(this.dataGroupTable && this.dataGroupTable[controlName]){
-                            //     tableControl.setGroupTableConfig(this.dataGroupTable[controlName]);
-                            // }
                             tableControl.renderTable();
+                            this.addToListInputInDocument(controlName,tableControl);
+                            console.log(valueInput,'valueInputvalueInput');
                             tableControl.setData(valueInput);
-                            this.addToListInputInDocument(controlName,tableControl)
-                            // tableControl.renderInfoButtonInRow(this.listLinkControl);
-                            // listTableIns[controlName] = tableControl;
                         }
                     }
                 }
@@ -578,7 +581,7 @@ export default {
     .wrap-content-detail{
         position: relative;
         width: 100%;
-        height: calc(100vh - 50px);
+        height: 100%;
         overflow-y: auto;
         overflow-x: hidden;
     }

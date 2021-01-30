@@ -88,6 +88,7 @@ export default {
         link: "/myitem",
         group: "My work",
     },
+   
     timeTable: {
         icon: "mdi-calendar-month-outline",
         title: "myWork",
@@ -243,6 +244,12 @@ export default {
         icon: 'mdi-earth',
 		group: "Setting",
 		link: '/environment-management',
-	}
+    },
+    authen: {
+        title: "Authen",
+        icon: "mdi-account-key",
+        link: "/authen",
+        group: "Setting"
+    }
 
 };
