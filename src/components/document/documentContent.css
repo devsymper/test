@@ -22,7 +22,7 @@ div.ag-root {
     user-select:text;
     }
 
-.document-form-style-default  input:not(.ag-input-field-input){
+.document-form-style-default input:not(.ag-input-field-input):not(.v-select__slot input){
     border-bottom: 0.5px solid #ccc;
     border-radius: 0;
     height: 25px;

@@ -5,11 +5,14 @@ export const DateCellRenderer =()=> {}
 DateCellRenderer.prototype.init = function(params) {
     if(!params.node.rowPinned){
         this.eGui = document.createElement('div');
-        let value = (params.value) ? params.value : '<span style="color: #ababab;font-size: 11px;">DD/MM/YYYY</span>';
         let control = params.control;
-        let pattern = control.controlProperties.formatDate.value;
-        if(pattern && params.value){
-            value = SYMPER_APP.$moment(value, 'YYYY-MM-DD').format(pattern);
+        let placeHolder = (control.type == 'date') ? "DD/MM/YYYY" : "DD/MM/YYYY HH:mm";
+        let value = (params.value) ? params.value : '<span style="color: #ababab;font-size: 11px;">'+placeHolder+'</span>';
+        if(control.type == 'date'){
+            let pattern = control.controlProperties.formatDate.value;
+            if(pattern && params.value){
+                value = SYMPER_APP.$moment(value, 'YYYY-MM-DD').format(pattern);
+            }
         }
         control.optionValues['Require'] = {};
         control.optionValues['Require'][params.rowIndex] = {
@@ -35,6 +38,7 @@ DateCellRenderer.prototype.init = function(params) {
                 return false;
             }
             event.controlName = params.control.name;
+            event.control = params.control;
             SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', event);
         });
     }
