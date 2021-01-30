@@ -395,7 +395,7 @@ export default {
                 thisCpn.userId = res.data.document_object_user_created_id;
                 thisCpn.taskId = res.data.document_object_task_id;
                 thisCpn.createTime = res.data.document_object_create_time
-                thisCpn.workflowId = res.data.document_object_workflow_id;
+                thisCpn.workflowId = res.data.document_object_workflow_object_id;
                 thisCpn.documentId = res.data.documentId;
                 thisCpn.userCreateInfo = res.data.userCreateInfo;
                 let dataToStore = res.data;
