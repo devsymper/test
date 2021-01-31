@@ -68,7 +68,7 @@ export default class SymperTable {
             currency: 'NumberCellRenderer',
             number: 'NumberCellRenderer',
             date: 'DateCellRenderer',
-            // dateTime: 'DatetimeRenderer',
+            dateTime: 'DateCellRenderer',
             time: 'TimeCellRenderer',
             image: 'FileCellRenderer',
             fileUpload: 'FileCellRenderer',

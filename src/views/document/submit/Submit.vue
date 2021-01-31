@@ -11,9 +11,10 @@
         >
             <date-picker
                 :keyInstance="keyInstance"
-                @clickDateCell="selectedDate"
+                @after-select-date="afterSelectDate"
+                @after-apply-datetime="afterSelectDateTime"
                 :title="'Chọn ngày'"
-                :isTime="false"
+                :isTime="isDateTimePicker"
                 ref="datePicker"
             />
             <FloattingPopup 
@@ -364,6 +365,7 @@ export default {
     },
     data() {
         return {
+            isDateTimePicker:false,
             controlInfinity:[],
             focusingControlName: '',
             contentDocument: null,
@@ -710,13 +712,13 @@ export default {
         });
         this.$evtBus.$on("document-submit-date-input-click", e => {
             if(this._inactive == true) return;
-            let controlIns = getControlInstanceFromStore(this.keyInstance,e.controlName);
-            this.$refs.datePicker.setRange(controlIns.minDate,controlIns.maxDate);
+            let controlIns = e.control;
+            this.isDateTimePicker = true;
+            if(e.control.type == 'date'){
+                this.isDateTimePicker = false;
+                this.$refs.datePicker.setRange(controlIns.minDate,controlIns.maxDate);
+            }
             this.$refs.datePicker.openPicker(e);
-            this.$store.commit("document/updateCurrentControlEditByUser", {
-                currentControl: e.controlName,
-                instance: this.keyInstance
-            });
         });
         /**
          * Sự kiện bắn ra từ click vào input filter để mở popup
@@ -840,7 +842,9 @@ export default {
                 }
                 if (
                     !$(evt.target).hasClass("s-control-date") &&
+                    !$(evt.target).hasClass("s-control-datetime") &&
                     !$(evt.target).hasClass("card-datetime-picker") &&
+                    $(evt.target).closest(".v-list-item").length == 0 &&
                     $(evt.target).closest(".card-datetime-picker").length == 0 && 
                     $(evt.target).closest('.ag-input-date').length == 0
                 ) {
@@ -1913,17 +1917,27 @@ export default {
                                                 instance: this.keyInstance
                                             });
         },
-
-
+        /**
+         * Sự kiện phát ra khi click vào áp dụng của date time picker
+         */
+        afterSelectDateTime(data){
+            let controlName = data.inputForcusing;
+            let dateTime = data.dateTime;
+            this.setDataForDateTimeControl(controlName, dateTime);
+        },
         /**
          * Sự kiện phát ra khi click vào date của date picker
          */
-        selectedDate(data){
+        afterSelectDate(data){
+            let controlName = data.inputForcusing;
+            let date = data.date;
+            this.setDataForDateTimeControl(controlName, date);
+        },
+
+        setDataForDateTimeControl(controlName, data){
             this.$refs.datePicker.closePicker();
-            let controlName = this.sDocumentSubmit.currentControlEditByUser;
             let controlInstance = getControlInstanceFromStore(this.keyInstance, controlName);
             if(controlInstance.inTable == false){
-                controlInstance.setValue(data);
                 this.handleInputChangeBySystem(controlName,data)
             }
             else{
@@ -1933,7 +1947,6 @@ export default {
                 tableControl.tableInstance.setDataAtCell(controlName, data, currentRow.id);
             }
         },
-
         /**
          * Hàm mở sub-form submit
          */
