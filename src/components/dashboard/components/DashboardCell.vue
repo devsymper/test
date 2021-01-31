@@ -25,6 +25,7 @@
             </div>
             <component 
                 :is="reportTag"
+                :isView="isView"
                 :cellConfigs="cellConfigs">
             </component>
         </div>
@@ -106,7 +107,7 @@ export default {
         },
         isView: {
             default: true
-        }
+        },
     }
 }
 </script>
