@@ -4,7 +4,10 @@
             <v-icon color="#000" class="fs-14 pr-2">{{icon[infoColumn.type]}}</v-icon>
             <span :title="infoColumn.title" class="mr-2" :class="{ 'highlight' : infoColumn.isSelected}">{{infoColumn.title}}</span>
         </span>
-        <span :title="infoColumn.name" class="float-right pr-1" style="color: #909399">{{infoColumn.name}}</span>
+        <div  class="float-right d-flex" style="color: #909399">
+           <span :title="infoColumn.name ? infoColumn.name : infoColumn.columnName">{{infoColumn.name ? infoColumn.name : infoColumn.columnName}}</span> 
+            <v-icon title="Remove" v-if="showIconRemove" @click.prevent.stop="removeItem(infoColumn)" class="fs-14 ml-2 mr-1">mdi-close</v-icon>
+        </div>
     </div>
 </template>
 
@@ -16,6 +19,10 @@ export default {
             default(){
                 return {}
             }
+        },
+        showIconRemove:{
+            type: Boolean,
+            default: false
         }
 
     },
@@ -26,6 +33,11 @@ export default {
                 'text' : "mdi-format-letter-case",  
                 'date' : "mdi-calendar",  
             }
+        }
+    },
+    methods:{
+        removeItem(item){
+            this.$emit("remove-item",item);
         }
     }
 

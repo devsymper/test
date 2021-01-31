@@ -1,5 +1,5 @@
 <template>
-	<div class="ml-2 mr-2 d-flex flex-column">
+	<div class="ml-2 mr-2 h-100 d-flex flex-column">
 		<FormTpl 
 			:allInputs="allInputs"
 		/>
@@ -14,10 +14,14 @@
 				<PeriodTimeConfig />
 			</div>
 		</div>
-		<component 
+		<!-- <component 
 			:is="nodeConfigTag"
 			:nodeData="selectingNode">
-		</component>
+		</component> -->
+		<pivot-data 
+			:nodeData="selectingNode"
+			style="height: calc(100% - 150px)"
+		/>
 	</div>
 </template>
 
@@ -26,6 +30,7 @@ import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
 import FormTpl from "@/components/common/FormTpl.vue";
 import { autoLoadNodeClasses } from "@/components/dataflow/configPool/dataflowConfig.js";
 import _cloneDeep from "lodash/cloneDeep";
+import PivotData from './configs/PivotData.vue';
 
 
 let mapTypeToNodeClass = autoLoadNodeClasses();
@@ -56,6 +61,7 @@ export default {
 
 		FormTpl,
 		PeriodTimeConfig,
+		PivotData,
 	},
 	computed:{
 		nodeConfigTag(){
