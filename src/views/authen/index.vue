@@ -1,6 +1,5 @@
 <template>
 <div class="w-100">
-    hello  {{$store.state.app.allBA}}
      <list-items
         ref="listServerKey"
         :showImportHistory="false"
@@ -44,6 +43,7 @@ export default {
   watch: {
   },
   created () {
+      this.$store.dispatch("app/getAllBA");
       this.getRole()
   },
     components: {
@@ -90,12 +90,14 @@ export default {
                         listObject:res.data,
                         total:res.data.length
                     };
-                    debugger
                     data.listObject.map(d=>{
                         d.status = this.setStatus( d.status);
                         listBA.map(ba=>{
 								if(ba.id == d.userCreate){
 									d.userCreate =  ba.name
+                                };
+                                if(ba.id == d.userUpdate){
+									d.userUpdate =  ba.name
 								}
 							})
 
@@ -166,7 +168,7 @@ export default {
         setKeyValue(){
             this.$refs.addView.nameKey = this.detailKey.name;
             this.$refs.addView.descriptionKey = this.detailKey.description;
-            this.$refs.addView.statusKey = this.detailKey.status==1?true:false;
+            this.$refs.addView.statusKey = this.detailKey.status=="Hoạt động"?true:false;
             this.$refs.addView.keyId = this.detailKey.id;
         },
         updateKey(key){
@@ -179,8 +181,17 @@ export default {
         },
         viewKey(key){
             this.changeView(false,true);
-            this.actionPanelWidth=500;
-            this.detailKey = key;
+            this.actionPanelWidth=630;
+            let arr = Object.keys(key);
+            arr.pop();
+            let detailKey = [];
+            arr.map(a=>{
+                detailKey.push({
+                    name:a,
+                    value:key[a]
+                })
+             })
+            this.detailKey = detailKey
             this.detailKey.idRole = this.getIdRole(key)
         },
         getIdRole(detailKey){

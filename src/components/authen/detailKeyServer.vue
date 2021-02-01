@@ -5,13 +5,22 @@
         </div>
         <v-divider class="mb-3">
         </v-divider>
-        <v-row v-for="(key,idx) in detailKey" :key="idx" >
-            <v-col class="col-md-5 fs-13">
-                 {{$t("authen.table."+idx)}}: 
+        <v-row v-for="(key,idx) in detailKey" :key="idx" style="margin-top:-10px">
+            <v-col class="col-md-3 fs-13 fw-430">
+                 {{$t("authen.table."+key.name)}}: 
             </v-col>
-            <v-col class="col-md-7 fs-13">
-                {{key}}
+            <v-col class="col-md-8 fs-13" style="margin-left:-50px!important">
+                {{key.value}}
+                  
             </v-col>
+             <v-col>
+                 <v-icon  v-if="key.name=='id'||key.name=='serverKey'"
+                    class="close-btn float-right "
+                    @click="$copyTextToClipboard(key.value)"  
+                    size="15"
+                    >mdi-content-copy
+                </v-icon>
+             </v-col>
         </v-row>
          <permission-selector 
             v-model="permissions"
@@ -44,11 +53,12 @@ export default {
          }
     },
     updateRole(){
+        let test = this.detailKey;
         let data = {
-              name: this.detailKey.name,
-              description:this.detailKey.description,
-              users:JSON.stringify([this.detailKey.id]),
-              permissions: JSON.stringify(this.getListPermission())
+            name: this.detailKey[1].value,
+            description:this.detailKey[2].value,
+            users:JSON.stringify([this.detailKey[0].value]),
+            permissions: JSON.stringify(this.getListPermission())
           }
           systemRoleApi.update(this.detailKey.idRole,data).then(res=>{
               if(res.status==200){
@@ -66,23 +76,24 @@ export default {
           })
     },
     createRole(){
+        const self = this;
          let data = {
-              name: this.detailKey.name,
-              description:this.detailKey.description,
-              users:JSON.stringify([this.detailKey.id]),
+              name: this.detailKey[1].value,
+              description:this.detailKey[2].value,
+              users:JSON.stringify([this.detailKey[0].value]),
               permissions:JSON.stringify(this.getListPermission())
           }
           systemRoleApi.create(data).then(res=>{
               if(res.status==200){
-                    this.$snotify({
+                    self.$snotify({
                         type: "success",
-                        title:this.$t(+"authen.notify.success"),
+                        title:self.$t(+"authen.notify.success"),
                 });
-                this.$emit('close-detail-key')
+                self.$emit('close-detail-key')
               }else{
-                    this.$snotify({
+                    self.$snotify({
                         type: "error",
-                        title: this.$t("authen.notify.error"),
+                        title: self.$t("authen.notify.error"),
                 });
               }
           })
@@ -117,16 +128,7 @@ export default {
 
   },
   created () {
-      let arr = Object.keys(this.detailKey);
-      arr.pop();
-      let detailKey = [];
-      arr.map(a=>{
-          detailKey.push({
-              name:a,
-              value:this.detailKey[a]
-          })
-      })
-      this.detailKey = detailKey
+    
   },
   props: {
       detailKey:{
