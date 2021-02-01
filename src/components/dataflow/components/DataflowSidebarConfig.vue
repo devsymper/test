@@ -14,7 +14,7 @@
 				<PeriodTimeConfig />
 			</div>
 		</div>
-		<SummalizeConfig />
+		<!-- <SummalizeConfig /> -->
 		<!-- <NodeConfig
 			@dataset-selected="handleDatasetSelected"
 		/>
@@ -23,14 +23,16 @@
 			:is="nodeConfigTag"
 			:nodeData="selectingNode">
 		</component> -->
-		<pivot-data 
+		<!-- <pivot-data 
 			:nodeData="selectingNode"
 			style="height: calc(100% - 150px)"
-		/>
+		/> -->
+		<SelectConfig />
 	</div>
 </template>
 
 <script>
+import SelectConfig from '@/components/dataflow/components/SelectConfig'
 import SummalizeConfig from '@/components/dataflow/components/SummalizeConfig'
 import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
 import NodeConfig from '@/components/dataflow/components/NodeConfig'
@@ -73,6 +75,7 @@ export default {
 		DatasetColumnSelector,
 		PivotData,
 		SummalizeConfig,
+		SelectConfig
 	},
 	created(){
 		this.dashboardDatasetWorker = new DashboardDatasetWorker()
