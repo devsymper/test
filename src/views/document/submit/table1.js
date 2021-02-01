@@ -820,6 +820,7 @@ export default class SymperTable {
         if(params.rowPinned){
             return;
         }
+        console.log(event,'eventevent');
         if(event.key == 'Enter' && event.shiftKey && this.tableInstance.tableControl.isInsertRow()){
             let rowData = this.tableInstance.getRowDefaultData(false);
             let listRootTable = sDocument.state.submit[this.tableInstance.keyInstance]['listTableRootControl'];
