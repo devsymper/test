@@ -8,6 +8,8 @@ import { appConfigs } from "@/configs.js";
 import tinymce from 'tinymce/tinymce';
 import { documentApi } from "../../../api/Document";
 import { str } from "../../../plugins/utilModules/str";
+import PerfectScrollbar from "perfect-scrollbar";
+import { fileManagementApi } from "../../../api/FileManagement";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
@@ -329,7 +331,7 @@ export default class BasicControl extends Control {
             if(!this.value){
                 this.value = [];
             }
-            this.value.push({id:value.id,uid:value.uid,name:value.name,type:value.type,serverPath:value.serverPath,size:value.size});
+            this.value.push(value);
             this.setFileControlValue(value);
         }
         else{
@@ -473,7 +475,7 @@ export default class BasicControl extends Control {
         else{
             fileEl = this.genFileElItem(fileData);
         }
-        this.ele.find('.upload-file-wrapper-outtb .list-file').append(fileEl)
+        this.ele.find('.upload-file-wrapper-outtb .list-file').append(fileEl);
         this.ele.off('click', '.remove-file')
         this.ele.on('click', '.remove-file', function(e) {
             let item = $(this).attr('data-item');
@@ -559,19 +561,58 @@ export default class BasicControl extends Control {
 
     renderFileControl = function() {
         let fileHtml = this.genFileView();
-        this.ele.css('width', 'unset').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
+        this.ele.html(fileHtml);
         let thisObj = this;
-        $('.file-add').click(function(e) {
+        const agBodyHorizontalViewport = $(this.ele).find('.upload-file-wrapper-outtb .list-file')[0];
+        if (agBodyHorizontalViewport) {
+            const ps = new PerfectScrollbar(agBodyHorizontalViewport);
+            ps.update();
+        }
+        this.ele.find('.file-add').click(function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-add-file-click', { control: thisObj });
         })
+        this.ele.on('click','.list-file',function(e){
+            if($(e.target).is('.file-item') || ($(e.target).is('.file-item__name') && !$(e.target).attr('contenteditable'))){
+                let link = $(e.target).attr('path');
+                window.open(link)
+            }
+            else if($(e.target).is('.file-item__edit')){
+                e.preventDefault();
+                e.stopPropagation();
+                $(e.target).closest('.file-item').find('.file-item__name').attr('contenteditable',true);
+                $(e.target).closest('.file-item').find('.file-item__name').focus();
+            }
+            else if($(e.target).is('.file-item__remove')){
+                e.preventDefault();
+                e.stopPropagation();
+                let fileId = $(e.target).closest('.file-item').attr('file-id');
+                let fileItem = thisObj.value.find(el => el.id == fileId);
+                thisObj.value.splice(thisObj.value.indexOf(fileItem),1);
+                $(e.target).closest('.file-item').remove();
+            }
+        });
+        this.ele.on('keydown','.list-file',function(e){
+            if($(e.target).is('.file-item__name') && e.keyCode == 13){
+                $(e.target).attr('contenteditable',false);
+                let fileId = $(e.target).closest('.file-item').attr('file-id');
+                fileManagementApi.renameFile({id:fileId,newName:$(e.target).val()});
+                return false
+            }
+        })
+
     }
     genFileElItem(fileData){
         let icon = fileTypes[fileData.type];
         let file = `
-                <div class="file-item"  onclick="window.open('`+fileData.serverPath+`');">
+                <div class="file-item" fild-id="`+fileData.id+`" path="`+fileData.serverPath+`">
                     <span class="mdi ` + icon + ` " style="font-size: 14px;"></span>
-                    <span class="file-item__name">`+fileData.name+`</span>
+                    <div class="file-item__name">`+fileData.name+`</div>
+                    <div class="file-item__action">
+                        <span class="file-item__edit mdi mdi-lead-pencil"></span>
+                        <span class="file-item__remove mdi mdi-trash-can-outline"></span>
+                    </div>
                     <span class="file-item__size">`+str.getFileSize(fileData.size)+`</span>
+                    
                 </div>
             `
         return file;
@@ -601,84 +642,6 @@ export default class BasicControl extends Control {
         return addTpl.replace(/\n/g, '');
     }
 
-    addFile(item, rowId = "") {
-        let type = Util.getFileExtension(item.name);
-        let form = new FormData();
-        form.append('file', item);
-        let icon = fileTypes[type];
-        let thisObj = this;
-        $.ajax({
-            url: sDocumentManagementUrl+'uploadFile',
-            dataType: 'json',
-            processData: false,
-            contentType: false,
-            data: form,
-            type: 'post',
-            success: function(response) {
-                if (response.status == 200) {
-                    let file = `<div title="${response.data.path}" class="file-item">
-                                <span data-file-name="${response.data.path}" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i  onclick="window.open('` + sDocumentManagementUrl + `file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
-                            </div>`
-                    thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name);
-                    thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
-                    let curValue = sDocument.state.submit[thisObj.keyInstance].listInputInDocument[thisObj.name].value;
-                    let tableName = thisObj.inTable;
-                    if (tableName != false) {
-                        if (!Array.isArray(curValue)) {
-                            curValue = [];
-                        }
-                        if (!curValue.hasOwnProperty(rowId)) {
-                            curValue[rowId] = []
-                        }
-                        curValue[rowId].push(response.data.name);
-                    } else {
-                        curValue += "," + response.data.name;
-                        thisObj.value = curValue;
-                    }
-                    store.commit("document/updateListInputInDocument", {
-                        controlName: thisObj.name,
-                        key: 'value',
-                        value: curValue,
-                        instance: thisObj.keyInstance
-                    });
-                    if (tableName != false) {
-                        sDocument.state.submit[thisObj.keyInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
-                    }
-
-                }
-            }
-        });
-    }
-    setDeleteFileEvent(ele, controlName) {
-        let listInputInDocument = sDocument.state.submit[this.keyInstance].listInputInDocument
-        let value = listInputInDocument[controlName].value;
-        let thisObj = this;
-        ele.off('click', '.remove-file')
-        ele.on('click', '.remove-file', function(e) {
-            let rowId = $(this).attr('data-rowid');
-            e.preventDefault();
-            e.stopPropagation();
-            let fileName = $(this).attr('data-file-name');
-            let newValue = "";
-            // nếu trong table
-            if (rowId != "" && rowId != undefined) {
-                listInputInDocument[controlName].value.splice(value.indexOf(fileName), 1);
-                newValue = listInputInDocument[controlName].value;
-                $(this).closest('.file-item').remove();
-            } else {
-                newValue = value.replace(/^,/gi, "");
-                newValue = newValue.replace(fileName, "");
-                $(this).closest('.file-item').remove();
-            }
-            store.commit("document/updateListInputInDocument", {
-                controlName: controlName,
-                key: 'value',
-                value: newValue,
-                instance: thisObj.keyInstance
-            });
-        })
-    }
     getNumberFormat() {
         return (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
     }

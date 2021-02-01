@@ -13,6 +13,7 @@
     margin: 8px;
     width: calc(100% - 102px);
     font-size: 12px;
+    overflow: hidden;
 }
 .upload-file-wrapper-outtb .list-file .file-item{
     cursor: pointer;
@@ -26,6 +27,12 @@
 }
 .upload-file-wrapper-outtb .list-file .file-item__name{
     margin: 1px 4px;
+    padding: 0 4px;
+    width: 70%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    height: 18px;
 }
 .upload-file-wrapper-outtb .list-file .file-item__size{
     margin-left: auto;   
@@ -35,7 +42,22 @@
 .upload-file-wrapper-outtb .list-file .file-item:hover{
     background: var(--symper-background-hover);
 }
+.upload-file-wrapper-outtb .list-file .file-item:hover .file-item__action{
+    display: block;
+}
+.upload-file-wrapper-outtb .list-file .file-item:hover .file-item__size{
+    margin-left: 0;
+}
+.upload-file-wrapper-outtb .list-file .file-item .file-item__action{
+    margin-top: 1px;
+    margin-right: 4px;
+    display: none;
+    margin-left: auto;
+}
 
+.upload-file-wrapper-outtb .list-file .file-item .file-item__action .file-item__remove{
+    color: red;
+}
 .upload-file-wrapper-outtb .wrap-button-upload {
     width: 60px;
     height: 60px;
