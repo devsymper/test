@@ -35,7 +35,7 @@
 						:key="key"
 						v-show="groupData.show"
 					>
-						<v-expansion-panel-header>{{groupData.label}}</v-expansion-panel-header>
+						<v-expansion-panel-header ><span class="fs-13">{{groupData.label}}</span> </v-expansion-panel-header>
 						<v-expansion-panel-content>
 							<form-tpl
 								:allInputs="groupData.children"

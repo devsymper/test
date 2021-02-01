@@ -14,13 +14,11 @@
 				<PeriodTimeConfig />
 			</div>
 		</div>
-<<<<<<< HEAD
 		<SummalizeConfig />
 		<!-- <NodeConfig
 			@dataset-selected="handleDatasetSelected"
 		/>
 		<DatasetColumnSelector  :rowData="rowData" /> -->
-=======
 		<!-- <component 
 			:is="nodeConfigTag"
 			:nodeData="selectingNode">
@@ -29,17 +27,13 @@
 			:nodeData="selectingNode"
 			style="height: calc(100% - 150px)"
 		/>
->>>>>>> 601f026cf1e91020bf6e6b42b3ca3e41986df77e
 	</div>
 </template>
 
 <script>
-<<<<<<< HEAD
 import SummalizeConfig from '@/components/dataflow/components/SummalizeConfig'
 import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
 import NodeConfig from '@/components/dataflow/components/NodeConfig'
-=======
->>>>>>> 601f026cf1e91020bf6e6b42b3ca3e41986df77e
 import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
 import FormTpl from "@/components/common/FormTpl.vue";
 import { autoLoadNodeClasses } from "@/components/dataflow/configPool/dataflowConfig.js";
@@ -75,17 +69,14 @@ export default {
 
 		FormTpl,
 		PeriodTimeConfig,
-<<<<<<< HEAD
 		NodeConfig,
 		DatasetColumnSelector,
-		SummalizeConfig
+		PivotData,
+		SummalizeConfig,
 	},
 	created(){
 		this.dashboardDatasetWorker = new DashboardDatasetWorker()
 		this.listenFromWorker()
-=======
-		PivotData,
->>>>>>> 601f026cf1e91020bf6e6b42b3ca3e41986df77e
 	},
 	computed:{
 		nodeConfigTag(){

@@ -18,7 +18,7 @@
 		<div class="all-chart-types">
 			<span v-for="(item , i ) in chartConfigs" :key="i" >
 				<img 
-					:title="i" 
+					:title="$t('bi.chart.'+i)" 
 					:src="'img/dashboard/report-builder/'+i+'.png'" 
 					@click="selectCellType(i)"
 					class="report-type-img" 
@@ -39,18 +39,19 @@
 					v-for="(item, i ) in tabItems"
 					:key="i"
 				>
-					 <v-tooltip bottom>
-						<template v-slot:activator="{ on, attrs }">
-							<v-icon
-								v-bind="attrs"
-								v-on="on"
-								small 
+					<template v-slot:activator="{ on: tab }">
+						<v-tooltip bottom>
+							<template v-slot:activator="{ on: tooltip }">
+								<v-icon
+									v-on="{ ...tooltip, ...tab }"
+									small 
 								>
-								{{item.icon}}
-							</v-icon>
-						</template>
-						<span> {{item.title}} </span>
-					</v-tooltip>
+									{{item.icon}}
+								</v-icon>
+							</template>
+							<span> {{item.title}} </span>
+						</v-tooltip>
+					</template>
 				</v-tab>
 			</v-tabs>
 		</div>
