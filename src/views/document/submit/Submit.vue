@@ -2371,6 +2371,9 @@ export default {
                         if(controlIns.type == 'percent'){
                             value = (controlIns.value === "" ) ? 0 : controlIns.value/100;
                         }
+                        else if(controlIns.checkEmptyFormulas('autocomplete')){
+                            value = controlIns.inputValue;
+                        }
                         dataControl[controlName] = value;
                         if(controlIns.type == 'checkbox'){
                             dataControl[controlName] = (value) ? 1 : 0;
