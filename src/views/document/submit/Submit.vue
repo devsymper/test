@@ -3050,7 +3050,7 @@ export default {
                 tableControl.tableInstance.setDataAtCell(controlIns.name, url, currentRow.id);
             }
             else{
-                this.currentFileControl.controlIns.setValue(url);
+                this.currentFileControl.controlIns.setValue(data);
             }
             
         },
