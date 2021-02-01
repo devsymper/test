@@ -334,7 +334,8 @@ function getVariables(dataObjects) {
 export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
     return new Promise((resolve, reject) => {
         let vars = [];
-        let dataInputForFormula = {};
+		let dataInputForFormula = {};
+		debugger
         documentApi.detailDocument(docId).then(ctrls => {
             ctrls = ctrls.data.fields;
             let ctrlsMap = Object.values(ctrls).reduce((map, el, idx) => {
