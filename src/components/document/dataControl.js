@@ -354,7 +354,12 @@ export const getDataInputFormula = (formulaInstance, listInput, extraData = null
                             dataInput[inputControlName] = currentColData;
                         }
                         else{
-                            dataInput[inputControlName] = controlIns.value;
+                            if(controlIns.inputValue){
+                                dataInput[inputControlName] = controlIns.inputValue;
+                            }
+                            else{
+                                dataInput[inputControlName] = controlIns.value;
+                            }
                         }
                         if(controlIns.type == 'inputFilter'){
                             valueInputControl = dataInput[inputControlName].split(',')
