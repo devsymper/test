@@ -214,6 +214,7 @@
                 for(let col of this.settingItem.selectedColums){
                     if(col.newClonedColumn){
 						col.newClonedColumn = false;
+						// dungna thêm , a Tân yêu cầu khi kéo vào thì để not_agg 
 						col.agg = 'not_agg';
                         // if(this.settingItem.defaultAgg){
                         //     col.agg = this.settingItem.defaultAgg;

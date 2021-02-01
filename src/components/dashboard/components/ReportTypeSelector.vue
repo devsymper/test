@@ -26,7 +26,7 @@
 				</v-expansion-panel-content>
 			</v-expansion-panel>
 		</v-expansion-panels>
-		<div class="mt-2">
+		<div>
 			<v-tabs
 				v-model="tabs"
 				fixed-tabs
@@ -153,6 +153,9 @@ export default {
 </script>
 
 <style scoped>
+.symper-report-type-selector >>> .v-expansion-panel::before{
+	box-shadow: unset !important;
+}
 .symper-report-type-selector >>> .v-expansion-panel-header{
 	padding: unset !important;
 	background-color: #EFEFEF !important;
