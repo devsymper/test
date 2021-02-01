@@ -14,14 +14,16 @@
 				<PeriodTimeConfig />
 			</div>
 		</div>
-		<NodeConfig
+		<SummalizeConfig />
+		<!-- <NodeConfig
 			@dataset-selected="handleDatasetSelected"
 		/>
-		<DatasetColumnSelector  :rowData="rowData" />
+		<DatasetColumnSelector  :rowData="rowData" /> -->
 	</div>
 </template>
 
 <script>
+import SummalizeConfig from '@/components/dataflow/components/SummalizeConfig'
 import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
 import NodeConfig from '@/components/dataflow/components/NodeConfig'
 import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
@@ -33,7 +35,8 @@ export default {
 		FormTpl,
 		PeriodTimeConfig,
 		NodeConfig,
-		DatasetColumnSelector
+		DatasetColumnSelector,
+		SummalizeConfig
 	},
 	created(){
 		this.dashboardDatasetWorker = new DashboardDatasetWorker()
