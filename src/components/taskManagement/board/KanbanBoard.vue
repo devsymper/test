@@ -78,7 +78,7 @@
                 >
                     <p class="title-column">{{column.name}}</p>
                     <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-                    <VuePerfectScrollbar style="max-height: calc(100vh - 200px);" class="wrap-scroll-column">
+                    <VuePerfectScrollbar style="max-height: calc(100vh - 232px);" class="wrap-scroll-column">
                         <div v-for="(status, index) in column.statusInColumn"
                             :key="index"
                             class="mt-2 list-control-autocomplete"
@@ -256,8 +256,8 @@ export default {
                         operation : "and",
                         conditions : [
                             {
-                                name : "in",
-                                value : [self.$route.params.id],
+                                name : "equal",
+                                value : "'"+self.$route.params.id+"'",
                             }
                         ],
                     },
@@ -554,8 +554,8 @@ export default {
                         operation : "and",
                         conditions : [
                             {
-                                name : "in",
-                                value : [this.$store.state.app.endUserInfo.id],
+                                name : "equal",
+                                value : this.$store.state.app.endUserInfo.id,
                             }
                         ],
                     };

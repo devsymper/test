@@ -17,8 +17,17 @@
         </div>
         <div class="content-table">
             <!-- :style="{'max-height':tableMaxHeight+'px','overflow':'auto'}" -->
-            <data-table ref="dataTable" :isRenderAllRows="true" :columns="columns" @cell-change="cellChange" :data="data" class="hot-table" ></data-table>
-
+            <!-- <data-table ref="dataTable" :isRenderAllRows="true" :columns="columns" @cell-change="cellChange" :data="data" class="hot-table" ></data-table> -->
+            <ag-grid-vue
+            style="width: 100%; height: 100%;"
+            class="ag-theme-alpine"
+            :columnDefs="columnDefs"
+            :defaultColDef="defaultColDef"
+            :gridOptions="gridOptions"
+            :getRowHeight="getRowHeight"
+            @grid-ready="onGridReady"
+            :rowData="rowData">
+            </ag-grid-vue>
         </div>
         <div class="footer-filter">
             <span class="total-record">Tổng số bản ghi: {{totalRecord}}</span>
@@ -27,11 +36,18 @@
     </div>
 </template>
 <script>
-import DataTable from './../../../../components/common/customTable/DataTable.vue'
-import { str } from "./../../../../plugins/utilModules/str.js"
+import PerfectScrollbar from "perfect-scrollbar";
+import DataTable from './../../../../components/common/customTable/DataTable.vue';
+import { str } from "./../../../../plugins/utilModules/str.js";
+import "ag-grid-community/dist/styles/ag-grid.css";
+import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+import { AgGridVue } from 'ag-grid-vue';
+import { getControlInstanceFromStore } from '../../common/common';
+import { util } from '../../../../plugins/util';
 export default {
     components:{
-        'data-table':DataTable
+        'data-table':DataTable,
+        'ag-grid-vue':AgGridVue
     },
     props:{
         keyInstance:{
@@ -47,80 +63,109 @@ export default {
         return {
             columns:null,
             data:null,
-            colActive:null,
-            curControlId:null,
             formulas:null,
             search:null,
             controlName:null,
-            dataSelected:[],
             fieldSearch:"",
-            mapNameToTitle:{},
-            totalRecord:0
+            totalRecord:0,
+            columnDefs: null,
+            defaultColDef: null,
+            rowData: null,
+            gridOptions: null,
         }
     },
     beforeMount(){
         this.columns = []
         this.data = []
+        this.gridOptions = {
+            headerHeight:25,
+            enableRangeSelection: true,
+            rowBuffer: 0,
+            rowSelection:'multiple'
+        };
+        
+
+        
+        this.defaultColDef = {
+            width: 150,
+            sortable: true,
+            resizable: true,
+            filter: true,
+            autoHeight:true,
+            editable:true,
+            wrapText:true,
+        };
     },
     methods:{
-        setData(controlId,colActive,data){
-            this.colActive = colActive;
+        onGridReady(params){
+			const agBodyViewport = document.querySelector('.content-filter .ag-body-viewport');
+			const agBodyHorizontalViewport = document.querySelector('.content-filter .ag-body-horizontal-scroll-viewport');
+			if (agBodyViewport) {
+			const ps = new PerfectScrollbar(agBodyViewport);
+				ps.update();
+			}
+			if (agBodyHorizontalViewport) {
+			const ps = new PerfectScrollbar(agBodyHorizontalViewport);
+				ps.update();
+			}
+		},
+        getRowHeight:function (params) {
+            return 25;
+        },
+        setData(data){
             let dataTable = [];
-            this.columns = [];
+            this.columnDefs = [];
             for (let index = 0; index < data.length; index++) {
                 let row = data[index];
                 if(index == 0){
                     for(let c in row){
                         let colName = str.nonAccentVietnamese(c);
-                        let item = {name:colName,title:c,type:'text',readOnly:true};
-                        this.columns.push(item)
+                        let item = {field:colName,headerName:c,type:'text',editable:false};
+                        if(this.columnDefs.length == 0){
+                            item.headerCheckboxSelection = true;
+                            item.checkboxSelection = true;
+                        }
+                        this.columnDefs.push(item)
                     }
-                    this.columns.unshift({name:'active',title:'Chọn',type:'checkbox'})
                 }
                 let item1 = {};
                 for(let c in row){
                     let colName = str.nonAccentVietnamese(c);
                     item1[colName] = row[c];
                 }
-                if(this.dataSelected.includes(row[this.colActive])){
-                    item1['active'] = true;
-                }
-                else{
-                    item1['active'] = false;
-                }
                 dataTable.push(item1)
             }   
-            this.data = null;
-            this.data = dataTable;
-            this.curControlId = controlId;
-            this.totalRecord = dataTable.length
+            this.rowData = null;
+            this.rowData = dataTable;
+            this.totalRecord = dataTable.length;
+            setTimeout((self) => {
+                self.setSelection();
+            }, 500,this);
         },
-        cellChange(res){
-            let changes = res.changes;
-            let source = res.source;
-            if(source == 'edit' && changes[0][1] == 'active'){
-                let rowIndex = changes[0][0];
-                let tableInstance = this.$refs.dataTable.getTableInstance();
-                let rowData = tableInstance.getDataAtRow(rowIndex);
-                let colHeader = tableInstance.getColHeader();
-                let indexColDataActive = colHeader.indexOf(this.colActive);
-                if(changes[0][3] == true){
-                    this.dataSelected.push(rowData[indexColDataActive]);
+        setSelection(){
+            let controlIns = getControlInstanceFromStore(this.keyInstance, this.controlName);
+            let currentValue = util.cloneDeep(controlIns.value);
+            this.gridOptions.api.forEachNode(node => {
+                let nodeData = node.data;
+                if(currentValue.indexOf(nodeData[controlIns.name]) != -1){
+                    node.setSelected(true);
                 }
-                else{
-                    const index = this.dataSelected.indexOf(rowData[indexColDataActive]);
-                    if (index > -1) {
-                        this.dataSelected.splice(index, 1);
-                    }
-                }
-            }
+            });
         },
         saveInputFilter(){
-            this.$emit('save-input-filter',{controlId:this.curControlId,value:this.dataSelected.join(),controlName:this.controlName});
+            let listRowSelection = this.gridOptions.api.getSelectedRows();
+            if(listRowSelection.length > 0){
+                listRowSelection = listRowSelection.reduce((arr,obj)=>{
+                    arr.push("'"+obj[this.controlName]+"'");
+                    return arr;
+                },[]);
+            }
+            this.$emit('save-input-filter',
+            {value: (listRowSelection.length > 0) ? listRowSelection.join(',') : "",controlName:this.controlName}
+            );
         },
-        setFormulas(formulas,controlName){
+        setFormulas(formulas){
             this.formulas = formulas;
-            this.controlName = controlName;
             this.getSearchField(formulas.instance.formulas)
         },
         setControlName(controlName){
@@ -141,10 +186,13 @@ export default {
                 }
             }
             let allFieldCondition = formulas.match(/[a-zA-Z0-9_][^\s]*(?= ilike)/gm);
-            for (let index = 0; index < allFieldCondition.length; index++) {
-                const controlTitle = (mapColumnToAlias.hasOwnProperty(allFieldCondition[index])) ? mapColumnToAlias[allFieldCondition[index]] : "";
-                titleFieldSearch.push(controlTitle)
+            if(allFieldCondition){
+                for (let index = 0; index < allFieldCondition.length; index++) {
+                    const controlTitle = (mapColumnToAlias.hasOwnProperty(allFieldCondition[index])) ? mapColumnToAlias[allFieldCondition[index]] : "";
+                    titleFieldSearch.push(controlTitle)
+                }
             }
+            
             if(titleFieldSearch.length>0){
                 this.fieldSearch = titleFieldSearch.join(", ")
             }  
@@ -195,8 +243,8 @@ export default {
     }
     .content-table{
         height: calc(100% - 90px);
-        overflow-x: hidden;
-        overflow-y: scroll;   
+        overflow: hidden;
+        font-size: 12px;
     }
     .content-filter{
         height: 100%;
@@ -204,6 +252,9 @@ export default {
     .footer-filter .total-record{
         display: inline-block;
         margin-top: 16px;
+    }
+    .content-filter >>> .ag-theme-alpine .ag-cell{
+        line-height: 20px!important;
     }
   
 </style>

@@ -68,7 +68,7 @@ export default class SymperTable {
             currency: 'NumberCellRenderer',
             number: 'NumberCellRenderer',
             date: 'DateCellRenderer',
-            // dateTime: 'DatetimeRenderer',
+            dateTime: 'DateCellRenderer',
             time: 'TimeCellRenderer',
             image: 'FileCellRenderer',
             fileUpload: 'FileCellRenderer',
@@ -820,15 +820,17 @@ export default class SymperTable {
         if(params.rowPinned){
             return;
         }
+        console.log(event,'eventevent');
         if(event.key == 'Enter' && event.shiftKey && this.tableInstance.tableControl.isInsertRow()){
             let rowData = this.tableInstance.getRowDefaultData(false);
             let listRootTable = sDocument.state.submit[this.tableInstance.keyInstance]['listTableRootControl'];
             if (listRootTable.hasOwnProperty(this.tableInstance.tableName)){
                 let rowDataFromRoot = util.cloneDeep(listRootTable[this.tableInstance.tableName]['defaultRow']);
-                for (let index = 0; index < rowDataFromRoot.length; index++) {
-                    let cellValue = rowDataFromRoot[index];
-                    rowData[0][cellValue[1]] = cellValue[2];
-                    
+                if(rowDataFromRoot){
+                    for (let index = 0; index < rowDataFromRoot.length; index++) {
+                        let cellValue = rowDataFromRoot[index];
+                        rowData[0][cellValue[1]] = cellValue[2];
+                    }
                 }
                 rowData[0].s_table_id_sql_lite = Date.now();
             }
