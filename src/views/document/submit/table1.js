@@ -836,7 +836,7 @@ export default class SymperTable {
             }
             this.tableInstance.addNewRow(rowData, params.rowIndex + 1);
         }
-        else if(event.key == 'Backspace' && event.shiftKey){
+        else if(event.key == 'Backspace' && (event.shiftKey || event.metaKey)){
             let rowCount = this.api.getDisplayedRowCount();
             let rowSelection = this.tableInstance.getSelectedRows();
             this.tableInstance.deleteRow(rowSelection, sqlRowId);
