@@ -89,7 +89,7 @@ export const taskManagementApi = {
         return taskManagement.get("issue-types",filter);
     },
     getListIssueTypeInProject(projectId){
-        return taskManagement.get("issue-types/"+projectId);
+        return taskManagement.get("issue-types-in-project/"+projectId);
     },
     addIssueTypeForProject(data){
         return taskManagement.post("issue-types",data);
@@ -109,10 +109,10 @@ export const taskManagementApi = {
         return taskManagement.post("boards",data);
     },
     getListBoardInProject(projectId){
-        return taskManagement.get("boards/"+projectId);
+        return taskManagement.get("boards-in-project/"+projectId);
     },
     getDetailBoard(id){
-        return taskManagement.get("boards-detail/"+id);
+        return taskManagement.get("boards/"+id);
     },
     updateBoard(id,data){
         return taskManagement.put("boards/"+id,data);

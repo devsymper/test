@@ -2088,7 +2088,7 @@ export default {
                 documentApi.setEdittingDocument({id:self.documentId});
                 this.intervalSetEditting = setInterval((self) => {
                     documentApi.setEdittingDocument({id:self.documentId});
-                }, 2000,this);
+                }, 3000,this);
                 return true;
             }else{
                 if(Number(document.userEditting) != 0  && this.baInfo && this.baInfo.id != document.userEditting){

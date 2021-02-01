@@ -521,7 +521,8 @@ export default class Formulas extends FormulasEvent{
         let formulas = util.cloneDeep(this.formulas);
         let newFormulas = formulas.replace(/\/\*.*\*\/|\/\/.*/g,'');
         let listOrgchart = str.getBoundedSubstr(newFormulas,'role','(',')',true);
-        return listOrgchart;
+        console.log(listOrgchart,'listOrgchartlistOrgchart');
+        return [];
     }
 
     /**

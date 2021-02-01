@@ -19,7 +19,7 @@
                                 <v-icon v-if="!!sCurrentProject.icon && sCurrentProject.icon.indexOf('mdi-') > -1" style="font-size:25px" class="pt-0">{{sCurrentProject.icon}}</v-icon>
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!sCurrentProject.icon && sCurrentProject.icon.indexOf('mdi-') < 0" :src="sCurrentProject.icon" width="23" height="23">
                                 <div class="project-name" v-if="!mini">
-                                    <div class="mt-2">{{sCurrentProject.name}}</div>
+                                    <div class="mt-3 ml-2">{{sCurrentProject.name}}</div>
                                 </div>
                                 <!-- <v-icon style="height:24px;" v-if="!mini">mdi-chevron-down</v-icon> -->
                             </div>
@@ -47,7 +47,7 @@
                                 </v-list-item-icon>
                                 
                             </v-list-item>
-                            <div v-if="item.isWorkSpace" class="sidebar-group-item" :style="{'padding' : (mini) ? '' : '1px 16px'}">
+                            <div v-if="item.isWorkSpace && item.items.length > 0" class="sidebar-group-item" :style="{'padding' : (mini) ? '' : '1px 16px'}">
                                 <transition name="fade">
                                     <div class="title-workspace" v-if="!mini">{{ item.title }}</div>
                                 </transition>
@@ -84,12 +84,16 @@
 </template>
 <script>
 import _ from 'lodash';
-import { util } from "@/plugins/util.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ProjectPopup from '@/components/taskManagement/project/ProjectPopup';
 import SelectBoard from '@/components/taskManagement/board/SelectBoard';
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
+import HomeWorker from 'worker-loader!@/worker/taskManagement/home/Index.Worker.js';
+import { taskManagementApi } from "@/api/taskManagement.js";
+
 export default {
     created(){
+        this.homeWorker =  new HomeWorker();
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
             if (this.$refs.projectPopupView && 
                 ($(evt.target).closest(".project-info").length == 0 &&
@@ -104,12 +108,40 @@ export default {
                 this.$refs.SelectBoard.hide()
             }
         });
-
-        this.$evtBus.$on('selected-item-board', (board) =>{
-            this.menu.workspace1.items[0].title = board.name;
-            this.menu.workspace1.items[0].subTitle = "";
-        });
+        this.$evtBus.$on('task-manager-change-project', ()=>{
+            this.getCurrentProject()
+        })
         
+        
+        let self = this;
+       
+        this.homeWorker.addEventListener("message", function (event){
+			let data = event.data;
+            switch (data.action) {
+                case 'getAllProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllProject', res.data.listObject);
+                        self.getCurrentProject();
+                    }
+                    break;
+                case 'getDetailProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setCurrentProject", res.data);
+                    } 
+                    break;
+                case 'getListBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
+                        self.setCurentBoard();
+                    } 
+                    break;
+                default:
+                    break;
+            }
+        })
         
     },
     components: {
@@ -121,15 +153,18 @@ export default {
         sCurrentProject(){
             return this.$store.state.taskManagement.currentProject
         },
-        sTaskManagement(){
-            return this.$store.state.taskManagement
-        },
         userMenuItems(){
             return this.$store.getters['taskManagement/userMenuItems'];
         },
         listBoardInProject(){
             return this.$store.state.taskManagement.listBoardInProject;
-        }
+        },
+        sTaskManagement(){
+            return this.$store.state.taskManagement;
+        },
+        listBoard(){
+            return this.$store.state.taskManagement.listBoardInProject;
+        },
     },
     watch:{
         mini(vl){
@@ -142,7 +177,7 @@ export default {
         },
         '$route' (to, old) {
             if(to.meta.group){
-                this.menu = this.userMenuItems[to.meta.group];
+                this.checkShowListMenu();
             }         
         },
         drawer(vl){
@@ -151,20 +186,136 @@ export default {
                 this.$refs.SelectBoard.hide();
             }
         },
-        listBoardInProject(vl){
-            if(vl.length > 0){
-                this.menu.workspace1.items[0].title = vl[0].name;
-                this.menu.workspace1.items[0].subTitle = "";
+        sCurrentProject(after, before){
+            if(after.id == before.id){
+                return;
+            }
+            if (Object.keys(after).length > 0) {
+                this.checkShowListMenu();
+                this.getAllUserOperations(after.id);
+                this.getListBoard();
+            }
+        },
+        "sTaskManagement.currentBoard":function(after){
+            if(this.$route.meta.group == 'home'){
+                this.menu.workspace1.items[0].title = after.name
+                this.menu.workspace1.items[0].subTitle = after.description;
+               
             }
         }
+        
     },
     mounted(){
-        this.menu = this.userMenuItems[this.$route.meta.group];
+        this.checkShowListMenu()
     },
     
     methods: {
+        checkShowListMenu(){
+            this.menu = [];
+            let currentMenu = this.userMenuItems[this.$route.meta.group];
+            let currentProject = this.$store.state.taskManagement.currentProject;
+            if (currentProject.userLeader == this.$store.state.app.endUserInfo.id) {
+                this.menu = currentMenu;
+            }
+            else{
+                if (currentMenu.workspace1) {
+                    let listItemInWorkspace1 = currentMenu.workspace1.items;
+                    // check role show list component
+                    if (!checkPermission('task_manager_components','list')) {
+                        let item = listItemInWorkspace1.find(data => data.name === 'component')
+                        var index = listItemInWorkspace1.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspace1.splice(index, 1);
+                        }
+                    }
+                    // check role show list version
+                    if (!checkPermission('task_manager_version','list')) {
+                        let item = listItemInWorkspace1.find(data => data.name === 'version')
+                        var index = listItemInWorkspace1.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspace1.splice(index, 1);
+                        }
+                    }
+                }
+                //check trong workspace 2
+                if (currentMenu.workspace2) {
+                    let listItemInWorkspace2 = currentMenu.workspace2.items;
+                        // check role show báo cáo
+                    if (!checkPermission('task_manager_report_config','view')) {
+                        let item = listItemInWorkspace2.find(data => data.name === 'report')
+                        var index = listItemInWorkspace2.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspace2.splice(index, 1);
+                        }
+                    }
+                }
+                //check trong item 3
+                if (currentMenu.workspace3) {
+                    let listItemInWorkspace3 = currentMenu.workspace3.items;
+                        // check role project setting
+                    if (!checkPermission('task_manager_project_setting','config')) {
+                        let item = listItemInWorkspace3.find(data => data.name === 'projectSetting')
+                        var index = listItemInWorkspace3.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspace3.splice(index, 1);
+                        }
+                    }
+                }
+                //check trong setting project
+                if (currentMenu.workspaceProject) {
+                    let listItemInWorkspaceProject = currentMenu.workspaceProject.items;
+                        // check role show list access controls
+                    if (!checkPermission('task_manager_access','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "access")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+
+                    // check role show list issue type
+                    if (!checkPermission('task_manager_issue_type','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "issueType")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+
+                    // check role show list workflow
+                    if (!checkPermission('task_manager_task_life_cycle','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "workflow")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+
+                    // check role show list issue link
+                    if (!checkPermission('task_manager_issue_link','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "issueLink")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+                    // check role show list priority
+                    if (!checkPermission('task_manager_priority','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "priority")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+                }
+                this.menu = currentMenu;
+            }
+            
+        },
         afterSelectBoard(board){
             this.menu.workspace1.items[0].title = board.name
+            this.menu.workspace1.items[0].subTitle = board.description;
+            this.$store.commit("taskManagement/setCurrentBoard",board);
         },
         checkShowSideBar(){
             if(!this.isExpand){
@@ -209,7 +360,49 @@ export default {
                 this.$router.push(link);
             }
         },
-      
+        getAllUserOperations(projectId){
+            let thisCpn = this;
+            taskManagementApi.getAllActionOfProject(projectId).then(res=>{
+                if(res.status == 200){
+                    thisCpn.$store.commit('taskManagement/addToTaskManagementStore',{key:'userOperations',value:res.data})
+                }
+            })
+        },
+        getAllProject(){
+            this.homeWorker.postMessage({
+                action:'getAllProject',
+                data:null
+            });
+        },
+        getCurrentProject(){
+            this.projectId = this.$route.params.id;
+            this.getDetailProject();
+        },
+        getDetailProject(){
+            this.homeWorker.postMessage({
+                action:'getDetailProject',
+                data:this.projectId
+            });
+        },
+        getListBoard(){
+            this.homeWorker.postMessage({
+                action:'getListBoard',
+                data:this.projectId
+            });
+        },
+        setCurentBoard(board=null){
+            let self = this;
+            let currentBoard = null;
+            if (board) {
+                currentBoard = board;
+            }else{
+                let allBoard = this.listBoard;
+                if (allBoard.length>0) {
+                    currentBoard = allBoard[0];  
+                }
+            }
+            self.$store.commit("taskManagement/setCurrentBoard",currentBoard);
+        },
     },
     data() {
         return {
@@ -222,9 +415,21 @@ export default {
             isShowSidebar:true,
             drawer: false,
             mini: false,
-            oldSelected:null
+            oldSelected:null,
+            originMenu:null,
+            homeWorker:null,
+            projectId:null
         };
-    }
+    },
+    activated(){
+        this.projectId = this.$route.params.id;
+        if (!this.sTaskManagement.allProject || this.sTaskManagement.allProject.length == 0) {
+            this.getAllProject();
+        }
+        else if(!this.sCurrentProject.id){
+            this.getCurrentProject();
+        }
+    },
 };
 </script>
 <style scoped>
@@ -393,7 +598,7 @@ export default {
     height: calc(100%);
     left: 0;
     font-size:13px;
-    z-index: 1;
+    z-index: 99;
 }
 .task-sidebar-item{
     padding: 0 !important;

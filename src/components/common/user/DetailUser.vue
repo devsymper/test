@@ -149,11 +149,11 @@
                 <div>
                     <v-icon class="fs-16">mdi mdi-office-building-outline</v-icon>
                     <span class="fw-430 fs-13 "> 
-                    {{$t('user.myInfo.myPosition')}} ( 
-                        <v-btn class="fs-13 fw-430 " style="letter-spacing:0px;" 
+                    {{$t('user.myInfo.myPosition')}}
+                        <!-- <v-btn class="fs-13 fw-430 " style="letter-spacing:0px;" 
                         @click="viewAllPermission()" text x-small >   
                             Xem tất cả
-                        </v-btn>)
+                        </v-btn>) -->
                     </span>
                 </div>
                 <div 
@@ -170,7 +170,7 @@
                             text 
                             style="letter-spacing:0px;"
                             @click="viewUserRole(role.id,role.active,role.name)" >
-                            <span>
+                            <span :style="{color:role.active?'black':'lightgrey'}">
                                 {{role.name}}
                             </span>
                         </v-btn>
@@ -198,7 +198,7 @@
                                 text 
                                 x-small
                                 @click="viewUserRole(role.id,role.active,role.name)" >
-                                <span class='fm fs-13'>
+                                <span :style="{color:role.active?'black':'lightgrey'}" class='fm fs-13'>
                                     {{role.name}}
                                 </span>
                             </v-btn>
@@ -321,6 +321,7 @@ export default {
         },
         viewUserRole(role,active,roleName){
             if(active){
+                debugger
                 this.roleName = roleName;
                 this.isViewDetail = true;
                 this.isViewUserRole = true;

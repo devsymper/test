@@ -219,6 +219,22 @@ export default {
         }
     },
     methods:{
+        checkUpdateTaskInSprint(issue){
+            if (issue.tmg_sprint_id) {
+                let projectId = this.$route.params.id;
+                let data = {};
+                data.dataSprintAfterMapIssue = this.dataSprintAfterMapIssue;
+                data.issue = issue;
+                data.allPriority = this.$store.state.taskManagement.allPriority;
+                data.listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[projectId];
+                data.allStatus = this.$store.state.taskManagement.allStatus;
+                this.kanbanWorker.postMessage({
+                    action:'checkUpdateTaskInSprint',
+                    data: data
+                });
+            }
+        
+        },
         isSprintStart(){
             let allSprint = this.dataSprintAfterMapIssue;
             let item = allSprint.find(ele => ele.status == "running");
@@ -318,6 +334,9 @@ export default {
         let self = this;
         this.kanbanWorker = new KanbanWorker();
 
+        this.$evtBus.$on('task-manager-submit-issue-success', (issue) =>{
+            self.checkUpdateTaskInSprint(issue);
+        })
         this.getListSprintInBoard();
         this.kanbanWorker.addEventListener("message", function (event) {
 			let data = event.data;
@@ -352,6 +371,15 @@ export default {
                     break;
                 case 'handleChangeIssueInSprint':
                     console.log("update task success");
+                    break;
+                case 'pushTaskInSprint':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        let dataSetStore3 = {};
+                        dataSetStore3.key = self.currentBoard.id;
+                        dataSetStore3.data = res;
+                        self.$store.commit("taskManagement/setListDataSprintAfterAfterMapIssue",dataSetStore3);
+                    }
                     break;
                 default:
                     break;

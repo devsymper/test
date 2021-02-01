@@ -141,7 +141,6 @@ export default {
         }
     },
     data(){
-        let self = this;
         return{
             colors:[
                 "#F44336",

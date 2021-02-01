@@ -20,7 +20,8 @@
 				<v-btn small disabled class="mr-3" color="success" v-if="showSubmitSuccessBtn"> <v-icon small color="success" class="mr-1">mdi-check-outline</v-icon> Submited </v-btn>
 				<span v-if="!originData.endTime && !hideActionTask" class="mr-10">
 					<span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true" style="margin-right: 85px !important">
-						<v-btn
+						<!-- test -->
+						<v-btn 
 							small
 							depressed
 							v-for="(action, idx) in taskActionBtns"
@@ -29,11 +30,21 @@
 							:color="action.color"
 							class="mr-1"
 							@click="saveTaskOutcome(action.value, idx)"
-							:loading="loadingAction && idx == indexAction"
+							:loading="loadingAction && idx == indexAction&&!repeatedSubmit"
 							:disabled="loadingAction && idx != indexAction"
 						>
 							{{ action.text }}
 						</v-btn>
+						<v-btn v-if="repeatedSubmit"
+							small
+							depressed
+							:color="'success'"
+							class="mr-1"
+							@click="repeatSubmit()"
+						>
+							Submit & Create
+						</v-btn>
+						<!-- test -->
 					</span>
 					<span v-else class="mr-14">
 						<v-btn small depressed disabled v-for="(action, idx) in taskActionBtns" :key="idx" :color="action.color" class="mr-2" :class="{'mr-9': checkShowEditRecord()}" >
@@ -197,6 +208,10 @@ export default {
 			},
 		},
 		isInitInstance: {
+			type: Boolean,
+			default: false,
+		},
+		repeatedSubmit:{
 			type: Boolean,
 			default: false,
 		},
@@ -417,6 +432,10 @@ export default {
 	},
 	created() {},
 	methods: {
+		repeatSubmit(){
+			this.saveTaskOutcome("submit",0)
+			this.$emit('repeated-submit');
+		},
 		needComplyFormula(str) {
 			return /ref\s*\(|select |\$\{/i.test(str);
 		},

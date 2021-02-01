@@ -32,6 +32,15 @@ self.onmessage = async function (event) {
                 }
             })
             break;
+        case 'getDetailProject':
+            if (data) {
+                taskManagementApi.getDetailProject(data).then(res => {
+                    if(res['status'] == 200 && res['data']){
+                        postMessage({action:'getDetailProject', dataAfter : res})
+                    }
+                });
+            }
+            break;
         case 'getAllProject':
             let item={
                 column : "isDelete",
@@ -125,6 +134,15 @@ self.onmessage = async function (event) {
         case 'getListAssigneeIssueGroupDateTime':
             let res3 = setDataListAssigneeIssueGroupDateTime(data);
             postMessage({action:'getListAssigneeIssueGroupDateTime',dataAfter : res3})
+            break;
+        case 'getListBoard':
+            if (data) {
+                taskManagementApi.getListBoardInProject(data).then(res => {
+                    if(res['status'] == 200 && res['data']){
+                        postMessage({action:'getListBoard', dataAfter : res})
+                    }
+                });
+            }
             break;
         default:
             break;

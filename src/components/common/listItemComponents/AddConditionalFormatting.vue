@@ -75,11 +75,13 @@ export default {
       return String(index+1).padStart(3, '0')
     },
     handleAction(actionIdx,dataIdx){
-      if(actionIdx==2){
+      if(actionIdx==2){// chọn
         this.listDataIdSelected.push(dataIdx);
+        this.listData[dataIdx].isSelected = true;
         this.$emit('change-apply',this.listDataIdSelected )
       }else{
-        if(actionIdx==3){
+        if(actionIdx==3){// bỏ chọn
+          this.listData[dataIdx].isSelected = false;
           this.listDataIdSelected = this.listDataIdSelected.filter(i=>i!=dataIdx);
         }
         let data={
@@ -95,6 +97,9 @@ export default {
       },
       checkIsSelected(dataIdxSelected){
         let check = false;
+        if(this.listData[dataIdxSelected].isSelected){
+          check = true
+        }
         this.listDataIdSelected.map(data=>{
           if(data==dataIdxSelected){
             check = true

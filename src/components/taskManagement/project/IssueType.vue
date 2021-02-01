@@ -60,7 +60,7 @@
                             <span class="name-object" style="color:blue" @click.prevent.stop="goToWorkflow(item)" v-if="item.workflowName">{{item.workflowName}}</span>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
-                                    <v-icon v-if="checkRole('task_manager_issue_type','edit')" v-on="on" @click.prevent.stop="handleChangeWorkflow(item)" class="ml-1" size="16" color="blue">mdi-autorenew</v-icon>
+                                    <v-icon v-if="checkRole('task_manager_issue_type','edit')" v-on="on" @click.prevent.stop="handleChangeWorkflow(item)" class="ml-1" size="16" color="grey">mdi-autorenew</v-icon>
                                 </template>
                                 <span>Change</span>
                             </v-tooltip>
@@ -74,10 +74,10 @@
                             </v-btn>
                         </div>
                         <div v-else>
-                            <span class="name-object" style="color:blue" @click.prevent.stop="goToWorkflow(item)" v-if="item.documentName">{{item.documentName}}</span>
+                            <span class="name-object" style="color:blue" @click.prevent.stop="goToDocument(item)" v-if="item.documentName">{{item.documentName}}</span>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
-                                    <v-icon v-if="checkRole('task_manager_issue_type','edit')" v-on="on" @click.prevent.stop="handleChangeDocConfigField(item)" class="ml-1" size="16" color="blue">mdi-autorenew</v-icon>
+                                    <v-icon v-if="checkRole('task_manager_issue_type','edit')" v-on="on" @click.prevent.stop="handleChangeDocConfigField(item)" class="ml-1" size="16" color="grey">mdi-autorenew</v-icon>
                                 </template>
                                 <span>Change</span>
                             </v-tooltip>
@@ -486,6 +486,11 @@ export default {
             let projectId=this.$route.params.id;
             if (item.taskLifeCircleId) {
                 this.$router.push("/task-management/projects/"+projectId+"/workflow/"+item.taskLifeCircleId);
+            }
+        },
+        goToDocument(item){
+            if (item.documentId) {
+                this.$router.push("/documents/"+item.documentId+"/editor/edit");
             }
         },
         handleUpdateIssueWorkflowOrDocumentId(typeUpdate = "workflow"){

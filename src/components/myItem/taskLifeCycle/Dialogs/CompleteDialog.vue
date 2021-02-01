@@ -122,7 +122,8 @@ export default {
 				debugger
 				let res = await documentApi.detailDocumentObject(docObjId)
 				if(res.status == 200){
-					dataDoc = res.data
+					dataDoc = res.data;
+					docId = res.data.documentId;
 				}else{
 					this.$snotify(
 						{

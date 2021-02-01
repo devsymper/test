@@ -130,6 +130,9 @@ export default {
                 return {}
         }
       },
+      isUpdate:{
+          type: Boolean,
+      },
        rowData:{
              type: Array,
                 default(){

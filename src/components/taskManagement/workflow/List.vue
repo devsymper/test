@@ -29,6 +29,7 @@
                     @click:row="handleClickRow"
                 >
                     <template v-slot:[`item.name`]="{ item }">
+                        <v-icon class="fs-16">mdi-lan</v-icon>
                         <span class="name-project pt-1 pl-2" style="color:#0000aa">
                             {{item.name}}
                         </span>

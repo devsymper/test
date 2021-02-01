@@ -112,6 +112,10 @@ export default class BasicControl extends Control {
                 this.renderRichTextControl();
             }
 
+
+            if(this.checkEmptyFormulas('autocomplete')){
+                this.inputValue = null;
+            }
             if (this.checkDetailView()) {
                 // this.ele.addClass('detail-view');
                 this.ele.attr('disabled', 'disabled');
@@ -282,7 +286,8 @@ export default class BasicControl extends Control {
                     instance: thisObj.keyInstance
                 });
                 e.controlName = thisObj.name;
-                if (thisObj.type == 'date') {
+                e.control = thisObj;
+                if (['date','dateTime'].includes(thisObj.type)) {
                     SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
                 } else if (thisObj.type == 'inputFilter') {
                     e.formulas = thisObj.controlFormulas.list;
@@ -328,6 +333,7 @@ export default class BasicControl extends Control {
         else{
             if(value && value.inputDislay && value.inputValue){
                 this.value = value.inputValue;
+                this.inputValue = value.inputValue;
             }
             else{
                 this.value = value;
@@ -336,6 +342,9 @@ export default class BasicControl extends Control {
                 if (this.type == 'label') {
                     this.ele.text(value);
                 } else if (this.type == 'richText') {
+                    this.ele.val(value);
+                }
+                else if (this.type == 'dateTime') {
                     this.ele.val(value);
                 } else if (this.type == 'date') {
                     this.ele.val(SYMPER_APP.$moment(value).format(this.formatDate));
@@ -369,6 +378,7 @@ export default class BasicControl extends Control {
             if (sDocument.state.submit[this.keyInstance].docStatus == 'init') {
                 this.defaultValue = value;
             }
+            console.log(this.value,'this.value');
         }
     }
     getValue() {
@@ -389,6 +399,9 @@ export default class BasicControl extends Control {
         if (this.type == 'label') {
             this.ele.text(value)
         } else if (this.type == 'richText') {
+            this.ele.val(value);
+        }
+        else if (this.type == 'dateTime') {
             this.ele.val(value);
         } else if (this.type == 'image') {
             this.setImageControlValue(value)
@@ -488,6 +501,9 @@ export default class BasicControl extends Control {
 
         } else if (this.type == 'date') {
             value = SYMPER_APP.$moment(value).format(this.formatDate);
+        }
+        else if (this.type == 'dateTime') {
+            this.ele.val(value);
         }
        
         if (this.type == 'image') {
@@ -759,8 +775,8 @@ export default class BasicControl extends Control {
         this.ele.parent().append(icon);
     }
     renderDateTimeControl() {
-        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
+        if (this.checkDetailView()) return;
 
     }
     renderDateControl() {

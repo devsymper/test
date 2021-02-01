@@ -107,6 +107,12 @@
                             </template>
                             <span>{{$t('document.instance.showlist.update')}}</span>
                         </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                    <v-icon @click="handleClickPrint" v-on="on">mdi-printer</v-icon>
+                            </template>
+                            <span>{{$t('document.detail.fab.print')}}</span>
+                        </v-tooltip>
                     </div>
                 </div>
                 <div  v-else-if="actionOnRightSidebar == 'update'">
@@ -252,21 +258,30 @@ export default {
             },
             customAPIResult:{
                 reformatData(res){
-					res.data.columns.forEach(function(e){
-						if(e.name == 'tmg_description'){
-							e.cellRenderer = function(params) {
-								let rtf = params.value
-								rtf = rtf.replace(/\\par[d]?/g, "");
-								rtf = rtf.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
-								return rtf.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim();
-							}
-						}					
-					})
-                    return{
-                        columns:res.data.columns,
-                        listObject:res.data.listObject,
-                        total:res.data.total,
-                    }
+					if(res.status == 200){
+						res.data.columns.forEach(function(e){
+							if(e.type == "richtext"){
+								e.cellRenderer = function(params) {
+									let content = ""
+									let rtf = params.value
+									if(rtf){
+										rtf = rtf.replace(/\\par[d]?/g, "");
+										rtf = rtf.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
+										content = rtf.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim()
+									}
+									return '<span>'+content+'</span>'
+								}
+							}					
+						})
+						return{
+							columns:res.data.columns,
+							listObject:res.data.listObject,
+							total:res.data.total,
+						}
+					}else{
+						return {}
+					}
+					
                 }
             },
             docId:parseInt(this.$route.params.id),
@@ -463,6 +478,9 @@ export default {
 		},
         updateCurrentRecord(){
             this.actionOnRightSidebar = 'update';
+        },
+        handleClickPrint(){
+            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:this.docObjInfo.docObjId}]});
         },
         deleteSelectedRecord(){
             let itemSelected = Object.values(this.recordSelected);

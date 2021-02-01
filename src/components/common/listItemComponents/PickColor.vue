@@ -1,5 +1,8 @@
 <template>
     <div style="background:white!important">
+        <!-- <div>
+            <v-btn x-small text><i class="mdi mdi-close"></i></v-btn>
+        </div> -->
         <div class="mt-2 ml-2 d-flex fs-13 justify-center" style="margin-bottom:-10px">
         </div>
         <v-color-picker 
@@ -8,7 +11,7 @@
             hide-inputs
             hide-mode-switch
             :hide-sliders="false"
-            mode="hexa"
+            mode="rgba"
             v-model="color"
             show-swatches
             :swatches="swatches"
@@ -36,7 +39,7 @@ export default {
     },
   data () {
     return {
-        color:'#000000',
+        color:'',
          swatches: [
             ['#FF0000', '#AA0000', '#550000','#000000'],
             ['#FFFF00', '#AAAA00', '#555500','#00A0AA'],
