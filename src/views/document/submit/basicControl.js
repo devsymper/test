@@ -112,6 +112,10 @@ export default class BasicControl extends Control {
                 this.renderRichTextControl();
             }
 
+
+            if(this.checkEmptyFormulas('autocomplete')){
+                this.inputValue = null;
+            }
             if (this.checkDetailView()) {
                 // this.ele.addClass('detail-view');
                 this.ele.attr('disabled', 'disabled');
@@ -329,6 +333,7 @@ export default class BasicControl extends Control {
         else{
             if(value && value.inputDislay && value.inputValue){
                 this.value = value.inputValue;
+                this.inputValue = value.inputValue;
             }
             else{
                 this.value = value;
@@ -373,6 +378,7 @@ export default class BasicControl extends Control {
             if (sDocument.state.submit[this.keyInstance].docStatus == 'init') {
                 this.defaultValue = value;
             }
+            console.log(this.value,'this.value');
         }
     }
     getValue() {
