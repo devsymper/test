@@ -474,7 +474,8 @@ export default {
                     let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, controlName)
                     if(rowNodeId){
                         let tableControl = getControlInstanceFromStore(thisCpn.keyInstance, controlIns.inTable);
-                        tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, rowNodeId, columnName);
+                        let isMultiple = data.dataAfter.isMultiple;
+                        tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, rowNodeId, columnName, isMultiple);
                     }
                     else{
                         thisCpn.handleAfterRunFormulas(res,controlName,formulaType);
@@ -2508,15 +2509,8 @@ export default {
             if(allFormulas.hasOwnProperty('list')){
                 if(allFormulas['list'].hasOwnProperty('instance')){
                     let formulaInstance = allFormulas['list'].instance;
-                    if(formulaInstance.getFormulas() != ""){
-                        if( !formulaInstance.hasOwnProperty('oldFormulas')){
-                            formulaInstance.oldFormulas = formulaInstance.getFormulas();
-                        }
-                        // trường hợp có search trong filter thì wrap lại công thức với biến search
-                        let newFormulas = formulaInstance.wrapSyqlForSearchInputFilter(search);
-                        formulaInstance.setFormulas(newFormulas);
-                        this.handlerBeforeRunFormulasValue(formulaInstance,controlName,'list')
-                    }
+                    this.optionalDataBinding = {...this.optionalDataBinding, ...{search_value:search}}
+                    this.handlerBeforeRunFormulasValue(formulaInstance,controlName,'list','inputFilter')
                 }
             }
         },
@@ -2612,6 +2606,9 @@ export default {
          */
         handlerBeforeRunFormulasValue(formulaInstance,controlName,formulaType,from=false){
             let dataInput = getDataInputFormula(formulaInstance,this.sDocumentSubmit.listInputInDocument,this.optionalDataBinding,'all');
+            if(from == 'inputFilter'){
+                dataInput['search_value'] = this.optionalDataBinding['search_value']
+            }
             if(checkDataInputChange(this.sDocumentSubmit.rootChangeFieldName, this.sDocumentSubmit.dataInputBeforeChange, dataInput)){
                 let control = getControlInstanceFromStore(this.keyInstance,controlName);
                 if(control.inTable != false){
@@ -3050,7 +3047,7 @@ export default {
                 tableControl.tableInstance.setDataAtCell(controlIns.name, url, currentRow.id);
             }
             else{
-                this.currentFileControl.controlIns.setValue(url);
+                this.currentFileControl.controlIns.setValue(data);
             }
             
         },
