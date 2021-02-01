@@ -1483,8 +1483,8 @@ export default class SymperTable {
      * @param {*} dataRowId 
      * @param {*} from 
      */
-    afterRunFormula(res, formulasType, controlInstance, rowNodeId, columnName){
-        if(rowNodeId.length == 1){
+    afterRunFormula(res, formulasType, controlInstance, rowNodeId, columnName, isMultiple = false){
+        if(rowNodeId.length == 1 && !isMultiple){
             this.prepareDataAfterRunFormulaOnRow(res, formulasType, controlInstance, rowNodeId, columnName);
         }
         else{

@@ -474,7 +474,8 @@ export default {
                     let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, controlName)
                     if(rowNodeId){
                         let tableControl = getControlInstanceFromStore(thisCpn.keyInstance, controlIns.inTable);
-                        tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, rowNodeId, columnName);
+                        let isMultiple = data.dataAfter.isMultiple;
+                        tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, rowNodeId, columnName, isMultiple);
                     }
                     else{
                         thisCpn.handleAfterRunFormulas(res,controlName,formulaType);
