@@ -87,6 +87,7 @@ export default {
 			customAPIResult:{
 				reformatData(res){
 					let listBA = self.$store.state.app.allBA;
+					debugger
 					res.data.listObject.forEach(function(e){
 						if(!e.userCreate){
 							e.userCreateName = ""  

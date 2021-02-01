@@ -1,5 +1,6 @@
 <template>
 <div class="w-100">
+    hello  {{$store.state.app.allBA}}
      <list-items
         ref="listServerKey"
         :showImportHistory="false"
@@ -40,6 +41,8 @@ import { appConfigs } from '../../configs';
 import { systemRoleApi } from "@/api/systemRole.js";
 import {accessControlApi} from './../../api/accessControl';
 export default {
+  watch: {
+  },
   created () {
       this.getRole()
   },
@@ -59,7 +62,19 @@ export default {
             importInfo:{},
             typeView:"add",
             customAPIResult: {
+                setStatus(status){
+                     switch(status){
+                         case '0':
+                             return 'Dừng';
+                        case '1':
+                            return 'Hoạt động';
+                        default:
+                            return 'Hoạt động';
+                        break
+                     }  
+                },
                 reformatData(res){
+                    let listBA = self.$store.state.app.allBA;
                     let data =  {
                          columns:[
                             {name: "id", title: "id", type: "numeric"},
@@ -74,7 +89,17 @@ export default {
                        ],
                         listObject:res.data,
                         total:res.data.length
-                    }
+                    };
+                    debugger
+                    data.listObject.map(d=>{
+                        d.status = this.setStatus( d.status);
+                        listBA.map(ba=>{
+								if(ba.id == d.userCreate){
+									d.userCreate =  ba.name
+								}
+							})
+
+                    })
                      return data
                 } 
             },
