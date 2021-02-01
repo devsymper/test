@@ -14,5 +14,8 @@ export const syqlFunctionApi = {
     },
 	viewFunction(id){
 		return moduleApi.get('functions/'+id)
-    },
+	},
+	updateBulk(data){
+		return moduleApi.post('formulas/compileClientBulk',data)
+	}
 };

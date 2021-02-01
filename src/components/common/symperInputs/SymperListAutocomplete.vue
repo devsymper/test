@@ -103,6 +103,10 @@ export default {
         },
         isSelectionChip:{
             default:true
+        },
+        isEmitOnSearch:{
+            type: Boolean,
+            default: false
         }
     },
     created(){
@@ -136,6 +140,9 @@ export default {
             let self = this;
             this.delayTimer = setTimeout(function() {
                 let val = self.search;
+                if (self.isEmitOnSearch) {
+                    self.$emit("symper-autocomplete-search-vl",val);
+                }
                 if(!self.onSearch){
                     if(!val){
                         self.myItems = util.cloneDeep(self.items);

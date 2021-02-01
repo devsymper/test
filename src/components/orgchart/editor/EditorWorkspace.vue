@@ -133,7 +133,6 @@ export default {
                     }
                 }else{
 					let imgurl = appConfigs.apiDomain.fileManagement+'readFileSvg/user_avatar';
-					debugger
                     if(value.includes(imgurl)){
 						cell.attr(mapName[attrName], value,
 					);

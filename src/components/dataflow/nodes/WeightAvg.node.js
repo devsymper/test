@@ -5,6 +5,6 @@ export default class WeightAvg extends NodeBase {
         let defaultConfig = {
             
         };
-        super(symperId, 'Weightavg', defaultConfig);
+        super(symperId, 'WeightAvg', defaultConfig);
     }
 }

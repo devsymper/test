@@ -133,9 +133,7 @@ export const TranslatorHelper = {
 			let chartData = TranslatorHelper.getTreeMapData(groupCol, detailCol, valueCol, data, colors);
 			let rsl = {
 				chart: {
-					type: 'treemap',
-					height: extraData.size.h,
-					width: extraData.size.w,
+					type: 'treemap'
 				},
 				// tooltip: {
 				// 	formatter: function() {
@@ -319,6 +317,25 @@ export const TranslatorHelper = {
 			rsl.scrollbar = {
 				enabled: true
 			};
+			rsl.navigator = {
+				enabled: true,
+				liveRedraw: true,
+				series: {
+					type: 'gantt',
+					pointPlacement: 0.5,
+					pointPadding: 0.25
+				},
+				yAxis: {
+					min: 0,
+					max: 3,
+					reversed: true,
+					categories: []
+				}
+			};
+			rsl.credits= {
+				enabled: false
+			};
+	
 			rsl.chart.height = extraData.size.h;
 			rsl.chart.width = extraData.size.w;
 			return rsl;
@@ -730,6 +747,9 @@ export const TranslatorHelper = {
 					item[name] = convertDateToTimestamp(data[i][columns[name].selectedColums[0].as]);
 				}
 				else if(name == "duration" && data[i][columns[name].selectedColums[0].as]){
+					if (columns['end'] && data[i][columns['end'].selectedColums[0].as]) {
+						continue;
+					}
 					if (!timestart) {
 						timestart = convertDateToTimestamp(data[i][columns["start"].selectedColums[0].as]);
 						let endDate = timestart+Number(data[i][columns[name].selectedColums[0].as])*1000 * 60 * 60 * 24;

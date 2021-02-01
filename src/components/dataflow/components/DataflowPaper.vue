@@ -1,13 +1,15 @@
 <template>
-    <div class="h-100 w-100">
-        <div ref="symperPaperToolbar" class=" d-none">
+    <div class=" symper-dataflow-workspace">
+        <div ref="symperPaperToolbar d-none" >
         </div>
-        <div ref="nodeStencile" class="symper-node-stencil" style="height:55px;width:100%;position:relative" v-show="action != 'embed'">
+        <div ref="nodeStencile" style="width: 100%;position: relative;" class="symper-node-stencil" v-show="action != 'embed'">
 
         </div>
-    	<div ref="jointWrapper" class="symper-orgchart-paper" :style="{
-            height: wrapper.height,
-            width: wrapper.width
+    	<div ref="jointWrapper" :style="{
+            maxHeight: '100%',
+            maxWidth: '100%',
+            overflow: 'auto',
+            height: (height - 55) + 'px'
         }"></div>
         <a ref="downloadLinkSVG" href></a>
     </div>
@@ -28,7 +30,8 @@ export default {
             wrapper: {
                 height: '300px',
                 width: '500px'
-            }
+            },
+            selectingNode: null
         }
     }, 
 	name: 'DataflowPaper',
@@ -45,7 +48,7 @@ export default {
 		},
 		height: {
 			type: [String, Number],
-			default: 600
+			default: 250
 		},
 		gridSize: {
 			type: Number,
@@ -148,6 +151,9 @@ export default {
             }
             return Object.keys(nodesOrder);
         },
+        center(){
+            this.actionOnToolbar('zoomToFit');
+        },
         initPaper(){
             let graph = this.graph;
             let thisSize = util.getComponentSize(this);
@@ -208,14 +214,25 @@ export default {
                 autoResizePaper: true
             });
             this.paperScroller = paperScroller;
-            
-            paperScroller.$el.css({ width: '100%', height: '100%' }).appendTo(this.$refs.jointWrapper);
-            paperScroller.zoom(-0.2);
-            paperScroller.centerContent();
+            // this.addToolbar();
+            var commandManager = new joint.dia.CommandManager({
+                graph: graph
+            });
+            var toolbar = new joint.ui.Toolbar({
+                // initialize tools with default settings
+                tools: ['zoomIn', 'zoomOut', 'zoomToFit', 'zoomSlider', 'undo', 'redo'],
+                references: {
+                    paperScroller: paperScroller,
+                    commandManager: commandManager
+                }
+            });
+            $(this.$refs.symperPaperToolbar).append(toolbar.render().el);
+        
             this.addStencil();
             this.paper.on('blank:pointerdown', paperScroller.startPanning);
-            this.addToolbar(paperScroller);
             this.handlePaperEvents();
+            $(this.$refs.jointWrapper).append(paperScroller.el);
+            paperScroller.render().center();
         },
         addStencil() {
             let graph = this.graph;
@@ -225,7 +242,7 @@ export default {
                 graph: graph,
                 paper: paper,
                 width: '100%',
-                height: 50,
+                height: 58,
                 layout: {
                     columnWidth: 70,
                     columns: 30,
@@ -237,10 +254,12 @@ export default {
             let items = [];
 
             for (let type in mapTypeToNodeClass) {
-                let s = new joint.shapes.app[type]({
-                    size: { width: 45, height: 45 },
-                });
-                items.push(s);
+                if(joint.shapes.app[type]){
+                    let s = new joint.shapes.app[type]({
+                        size: { width: 45, height: 45 },
+                    });
+                    items.push(s);
+                }
             }
             stencil.render().load(items);
         },
@@ -274,6 +293,14 @@ export default {
             let self = this;
 
             paper.on('cell:pointerdown', (cellView, evt, x, y) => {
+                let node = cellView.model;
+                if (node.attributes.type == 'app.Link') {
+                    return;
+                }
+                self.disSelectNode(self.selectingNode);
+                self.highlightNode(node);
+                self.showRemoveButton(node.id);
+                self.selectingNode = node;
                 self.$emit('node-selected', {id: cellView.model.id});
             });
 
@@ -287,6 +314,8 @@ export default {
                 // }
             });
             paper.on('blank:pointerclick', (cellView, evt, x, y) => {
+                this.disSelectNode(this.selectingNode);
+                self.selectingNode = null;
                 self.$emit('paper-selected');
             });
             graph.on('remove', function(cell, collection, opt) {
@@ -379,14 +408,14 @@ export default {
                 $(this.$refs.symperPaperToolbar).find('.joint-widget[data-type=zoomSlider]').find('input').val(100).change();
             }
         },
-        addToolbar(paperScroller){
+        addToolbar(){
             let commandManager = new joint.dia.CommandManager({
                 graph: this.graph
             });
             let toolbar = new joint.ui.Toolbar({
                 tools: ['zoomIn', 'zoomOut', 'zoomToFit', 'undo', 'redo', 'zoomSlider'],
                 references: {
-                    paperScroller: paperScroller,
+                    paperScroller: this.paperScroller,
                     commandManager: commandManager
                 }
             });
@@ -395,15 +424,32 @@ export default {
         disSelectNode(node) {
             this.unHighlightNode(node);
         },
-        unHighlightNode(node) {
+        highlightNode(node, mode = 'select') {
             if (node.model) {
                 node = node.model
             }
-            if (node.attr) {
-                node.attr('.symper-widget-frame/stroke', wg.normalWidgetBorderColor);
-                node.attr('.symper-widget-frame/strokeWidth', 1);
+            let color = '';
+            if (mode == 'select') {
+                color = DISPLAY_CONFIGS.highlightWidBordergetColor;
+            } else {
+                color = 'red';
             }
-            this.hideRemoveButton(node.id);
+            if (node.attr) {
+                node.attr('.symper-widget-frame/stroke', color);
+                node.attr('.symper-widget-frame/strokeWidth', 2);
+            }
+        },
+        unHighlightNode(node) {
+            if(node){
+                if (node.model) {
+                    node = node.model
+                }
+                if (node.attr) {
+                    node.attr('.symper-widget-frame/stroke', DISPLAY_CONFIGS.normalWidgetBorderColor);
+                    node.attr('.symper-widget-frame/strokeWidth', 1);
+                }
+                this.hideRemoveButton(node.id);
+            }
         },
         showRemoveButton(idNode) {
             $(".joint-cell[model-id=" + idNode + "]").find('.symper-widget-remove').removeClass('d-none');
@@ -456,5 +502,31 @@ export default {
 
 .symper-node-stencil .content {
     overflow: hidden;
+}
+
+.symper-dataflow-workspace .joint-paper{
+    top: -10px;
+    left: -15px;
+    height: 55px;
+}
+.symper-dataflow-workspace .symper-widget .symper-widget-remove{
+    height: 15px;
+    width: 15px;
+    x:18px;
+    y:-12px;
+    cursor: pointer;
+}
+.symper-dataflow-workspace .embed-dataflow .multipane-resizer, .embed-dataflow circle{
+    display: none;
+}
+
+.symper-dataflow-workspace .embed-dataflow .joint-paper-scroller {
+    overflow: hidden;
+}
+
+
+.symper-dataflow-workspace .symper-widget-image {
+    height: 35px;
+    width: 35px;
 }
 </style>
