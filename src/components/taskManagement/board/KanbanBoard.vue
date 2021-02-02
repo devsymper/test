@@ -273,7 +273,7 @@ export default {
                     }
                 ],
                 page : 1,
-                pageSize: 500,
+                pageSize: 200,
                 distinct: true
             },
             filterScrum:{
@@ -291,7 +291,7 @@ export default {
                     },
                 ],
                 page : 1,
-                pageSize: 500,
+                pageSize: 200,
                 distinct: true
             },
             filterProps:{ // bộ lọc
@@ -560,7 +560,7 @@ export default {
                         ],
                     };
                     data.filter = util.cloneDeep(this.filter);
-                    data.filter.filter.push(item);
+                    // data.filter.filter.push(item);
                 }else{
                     data.filter = filter;
                 }
