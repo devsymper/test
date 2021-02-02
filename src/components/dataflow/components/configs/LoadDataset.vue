@@ -15,7 +15,7 @@ import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/D
 export default {
     data(){
         return {
-			currentId:0,
+			currentId: 0,
         }
     },
     computed: {

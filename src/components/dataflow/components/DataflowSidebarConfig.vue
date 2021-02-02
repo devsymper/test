@@ -22,17 +22,10 @@
 </template>
 
 <script>
-import ScriptRunner from '@/components/dataflow/components/configs/ScriptRunner'
-import FilterData from '@/components/dataflow/components/configs/FilterData'
-import SelectColumns from '@/components/dataflow/components/configs/SelectColumns'
-import SummarizeData from '@/components/dataflow/components/configs/SummarizeData'
-import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
-import NodeConfig from '@/components/dataflow/components/NodeConfig'
 import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
 import FormTpl from "@/components/common/FormTpl.vue";
 import { autoLoadNodeClasses } from "@/components/dataflow/configPool/dataflowConfig.js";
 import _cloneDeep from "lodash/cloneDeep";
-import PivotData from './configs/PivotData.vue';
 
 
 let mapTypeToNodeClass = autoLoadNodeClasses();
@@ -60,16 +53,8 @@ export default {
 	},
 	components:{
 		...nodeConfigComps,
-
 		FormTpl,
 		PeriodTimeConfig,
-		NodeConfig,
-		DatasetColumnSelector,
-		PivotData,
-		SummarizeData,
-		SelectColumns,
-		ScriptRunner,
-		FilterData
 	},
 	created(){
 	},
