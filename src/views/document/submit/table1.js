@@ -804,6 +804,9 @@ export default class SymperTable {
             })
         this.caculatorHeight()
     }
+    setFocusedCell(rowIndex, columnName){
+        this.gridOptions.api.setFocusedCell(rowIndex, columnName)   
+    }
     
     /**
      * Xử lý sự kiện shift + enter xuống dòng

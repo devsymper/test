@@ -1484,6 +1484,7 @@ export default {
                 let currentCell = tableControl.tableInstance.getFocusedCell();
                 let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
                 tableControl.tableInstance.setDataAtCell(currentCell.column.colDef.field, data.value.inputValue, currentRow.id);
+                tableControl.tableInstance.setFocusedCell(currentCell.rowIndex, currentCell.column.colDef.field);
             }
         },
 
@@ -1953,7 +1954,8 @@ export default {
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlInstance.inTable);
                 let currentCell = tableControl.tableInstance.getFocusedCell();
                 let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
-                tableControl.tableInstance.setDataAtCell(controlName, data, currentRow.id);
+                tableControl.tableInstance.setDataAtCell(currentCell.column.colDef.field, data, currentRow.id);
+                tableControl.tableInstance.setFocusedCell(currentCell.rowIndex, currentCell.column.colDef.field);
             }
         },
         /**
