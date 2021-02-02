@@ -111,12 +111,12 @@ export default {
         DragColumns
     },
     props:{
-        // nodeData:{
-        //     type: Object,
-        //     default(){
-        //         return {}
-        //     }
-        // },
+        nodeData:{
+            type: Object,
+            default(){
+                return {}
+            }
+        },
 
     },
     data(){
@@ -125,9 +125,6 @@ export default {
             panelColumns:[0],
             panelRows:[0],
             panelValues:[0],
-            nodeData: {
-                configs:{"wgName":"","wgDes":"","saveAs":[],"nameToSaveAs":"","newIdDataset":"stmp_1608687152553","selectedDataset":"","errorList":[],"autoUpdatePeriod":{"time":5,"unit":"minutes"},"rows":[{"uid":"stmp_1608687135869_tb1_date","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"date","title":"tb1 date","idDataset":"stmp_1608687135869","columnName":"tb1_date","symperDocId":"stmp_1608687135869"}],"values":[{"uid":"stmp_1608687135869_tb1_ma_hang_td","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"text","title":"mã hàng trong bảng 1 bị thay đổi","idDataset":"stmp_1608687135869","columnName":"tb1_ma_hang_td","symperDocId":"stmp_1608687135869"}],"columns":[{"uid":"stmp_1608687135869_ma_hang_td","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"text","title":"mã hàng ngoài bảng này bị thay đổi","idDataset":"stmp_1608687135869","columnName":"ma_hang_td","symperDocId":"stmp_1608687135869"},{"uid":"stmp_1608687135869_tb1_date","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"date","title":"tb1 date","idDataset":"stmp_1608687135869","columnName":"tb1_date","symperDocId":"stmp_1608687135869"}],"nextNodes":[],"prevNodes":["33d9562d-ab4d-4de1-962f-0c96e051b68d"],"allColumns":[{"uid":"stmp_1608687135869_ma_hang_ngoai_bang","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"text","title":"mã hàng","idDataset":"stmp_1608687135869","columnName":"ma_hang_ngoai_bang","symperDocId":"stmp_1608687135869"},{"uid":"stmp_1608687135869_ma_cty_xxxxx","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"text","title":"ma cong ty","idDataset":"stmp_1608687135869","columnName":"ma_cty_xxxxx","symperDocId":"stmp_1608687135869"},{"uid":"stmp_1608687135869_tb2_ten_hang","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"text","title":"tên hàng bảng 2","idDataset":"stmp_1608687135869","columnName":"tb2_ten_hang","symperDocId":"stmp_1608687135869"},{"uid":"stmp_1608687135869_tb1_ma_hang","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"text","title":"mã hàng trong bảng 1","idDataset":"stmp_1608687135869","columnName":"tb1_ma_hang","symperDocId":"stmp_1608687135869"},{"uid":"stmp_1608687135869_tb1_date","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"date","title":"tb1 date","idDataset":"stmp_1608687135869","columnName":"tb1_date","symperDocId":"stmp_1608687135869"},{"uid":"stmp_1608687135869_ten_hang","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"text","title":"tên hàng","idDataset":"stmp_1608687135869","columnName":"ten_hang","symperDocId":"stmp_1608687135869"},{"uid":"stmp_1608687135869_vvvv","from":"33d9562d-ab4d-4de1-962f-0c96e051b68d","type":"text","title":"ccccc","idDataset":"stmp_1608687135869","columnName":"vvvv","symperDocId":"stmp_1608687135869"}]}
-            },
             searchKey:""
         }
     },
