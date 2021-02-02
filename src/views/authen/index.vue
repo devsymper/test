@@ -40,7 +40,10 @@ import { appConfigs } from '../../configs';
 import { systemRoleApi } from "@/api/systemRole.js";
 import {accessControlApi} from './../../api/accessControl';
 export default {
+  watch: {
+  },
   created () {
+      this.$store.dispatch("app/getAllBA");
       this.getRole()
   },
     components: {
@@ -59,7 +62,19 @@ export default {
             importInfo:{},
             typeView:"add",
             customAPIResult: {
+                setStatus(status){
+                     switch(status){
+                         case '0':
+                             return 'Dừng';
+                        case '1':
+                            return 'Hoạt động';
+                        default:
+                            return 'Hoạt động';
+                        break
+                     }  
+                },
                 reformatData(res){
+                    let listBA = self.$store.state.app.allBA;
                     let data =  {
                          columns:[
                             {name: "id", title: "id", type: "numeric"},
@@ -74,7 +89,19 @@ export default {
                        ],
                         listObject:res.data,
                         total:res.data.length
-                    }
+                    };
+                    data.listObject.map(d=>{
+                        d.status = this.setStatus( d.status);
+                        listBA.map(ba=>{
+								if(ba.id == d.userCreate){
+									d.userCreate =  ba.name
+                                };
+                                if(ba.id == d.userUpdate){
+									d.userUpdate =  ba.name
+								}
+							})
+
+                    })
                      return data
                 } 
             },
@@ -141,7 +168,7 @@ export default {
         setKeyValue(){
             this.$refs.addView.nameKey = this.detailKey.name;
             this.$refs.addView.descriptionKey = this.detailKey.description;
-            this.$refs.addView.statusKey = this.detailKey.status==1?true:false;
+            this.$refs.addView.statusKey = this.detailKey.status=="Hoạt động"?true:false;
             this.$refs.addView.keyId = this.detailKey.id;
         },
         updateKey(key){
@@ -154,8 +181,17 @@ export default {
         },
         viewKey(key){
             this.changeView(false,true);
-            this.actionPanelWidth=500;
-            this.detailKey = key;
+            this.actionPanelWidth=630;
+            let arr = Object.keys(key);
+            arr.pop();
+            let detailKey = [];
+            arr.map(a=>{
+                detailKey.push({
+                    name:a,
+                    value:key[a]
+                })
+             })
+            this.detailKey = detailKey
             this.detailKey.idRole = this.getIdRole(key)
         },
         getIdRole(detailKey){
