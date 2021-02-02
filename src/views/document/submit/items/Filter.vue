@@ -72,6 +72,7 @@ export default {
             defaultColDef: null,
             rowData: null,
             gridOptions: null,
+            dataSelection:{}
         }
     },
     beforeMount(){
@@ -140,13 +141,27 @@ export default {
                 self.setSelection();
             }, 500,this);
         },
+        getRowkey(rowData){
+            let key = []
+            for(let col in rowData){
+                key.push(rowData[col]);
+            }
+            return key.join("_____");
+        },
         setSelection(){
+            let self = this;
             let controlIns = getControlInstanceFromStore(this.keyInstance, this.controlName);
             let currentValue = util.cloneDeep(controlIns.value);
             this.gridOptions.api.forEachNode(node => {
                 let nodeData = node.data;
-                if(currentValue.indexOf(nodeData[controlIns.name]) != -1){
-                    node.setSelected(true);
+                let rowKey = self.getRowkey(nodeData);
+                if(self.dataSelection[self.controlName].includes(rowKey)){
+                    if(currentValue.indexOf(nodeData[controlIns.name]) != -1){
+                        node.setSelected(true);
+                    }
+                    else{
+                        self.dataSelection[self.controlName].splice(self.dataSelection[self.controlName].indexOf(rowKey))
+                    }
                 }
             });
         },
@@ -154,6 +169,10 @@ export default {
             let listRowSelection = this.gridOptions.api.getSelectedRows();
             if(listRowSelection.length > 0){
                 listRowSelection = listRowSelection.reduce((arr,obj)=>{
+                    let rowKey = this.getRowkey(obj);
+                    if(!this.dataSelection[this.controlName][rowKey]){
+                        this.dataSelection[this.controlName].push(rowKey);
+                    }
                     arr.push("'"+obj[this.controlName]+"'");
                     return arr;
                 },[]);
@@ -168,6 +187,9 @@ export default {
         },
         setControlName(controlName){
             this.controlName = controlName;
+            if(!this.dataSelection[this.controlName]){
+                this.dataSelection[this.controlName] = [];
+            }
         },
         getSearchField(formulas){
             let titleFieldSearch = []
