@@ -41,14 +41,14 @@ export default {
             }
         },
         date:{
-            type: Number,
-            default:0
+            type: String,
+            default:''
         },
     },
     methods: {
-            start(date){
-                this.$emit('showLog',date);   
-            },
+        start(date){
+            this.$emit('showLog',date);   
+        },
     },
         
 }

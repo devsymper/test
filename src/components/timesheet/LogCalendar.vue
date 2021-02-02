@@ -69,14 +69,14 @@
                                                 v-on="actionEvents" style="margin-right:-20px">
                                                 {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
                                             </span>
-                                            <v-btn class="ml-1" dense dark icon="actionAttrs" v-on="actionEvents">
+                                            <v-btn class="ml-1" dense dark v-on="actionEvents" :icon="actionAttrs">
                                                 <v-icon v-if="event.type"
                                                     small class="ml-4 color-black" 
                                                     :style="{'margin-right':(findDuration(event.start, event.end)>62)?'':':25px'}" > mdi-dots-vertical</v-icon>
                                             </v-btn>
                                         </template>
                                         <div class="d-flex flex-column" style="background:white">
-                                            <v-btn v-for="action in actionLog" text small :key='action.id'>{{$t(action.name)}}</v-btn>
+                                            <v-btn v-for="action in actionLog" text small :key='action.id' @click="actionLogEvent(event,action.id)">{{$t(action.name)}}</v-btn>
                                         </div>
                                     </v-menu>
                                 </div>
@@ -303,7 +303,7 @@ export default {
             let duration = this.findDuration(startTime, endTime);
             return this.changeDuration(duration);
         },
-        actionLogEvent(index,event){
+        actionLogEvent(event,index){
             switch(index){
                 case 0:
                     this.openLogTimeDialog(event, true);

@@ -3,6 +3,7 @@
         style="height: 25px; margin-left:3px;">
         <v-tooltip top>
             <template v-slot:activator="{ on }">
+                
                 <div v-on="on" style="margin-left:-13px;" class="fs-12 w-100">
                     <span :class="[present ? 'present-month' :'']">
                         <span v-if="day==1"> {{day+'/'}} {{month}}</span>
@@ -45,8 +46,8 @@ export default {
           default:0
       },
       date:{
-          type: Number,
-          default:0
+          type: String,
+          default:''
       },
        month:{
           type: Number,
