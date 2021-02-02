@@ -34,6 +34,7 @@
             <sym-drag-panel
                 ref="symDragPanel"
                 :dragPanelWidth="600"
+                :dragPanelHeight="(dragPopupType == 'fileUpload') ? 150 : 400"
                 :topPosition='topPositionDragPanel'
                 :leftPosition="leftPositionDragPanel"
                 :actionTitle="titleDragPanel"
@@ -42,7 +43,8 @@
             >
                 <template slot="drag-panel-content">
                     <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
-                    <filter-input :keyInstance="keyInstance" @save-input-filter="saveInputFilter" @search-data="searchDataFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
+                    <filter-input v-if="dragPopupType == 'inputFilter'" :keyInstance="keyInstance" @save-input-filter="saveInputFilter" @search-data="searchDataFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
+                    <FileUpload v-if="dragPopupType == 'fileUpload'" ref="fileUploadPopup" @add-file-click="afterAddFileClick" @after-remove-file="afterRemoveFile"/>
                 </template>
             </sym-drag-panel>
             <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
@@ -177,7 +179,6 @@
 <script>
 import { documentApi } from "./../../../api/Document.js";
 import { formulasApi } from "./../../../api/Formulas.js";
-import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
 import {allControlNotSetData,getMapControlEffected,checkInfinityControl, getDataInputFormula } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
@@ -189,14 +190,13 @@ import TabControl from "./tabControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
 import UploadFile from "@/components/common/UploadFile.vue";
-import Table from "./table.js";
 import SymperDragPanel from "./../../../components/common/SymperDragPanel.vue";
 import { util } from "./../../../plugins/util.js";
 import AutocompleteInput from "./items/AutocompleteInput.vue";
 import User from "./items/User.vue";
 import Filter from "./items/Filter.vue";
+import FileUpload from "./items/FileUpload.vue";
 import Validate from "./../common/Validate";
-import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
 import SidebarTraceFormulas from './SidebarTraceFormulas.vue';
 import './customControl.css';
@@ -207,18 +207,17 @@ import Preloader from './../../../components/common/Preloader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FloattingPopup from './../common/FloattingPopup'
-import PopupPivotTable from './items/PopupPivotTable'
 
 import tinymce from 'tinymce/tinymce';
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import {checkControlPropertyProp,getControlInstanceFromStore, 
-        getControlTitleFromName, getListInputInDocument, 
-        mapTypeToEffectedControl, minimizeDataAfterRunFormula,SQLITE_COLUMN_IDENTIFIER} from './../common/common'
+        getListInputInDocument,mapTypeToEffectedControl, minimizeDataAfterRunFormula,SQLITE_COLUMN_IDENTIFIER} from './../common/common'
 import Formulas from './formulas.js';
 import { startWorkflowBySubmitedDoc } from '../../../components/process/processAction.js';
 
+import PopupPivotTable from './items/PopupPivotTable'
 
 import ControlRelationWorker from 'worker-loader!@/worker/document/submit/ControlRelation.Worker.js';
 import FormulasWorker from 'worker-loader!@/worker/document/submit/Formulas.Worker.js';
@@ -320,6 +319,7 @@ export default {
         "autocomplete-input": AutocompleteInput,
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
+        FileUpload,
         EmbedDataflow,
         Preloader,
         UploadFile,
@@ -419,6 +419,7 @@ export default {
             optionalDataBinding:{},
             tableFocusing:null,
             rootControlFromWorkflow:[],
+            dragPopupType:'inputFilter'
         };
 
     },
@@ -681,25 +682,20 @@ export default {
         this.$evtBus.$on("document-submit-add-file-click", data => {
             if(thisCpn._inactive == true) return;
             this.currentFileControl = {controlIns:data.control};
-            this.$refs.fileUploadView.onButtonClick();
+            if(data.control.inTable != false){
+                this.titleDragPanel = "Thêm tệp đính kèm";
+                this.dragPopupType = 'fileUpload';
+                this.$refs.symDragPanel.show();
+            }   
+            else{
+                this.$refs.fileUploadView.onButtonClick();
+            }
         });
-        var delayTimer;
         // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", controlInstance => {
-           if(this._inactive == true) return;
-                let valueControl = controlInstance.value;
-                // if(controlInstance.checkAutoCompleteControl()){
-                //     clearTimeout(delayTimer);
-                //     // delay trong trường hợp chọn dòng trong box autocomplete thì đã kích hoạt sự kiện onchange
-                //     // lúc này input chưa có dữ liệu đên phải delay
-                //     delayTimer = setTimeout(function() {
-                //         thisCpn.handleInputChangeByUser( controlInstance, valueControl);
-                //     }, 300);
-                // }
-                // else{
-                   
-                // }
-                 this.handleInputChangeByUser( controlInstance, valueControl);
+            if(this._inactive == true) return;
+            let valueControl = controlInstance.value;
+            this.handleInputChangeByUser( controlInstance, valueControl);
         });
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
             if(this._inactive == true) return;
@@ -746,6 +742,7 @@ export default {
             }
             this.titleDragPanel = "Tìm kiếm thông tin";
             this.titleDragPanelIcon = "mdi-file-search";
+            this.dragPopupType = 'inputFilter';
             this.$refs.inputFilter.setControlName(e.controlName);
             this.runInputFilterFormulas(e.controlName);
             this.$refs.symDragPanel.show();
@@ -1509,6 +1506,17 @@ export default {
             if(isRunChange){
                 this.handleControlInputChange(controlInstance);
             }
+        },
+        handleInputChangeByUser( controlInstance, valueControl){
+            setDataInputBeforeChange(this.keyInstance, controlInstance);
+            if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
+                $('#'+controlInstance.id).attr('data-autocomplete',"");
+                return;
+            }
+            let controlToWorker = {name:controlInstance.name,type:controlInstance.type,value:controlInstance.value}
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.keyInstance, type:'submit'}})
+            resetImpactedFieldsList(this.keyInstance);
+            this.handleControlInputChange(controlInstance);
         },
         /**
          * Hàm  xử lí data sau khi query công thức autocomplete,
@@ -3038,30 +3046,31 @@ export default {
             }
         },
         afterFileUpload(data){
-            let url = data.serverPath;
+            let file = {id:data.id, uid:data.uid, name:data.name, type:data.type, serverPath:data.serverPath, size:data.size}
             let controlIns = this.currentFileControl.controlIns;
             if(controlIns.inTable != false){
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
                 let currentCell = tableControl.tableInstance.getFocusedCell();
                 let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
-                tableControl.tableInstance.setDataAtCell(controlIns.name, url, currentRow.id);
+                this.$refs.fileUploadPopup.addFileToList(file);
+                try {
+                    let currentData = currentRow.data[this.currentFileControl.controlIns.name];
+                    currentData = (currentData) ? JSON.parse(currentData) : null;
+                    if(!currentData){
+                        currentData = [];
+                    }
+                    currentData.push(file);
+                    tableControl.tableInstance.setDataAtCell(controlIns.name, JSON.stringify(currentData), currentRow.id);
+                } catch (error) {
+                    console.warn(error);
+                }
             }
             else{
-                this.currentFileControl.controlIns.setValue(data);
+                this.currentFileControl.controlIns.setValue(file);
             }
             
         },
-        handleInputChangeByUser( controlInstance, valueControl){
-            setDataInputBeforeChange(this.keyInstance, controlInstance);
-            if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
-                $('#'+controlInstance.id).attr('data-autocomplete',"");
-                return;
-            }
-            let controlToWorker = {name:controlInstance.name,type:controlInstance.type,value:controlInstance.value}
-            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.keyInstance, type:'submit'}})
-            resetImpactedFieldsList(this.keyInstance);
-            this.handleControlInputChange(controlInstance);
-        },
+        
        
         /**
          * Hàm nhận sự kiên sau khi đóng pop up validate
@@ -3069,6 +3078,26 @@ export default {
         afterCloseDialogValidate(type){
             if(type == "checkInfinityControl"){
                 this.$emit('before-close-submit');
+            }
+        },
+        afterAddFileClick(){
+            this.$refs.fileUploadView.onButtonClick();
+        },
+        afterRemoveFile(file){
+            let controlIns = this.currentFileControl.controlIns;
+            if(controlIns.inTable != false){
+                let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
+                let currentCell = tableControl.tableInstance.getFocusedCell();
+                let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
+                try {
+                    let currentData = currentRow.data[this.currentFileControl.controlIns.name];
+                    currentData = (currentData) ? JSON.parse(currentData) : null;
+                    let fileRemove = currentData.find(el=>el == file.id);
+                    currentData.splice(currentData.indexOf(fileRemove),1);
+                    tableControl.tableInstance.setDataAtCell(controlIns.name, JSON.stringify(currentData), currentRow.id);
+                } catch (error) {
+                    console.warn(error);
+                }   
             }
         }
     }
