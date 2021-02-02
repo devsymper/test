@@ -27,11 +27,14 @@
 			:nodeData="selectingNode"
 			style="height: calc(100% - 150px)"
 		/> -->
-		<SelectConfig />
+		<!-- <SelectConfig /> -->
+		<FilterConfig />
 	</div>
 </template>
 
 <script>
+import ScriptConfig from '@/components/dataflow/components/ScriptConfig'
+import FilterConfig from '@/components/dataflow/components/FilterConfig'
 import SelectConfig from '@/components/dataflow/components/SelectConfig'
 import SummalizeConfig from '@/components/dataflow/components/SummalizeConfig'
 import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
@@ -75,7 +78,9 @@ export default {
 		DatasetColumnSelector,
 		PivotData,
 		SummalizeConfig,
-		SelectConfig
+		SelectConfig,
+		ScriptConfig,
+		FilterConfig
 	},
 	created(){
 		this.dashboardDatasetWorker = new DashboardDatasetWorker()
