@@ -240,7 +240,7 @@ export default {
                 selectionText = this.$refs.edtScript.getValue();
             }
             if(selectionText.length > 0){
-                let dataInput = selectionText.match(/{([\s\S].*?)}/gi);
+                let dataInput = selectionText.match(/{([a-zA-Z0-9].*?)}/g);
                 let self = this;
                 if(dataInput){
                     this.allInput = dataInput.reduce(function(obj, cur, i) {

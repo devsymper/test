@@ -1,12 +1,17 @@
 <template> 
 	<DatasetColumnSelector :rowData="columns" />
-
 </template>
 
 <script>
 import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector';
 export default {
 	props: {
+		nodeData:{
+			type: Object,
+			default(){
+				return {}
+			}
+		},
 		columns: {
 			tyoe: Array,
 			default() {
