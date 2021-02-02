@@ -20,7 +20,7 @@
 					>
                         <span class="column d-flex flex-grow-1" style="width: calc(100% - 35px)">
 							<v-menu
-								open-on-hover
+								
 								v-if="checkColumnExist(subItem) && settingItem.hasAgg"  
 								top
 								offset-y
@@ -31,6 +31,7 @@
 										:ref="'agg'+subItem.name" 
 										v-if="settingItem.hasAgg" 
 										class="agg-func-name"
+										:class="{'dont-agg-func-name': subItem.agg == 'not_agg' }"
 										v-bind="attrs"
 										v-on="on"
 									>
@@ -90,7 +91,6 @@
 						</v-icon>
                     </div>
 						<v-menu
-							open-on-hover
 							v-if="showSelectAxisType(settingItem)"
 							bottom
 							offset-y
@@ -213,14 +213,16 @@
             onAddColumn(newIndex, el){
                 for(let col of this.settingItem.selectedColums){
                     if(col.newClonedColumn){
-                        col.newClonedColumn = false;
-                        if(this.settingItem.defaultAgg){
-                            col.agg = this.settingItem.defaultAgg;
-                        }
+						col.newClonedColumn = false;
+						// dungna thêm , a Tân yêu cầu khi kéo vào thì để not_agg 
+						col.agg = 'not_agg';
+                        // if(this.settingItem.defaultAgg){
+                        //     col.agg = this.settingItem.defaultAgg;
+                        // }
 
-                        if(!this.settingItem.hasAgg){
-                            col.agg = 'not_agg';
-                        }
+                        // if(!this.settingItem.hasAgg){
+                        //     col.agg = 'not_agg';
+                        // }
                     }
                 }
             },
@@ -355,9 +357,16 @@
         font-weight: 900;
     }
     .agg-func-name{
-        color: #369cff;
+        color: #F58634;
         padding-right: 5px;
-        font-size: 12px;
+        font-size: 10px;
+		font-weight: bold;
+    }
+    .dont-agg-func-name{
+        color: #1976D2 !important;
+        padding-right: 5px;
+        font-size: 10px;
+		font-weight: bold;
     }
 
     .rename-column-editor{
