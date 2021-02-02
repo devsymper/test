@@ -85,9 +85,9 @@
 
 						<table class="workflow-info" v-if="workflowId !='' ">
 							<tr>
-								<td><v-icon style="font-size:15px ; padding-right:6px">mdi-lan</v-icon> {{workflowName}}</td>
+								<td v-if="workflowInfo" style="cursor:pointer;" @click="gotoDetailWorkflow"><v-icon style="font-size:15px ; padding-right:6px">mdi-lan</v-icon> {{workflowInfo.name}}</td>
 							<tr>
-								<td v-if="taskName != ''"> <v-icon style="font-size:15px ; padding-right:6px">mdi-format-list-checkbox</v-icon>{{taskName}}</td>
+								<td v-if="taskInfo" style="cursor:pointer;" @click="gotoDetailTask"> <v-icon style="font-size:15px ; padding-right:6px">mdi-format-list-checkbox</v-icon>{{taskInfo.name}}</td>
 							</tr>
 							
 						</table>
@@ -166,11 +166,12 @@ export default {
 			panel: [0, 1, 2, 3, 4],
 			userCreate:"",
 			createdDate:"",
+			workflowInfo:null,
+			taskInfo:null,
 			workflowName:"",
 			userRoleInfo:"",
 			showPanelWorkflow:true,
 			fileDomain: appConfigs.apiDomain.fileManagement,
-			taskName:"",
 			listApprovalUser:[],
 			listRelatedUser:[],
 			listHistoryControl:[],
@@ -243,7 +244,7 @@ export default {
 			let self = this
 			if(after != "" && after != "0"){
 				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
-					self.workflowName = res.data.length > 0 ? res.data[0].processDefinitionName : ""
+					self.workflowInfo = res.data.length > 0 ? res.data[0] : null
 				});
 			}
 		},
@@ -253,7 +254,7 @@ export default {
 				//Tger chỉnh sửa lại api get detail task
 				bpmnApi.postTaskHistory({taskId:this.taskId}).then(res=>{
 					if (res.total>0) {
-                   		self.taskName = res.data[0].name == null ? "" : res.data[0].name
+						self.taskInfo = res.data[0];
 					}
                 });
 			}
@@ -304,6 +305,12 @@ export default {
 		}, 2000, this);
 	},
 	methods:{
+		gotoDetailWorkflow(){
+			this.$goToPage('myitem/work/'+this.workflowInfo.id);
+		},
+		gotoDetailTask(){
+			this.$goToPage('myitem/tasks/'+this.taskInfo.id);
+		},
 		async setDocUpdateHistory(){
 			let res = await logServiceApi.query({
 				"query": {

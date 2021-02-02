@@ -14,23 +14,22 @@
 				<PeriodTimeConfig />
 			</div>
 		</div>
-		<!-- <component 
+		<component 
 			:is="nodeConfigTag"
 			:nodeData="selectingNode">
-		</component> -->
-		<transposeTable 
-			:nodeData="selectingNode"
-			style="height: calc(100% - 150px)"
-		/>
+		</component>
 	</div>
 </template>
 
 <script>
+import SelectConfig from '@/components/dataflow/components/SelectConfig'
+import SummalizeConfig from '@/components/dataflow/components/SummalizeConfig'
+import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
+import NodeConfig from '@/components/dataflow/components/NodeConfig'
 import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
 import FormTpl from "@/components/common/FormTpl.vue";
 import { autoLoadNodeClasses } from "@/components/dataflow/configPool/dataflowConfig.js";
 import _cloneDeep from "lodash/cloneDeep";
-import TransposeTable from './configs/TransposeTable.vue';
 
 
 let mapTypeToNodeClass = autoLoadNodeClasses();
@@ -61,7 +60,13 @@ export default {
 
 		FormTpl,
 		PeriodTimeConfig,
-		TransposeTable,
+		NodeConfig,
+		DatasetColumnSelector,
+		PivotData,
+		SummalizeConfig,
+		SelectConfig
+	},
+	created(){
 	},
 	computed:{
 		nodeConfigTag(){
@@ -75,7 +80,6 @@ export default {
 	},
 	data(){
 		return {
-			dashboardDatasetWorker: null,
 			allDatasetColumn:{},
 			allInputs:{
 				name: {

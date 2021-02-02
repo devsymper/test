@@ -1,9 +1,9 @@
 <template>
 <div class="w-100">
      <list-items
-        ref="listImport"
+        ref="listCategory"
         :showImportHistory="false"
-        :showButtonAdd="false"
+        @after-open-add-panel="addCategory"
         :headerPrefixKeypath="'timesheet'"
         :useDefaultContext="false"
         :pageTitle="$t('timesheet.table.category')"
@@ -12,47 +12,40 @@
         :customAPIResult="customAPIResult"
         :tableContextMenu="tableContextMenu"
         :getDataUrl="getListUrl">
+        <div slot="right-panel-content" class="h-100">
+           <CategoryForm 
+            ref="category"
+            :isAddView="isAddView"
+            @cancel="cancel()"/>
+        </div>
     </list-items>
-    </div>
+    
+     
+</div>
 </template>
 <script>
-import { documentApi } from "./../../api/Document.js";
 import ActionPanel from "./../../views/import/Detail.vue";
 import ListItems from "./../../components/common/ListItems.vue";
-import importApi from "./../../api/ImportExcel";
 import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
-import Handsontable from 'handsontable';
+import timesheetApi from '../../api/timesheet';
+import CategoryForm from "./../../components/timesheet/CategoryForm";
 
 export default {
     components: {
         "list-items": ListItems,
         "action-panel": ActionPanel,
-        Handsontable
+        CategoryForm,
     },
     data(){
         const self = this
         return {
-            showDetailView:false,
-            listRowUser:[],
-            listUser:[],
-            nameUser:[],
-            importInfo:{},
-            drawer:false,
-            showImportUser:false,
+            isAddView:true,
+            listCategory:[],
+            categoryTask: [],
+            updateCategory:{},
+            showAddCategory:false,
             customAPIResult: {
-                setStatus(status){
-                    let nameStatus = '';
-                    switch(status){
-                        case '0':
-                            nameStatus = "Dừng";
-                            break;
-                         case '1':
-                            nameStatus = "Đang sử dụng";
-                            break;
-                    }
-                    return nameStatus;
-                },
                   reformatData(res){
                     let data={
                         listObject:[],
@@ -80,51 +73,56 @@ export default {
                             title:'table.description',
                             type:"text"
                         },
+                        // {
+                        //     name:'user_created',
+                        //     title:'table.user_created',
+                        //     type:"text"
+                        // },
                         {
-                            name:'user_created',
-                            title:'table.user_created',
-                            type:"text"
-                        },
-                        {
-                            name:'date_created',
+                            name:'createAt',
                             title:'table.date_created',
                             type:"text"
                         },
+                        // {
+                        //     name:'status',
+                        //     title:'table.status',
+                        //     type:"numeric"
+                        // },
+                        // {
+                        //     name:'user_updated',
+                        //     title:'table.user_updated',
+                        //     type:"text"
+                        // },
                         {
-                            name:'status',
-                            title:'table.status',
-                            type:"text"
-                        },
-                        {
-                            name:'user_updated',
-                            title:'table.user_updated',
-                            type:"text"
-                        },
-                        {
-                            name:'date_updated',
+                            name:'updateAt',
                             title:'table.date_updated',
                             type:"text"
                         },
-                         
                       
                    );
-                    data.listObject.map(x=>x.status=this.setStatus(x.status))
                     return  data;
                 } 
             },
              tableContextMenu:{
-                  view: {
+                view: {
                     name:"view",
                     text:this.$t('timesheet.table.view'),
                     callback: (cate, callback) => {
                         this.showDetail(cate);
                     }
                 },
-                 downloadExcel: {
+                 update: {
                     name:"update",
                     text:this.$t('timesheet.table.update'),
                     callback: (cate, callback) => {
-                        this.downloadExcel(cate);
+                        this.update(cate);
+                    }
+                },
+                delete: {
+                    name:"delete",
+                    text:this.$t('timesheet.table.delete'),
+                    callback: (cate, callback) => {
+                        this.delete(cate);
                     }
                 }
             },
@@ -132,8 +130,6 @@ export default {
             actionPanelWidth:800,
             containerHeight: 200,
             columns: [],
-            totalPage: 6,
-            listDocument: [],
         }
     },
     mounted() {
@@ -143,13 +139,40 @@ export default {
         this.getListUrl = appConfigs.apiDomain.timesheet+'category';
     },
     methods:{
-     
-       
-        refreshListUser(){
-            this.$refs.listUser.refreshList();
+        deleteOne(cate){
+            this.$refs.category.id = cate.id;
+            this.$refs.category.key= cate.key;
+            this.$refs.category.name= cate.name;
+            this.$refs.category.description= cate.description;
+            this.$refs.category.status= 0;
+            this.$refs.category.updateAPI();
+        },
+        delete(category){
+            category.map(cate=>{
+                this.deleteOne(cate)
+                }
+            )
+        },
+        update(category){
+            this.isAddView = false;
+            this.$refs.listCategory.openactionPanel();
+            this.$refs.category.key = category.key;
+            this.$refs.category.name = category.name;
+            this.$refs.category.description = category.description;
+            this.$refs.category.id = category.id;
+        },
+        addCategory(){
+            this.$refs.category.refreshAll();
+            this.isAddView = true;
+            this.showAddCategory = true;
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;
+        },
+        cancel(){
+            this.$refs.listCategory.refreshList()
+            this.$refs.category.refreshAll();
+            this.$refs.listCategory.closeactionPanel();
         }
     }
 }

@@ -241,7 +241,8 @@
             "compact": "Compact"
         },
         "error": {
-            "cannot_get_data": "Can not get data from server"
+            "cannot_get_data": "Can not get data from server",
+            "name_exist":"Name already exist"
         },
         "success": {
             "save_config": "Save config successfully!",
@@ -1196,6 +1197,30 @@
 		"relation":{
 			"title-show-list": "Danh sách relation",
 			"title-show-list-trash": "Danh sách relation đã xóa"
+		},
+		"chart":{
+			"area": "Area",
+			"card": "Card",
+			"clusteredBar": "Clustered Bar",
+			"clusteredColumn": "Clustered Column",
+			"donut": "Donut",
+			"editor": "Editor",
+			"filter": "Filter",
+			"gantt": "Gantt",
+			"global": "Global",
+			"line": "Line",
+			"lineAndClusteredColumn": "Line And Clustered Column",
+			"lineAndStackedColumn": "Line And Stacked Column",
+			"pie": "Pie",
+			"pivot": "Pivot",
+			"stackedArea": "Stacked Area",
+			"stackedBar": "Stacked Bar",
+			"stackedBar100": "Stacked Bar 100",
+			"stackedColumn": "Stacked Column",
+			"stackedColumn100": "Stacked Column 100",
+			"table": "Bảng",
+			"treeMap": "TreeMap"
+
 		}
 	},
     "virtualdoc": {

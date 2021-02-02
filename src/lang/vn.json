@@ -5,7 +5,7 @@
         "id": "Id",
 		"deleteAll": "Xóa tất cả",
 		"inputPlaceholder": "Nhập giá trị",
-		"inputAddPlaceholder": "Thêm giá trị",
+		"inputAddPlaceholder": "Kéo field vào để thêm dữ liệu",
 		"placeholder-search": "Tìm kiếm",
 		"dblclick": "Click đúp để đổi tên",
         "format_table":"Định dạng",
@@ -260,7 +260,8 @@
             "compact": "Gần nhau"
         },
         "error": {
-            "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
+            "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ",
+            "name_exist":"Tên này đã tồn tại"
         },
         "success": {
             "save_config": "Lưu cấu hình hiển thị thành công!",
@@ -1352,6 +1353,30 @@
 			"title-show-list": "Danh sách relation",
 			"title-show-list-trash": "Danh sách relation đã xóa",
 			"selector": "Lựa chọn relation"
+		},
+		"chart":{
+			"area": "Area",
+			"card": "Card",
+			"clusteredBar": "Clustered Bar",
+			"clusteredColumn": "Clustered Column",
+			"donut": "Donut",
+			"editor": "Editor",
+			"filter": "Filter",
+			"gantt": "Gantt",
+			"global": "Global",
+			"line": "Line",
+			"lineAndClusteredColumn": "Line And Clustered Column",
+			"lineAndStackedColumn": "Line And Stacked Column",
+			"pie": "Pie",
+			"pivot": "Pivot",
+			"stackedArea": "Stacked Area",
+			"stackedBar": "Stacked Bar",
+			"stackedBar100": "Stacked Bar 100",
+			"stackedColumn": "Stacked Column",
+			"stackedColumn100": "Stacked Column 100",
+			"table": "Bảng",
+			"treeMap": "TreeMap"
+
 		}
 
 	},
