@@ -7,6 +7,9 @@ var numbro = require("numbro");
 import { appConfigs } from "@/configs.js";
 import tinymce from 'tinymce/tinymce';
 import { documentApi } from "../../../api/Document";
+import { str } from "../../../plugins/utilModules/str";
+import PerfectScrollbar from "perfect-scrollbar";
+import { fileManagementApi } from "@/api/FileManagement";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
@@ -32,6 +35,7 @@ let fileTypes = {
     'png': 'mdi-file-image',
     'gif': 'mdi-file-image',
     'svg': 'mdi-file-image',
+    'jfif': 'mdi-file-image',
 
     'js': 'mdi-file-code-outline',
     'php': 'mdi-file-code-outline',
@@ -447,21 +451,21 @@ export default class BasicControl extends Control {
         let image = '<img height="' + h + '" width="' + w + '" src="' + value + '">';
         this.ele.append(image);
     }
-    setFileControlValue(url, isMultiple = false){
+    setFileControlValue(fileData, isMultiple = false){
         let thisObj = this;
         let fileEl = ""
         if(isMultiple){
             try {
-                url = JSON.parse(url);
-                this.value = url
+                fileData = JSON.parse(fileData);
+                this.value = fileData
                 store.commit("document/updateListInputInDocument", {
                     controlName: this.name,
                     key: 'value',
                     value: this.value,
                     instance: this.keyInstance
                 });
-                for (let index = 0; index < url.length; index++) {
-                    let fileItem = url[index];
+                for (let index = 0; index < fileData.length; index++) {
+                    let fileItem = fileData[index];
                     fileEl += this.genFileElItem(fileItem);
                 }
             } catch (error) {
@@ -469,9 +473,9 @@ export default class BasicControl extends Control {
             }
         }
         else{
-            fileEl = this.genFileElItem(url);
+            fileEl = this.genFileElItem(fileData);
         }
-        this.ele.find('.upload-file-wrapper-outtb').append(fileEl)
+        this.ele.find('.upload-file-wrapper-outtb .list-file').append(fileEl);
         this.ele.off('click', '.remove-file')
         this.ele.on('click', '.remove-file', function(e) {
             let item = $(this).attr('data-item');
@@ -557,26 +561,72 @@ export default class BasicControl extends Control {
 
     renderFileControl = function() {
         let fileHtml = this.genFileView();
-        this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
+        this.ele.html(fileHtml);
         let thisObj = this;
-        $('.file-add').click(function(e) {
+        const agBodyHorizontalViewport = $(this.ele).find('.upload-file-wrapper-outtb .list-file')[0];
+        if (agBodyHorizontalViewport) {
+            const ps = new PerfectScrollbar(agBodyHorizontalViewport);
+            ps.update();
+        }
+        this.ele.find('.file-add').click(function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-add-file-click', { control: thisObj });
         })
+        this.ele.on('click','.list-file',function(e){
+            if($(e.target).is('.file-item') || ($(e.target).is('.file-item__name') && !$(e.target).attr('contenteditable'))){
+                let link = $(e.target).attr('path');
+                window.open(link)
+            }
+            else if($(e.target).is('.file-item__edit')){
+                e.preventDefault();
+                e.stopPropagation();
+                $(e.target).closest('.file-item').find('.file-item__name').attr('contenteditable',true);
+                $(e.target).closest('.file-item').find('.file-item__name').focus();
+            }
+            else if($(e.target).is('.file-item__remove')){
+                e.preventDefault();
+                e.stopPropagation();
+                let fileId = $(e.target).closest('.file-item').attr('file-id');
+                let fileItem = thisObj.value.find(el => el.id == fileId);
+                thisObj.value.splice(thisObj.value.indexOf(fileItem),1);
+                $(e.target).closest('.file-item').remove();
+            }
+        });
+        this.ele.on('keydown','.list-file',function(e){
+            if($(e.target).is('.file-item__name') && e.keyCode == 13){
+                $(e.target).attr('contenteditable',false);
+                let fileId = $(e.target).closest('.file-item').attr('file-id');
+                fileManagementApi.renameFile(fileId,$(e.target).text());
+                return false
+            }
+        })
+
     }
-    genFileElItem(url){
-        let fileExt = Util.getFileExtension(url);
-        let icon = fileTypes[fileExt];
-        let file = `<div title="${url}" class="file-item">
-                    <span title="xóa" data-item="`+url+`" class="remove-file"><span class="mdi mdi-close"></span></span>
-                <i  onclick="window.open('`+url+`');" class="mdi ` + icon + ` file-view" ></i>
-            </div>`
+    genFileElItem(fileData){
+        let icon = fileTypes[fileData.type];
+        let file = `
+                <div class="file-item" file-id="`+fileData.id+`" path="`+fileData.serverPath+`">
+                    <span class="mdi ` + icon + ` " style="font-size: 14px;"></span>
+                    <div class="file-item__name">`+fileData.name+`</div>
+                    <div class="file-item__action">
+                        <span class="file-item__edit mdi mdi-lead-pencil"></span>
+                        <span class="file-item__remove mdi mdi-trash-can-outline"></span>
+                    </div>
+                    <span class="file-item__size">`+str.getFileSize(fileData.size)+`</span>
+                    
+                </div>
+            `
         return file;
     }
 
     genBtnAddFile(rowId = null){
         return `
             <div class="file-add" title="Thêm file" data-rowid="${rowId}">
-                <span class="text-show"><span class="mdi mdi-plus"></span></span>
+                <div class="wrap-button-upload">
+                    <span class="mdi mdi-cloud-upload" style="color:blue;font-size: 30px;"></span>
+                </div>
+                <div style="margin-bottom: 4px;">
+                    <span>Choose File</span>
+                </div>
             </div>
         `;
     }
@@ -585,90 +635,13 @@ export default class BasicControl extends Control {
         if (!this.checkDetailView()) {
             addTpl = this.genBtnAddFile();
         }
+        let templateListFile = `<div class="list-file"></div>`
         if (!this.inTable) {
-            return `<div class="upload-file-wrapper-outtb">${addTpl}</div>`;
+            return `<div class="upload-file-wrapper-outtb">${addTpl + templateListFile}</div>`;
         }
         return addTpl.replace(/\n/g, '');
     }
 
-    addFile(item, rowId = "") {
-        let type = Util.getFileExtension(item.name);
-        let form = new FormData();
-        form.append('file', item);
-        let icon = fileTypes[type];
-        let thisObj = this;
-        $.ajax({
-            url: sDocumentManagementUrl+'uploadFile',
-            dataType: 'json',
-            processData: false,
-            contentType: false,
-            data: form,
-            type: 'post',
-            success: function(response) {
-                if (response.status == 200) {
-                    let file = `<div title="${response.data.path}" class="file-item">
-                                <span data-file-name="${response.data.path}" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i  onclick="window.open('` + sDocumentManagementUrl + `file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
-                            </div>`
-                    thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name);
-                    thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
-                    let curValue = sDocument.state.submit[thisObj.keyInstance].listInputInDocument[thisObj.name].value;
-                    let tableName = thisObj.inTable;
-                    if (tableName != false) {
-                        if (!Array.isArray(curValue)) {
-                            curValue = [];
-                        }
-                        if (!curValue.hasOwnProperty(rowId)) {
-                            curValue[rowId] = []
-                        }
-                        curValue[rowId].push(response.data.name);
-                    } else {
-                        curValue += "," + response.data.name;
-                        thisObj.value = curValue;
-                    }
-                    store.commit("document/updateListInputInDocument", {
-                        controlName: thisObj.name,
-                        key: 'value',
-                        value: curValue,
-                        instance: thisObj.keyInstance
-                    });
-                    if (tableName != false) {
-                        sDocument.state.submit[thisObj.keyInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
-                    }
-
-                }
-            }
-        });
-    }
-    setDeleteFileEvent(ele, controlName) {
-        let listInputInDocument = sDocument.state.submit[this.keyInstance].listInputInDocument
-        let value = listInputInDocument[controlName].value;
-        let thisObj = this;
-        ele.off('click', '.remove-file')
-        ele.on('click', '.remove-file', function(e) {
-            let rowId = $(this).attr('data-rowid');
-            e.preventDefault();
-            e.stopPropagation();
-            let fileName = $(this).attr('data-file-name');
-            let newValue = "";
-            // nếu trong table
-            if (rowId != "" && rowId != undefined) {
-                listInputInDocument[controlName].value.splice(value.indexOf(fileName), 1);
-                newValue = listInputInDocument[controlName].value;
-                $(this).closest('.file-item').remove();
-            } else {
-                newValue = value.replace(/^,/gi, "");
-                newValue = newValue.replace(fileName, "");
-                $(this).closest('.file-item').remove();
-            }
-            store.commit("document/updateListInputInDocument", {
-                controlName: controlName,
-                key: 'value',
-                value: newValue,
-                instance: thisObj.keyInstance
-            });
-        })
-    }
     getNumberFormat() {
         return (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
     }

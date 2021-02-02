@@ -321,7 +321,6 @@ export default {
         },
         viewUserRole(role,active,roleName){
             if(active){
-                debugger
                 this.roleName = roleName;
                 this.isViewDetail = true;
                 this.isViewUserRole = true;
