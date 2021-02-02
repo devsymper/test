@@ -25,7 +25,7 @@ export const fileManagementApi = {
     getFileCountPerObj(ids) {
         return coreApi.get('countAttackment?ids=' + JSON.stringify(ids))
     },
-    renameFile(data){
-        return coreApi.post('renameFile',data)
+    renameFile(id,newName){
+        return coreApi.get('renameFile/'+id+"/"+newName);
     }
 };

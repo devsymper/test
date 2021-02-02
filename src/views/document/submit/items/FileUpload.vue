@@ -13,7 +13,7 @@
                     <VuePerfectScrollbar class="list-file">
                         <div v-for="file in listFile" :key="file.id" class="file-item" @click="openFile(file)">
                             <span class="mdi mdi-microsoft-excel " style="font-size: 14px;"></span>
-                            <span class="file-item__name" :contenteditable="file.isEditting">{{file.name}}</span>
+                            <span class="file-item__name" @keydown="onSaveFileName($event,file)" :contenteditable="file.isEditting">{{file.name}}</span>
                             <div class="file-item__action">
                                 <span class="file-item__edit mdi mdi-lead-pencil" @click.stop.prevent="editFile(file)"></span>
                                 <span class="file-item__remove mdi mdi-trash-can-outline" @click.stop.prevent="removeFile(file)"></span>
@@ -28,7 +28,8 @@
 </template>
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import { str } from '../../../../plugins/utilModules/str';
+import { str } from '@/plugins/utilModules/str';
+import { fileManagementApi } from "@/api/FileManagement";
 export default {
     components:{
         VuePerfectScrollbar
@@ -56,6 +57,9 @@ export default {
         },
         editFile(file){
             this.$set(file,'isEditting',true)
+        },
+        onSaveFileName(event, file){
+            fileManagementApi.renameFile(file.id,$(event.target).text());
         },
         removeFile(file){
             let fileItem = this.listFile.find(el => el.id == file.id);

@@ -362,7 +362,14 @@ export const getDataInputFormula = (formulaInstance, listInput, extraData = null
                             }
                         }
                         if(controlIns.type == 'inputFilter'){
-                            valueInputControl = dataInput[inputControlName].split(',')
+                            let dataInputFilter = dataInput[inputControlName].split(',');
+                            dataInputFilter = dataInputFilter.reduce((arr,item)=>{
+                                let data = item.replace(/'/g,"");
+                                data = data.trim();
+                                arr.push(data);
+                                return arr;
+                            },[])
+                            dataInput[inputControlName] = dataInputFilter;
                         }
                         if(controlIns.type == 'date'){
                             dataInput[inputControlName] = controlIns.convertDateToStandard(dataInput[inputControlName])

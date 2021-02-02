@@ -9,7 +9,7 @@ import tinymce from 'tinymce/tinymce';
 import { documentApi } from "../../../api/Document";
 import { str } from "../../../plugins/utilModules/str";
 import PerfectScrollbar from "perfect-scrollbar";
-import { fileManagementApi } from "../../../api/FileManagement";
+import { fileManagementApi } from "@/api/FileManagement";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
@@ -595,7 +595,7 @@ export default class BasicControl extends Control {
             if($(e.target).is('.file-item__name') && e.keyCode == 13){
                 $(e.target).attr('contenteditable',false);
                 let fileId = $(e.target).closest('.file-item').attr('file-id');
-                fileManagementApi.renameFile({id:fileId,newName:$(e.target).val()});
+                fileManagementApi.renameFile(fileId,$(e.target).text());
                 return false
             }
         })
@@ -604,7 +604,7 @@ export default class BasicControl extends Control {
     genFileElItem(fileData){
         let icon = fileTypes[fileData.type];
         let file = `
-                <div class="file-item" fild-id="`+fileData.id+`" path="`+fileData.serverPath+`">
+                <div class="file-item" file-id="`+fileData.id+`" path="`+fileData.serverPath+`">
                     <span class="mdi ` + icon + ` " style="font-size: 14px;"></span>
                     <div class="file-item__name">`+fileData.name+`</div>
                     <div class="file-item__action">
