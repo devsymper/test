@@ -10,9 +10,9 @@
 				</span>
 			</div>
 			<div class="drag-columns" style="height:150px;overflow:auto">
-				<draggable :clone="cloneColumn" :list="allColumns" :group="{ name: 'drop-column', pull: 'clone', put: false }" class="drag-columns-area">
+				<draggable :clone="cloneColumn" :list="nodeData.configs.allColumns" :group="{ name: 'drop-column', pull: 'clone', put: false }" class="drag-columns-area">
 					<div
-						v-for="column in allColumns"
+						v-for="column in nodeData.configs.allColumns"
 						:key="column.columnName"
 						:style="{
 							display: checkMatch(column) ? 'flex' : 'none',
@@ -36,7 +36,7 @@
 				<draggable @change="handleChangeColumn" :list="aggColumns" :group="{ name: 'drop-column' }" class="drag-columns-area">
 					<div
 						:ref="'left_comp'"
-						v-for="(column, idx) in aggColumns"
+						v-for="(column, idx) in nodeData.configs.aggColumns"
 						:key="idx"
 						:style="{
 							display: checkMatch(column) ? 'flex' : 'none',
@@ -98,9 +98,9 @@
 					Group by
 				</span>
 			</div>
-			<draggable @change="handleChangeColumn" :list="groupBy" :group="{ name: 'drop-column' }" class="drag-columns-area">
+			<draggable @change="handleChangeColumn" :list="nodeData.configs.groupBy" :group="{ name: 'drop-column' }" class="drag-columns-area">
 				<div
-					v-for="(column, idx) in groupBy"
+					v-for="(column, idx) in nodeData.configs.groupBy"
 					:key="idx"
 					:style="{
 						display: checkMatch(column) ? 'block' : 'none',
@@ -134,205 +134,13 @@ export default {
             aggTpl:newAggTpl
         }
 	},
-	props: {
-		allColumns: {
-			default() {
-				return [
-					{
-						uid: 'stmp_1607880685991_day_chuyen__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'day_chuyen__1',
-						type: 'text',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Dây chuyền (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_ngay_chung_tu__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'ngay_chung_tu__1',
-						type: 'date',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Ngày chứng từ (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_ca_lam__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'ca_lam__1',
-						type: 'text',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Ca làm (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_pp_moc__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'pp_moc__1',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'PP mộc (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_so_luong_ep__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'so_luong_ep__1',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Số lượng ép (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_bot_su_dung__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'bot_su_dung__1',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Bột sử dụng (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_pp_bot__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'pp_bot__1',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'PP bột (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_ma_san_pham__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'ma_san_pham__1',
-						type: 'text',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Mã sản phẩm (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_so_luong_giao__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'so_luong_giao__1',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Số lượng giao (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_bot_su_dung__1__2',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'bot_su_dung__1__2',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Bột sử dụng (# 1)  (# 2) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_chi_so_gas_tao_hinh__1__2',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'chi_so_gas_tao_hinh__1__2',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Chỉ số gas tạo hình (# 1)  (# 2) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_gas_th__2',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'gas_th__2',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'GAS TH (# 2) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-					{
-						uid: 'stmp_1607880685991_gas_th_kg__2',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'gas_th_kg__2',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'GAS TH KG (# 2) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-					},
-				];
-			},
-		},
-		groupBy: {
-			default() {
-				return [
-					{
-						uid: 'stmp_1607880685991_day_chuyen__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'day_chuyen__1',
-						type: 'text',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Dây chuyền (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-						as: ' first Dây chuyền (# 1) ',
-					},
-					{
-						uid: 'stmp_1607880685991_ngay_chung_tu__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'ngay_chung_tu__1',
-						type: 'date',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Ngày chứng từ (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-						as: ' first Ngày chứng từ (# 1) ',
-					},
-					{
-						uid: 'stmp_1607880685991_ma_san_pham__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'ma_san_pham__1',
-						type: 'text',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Mã sản phẩm (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-						as: ' first Mã sản phẩm (# 1) ',
-					},
-				];
-			},
-		},
-		aggColumns: {
-			default() {
-				return [
-					{
-						uid: 'stmp_1607880685991_so_luong_giao__1',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'so_luong_giao__1',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'Số lượng giao (# 1) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-						as: ' sum Số lượng giao (# 1) ',
-						agg: 'sum',
-					},
-					{
-						uid: 'stmp_1607880685991_gas_th__2',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'gas_th__2',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'GAS TH (# 2) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-						as: ' sum GAS TH (# 2) ',
-						agg: 'sum',
-					},
-					{
-						uid: 'stmp_1607880685991_gas_th_kg__2',
-						idDataset: 'stmp_1607880685991',
-						columnName: 'gas_th_kg__2',
-						type: 'number',
-						symperDocId: 'stmp_1607880685991',
-						title: 'GAS TH KG (# 2) ',
-						from: '2681c71e-4d36-4989-88c5-d9e74678d47d',
-						as: ' sum GAS TH KG (# 2) ',
-						agg: 'sum',
-					},
-				];
-			},
-		},
+	props:{
+		nodeData:{
+			type: Object,
+			default(){
+				return {}
+			}
+		}
 	},
 	methods:{
 		handleChangeColumn(){

@@ -90,18 +90,15 @@ export default {
     
     },
     props:{
-        // nodeData:{
-        //     type: Object,
-        //     default(){
-        //         return {}
-        //     }
-        // },
+        nodeData:{
+            type: Object,
+            default(){
+                return {}
+            }
+        },
     },
     data(){
         return{
-            nodeData: {
-                configs:{"wgName":"","wgDes":"","saveAs":[],"nameToSaveAs":"","newIdDataset":"stmp_1608611308121","selectedDataset":"","errorList":{"notFoundColumns":[]},"autoUpdatePeriod":{"time":5,"unit":"minutes"},"nextNodes":["2406dc99-c6bd-4b4c-9dce-72c61dde8cf9"],"prevNodes":["68f23029-80c9-4bb4-aeab-66bcc21bbaf1"],"allColumns":{"stmp_1608612473348_nct":{"uid":"stmp_1608612473348_nct","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"date","title":"Ngày chứng từ","idDataset":"stmp_1608612473348","columnName":"nct","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_sum_a":{"uid":"stmp_1608612473348_sum_a","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"number","title":" sum A","idDataset":"stmp_1608612473348","columnName":"sum_a","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_ca_lam":{"uid":"stmp_1608612473348_ca_lam","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"text","title":"Ca làm","idDataset":"stmp_1608612473348","columnName":"ca_lam","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_sum_a1":{"uid":"stmp_1608612473348_sum_a1","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"number","title":" sum A1","idDataset":"stmp_1608612473348","columnName":"sum_a1","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_day_chuyen":{"uid":"stmp_1608612473348_day_chuyen","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"text","title":"Dây chuyền","idDataset":"stmp_1608612473348","columnName":"day_chuyen","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_tb1_ma_hang":{"uid":"stmp_1608612473348_tb1_ma_hang","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"text","title":"Mã sản phẩm","idDataset":"stmp_1608612473348","columnName":"tb1_ma_hang","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_sum_nap_tu_lo":{"uid":"stmp_1608612473348_sum_nap_tu_lo","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"number","title":" sum Nạp từ lò","idDataset":"stmp_1608612473348","columnName":"sum_nap_tu_lo","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_tb1_cong_viec":{"uid":"stmp_1608612473348_tb1_cong_viec","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"text","title":"Công việc","idDataset":"stmp_1608612473348","columnName":"tb1_cong_viec","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_sum_phe_pham_sau_mai":{"uid":"stmp_1608612473348_sum_phe_pham_sau_mai","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"number","title":" sum Phế phẩm sau mài","idDataset":"stmp_1608612473348","columnName":"sum_phe_pham_sau_mai","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_sum_phe_pham_dong_dai":{"uid":"stmp_1608612473348_sum_phe_pham_dong_dai","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"number","title":" sum Phế phẩm đóng đai","idDataset":"stmp_1608612473348","columnName":"sum_phe_pham_dong_dai","symperDocId":"stmp_1608612473348"},"stmp_1608612473348_sum_tb1_nap_tu_ke_khac_ca":{"uid":"stmp_1608612473348_sum_tb1_nap_tu_ke_khac_ca","from":"68f23029-80c9-4bb4-aeab-66bcc21bbaf1","type":"number","title":" sum tb1_nạp từ kệ khác ca","idDataset":"stmp_1608612473348","columnName":"sum_tb1_nap_tu_ke_khac_ca","symperDocId":"stmp_1608612473348"}},"addedColumns":[{"name":"sl_nap","type":"number","title":"SL nạp","formula":"[sum_tb1_nap_tu_ke_khac_ca] + [sum_nap_tu_lo]","columnAdd":{"type":"new","colInfp":[]},"invalidConfigs":false}]}
-            },
             dataTypes:[
                 {
                     text:'Text',
