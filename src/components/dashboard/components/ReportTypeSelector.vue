@@ -1,35 +1,33 @@
 <template>
 	<div class="symper-report-type-selector h-100 d-flex flex-column">
-		<div class="mt-2 mb-2 ml-1 title-all-chart-types">
-			<v-btn 
-				icon
-				tile
-				small
-				@click="collapse"
-			>
-				<v-icon >
-					mdi-chevron-right
-				</v-icon>
-			</v-btn>
-			<span class="mt-1 font-weight-bold" style="font-size: 13px !important">
-				{{$t('bi.dashboard.title-visualization')}}
-			</span>
-		</div>
-		<div class="all-chart-types">
-			<span v-for="(item , i ) in chartConfigs" :key="i" >
-				<img 
-					:title="i" 
-					:src="'img/dashboard/report-builder/'+i+'.png'" 
-					@click="selectCellType(i)"
-					class="report-type-img" 
-					:class="{'selected-report-type':i == currentCellConfigsType }"
-					height="32px" 
-					width="32px" 
-				>
-			</span>
-		</div>
-		<div >
-			 <v-tabs
+		<v-expansion-panels>
+			<v-expansion-panel>
+				<v-expansion-panel-header>
+					<div class="mt-2 mb-2 ml-1 title-all-chart-types">
+						<span class="mt-1 font-weight-bold" style="font-size: 13px !important">
+							{{$t('bi.dashboard.title-visualization')}}
+						</span>
+					</div>
+				</v-expansion-panel-header>
+				<v-expansion-panel-content>
+					<div class="all-chart-types">
+						<span v-for="(item , i ) in chartConfigs" :key="i" >
+							<img 
+								:title="$t('bi.chart.'+i)" 
+								:src="'img/dashboard/report-builder/'+i+'.png'" 
+								@click="selectCellType(i)"
+								class="report-type-img" 
+								:class="{'selected-report-type':i == currentCellConfigsType }"
+								height="32px" 
+								width="32px" 
+							>
+						</span>
+					</div>
+				</v-expansion-panel-content>
+			</v-expansion-panel>
+		</v-expansion-panels>
+		<div>
+			<v-tabs
 				v-model="tabs"
 				fixed-tabs
 			>
@@ -39,15 +37,16 @@
 					v-for="(item, i ) in tabItems"
 					:key="i"
 				>
-					 <v-tooltip bottom>
-						<template v-slot:activator="{ on, attrs }">
-							<v-icon
-								v-bind="attrs"
-								v-on="on"
-								small 
+					<v-tooltip bottom>
+						<template v-slot:activator="{ on }">
+							<div class="h-100" v-on="on" style="width: 50px"> 
+								<v-icon
+									small
+									class="mt-4"
 								>
-								{{item.icon}}
-							</v-icon>
+									{{item.icon}}
+								</v-icon>
+							</div>
 						</template>
 						<span> {{item.title}} </span>
 					</v-tooltip>
@@ -154,8 +153,16 @@ export default {
 </script>
 
 <style scoped>
+.symper-report-type-selector >>> .v-expansion-panel::before{
+	box-shadow: unset !important;
+}
+.symper-report-type-selector >>> .v-expansion-panel-header{
+	padding: unset !important;
+	background-color: #EFEFEF !important;
+}
 .symper-report-type-selector >>> .v-tab{
 	min-width: unset !important;
+	padding: unset !important;
 }
 .symper-report-type-selector >>> .v-slide-group__wrapper{
 	background-color: #EFEFEF;

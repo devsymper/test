@@ -1,6 +1,7 @@
 <template>
     <div class="border-bottom-1 pl-2 py-1 d-flex justify-space-between">
-        <div style="line-height: 30px;">
+		<ReportSideBar style="margin-top: -6px" />
+        <div style="line-height: 30px;" class="ml-8">
             <input 
                 :style="{
                     width: inputWidth
@@ -54,10 +55,14 @@
 </template>
 
 <script>
+import ReportSideBar from '@/views/report/ReportSideBar'
 import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/dashboardConfigs.js";
 import { util } from '../../../plugins/util';
 import { dashboardApi } from "@/api/dashboard.js";
 export default {
+	components:{
+		ReportSideBar
+	},
     watch: {
         'dashboardInfo.dashboardName': function(){
             this.inputWidth = (this.$refs.fakeTitle.getBoundingClientRect().width + 10) + 'px';
