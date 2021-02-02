@@ -354,7 +354,7 @@ export const getDataInputFormula = (formulaInstance, listInput, extraData = null
                             dataInput[inputControlName] = currentColData;
                         }
                         else{
-                            if(controlIns.inputValue){
+                            if(controlIns.checkEmptyFormulas('autocomplete') && controlIns.inputValue){
                                 dataInput[inputControlName] = controlIns.inputValue;
                             }
                             else{

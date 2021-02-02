@@ -1439,7 +1439,8 @@ export default {
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlInstance.inTable);
                 let currentCell = tableControl.tableInstance.getFocusedCell();
                 let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
-                tableControl.tableInstance.setDataAtCell(controlName, time, currentRow.id);
+                tableControl.tableInstance.setDataAtCell(currentCell.column.colDef.field, time, currentRow.id);
+                tableControl.tableInstance.setFocusedCell(currentCell.rowIndex, currentCell.column.colDef.field);
             }
         },
         checkEscKey(event){
@@ -2383,7 +2384,12 @@ export default {
                             value = (controlIns.value === "" ) ? 0 : controlIns.value/100;
                         }
                         else if(controlIns.checkEmptyFormulas('autocomplete')){
-                            value = controlIns.inputValue;
+                            if(controlIns.inputValue){
+                                value = controlIns.inputValue;
+                            }
+                            else{
+                                value = controlIns.value;
+                            }
                         }
                         dataControl[controlName] = value;
                         if(controlIns.type == 'checkbox'){
