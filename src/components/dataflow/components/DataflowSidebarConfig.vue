@@ -14,20 +14,10 @@
 				<PeriodTimeConfig />
 			</div>
 		</div>
-		<!-- <SummalizeConfig /> -->
-		<!-- <NodeConfig
-			@dataset-selected="handleDatasetSelected"
-		/>
-		<DatasetColumnSelector  :rowData="rowData" /> -->
-		<!-- <component 
+		<component 
 			:is="nodeConfigTag"
 			:nodeData="selectingNode">
-		</component> -->
-		<!-- <pivot-data 
-			:nodeData="selectingNode"
-			style="height: calc(100% - 150px)"
-		/> -->
-		<SelectConfig />
+		</component>
 	</div>
 </template>
 
@@ -78,8 +68,6 @@ export default {
 		SelectConfig
 	},
 	created(){
-		this.dashboardDatasetWorker = new DashboardDatasetWorker()
-		this.listenFromWorker()
 	},
 	computed:{
 		nodeConfigTag(){
@@ -93,7 +81,6 @@ export default {
 	},
 	data(){
 		return {
-			dashboardDatasetWorker: null,
 			allDatasetColumn:{},
 			allInputs:{
 				name: {

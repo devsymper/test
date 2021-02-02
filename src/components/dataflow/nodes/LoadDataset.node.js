@@ -6,6 +6,10 @@ export default class LoadDataset extends NodeBase {
     constructor(symperId){
         let defaultConfig = {
             allColumns: [],
+            idDataset: 0,
+            symperDocId: '',
+            name: '',
+            title: '',
             autoReplaceNullValue: true
         };
         super(symperId, 'Load', defaultConfig);

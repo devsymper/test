@@ -10,3 +10,7 @@ export const setSelectingWidget = function(state, data){
     let nodeData = state.allDataflow[data.instanceKey].allWidget[data.id];
     Vue.set(state.allDataflow[data.instanceKey], 'selectedWidget', nodeData);
 }
+
+export const setAllNodeRunning = function(state, data){
+    state.allDataflow[data.instanceKey].allWidget = Object.assign(state.allDataflow[data.instanceKey].allWidget, data.data);
+}

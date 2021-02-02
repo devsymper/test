@@ -95,8 +95,11 @@ export default {
             }, 0, this);
         },
         restoreRunningNodeData(data){ // Khôi phục lại data từ server phục vụ cho việc chạy dataflow
-
-        },
+            this.$store.commit('dataflow/setAllNodeRunning', {
+                data,
+                instanceKey: this.instanceKey
+            });
+        }, 
         getDataflowInfo(){
             if(this.idObject){
                 this.dataflowEditorWorker.postMessage({
