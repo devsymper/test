@@ -218,12 +218,12 @@
                <v-btn v-if= "update&&newEvent.type==1" text 
             class="button-logtime"
              @click="updatelog(1)">
-             <span >{{$t('timesheet.update')}}</span> 
+             <span >{{$t('common.update')}}</span> 
              </v-btn>
                <v-btn v-if= "update&&newEvent.type==0&&showPlan" text 
             class="button-logtime"
              @click="updatelog(0)">
-             <span >{{$t('timesheet.update')}}</span> 
+             <span >{{$t('common.update')}}</span> 
              </v-btn>
                <v-btn v-if= "update&&newEvent.type==0&&showLog" text 
             class="button-logtime mr-2" style="float:right!important; width: 60px"
