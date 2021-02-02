@@ -36,10 +36,18 @@
             >
                 <v-expansion-panel class="sym-expand-panel " v-for="(dataset,idx) in datasetAndColumn" :key="idx" v-show="dataset.show && !dataset.isSubDataset">
                     <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                        <v-icon v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
-                        <v-icon v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
-                        <v-icon class="selected-dataset-mark" v-if="dataset.isSelected">mdi-check-circle</v-icon>
-                        <span :title="dataset.title" class="dataset-item-title fs-13 pl-2">{{dataset.title}}</span>
+                        <v-tooltip bottom open-delay="400">
+                            <template v-slot:activator="{ on }">
+                                <v-icon v-on="on" v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
+                                <v-icon v-on="on" v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
+                                <v-icon  class="selected-dataset-mark" v-if="dataset.isSelected">mdi-check-circle</v-icon>
+                                <span v-on="on" class="dataset-item-title fs-13 pl-2">{{dataset.title}}</span>
+                            </template>
+                            <dataset-detail-tooltip 
+                                :info="getInfoDatasetTooltip(dataset)"
+                            />
+                        </v-tooltip>
+                        <v-icon class="fs-15" style="position: absolute;right: 40px;" @click.prevent.stop="removeDataset(dataset)">mdi-close</v-icon>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
                         <v-expansion-panels
@@ -51,9 +59,16 @@
                             <!-- Danh sách các table trong doc -->
                             <v-expansion-panel class="sym-expand-panel dataset-child" v-for="(subId,idx) in dataset.subDatasetIds" :key="idx"  v-show="datasetAndColumn[subId].show" >
                                 <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                                    <v-icon class="fs-15 icon-table">mdi-table-large</v-icon>
-                                    <v-icon class="selected-dataset-mark" v-if="dataset.isSelected">mdi-check-circle</v-icon>
-                                    <span class="dataset-item-title fs-13 pl-2">{{datasetAndColumn[subId].title}}</span>
+                                    <v-tooltip bottom open-delay="400">
+                                        <template v-slot:activator="{ on }">
+                                            <v-icon v-on="on" class="fs-15 icon-table">mdi-table-large</v-icon>
+                                            <v-icon class="selected-dataset-mark" v-if="dataset.isSelected">mdi-check-circle</v-icon>
+                                            <span v-on="on" class="dataset-item-title fs-13 pl-2">{{datasetAndColumn[subId].title}}</span>
+                                        </template>
+                                        <dataset-detail-tooltip 
+                                            :info="getInfoDatasetTooltip(datasetAndColumn[subId])"
+                                        />
+                                    </v-tooltip>
                                 </v-expansion-panel-header>
                                 <v-expansion-panel-content class="sym-v-expand-content">
                                     <!-- Danh sách các control trong table -->
@@ -101,12 +116,15 @@ import VuePerfectScrollbar from 'vue-perfect-scrollbar';
 import draggable from "vuedraggable";
 import columnInfo from "@/components/common/bi/ColumnInfo";
 import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/DashboardDataset.Worker.js';
+import { util } from '../../../plugins/util';
+import DatasetDetailTooltip from './DatasetDetailTooltip.vue';
 
 export default {
     components:{
         VuePerfectScrollbar,
         draggable,
-        columnInfo
+        columnInfo,
+        DatasetDetailTooltip
     },
     computed:{
         datasetAndColumn(){
@@ -155,7 +173,7 @@ export default {
             openedPanelParent:[],
             openedPanelChild:[],
             search:"",
-            dataSetTest :[{"id":"2833","name":"x_sgcnl","type":"doc","uid":null,"status":null,"id_database":null,"alias_name":"[BM.10.02] SỔ G.CA BP GCNL","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"1747","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"[BM.10.02] SỔ G.CA BP GCNL"},{"id":"2865","name":"x_bcsx_ngay","type":"doc","uid":null,"status":null,"id_database":null,"alias_name":"VID-BCSX NGÀY","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"1787","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"VID-BCSX NGÀY"},{"id":"2891","name":"lk_bcsxnl_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxnl_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxnl_th"},{"id":"2892","name":"lk_bcsxnl_na","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxnl_na","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxnl_na"},{"id":"2893","name":"lk_bcsxth_na","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxth_na","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxth_na"},{"id":"2894","name":"lk_bcsxth_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxth_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxth_th"},{"id":"2895","name":"lk_bcsxln_na","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxln_na","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxln_na"},{"id":"2896","name":"lk_bcsxln_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxln_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxln_th"},{"id":"2897","name":"lk_bcsxm_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxm_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxm_th"},{"id":"2898","name":"lk_bcsxm_na","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxm_na","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxm_na"},{"id":"2899","name":"lk_bcsxsp_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxsp_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxsp_th"},{"id":"3347","name":"sgcth1","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"sgcth1","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"sgcth1"}]
+            infoDataflows:[],
         }
     },
     methods:{
@@ -282,7 +300,46 @@ export default {
 
             let listColumnInDataset = data.listColumnInDataset;
             this.$store.commit("dashboard/setListColumnInDataset",listColumnInDataset);
+            this.getInfoDataFlow();
 
+        },
+        getInfoDataFlow(){
+            this.dashboardDatasetWorker.postMessage({
+				action: 'getInfoDataFlow',
+				data:{
+                    datasetAndColumn: this.datasetAndColumn
+				}
+            });
+        },
+        getInfoDataFlowAfter(data){
+            this.infoDataflows = data.infoDataFlow;
+        },
+        removeDataset(dataset){
+            let idDataset = dataset.id;
+            let datasetColumn = util.cloneDeep(this.datasetAndColumn);
+            if (dataset.subDatasetIds && dataset.subDatasetIds.length > 0) {
+                for (let i = 0; i < dataset.subDatasetIds.length; i++) {
+                    delete datasetColumn[dataset.subDatasetIds[i]];                    
+                }
+            }
+            delete datasetColumn[idDataset];
+
+            let dataPos = {};
+            dataPos.key = this.instanceKey;
+            dataPos.data = datasetColumn;
+            this.$store.commit("dashboard/addDatasetAndColumnInDashboard",dataPos);
+
+        },
+        getInfoDatasetTooltip(dataset){
+            if (dataset.type == 'doc') {
+                return dataset
+            }else{
+                let infoDataFlow = this.infoDataflows.find(ele => ele.id == dataset.id);
+                if (infoDataFlow) {
+                    infoDataFlow.type = 'dataset_by_dataflow'
+                    return infoDataFlow;
+                }
+            }
         }
     },
     created(){

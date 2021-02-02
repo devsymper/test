@@ -30,7 +30,6 @@ import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
 import FormTpl from "@/components/common/FormTpl.vue";
 import { autoLoadNodeClasses } from "@/components/dataflow/configPool/dataflowConfig.js";
 import _cloneDeep from "lodash/cloneDeep";
-import PivotData from './configs/PivotData.vue';
 
 
 let mapTypeToNodeClass = autoLoadNodeClasses();

@@ -31,6 +31,9 @@ export const biApi = {
 	},
 	getDatasetColumn(id){
 		return api.get('datasets/' + id + '/columns')
-	}
+	},
+	getDetailDataflowWithDatasetIds(strDatasetIds){
+        return api.get("dataflow/nodes/datasets-inside/"+strDatasetIds);
+	},
 	
 };

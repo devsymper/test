@@ -208,6 +208,25 @@ var handler = {
         }
        
         self.postMessage({action:'searchDatasetColumnAfter', data :{datasetAndColumn:datasetAndColumn}});
+    },
+    async getInfoDataFlow(data){
+        let datasetAndColumn = data.datasetAndColumn;
+        let str = "";
+        if (Object.keys(datasetAndColumn).length > 0) {
+            for (let key in datasetAndColumn) {
+                if (datasetAndColumn[key].type != 'doc') {
+                    str += datasetAndColumn[key].id + ",";
+                }
+            }
+        }
+        if (str.length > 0) { // call api get list info data flow in dataset
+            str = str.substring(0, str.length-1);
+            let res = await biApi.getDetailDataflowWithDatasetIds(str)
+            if(res['status'] == 200 && res['data']){
+                self.postMessage({action:'getInfoDataFlowAfter', data :{infoDataFlow: res['data']}});
+            }
+        }
+
     }
 
 }
