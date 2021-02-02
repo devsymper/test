@@ -119,9 +119,7 @@ export default {
     .user-popup ::v-deep .v-menu__content{
         background-color: white!important
     }
-    .color-blue{
-        color:blue;
-    }
+ 
     .color-blue:hover{
         cursor: pointer;
         text-decoration-line:underline;

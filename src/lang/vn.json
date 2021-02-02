@@ -542,7 +542,6 @@
             "user_updated": "Người cập nhật",
             "date_updated": "Ngày cập nhật",
             "create": "Thêm",
-            "update": "Cập nhật",
             "delete": "Xóa",
             "view": "Chi tiết"
         },
@@ -621,8 +620,6 @@
         "description": "Mô tả",
         "view_log_time": "Xem công việc",
         "save": "Lưu",
-        "update": "Cập nhật",
-        "delete": "Xoá",
         "category": "Loại công việc",
         "logged_time": "Số giờ",
         "view_plan_time": "Kế hoạch",

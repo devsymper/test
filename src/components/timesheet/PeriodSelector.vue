@@ -96,7 +96,7 @@ export default {
                 case'Nov':
                     return this.$t('timesheet.nov');
                 case'Dec':
-                    return this.$t('commom.dec');
+                    return this.$t('timesheet.dec');
             }
 
         },
