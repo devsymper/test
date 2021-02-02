@@ -1,5 +1,6 @@
 import NodeBase from './NodeBase'
 import _cloneDeep from 'lodash/cloneDeep';
+import NodeIO from "@/components/dataflow/configPool/NodeIO.js";
 
 export default class SelectColumns extends NodeBase {
     constructor(symperId){
