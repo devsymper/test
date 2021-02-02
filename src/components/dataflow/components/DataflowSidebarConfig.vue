@@ -62,7 +62,6 @@ export default {
 		PeriodTimeConfig,
 		NodeConfig,
 		DatasetColumnSelector,
-		PivotData,
 		SummalizeConfig,
 		SelectConfig
 	},
