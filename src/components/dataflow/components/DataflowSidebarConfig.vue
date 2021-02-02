@@ -65,7 +65,7 @@ export default {
 			return currentClassName;
 		},
 		selectingNode(){
-			this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
+			return this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
 		}
 	},
 	data(){

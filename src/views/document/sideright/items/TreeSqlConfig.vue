@@ -226,6 +226,9 @@ export default {
 .tree-view >>> .v-treeview-node__label {
 	flex: unset;
 }
+.tree-view >>> .v-text-field__details{
+	display: none;
+}
 .tree-view >>> .v-treeview-node__toggle {
 	display: none;
 }
@@ -242,6 +245,8 @@ export default {
 .tree-view >>> .tree-item-slot .v-input__control .v-input__slot {
 	height: 25px;
 	font-size: 11px;
+	box-shadow: unset !important;
+	border: 1px solid lightgray
 }
 .tree__list-columns >>> .v-input__icon,
 .tree__list-operations >>> .v-input__icon {
