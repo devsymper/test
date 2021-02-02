@@ -1,17 +1,18 @@
 <template>
-	<div class="dataflow-output-column">
+	<div class="dataflow-output-column h-100">
 		<v-text-field
 			v-model="searchKey"
 			single-line
 			solo
+			class="s-input-search"
 		>
 
 		</v-text-field>
-		<div class="ml-2 mr-2">
+		<div class="ml-2 mr-2" style="height: calc(100% - 57px)">
 			<ag-grid-vue
 				:style="{
 					width: '100%',
-					height: tableHeight + 'px',
+					height: '100%',
 				}"
 				:class="{ 'ag-theme-balham': true }"
 				:defaultColDef="defaultColDef"
@@ -47,7 +48,7 @@ export default {
 				{
 					checkboxSelection:true,
 					editable:false,
-					field:"select",
+					field:"selected",
 					width:50,
 				},
 				{
@@ -141,5 +142,7 @@ export default {
 	margin-top: 8px;
 	border: 1px solid lightgray;
 }
-
+.s-input-search >>> .v-input__slot{
+	margin: 0px!important;
+}
 </style>
