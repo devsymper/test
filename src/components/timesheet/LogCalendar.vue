@@ -2,8 +2,6 @@
 <div class="w-100 pr-5 mt-2 mr-3" style="height: calc(100vh - 120px)">
     <v-sheet style = "border-bottom:1px solid lightgrey" v-bind:class="[calendarType=='month'? 'h-50' :'h-580']" 
      class="h-100 calendar">
-        <v-toolbar-title v-if="$refs.calendar">
-        </v-toolbar-title>
     <!-- <div style="height:100%;width:97%; background-color:lightgrey;opacity:0.8;position: relative;"> -->
         <v-calendar ref="calendar"  
             :weekdays="weekday" 
@@ -172,16 +170,19 @@
             </template>
              <!-- màn hình week/day/weekday - header -->
             <template v-slot:day-header="{day, present, month, weekday, date}">
-                <div :class="[monthEvents[date]? 'light-green-color' :'grey-color']">
+                <div :class="[getColorHeader(monthEvents[date],hoursRequired)]">
                     <div class="px-3 pt-2">
                         <div class="d-flex justify-space-between">
-                            <span v-if=" weekday==1" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.mon')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12 ']" class="fs-14"> {{day}}/{{month}}</span></span>
-                            <span v-if=" weekday==2" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.tue')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
-                            <span v-if=" weekday==3" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.wed')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
-                            <span v-if=" weekday==4" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.thu')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
-                            <span v-if=" weekday==5" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.fri')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
-                            <span v-if=" weekday==6" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.sat')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
-                            <span v-if=" weekday==0" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.sun')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
+                            <!-- Xử lý header -->
+                            <span  
+                                v-for="(d,i) in dayOfWeek.filter((d,i)=>weekday==i)" 
+                                :key="i" 
+                                :class="[present ? 'color-orange' :'color-grey']" 
+                                class="fs-14">
+                                <span >{{$t('timesheet.'+d)}}</span>
+                                <span class="ml-2">{{day}}/{{month}}</span>
+                            </span>
+                            <!--  Xử lý header -->
                             <span v-if="monthEvents[date]">
                                <span class="fs-12" style="color:#484848">
                                    {{ changeDuration(monthEvents[date].reduce((acc, d) => +d.duration + acc, 0))}}/{{hoursRequired.substr(0,1)+'h'}}</span> 
@@ -239,6 +240,7 @@ export default {
             events: [],
             dialog: false,
             hoursRequired: '',
+            dayOfWeek:['sun','mon','tue','wed','thu','fri','sat']
         };
     },
 
@@ -246,6 +248,24 @@ export default {
         this.load();
     },
     methods: {
+        getColorHeader(date,hoursRequired){
+            let color = 'grey-color';
+            let hour = hoursRequired.trim()
+            if(date){
+                let totalHour =  date.reduce((acc, d) => +d.duration + acc, 0);
+                debugger
+                if(totalHour>hour*60){
+                    
+                    color = "light-red-color"
+                }else if(totalHour==hour*60){
+                    color = "light-green-color"
+                }
+                else{
+                    color = "light-yellow-color"
+                }
+            }
+            return color
+        },
         // lấy log time đầu tiên của mảng
         resizeLogtime(){
             let taskLength = 60*60*1000;
@@ -901,6 +921,12 @@ pointer-events: none;
 }
 .light-green-color{
     background-color: #e2f9e4
+}
+.light-red-color{
+    background-color:#FFC0CB
+}
+.light-yellow-color{
+background-color: #FAFAD2
 }
 .head-purple {
     background-color: #D8BFD8
