@@ -3,7 +3,7 @@
 		<NodeConfig
 			@dataset-selected="handleDatasetSelected"
 		/>
-		<DatasetColumnSelector  :rowData="rowData" />
+		<DatasetColumnSelector  :rowData="nodeData.configs.allColumns" />
     </div>
 </template>
 
@@ -13,19 +13,21 @@ import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
 import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/DashboardDataset.Worker.js';
 
 export default {
+	props:{
+		nodeData:{
+			type: Object,
+			default(){
+				return {}
+			}
+		},
+	},
     data(){
         return {
 			currentId: 0,
         }
     },
     computed: {
-		rowData(){
-			if(this.allDatasetColumn[this.currentId]){
-				return this.allDatasetColumn[this.currentId]
-			}else{
-				return []
-			}
-		},
+		
     },
 	created(){
 		this.dashboardDatasetWorker = new DashboardDatasetWorker()
