@@ -462,7 +462,7 @@ export default {
 			this.modelDialog[type + 'ShowDialog'] = false;
 			setTimeout(self=>{
 				self.$emit('task-submited');
-			},200 , this)
+			},400 , this)
 		},
 		handlerDelegateSuccess() {
 			this.modelDialog.delegateShowDialog = false;

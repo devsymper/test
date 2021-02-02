@@ -68,7 +68,7 @@ export default class SymperTable {
             currency: 'NumberCellRenderer',
             number: 'NumberCellRenderer',
             date: 'DateCellRenderer',
-            // dateTime: 'DatetimeRenderer',
+            dateTime: 'DateCellRenderer',
             time: 'TimeCellRenderer',
             image: 'FileCellRenderer',
             fileUpload: 'FileCellRenderer',
@@ -820,6 +820,7 @@ export default class SymperTable {
         if(params.rowPinned){
             return;
         }
+        console.log(event,'eventevent');
         if(event.key == 'Enter' && event.shiftKey && this.tableInstance.tableControl.isInsertRow()){
             let rowData = this.tableInstance.getRowDefaultData(false);
             let listRootTable = sDocument.state.submit[this.tableInstance.keyInstance]['listTableRootControl'];
@@ -835,7 +836,7 @@ export default class SymperTable {
             }
             this.tableInstance.addNewRow(rowData, params.rowIndex + 1);
         }
-        else if(event.key == 'Backspace' && event.shiftKey){
+        else if(event.key == 'Backspace' && (event.shiftKey || event.metaKey)){
             let rowCount = this.api.getDisplayedRowCount();
             let rowSelection = this.tableInstance.getSelectedRows();
             this.tableInstance.deleteRow(rowSelection, sqlRowId);
@@ -1482,8 +1483,8 @@ export default class SymperTable {
      * @param {*} dataRowId 
      * @param {*} from 
      */
-    afterRunFormula(res, formulasType, controlInstance, rowNodeId, columnName){
-        if(rowNodeId.length == 1){
+    afterRunFormula(res, formulasType, controlInstance, rowNodeId, columnName, isMultiple = false){
+        if(rowNodeId.length == 1 && !isMultiple){
             this.prepareDataAfterRunFormulaOnRow(res, formulasType, controlInstance, rowNodeId, columnName);
         }
         else{

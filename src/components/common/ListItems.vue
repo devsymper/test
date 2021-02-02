@@ -171,7 +171,7 @@
                                             <v-icon left dark class="mr-0" :style="{color:selectedFilterName?'#FF8C00!important':'black'}">mdi-filter</v-icon>
                                             <span style="color:#FF8C00!important;" >{{selectedFilterName}}</span>
                                             <div v-if="closeBtnFilter"  class="ml-2" style="border-right:1px solid #E0E0E0; height:27px"></div>
-                                            <v-icon v-if="closeBtnFilter" class="ml-2" style="font-size:14px" @click="hideCloseBtnFilter()">mdi-close</v-icon>
+                                            <v-icon v-if="closeBtnFilter" class="ml-2" style="font-size:14px" @click="closeBtnAndRefreshFilter()">mdi-close</v-icon>
                                           
                                         </v-btn>
                                     </template>
@@ -179,7 +179,7 @@
                                 </v-tooltip>
                             </template>
                             <config-filter 
-                                @set-table="setTable"
+                                @select-filter="selectedFilter"
                                 @config-filter-action="configFilterAction"
                                 @add-filter-config="addFilterConfig"
                                 :filter="listFilters"/>
@@ -892,6 +892,7 @@ export default {
     data(){
 		let self = this;
         return {
+            filterIdx:0,
             searchValue:'',
             typeDelete:'',
             countColumnResized:0,
@@ -1058,8 +1059,17 @@ export default {
 		},
         handleAddFilter(data){
             if(data.type=='save'){
-                this.filterName = data.filterName
-                this.checkIsAddFilter()
+                this.filterName = data.filterName;
+                 if(!this.checkExistNameFilter()){
+                    this.checkIsAddFilter()
+                    this.saveUiConfig()
+                }else{
+                    this.$snotify({
+                        type: "error",
+                        title: this.$t("table.error.name_exist")
+                    })
+                }
+               
             }else{
                 this.addFilter = false;
             }
@@ -1099,7 +1109,7 @@ export default {
             this.saveConditionalFormatting(this.conditionalFormat);
             this.getData();
         },
-         saveConditionalFormatting(data){
+        saveConditionalFormatting(data){
              this.conditionalFormat = data;
              this.saveUiConfig();
         },
@@ -1119,7 +1129,7 @@ export default {
             };  
                 this.getData();
         },
-         disApplyConfigFormat(index){
+        disApplyConfigFormat(index){
             let listSelectedCondition = [];
             this.listSelectedCondition.map(data=>{
                  if(data!=index){
@@ -1176,7 +1186,8 @@ export default {
             this.showDelPopUp = true;
             this.contentDelete =" Xóa định dạng "+this.conditionalFormat[index].nameGroup+" khỏi danh sách các định dạng";
         },
-        hideCloseBtnFilter(){
+        closeBtnAndRefreshFilter(){
+            this.filterName = '';
             this.selectedFilterName = '';
             this.closeBtnFilter = false;
             this.isClose=false;
@@ -1185,8 +1196,6 @@ export default {
             //set lại trạng thái không filter
             this.tableFilter.allColumn={}
             this.getData();
-           
-
         },
         // xử lý gán tất cả các biến trước khi gửi data
         saveUiConfig(){
@@ -1212,7 +1221,6 @@ export default {
             })
             this.saveUiConfig();
         },
-        //
         getDefaultFilter(){
             if(this.listFilters&&this.listFilters.length>0){
                 this.listFilters.map((fil,i)=>{
@@ -1242,14 +1250,10 @@ export default {
             this.saveUiConfig();
         },
         editFilter(filterIdx){
-            this.searchValue=this.listFilters[filterIdx].searchKey?this.listFilters[filterIdx].searchKey:'';
-            this.searchKey = this.searchValue;
             this.addFilter = true;
-            this.filterName = this.listFilters[filterIdx].name;
-            this.isUpdateFilter= true;
-            this.filterIdx = filterIdx;
+            this.isUpdateFilter = true;
+            this.selectedFilter(filterIdx);
         },
-        
         deleteFilter(filterIdx){
             this.showDelPopUp = true;
             this.contentDelete =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
@@ -1263,21 +1267,22 @@ export default {
                 this.notiFilter = this.$t("table.success.delete_filter");
             }else{
                 this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=this.conditionIndex)
-                 this.saveConditionalFormatting(this.conditionalFormat);
-                //  this.getData()
+                this.saveConditionalFormatting(this.conditionalFormat);
             }
             this.showDelPopUp=false;
         },
-       setTable(filterIdx){
-            this.closeBtnFilter = true;
+       selectedFilter(filterIdx){
             this.searchValue = this.listFilters[filterIdx].searchKey?this.listFilters[filterIdx].searchKey:'';
             this.searchKey = this.searchValue;
-            this.selectedFilterName = this.listFilters[filterIdx].name;
-            let filter = this.listFilters;
+            this.filterName = this.listFilters[filterIdx].name;
             this.tableFilter.allColumn = this.listFilters[filterIdx].columns;
+            this.filterIdx = filterIdx;
+            this.closeBtnFilter = true;
+            this.selectedFilterName = this.listFilters[filterIdx].name;
             this.getData()
         },
         addFilterConfig(){
+            this.closeBtnAndRefreshFilter();
             this.addFilter = true;
         },
         checkIsAddFilter(){
@@ -1289,6 +1294,7 @@ export default {
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
+                this.selectedFilter(this.listFilters.length-1);
             }else{
                 this.listFilters[this.filterIdx].name = this.filterName;
                 this.listFilters[this.filterIdx].searchKey = this.searchKey;
@@ -1296,7 +1302,18 @@ export default {
                 this.notiFilter = this.$t("table.success.edit_filter");
             }
             this.isNotiSuccess = true;
-            this.saveUiConfig()
+           
+        },
+        checkExistNameFilter(){
+            let check = false;
+            let filterName = this.listFilters[this.filterIdx]?this.listFilters[this.filterIdx].name:'';
+            this.listFilters.map(filter=>{
+                if(filter.name==this.filterName&&filterName!=this.filterName)
+                {
+                   check = true; 
+                }
+            })
+            return check
         },
 		getAllData(){
 			return this.rowData

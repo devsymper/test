@@ -78,6 +78,11 @@
             </VuePerfectScrollbar>
             <!-- </div> -->
         </div>
+		<TrackingProcessDefinition 
+			:processDefinitionId="calledElement"
+			:showDialog="showDialog"
+			@cancel="showDialog = false"
+		/>
     </div>
 </template>
 
@@ -87,6 +92,7 @@ import { getNodeAttrs, nodeAttrsDefinition } from "./nodeAttrsFactory";
 import { allAttrDisplayGroup } from "./allAttrDisplayGroup";
 import FormTpl from "./../common/FormTpl.vue";
 import { util } from "../../plugins/util";
+import TrackingProcessDefinition from "@/views/process/TrackingProcessDefinition.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
 import { defaultXML, reformatValueToStr } from "./../../components/process/reformatGetListData";
 import { allNodesAttrs } from "./../process/allAttrsOfNodes";
@@ -1165,6 +1171,10 @@ export default {
          * Xử lý sự kiện khi người dùng click vào một node
          */
         handleNodeSelected(node) {
+			if(node.$type == 'bpmn:CallActivity'){
+				this.showDialog = true
+				this.calledElement = node.calledElement
+			}
             let type = this.getNodeType(node);
             let wp = node.di.waypoint;
             console.log(type, node);
@@ -1567,6 +1577,8 @@ export default {
     },
     data() {
         return {
+			showDialog: false,
+			calledElement: "",
             instanceKey: null, // key của instance hiện tại
             attrPannelHeight: "300px", // chiều cao của panel cấu hình các element
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
@@ -1619,7 +1631,8 @@ export default {
     components: {
         "symper-bpmn": SymperBpmn,
         "form-tpl": FormTpl,
-        VuePerfectScrollbar
+		VuePerfectScrollbar,
+		TrackingProcessDefinition
     },
     props: {
         // Hành động cho editor này, nhận một trong các giá trị: create, edit, view, clone
