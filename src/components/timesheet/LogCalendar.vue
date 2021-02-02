@@ -137,6 +137,7 @@ import timesheetApi from '../../api/timesheet';
 import MonthViewHeader from "./../../components/timesheet/calendar/MonthViewHeader";
 import WeekdayHeader from "./../../components/timesheet/calendar/WeekdayHeader";
 import MonthViewEvent from "./../../components/timesheet/calendar/MonthViewEvent";
+import LogFormWorker from 'worker-loader!@/worker/timesheet/LogForm.Worker.js';
 
 
 import { mapState} from 'vuex';
@@ -173,32 +174,24 @@ export default {
             sum: [],
             events: [],// chứa event của calendar
             hoursRequired: '',
-
+            logFormWorker:null
         };
     },
 
     created() {
+        this.logFormWorker = new LogFormWorker();
+        //this.calendarViewTimesheetWorker = new CalendarViewWorker()
         this.load();
     },
     methods: {
-       
+        setResizeLogtime(event){
+            this.events = event
+        },
         // lấy log time đầu tiên của mảng
         resizeLogtime(){
-            let taskLength = 60*60*1000;
-            let padding = 60*60*300;
-            let lastDate, lastEnd;
-            let newTasks = this.events.map(task=>{
-                if(task.date!== lastDate){
-                    lastDate = task.date;
-                    task.start = this.$moment(task.start).startOf('day').hour(1).toDate().getTime()
-                    task.end = task.start + taskLength;
-                    lastEnd = task.end
-                }else{
-                    task.start = lastEnd+padding;
-                    task.end = task.start + taskLength;
-                    lastEnd = task.end
-                }
-                return task;
+             this.logFormWorker.postMessage({
+                action:'resizeLogtime',
+                data:this.events
             })
         },
         getCurrentTime () {
@@ -246,23 +239,15 @@ export default {
                 })
         },
         copyLogTime(event){
-              timesheetApi.createLogTime({
-                start:this.$moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
-                end: this.$moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
-                duration:event.duration,
-                task: event.task,
-                type: event.type,
-                id: event.id,
-                date: event.date,
-                categoryTask: event.category,
-                desc: event.desc || ""
+            this.logFormWorker.postMessage({
+                action:'copyLogTime',
+                data:event
             })
-            .then(res => {
-                if (res.status === 200) {
-                    this.load()
-                }
-            })
-            .catch(console.log);
+        },
+        setEventCopy(data){
+            if(data){
+                this.load()
+            }
         },
         // tính tổng thời gian của cả tháng
         sumMonthDuration(event, start, end) {
@@ -534,6 +519,7 @@ export default {
                 this.resizeLogtime();
             }else{
                  this.getLogByUserId(this.userId);
+                 this.load()
             }
             
         },
@@ -639,7 +625,22 @@ export default {
         this.ready = true
         this.scrollToTime()
         this.updateTime()
+        const self = this
+        this.logFormWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'copyLogTime':
+                    self.setEventCopy(data.dataAfter)
+                    break;
+                 case 'resizeLogtime':
+                    self.setResizeLogtime(data.dataAfter)
+                    break;
+                default:
+                    break;
+            }
+        });
     },
+
 
 };
 </script>
