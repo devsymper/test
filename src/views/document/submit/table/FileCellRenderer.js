@@ -41,30 +41,27 @@ FileCellRenderer.prototype.init = function(params) {
     this.eGui = document.createElement('span');
     if(!params.node.rowPinned){
         let control = params.control;
-        let div = `
-                <div class="file-add" title="Thêm file" >
-                    <span class="text-show"><span class="mdi mdi-plus"></span></span>
-                </div>
-            `;
-        let url = '';
-        let ext = url.split('.').pop();
-        let icon = fileTypes[ext] ? fileTypes[ext] : 'mdi-file-document-outline';
-        let fileEl = "";
-        if(params.value){
-            fileEl = `<div title="${url}" class="file-item">
-                <span title="xóa" data-item="`+url+`" class="remove-file"><span class="mdi mdi-close"></span></span>
-                <i  onclick="window.open('`+url+`');" class="mdi ` + icon + ` file-view" ></i>
-            </div>`
+        try {
+            let value = (params.value) ? JSON.parse(params.value) : null;
+            let countFile = (value && value.length > 0) ? '<span style="font-size:12px">'+value.length + ' files </span>' : "+";
+            let div = `
+                    <div class="file-add" title="Thêm file" style="font-size: 20px;
+                    text-align: center;
+                    line-height: 18px;" >
+                        `+countFile+`
+                    </div>
+                `;
+            this.eGui.innerHTML = div;
+            this.eGui.querySelector('.file-add').addEventListener('click', function(e){
+                SYMPER_APP.$evtBus.$emit('document-submit-add-file-click', {
+                    control:control
+                })
+            } );
+        } catch (error) {
+            console.warn(error);
         }
-        let template = `<div class="upload-file-wrapper-outtb">${div}
-            ${fileEl}
-        </div>`
-        this.eGui.innerHTML = template;
-        this.eGui.querySelector('.file-add').addEventListener('click', function(e){
-            SYMPER_APP.$evtBus.$emit('document-submit-add-file-click', {
-                control:control
-            })
-        } );
+        
+        
     }
     
 };

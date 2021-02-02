@@ -84,10 +84,8 @@ export default {
             rowSelection:'multiple'
         };
         
-
-        
         this.defaultColDef = {
-            width: 150,
+            minWidth: 150,
             sortable: true,
             resizable: true,
             filter: true,
