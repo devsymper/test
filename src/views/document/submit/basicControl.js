@@ -341,6 +341,7 @@ export default class BasicControl extends Control {
             }
             else{
                 this.value = value;
+                this.inputValue = value;
             }
             if (this.inTable === false) {
                 if (this.type == 'label') {
