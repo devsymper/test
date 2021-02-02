@@ -18,7 +18,7 @@
 			:is="nodeConfigTag"
 			:nodeData="selectingNode">
 		</component> -->
-		<pivot-data 
+		<transposeTable 
 			:nodeData="selectingNode"
 			style="height: calc(100% - 150px)"
 		/>
@@ -30,7 +30,7 @@ import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
 import FormTpl from "@/components/common/FormTpl.vue";
 import { autoLoadNodeClasses } from "@/components/dataflow/configPool/dataflowConfig.js";
 import _cloneDeep from "lodash/cloneDeep";
-import PivotData from './configs/PivotData.vue';
+import TransposeTable from './configs/TransposeTable.vue';
 
 
 let mapTypeToNodeClass = autoLoadNodeClasses();
@@ -61,7 +61,7 @@ export default {
 
 		FormTpl,
 		PeriodTimeConfig,
-		PivotData,
+		TransposeTable,
 	},
 	computed:{
 		nodeConfigTag(){
