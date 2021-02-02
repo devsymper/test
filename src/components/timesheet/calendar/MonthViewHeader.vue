@@ -22,7 +22,7 @@
         <div v-if="monthEvents[date]" class="month-status">
             <div :style="{'width': monthEvents[date]
             ? (((monthEvents[date].reduce((acc, d) => +d.duration + acc, 0) / 60) / hoursRequired) * 100) + '%'
-            : '0%'}" class="green-color ml-0" style="height: 3px; border:1px">
+            : '0%'}" class="green-color" style="height: 3px; border:1px">
             </div>
         </div>
     </div>
@@ -82,5 +82,22 @@ export default {
     color: orange;
     font-weight: bold;
     font-size: 13px;
+}
+.dark-sea-green {
+    background-color: #8FBC8F
+}
+.month-status{
+    background-color:#90EE90; 
+    width: 90%; 
+    height: 3px; 
+    border:1px;
+    margin-top: 1px;
+    margin-left: 9px
+}
+.grey-color {
+    background-color: #DCDCDC
+}
+.green-color{
+    background-color:green;
 }
 </style>
