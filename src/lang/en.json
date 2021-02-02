@@ -241,7 +241,8 @@
             "compact": "Compact"
         },
         "error": {
-            "cannot_get_data": "Can not get data from server"
+            "cannot_get_data": "Can not get data from server",
+            "name_exist":"Name already exist"
         },
         "success": {
             "save_config": "Save config successfully!",

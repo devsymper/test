@@ -1,27 +1,15 @@
 <template>
 <v-card>
     <v-tabs v-model="tab" color="orange" grow style="flex-grow: 0">
-        <v-tab href="#tab-1" class="tab">
-            {{$t('timesheet.period')}}
-        </v-tab>
         <v-tab href="#tab-2" class="tab">
             {{$t('timesheet.period')}}
         </v-tab>
         <v-tab href="#tab-3" class="tab">
             {{$t('timesheet.remind')}}
         </v-tab>
-        <v-tab href="#tab-4" class="tab">
-           Loại việc
-        </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab" style="flex-grow: 1">
         <!-- start of tab 1 -->
-        <v-tab-item :key="1" :value="'tab-' + 1" class="tab-item" style="flex-grow: 1">
-            <div class="ml-3 mt-3 mr-3">
-             <RepeatConfig />
-
-            </div>
-        </v-tab-item>
 
         <!-- start of tab 2 -->
         <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
@@ -201,70 +189,16 @@
             </div>
         </v-tab-item>
         <!-- end of tab 2 -->
-        <!-- tab4 -->
-          <v-tab-item :key="4" :value="'tab-' + 4" class="tab-item">
-            <v-divider></v-divider>
-           <div class="d-flex flex-column flex-grow-1" style="padding-bottom: 4rem">
-                <v-row class='d-flex justify-start mr-7 align-center flex-grow-0 mt-4 ml-4'>
-                    <div class="d-flex align-center ml-3 mr-4">
-                        <span class="font">
-                            Thêm mới </span>
-                    </div>
-                    <div class="d-flex justify-start">
-                        <v-dialog v-model="dialog" width="357">
-                            <template v-slot:activator="{on}">
-                                <v-btn style="font-weight: normal" depressed small class="mr-2 fs-13" color="success" v-on="on">
-                                    Loại công việc  <v-icon>mdi-plus</v-icon>
-                                </v-btn>
-                            </template>
-                            <CategoryForm :update="updateCategory" @updateList="getListCategory()" @cancel="cancel()"/>
-                       </v-dialog>
-                    </div>
-                </v-row>
-                 <v-row class='d-flex justify-start align-center flex-grow-0 mt-4 ml-4'>
-                    <div class="d-flex align-center ml-3 mr-4">
-                        <span class="font">
-                            Danh sách loại công việc</span>
-                    </div>
-                </v-row>
-                 <v-row class='d-flex justify-start align-center flex-grow-0 mt-4 ml-8 mr-5'>
-                    <v-row>
-                         <v-data-table dense :headers="headers" :items="categoryTask" item-key="name" class="elevation-1">
-                             <template v-slot:item.actions="{ item }">
-                        <v-icon
-                        small
-                        class="mr-2"
-                        @click="editItem(item)"
-                        >
-                        mdi-pencil
-                        </v-icon>
-                        <v-icon
-                        small
-                        @click="deleteItem(item)"
-                        >
-                        mdi-delete
-                        </v-icon>
-                     </template>
-                         </v-data-table>
-                    </v-row>
-                </v-row>
-                <v-row class="flex-grow-1">
-                </v-row>
-            </div>
-        </v-tab-item>
-        <!-- tab4 -->
     </v-tabs-items>
 </v-card>
 </template>
 
 <script>
-import RepeatConfig from "../../components/common/RepeatConfig"
 import timesheetApi from '../../api/timesheet';
 import CategoryForm from "../../components/timesheet/CategoryForm";
 export default {
     components:{
         CategoryForm,
-        RepeatConfig
     },
     data() {
         return {
@@ -303,8 +237,7 @@ export default {
             hoursRequiredError: '',
             //table
             updateCategory:{},
-            categoryTask: [
-            ],
+            categoryTask: [],
             headers: [
             {
                 text: 'ID',
@@ -364,24 +297,7 @@ export default {
         cancel(){
             this.dialog = false
         },
-        getListCategory(){
-            let self= this;
-             timesheetApi.getAllCategory({}).then(res => {
-                if (res.status === 200) {
-                    self.categoryTask=[];
-                    self.listCategory = res.data.category;
-                     console.log(self.listCategory); 
-                     for(let i=0; i<self.listCategory.length; i++){
-                         self.categoryTask.push({
-                            name: self.listCategory[i].name,
-                            key: self.listCategory[i].key,
-                            id:self.listCategory[i].id,
-
-                         })
-                     }
-                    }
-                }).catch(console.log);
-        },
+      
           saveHr(){
              alert('Lưu thành công')
         },

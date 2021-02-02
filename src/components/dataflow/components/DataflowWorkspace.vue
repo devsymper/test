@@ -16,7 +16,10 @@ export default {
     },
     methods: {
         selectNode(data){
-            let cellId = data.id;
+            this.$store.commit('dataflow/setSelectingWidget', {
+                id: data.id,
+                instanceKey: this.instanceKey
+            });
         },
         center(){
             this.$refs.dataflowPaper.center();

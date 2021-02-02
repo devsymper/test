@@ -11,9 +11,10 @@
         >
             <date-picker
                 :keyInstance="keyInstance"
-                @clickDateCell="selectedDate"
+                @after-select-date="afterSelectDate"
+                @after-apply-datetime="afterSelectDateTime"
                 :title="'Chọn ngày'"
-                :isTime="false"
+                :isTime="isDateTimePicker"
                 ref="datePicker"
             />
             <FloattingPopup 
@@ -41,7 +42,7 @@
             >
                 <template slot="drag-panel-content">
                     <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
-                    <filter-input @save-input-filter="saveInputFilter" @search-data="searchDataFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
+                    <filter-input :keyInstance="keyInstance" @save-input-filter="saveInputFilter" @search-data="searchDataFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
                 </template>
             </sym-drag-panel>
             <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
@@ -364,6 +365,7 @@ export default {
     },
     data() {
         return {
+            isDateTimePicker:false,
             controlInfinity:[],
             focusingControlName: '',
             contentDocument: null,
@@ -710,13 +712,13 @@ export default {
         });
         this.$evtBus.$on("document-submit-date-input-click", e => {
             if(this._inactive == true) return;
-            let controlIns = getControlInstanceFromStore(this.keyInstance,e.controlName);
-            this.$refs.datePicker.setRange(controlIns.minDate,controlIns.maxDate);
+            let controlIns = e.control;
+            this.isDateTimePicker = true;
+            if(e.control.type == 'date'){
+                this.isDateTimePicker = false;
+                this.$refs.datePicker.setRange(controlIns.minDate,controlIns.maxDate);
+            }
             this.$refs.datePicker.openPicker(e);
-            this.$store.commit("document/updateCurrentControlEditByUser", {
-                currentControl: e.controlName,
-                instance: this.keyInstance
-            });
         });
         /**
          * Sự kiện bắn ra từ click vào input filter để mở popup
@@ -746,7 +748,7 @@ export default {
             this.$refs.inputFilter.setControlName(e.controlName);
             this.runInputFilterFormulas(e.controlName);
             this.$refs.symDragPanel.show();
-            this.$refs.inputFilter.setFormulas(e.formulas,e.controlName);
+            this.$refs.inputFilter.setFormulas(e.formulas);
             
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
@@ -840,7 +842,9 @@ export default {
                 }
                 if (
                     !$(evt.target).hasClass("s-control-date") &&
+                    !$(evt.target).hasClass("s-control-datetime") &&
                     !$(evt.target).hasClass("card-datetime-picker") &&
+                    $(evt.target).closest(".v-list-item").length == 0 &&
                     $(evt.target).closest(".card-datetime-picker").length == 0 && 
                     $(evt.target).closest('.ag-input-date').length == 0
                 ) {
@@ -1913,17 +1917,27 @@ export default {
                                                 instance: this.keyInstance
                                             });
         },
-
-
+        /**
+         * Sự kiện phát ra khi click vào áp dụng của date time picker
+         */
+        afterSelectDateTime(data){
+            let controlName = data.inputForcusing;
+            let dateTime = data.dateTime;
+            this.setDataForDateTimeControl(controlName, dateTime);
+        },
         /**
          * Sự kiện phát ra khi click vào date của date picker
          */
-        selectedDate(data){
+        afterSelectDate(data){
+            let controlName = data.inputForcusing;
+            let date = data.date;
+            this.setDataForDateTimeControl(controlName, date);
+        },
+
+        setDataForDateTimeControl(controlName, data){
             this.$refs.datePicker.closePicker();
-            let controlName = this.sDocumentSubmit.currentControlEditByUser;
             let controlInstance = getControlInstanceFromStore(this.keyInstance, controlName);
             if(controlInstance.inTable == false){
-                controlInstance.setValue(data);
                 this.handleInputChangeBySystem(controlName,data)
             }
             else{
@@ -1933,7 +1947,6 @@ export default {
                 tableControl.tableInstance.setDataAtCell(controlName, data, currentRow.id);
             }
         },
-
         /**
          * Hàm mở sub-form submit
          */
@@ -2358,6 +2371,9 @@ export default {
                         if(controlIns.type == 'percent'){
                             value = (controlIns.value === "" ) ? 0 : controlIns.value/100;
                         }
+                        else if(controlIns.checkEmptyFormulas('autocomplete')){
+                            value = controlIns.inputValue;
+                        }
                         dataControl[controlName] = value;
                         if(controlIns.type == 'checkbox'){
                             dataControl[controlName] = (value) ? 1 : 0;
@@ -2488,7 +2504,6 @@ export default {
          */
         runInputFilterFormulas(controlName,search=""){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
-            let controlId = controlInstance.id
             let allFormulas = controlInstance.controlFormulas;
             if(allFormulas.hasOwnProperty('list')){
                 if(allFormulas['list'].hasOwnProperty('instance')){
@@ -2623,22 +2638,23 @@ export default {
          *  Hàm xử lí dứ liệu sau khi chạy công thức
          */
         handleAfterRunFormulas(res,controlName,formulaType){
+
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-            if(formulaType == 'autocomplete' || formulaType == 'list'){
+            let controlId = controlInstance.id;
+            if(controlInstance.type == 'inputFilter'){
+                this.$refs.inputFilter.setData(res.data.data);
+            }
+            else if(formulaType == 'autocomplete' || formulaType == 'list'){
                 let titleControl = (controlInstance) ? controlInstance.title : "";
                 this.setDataForControlAutocomplete(res,controlName,titleControl);
                 return;
             }
-            let controlId = controlInstance.id;
             let value = minimizeDataAfterRunFormula(res)
             if(formulaType === 'formulasDefaulRow'){
                 this.$store.commit("document/updateDataToTableControlRoot",{instance:this.keyInstance,value:value,controlName:controlName,tableName:controlInstance.inTable});
                 return;
             }
-            if(controlInstance.type == 'inputFilter'){
-                this.$refs.inputFilter.setData(controlId,controlName,res.data.data);
-                
-            }
+           
             else if(controlInstance.type == 'table'){
                 if(formulaType=='formulas'){
                     this.setDataToTable(controlId,res.data)

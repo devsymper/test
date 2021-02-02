@@ -49,12 +49,12 @@ export const permissionApi = {
         return actionModuleApi.get("");
     },
     deleteActionPack(idPacks) {
-        if ($.isArray(idPacks)) {
+        if (idPacks.length > 1){
             idPacks = idPacks.join(',');
         }
         return actionModuleApi.delete('/' + idPacks, idPacks);
     },
-    deleteActionPackBeta(id) {
+    deleteActionPackById(id) {
         return actionModuleApi.delete('/' + id);
     },
 

@@ -14,29 +14,18 @@
 				<PeriodTimeConfig />
 			</div>
 		</div>
-		<!-- <SummalizeConfig /> -->
-		<!-- <NodeConfig
-			@dataset-selected="handleDatasetSelected"
-		/>
-		<DatasetColumnSelector  :rowData="rowData" /> -->
-		<!-- <component 
+		<component 
 			:is="nodeConfigTag"
 			:nodeData="selectingNode">
-		</component> -->
-		<!-- <pivot-data 
-			:nodeData="selectingNode"
-			style="height: calc(100% - 150px)"
-		/> -->
-		<!-- <SelectConfig /> -->
-		<FilterConfig />
+		</component>
 	</div>
 </template>
 
 <script>
-import ScriptConfig from '@/components/dataflow/components/ScriptConfig'
-import FilterConfig from '@/components/dataflow/components/FilterConfig'
-import SelectConfig from '@/components/dataflow/components/SelectConfig'
-import SummalizeConfig from '@/components/dataflow/components/SummalizeConfig'
+import ScriptRunner from '@/components/dataflow/components/configs/ScriptRunner'
+import FilterData from '@/components/dataflow/components/configs/FilterData'
+import SelectColumns from '@/components/dataflow/components/configs/SelectColumns'
+import SummarizeData from '@/components/dataflow/components/configs/SummarizeData'
 import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
 import NodeConfig from '@/components/dataflow/components/NodeConfig'
 import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
@@ -77,14 +66,12 @@ export default {
 		NodeConfig,
 		DatasetColumnSelector,
 		PivotData,
-		SummalizeConfig,
-		SelectConfig,
-		ScriptConfig,
-		FilterConfig
+		SummarizeData,
+		SelectColumns,
+		ScriptRunner,
+		FilterData
 	},
 	created(){
-		this.dashboardDatasetWorker = new DashboardDatasetWorker()
-		this.listenFromWorker()
 	},
 	computed:{
 		nodeConfigTag(){
@@ -98,7 +85,6 @@ export default {
 	},
 	data(){
 		return {
-			dashboardDatasetWorker: null,
 			allDatasetColumn:{},
 			allInputs:{
 				name: {
