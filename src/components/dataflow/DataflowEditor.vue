@@ -87,12 +87,15 @@ export default {
         handleResizeBottomPane(eventName,left,top,width,height){
             this.workspaceHeight =  $(this.$el).height() - (40 + $(this.$refs.dataflowRunningInfo.$el).height());
         },
-        restoreDataflowData(data){
+        restoreDataflowDisplay(data){ // khôi phục data từ server cho hiển thị dataflow 
             let graphData = data.graph;
             this.$refs.dataflowWorkspace.restoreGraphDisplay(graphData);
             setTimeout((self) => {
                 self.$refs.dataflowWorkspace.center();
             }, 0, this);
+        },
+        restoreRunningNodeData(data){ // Khôi phục lại data từ server phục vụ cho việc chạy dataflow
+
         },
         getDataflowInfo(){
             if(this.idObject){
@@ -116,6 +119,7 @@ export default {
                 }
             });
         },
+        
     },
     data(){
         return {
