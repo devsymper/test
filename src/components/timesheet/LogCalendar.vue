@@ -94,13 +94,11 @@
                                         {{event.category_key}}
                                     </span>
                                 </div>
-                                <div>
                                     <div v-if="findDuration(event.start, event.end)>61" 
-                                        class="fs-11 font-normal fw-400" 
-                                        style="float:right;margin-top: -5px">
-                                        {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
+                                        class="d-flex flex-row-reverse color-black">
+                                       <span class="fs-11">
+                                           {{getDuration(eventParsed.input.start,eventParsed.input.end )}}</span>
                                     </div>
-                                </div>
                             </div>
                         </div>
                         <div v-if="timed" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
@@ -138,10 +136,7 @@ import MonthViewHeader from "./../../components/timesheet/calendar/MonthViewHead
 import WeekdayHeader from "./../../components/timesheet/calendar/WeekdayHeader";
 import MonthViewEvent from "./../../components/timesheet/calendar/MonthViewEvent";
 import LogFormWorker from 'worker-loader!@/worker/timesheet/LogForm.Worker.js';
-
-
 import { mapState} from 'vuex';
-
 import _groupBy from 'lodash/groupBy';
 
 export default {
@@ -180,12 +175,16 @@ export default {
 
     created() {
         this.logFormWorker = new LogFormWorker();
-        //this.calendarViewTimesheetWorker = new CalendarViewWorker()
         this.load();
     },
     methods: {
         setResizeLogtime(event){
             this.events = event
+        },
+        setLogTimeList(data){
+            this.events =  data.events;
+            this.sum = data.sumLogTime;
+            this.hoursRequired = data.hoursRequired;
         },
         // lấy log time đầu tiên của mảng
         resizeLogtime(){
@@ -209,33 +208,15 @@ export default {
             this.$emit('showLog',date);   
         },
          getLogByUserId(id){
-             const self = this;
+            const self = this;
             timesheetApi.getLogByUserId({userId:id})
                 .then(res => {
                     if (res.status === 200) {
-                        const logTimeList = res.data.listLogTime;
-                        self.sum = res.data.sumLogTime;
-                        self.hoursRequired = res.data.hourRequired[0].hoursRequired;
-                        self.events = [...logTimeList.map((logTime, idx) => ({
-                            name: `${logTime.task_id}`,
-                            timed: true,
-                            // log form data
-                            date: logTime.date,
-                            start: Date.parse(logTime.start_time_at),
-                            end: Date.parse(logTime.end_time_at),
-                            duration: logTime.duration,
-                            category: logTime.category_task,
-                            category_key: logTime.key,
-                            task: logTime.task_id,
-                            desc: logTime.description,
-                            type: logTime.type,
-                            id: logTime.id
-                        }))];
+                       
                     }
                 })
                 .catch(err => {
                     console.log(err);
-                    this.$store.commit("timesheet/setShowErrorDialog", { msg: '', show: true });
                 })
         },
         copyLogTime(event){
@@ -333,30 +314,9 @@ export default {
         },
         // lấy ra danh sách Log time
         load() {
-            const self = this;
-            timesheetApi.getLogTimeList()
-                .then(res => {
-                    if (res.status === 200) {
-                        const logTimeList = res.data.listLogTime;
-                        self.sum = res.data.sumLogTime;
-                        self.hoursRequired = res.data.hourRequired[0].hoursRequired;
-                        self.events = [...logTimeList.map((logTime, idx) => ({
-                            name: `${logTime.task_id}`,
-                            timed: true,
-                            // log form data
-                            date: logTime.date,
-                            start: Date.parse(logTime.start_time_at),
-                            end: Date.parse(logTime.end_time_at),
-                            duration: logTime.duration,
-                            category: logTime.category_task,
-                            category_key: logTime.key,
-                            task: logTime.task_id,
-                            desc: logTime.description,
-                            type: logTime.type,
-                            id: logTime.id
-                        }))];
-                    }
-                })
+             this.logFormWorker.postMessage({
+                action:'getLogTimeList',
+            })
         },
         // hàm có sẵn trong thư viện Calendar của Vue
         pre() {
@@ -635,6 +595,8 @@ export default {
                  case 'resizeLogtime':
                     self.setResizeLogtime(data.dataAfter)
                     break;
+                case "getLogTimeList":
+                    self.setLogTimeList(data.dataAfter)
                 default:
                     break;
             }

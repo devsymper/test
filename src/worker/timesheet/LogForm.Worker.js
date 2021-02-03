@@ -10,10 +10,18 @@ self.onmessage = async function (event) {
 			let isSuccessCopy = await copyLogTime(data);
             postMessage({action:'copyLogTime', dataAfter: isSuccessCopy})
             break;
+        case 'getLogTimeList':
+            let logTime = await getLogTimeList();
+            postMessage({action:'getLogTimeList', dataAfter: logTime})
+            break;
         case 'resizeLogtime':
-            debugger
             let task = await resizeLogtime(data);
             postMessage({action:'resizeLogtime', dataAfter: task})
+            break;
+        case 'changeDuration':
+            debugger
+            let duration = await changeDuration(data);
+            postMessage({action:'changeDuration', dataAfter: duration})
             break;
         default:
             break;
@@ -57,4 +65,49 @@ export const resizeLogtime = async function(events) {
         return task;
     })
     return newTasks
+}
+export const getLogTimeList = async function(){
+    let res = await  timesheetApi.getLogTimeList();
+    let data = {
+        sumLogTime: 0,
+        hoursRequired: 0,
+        events:[]
+    }
+    if(res.status == 200){
+        const logTimeList = res.data.listLogTime;
+        data.sum = res.data.sumLogTime;
+        data.hoursRequired = res.data.hourRequired[0].hoursRequired;
+        data.events = [...logTimeList.map((logTime, idx) => ({
+            name: `${logTime.task_id}`,
+            timed: true,
+            // log form data
+            date: logTime.date,
+            start: Date.parse(logTime.start_time_at),
+            end: Date.parse(logTime.end_time_at),
+            duration: logTime.duration,
+            category: logTime.category_task,
+            category_key: logTime.key,
+            task: logTime.task_id,
+            desc: logTime.description,
+            type: logTime.type,
+            id: logTime.id
+        }))];
+    }
+    return data
+}
+export const changeDuration = async function(duration){
+    debugger
+    let hour = duration / 60;
+    let minutes = duration % 60;
+    if (Math.floor(hour) > 0) {
+        hour = Math.floor(hour) + 'h';
+    } else {
+        hour = ''
+    }
+    if (minutes > 0) {
+        minutes = minutes + 'm';
+    } else {
+        minutes = '';
+    }
+    return hour + minutes
 }

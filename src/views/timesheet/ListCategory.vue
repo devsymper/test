@@ -12,14 +12,19 @@
         :customAPIResult="customAPIResult"
         :tableContextMenu="tableContextMenu"
         :getDataUrl="getListUrl">
-        <div slot="right-panel-content" class="h-100">
-           <CategoryForm 
+    </list-items>
+        <v-dialog 
+            v-model="showPanel"
+            persistent
+            max-width="350"
+      >
+       <CategoryForm
+            style="background:white!important"
             ref="category"
+            :listDoc="listDoc"
             :isAddView="isAddView"
             @cancel="cancel()"/>
-        </div>
-    </list-items>
-    
+      </v-dialog>
      
 </div>
 </template>
@@ -30,7 +35,7 @@ import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
 import timesheetApi from '../../api/timesheet';
 import CategoryForm from "./../../components/timesheet/CategoryForm";
-
+import {documentApi} from "../../api/Document"
 export default {
     components: {
         "list-items": ListItems,
@@ -40,6 +45,8 @@ export default {
     data(){
         const self = this
         return {
+            listDoc:[],
+            showPanel:false,
             isAddView:true,
             listCategory:[],
             categoryTask: [],
@@ -104,16 +111,16 @@ export default {
                 } 
             },
              tableContextMenu:{
-                view: {
-                    name:"view",
-                    text:this.$t('timesheet.table.view'),
-                    callback: (cate, callback) => {
-                        this.showDetail(cate);
-                    }
-                },
+                // view: {
+                //     name:"view",
+                //     text:this.$t('timesheet.table.view'),
+                //     callback: (cate, callback) => {
+                //         this.showDetail(cate);
+                //     }
+                // },
                  update: {
                     name:"update",
-                    text:this.$t('timesheet.table.update'),
+                    text:this.$t('common.update'),
                     callback: (cate, callback) => {
                         this.update(cate);
                     }
@@ -136,12 +143,22 @@ export default {
         this.calcContainerHeight();
     },
     created(){
+        this.getDocument();
         this.getListUrl = appConfigs.apiDomain.timesheet+'category';
     },
     methods:{
+        getDocument(){
+            const self = this;
+            documentApi.getSmallListDocument().then(res=>{
+                if(res.status==200){
+                    self.listDoc = res.data.listObject;
+                }
+            })
+        },
         deleteOne(cate){
             this.$refs.category.id = cate.id;
             this.$refs.category.key= cate.key;
+            this.$refs.category.keyDoc= cate.key;
             this.$refs.category.name= cate.name;
             this.$refs.category.description= cate.description;
             this.$refs.category.status= 0;
@@ -154,14 +171,16 @@ export default {
             )
         },
         update(category){
+             this.showPanel = true;
             this.isAddView = false;
-            this.$refs.listCategory.openactionPanel();
             this.$refs.category.key = category.key;
             this.$refs.category.name = category.name;
             this.$refs.category.description = category.description;
             this.$refs.category.id = category.id;
         },
         addCategory(){
+            this.showPanel = true;
+            this.$refs.listCategory.closeactionPanel();
             this.$refs.category.refreshAll();
             this.isAddView = true;
             this.showAddCategory = true;
@@ -170,9 +189,8 @@ export default {
             this.containerHeight = util.getComponentSize(this).h;
         },
         cancel(){
-            this.$refs.listCategory.refreshList()
             this.$refs.category.refreshAll();
-            this.$refs.listCategory.closeactionPanel();
+            this.showPanel = false
         }
     }
 }
