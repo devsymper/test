@@ -4,7 +4,6 @@
 
 <script>
 import JointPaperDataMapping from '@/components/common/rappid/JointPaperDataMapping';
-require('@/plugins/rappid/rappid.css');
 
 let relaventIcon = {
 	number:'image/relations/number.svg',

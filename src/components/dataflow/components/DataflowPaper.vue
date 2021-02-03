@@ -6,9 +6,7 @@
 
         </div>
     	<div ref="jointWrapper" :style="{
-            maxHeight: '100%',
-            maxWidth: '100%',
-            overflow: 'auto',
+            minHeight: '100px',
             height: (height - 55) + 'px'
         }"></div>
         <a ref="downloadLinkSVG" href></a>
@@ -504,6 +502,9 @@ export default {
     overflow: hidden;
 }
 
+.symper-node-stencil{
+    height: 55px;
+}
 .symper-dataflow-workspace .joint-paper{
     top: -10px;
     left: -15px;
