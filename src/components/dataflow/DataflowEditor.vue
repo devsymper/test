@@ -39,6 +39,7 @@
             @resize:end="handleResizePane"
         >
             <DataflowSidebarConfig
+                @node-name-changed="handleChangeNodeName"
                 :instanceKey="instanceKey"
                 :action="action"/>
         </vue-resizable>
@@ -68,6 +69,11 @@ export default {
         }
     },
     methods: {
+        handleChangeNodeName(data){
+            if(data.name == 'wgName'){
+                this.$refs.dataflowWorkspace.changeCurrentNodeName(data.value);
+            }
+        },
         initData(){
             let defaultData = getDefaultDataflowConfig();
             let data = {

@@ -367,10 +367,6 @@ export default {
                 let linkAttr = linkView.model.attributes;
                 let sourceId = linkAttr.source.id;
                 let targetId = linkAttr.target.id;
-                // if (ListWidget[targetId].stackInput) {
-                //     addLinkOrders(linkView.model, ListWidget[targetId].inputDatasetCount + 1);
-                // }
-                // ListWidget[sourceId].connectToWidget(targetId);
                 self.$emit('link-connected', {
                     sourceId: sourceId,
                     targetId: targetId
@@ -472,21 +468,6 @@ export default {
         },
         hideRemoveButton(idNode) {
             $(".joint-cell[model-id=" + idNode + "]").find('.symper-widget-remove').addClass('d-none');
-        },
-        removeNode(nodeId) {
-            // let jointLinks = this.graph.getLinks();
-            // let nodeId = currentNode.jointNode.id;
-            // for (let link of jointLinks) {
-            //     if (link.attributes.source.id == nodeId) {
-            //         ListWidget[link.attributes.target.id].removeLink(nodeId);
-            //     } else if (link.attributes.target.id == nodeId) {
-            //         ListWidget[nodeId].removeLink(link.attributes.source.id);
-            //     }
-            // }
-            // ListWidget[nodeId].jointChild.remove();
-            // delete ListWidget[nodeId];
-            // currentNode.jointNode = false;
-            // selectPaper();
         }
     },
 };

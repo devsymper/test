@@ -8,6 +8,7 @@
         @node-removed="removeNode"
         @link-removed="removeLink"
         @link-connected="connectLink"
+        @paper-selected="selectPaper"
     />
 </div>
 </template>
@@ -17,12 +18,23 @@ import DataflowPaper from "@/components/dataflow/components/DataflowPaper.vue";
 
 export default {
     computed: {
-        
+		selectingNode(){
+			return this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
+		}
     },
     components: {
         DataflowPaper
     },
     methods: {
+        changeCurrentNodeName(newName){
+            this.$refs.dataflowPaper.setNodeName(this.selectingNode.id, newName);
+        },
+        selectPaper(){
+            this.$store.commit('dataflow/setSelectingWidget', {
+                id: 'home',
+                instanceKey: this.instanceKey
+            });
+        },
         connectLink(data){
             this.$store.commit('dataflow/connectLink', {
                 ...data,
@@ -117,8 +129,7 @@ export default {
 
     },
     created(){
-        
-    }
+    },
 }
 </script>
 

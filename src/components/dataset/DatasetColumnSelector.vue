@@ -12,7 +12,7 @@
 			<ag-grid-vue
 				:style="{
 					width: '100%',
-					height: '100%',
+					height: tableHeight + 'px',
 				}"
 				:class="{ 'ag-theme-balham': true }"
 				:defaultColDef="defaultColDef"
@@ -38,6 +38,9 @@ export default {
 		useCheckbox:{
 			type: Boolean,
 			default: true
+		},
+		tableHeight: {
+			default: 400
 		}
 	},
 	data() {
@@ -81,7 +84,6 @@ export default {
                     editable: true,
 				},
 			],
-			tableHeight: 400,
 			searchKey: ''
 		};
 	},
