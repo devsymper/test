@@ -253,7 +253,6 @@ export default {
             let hour = hoursRequired.trim()
             if(date){
                 let totalHour =  date.reduce((acc, d) => +d.duration + acc, 0);
-                debugger
                 if(totalHour>hour*60){
                     
                     color = "light-red-color"

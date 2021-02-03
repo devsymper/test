@@ -291,6 +291,10 @@ export default {
         }
     },
     methods: {
+        changeStatusTask(data){
+            this.statusTask = data.status;
+            this.docObjInfo.docObjId = data.documentObjectId;
+        },
         getVarsMap(){
             return this.taskVarsMap;
         },
