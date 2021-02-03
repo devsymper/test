@@ -4,17 +4,85 @@
         :height="height" 
         ref="dataflowPaper"
         @node-selected="selectNode"
+        @node-added="addNewNode"
+        @node-removed="removeNode"
+        @link-removed="removeLink"
+        @link-connected="connectLink"
     />
 </div>
 </template>
 
 <script>
 import DataflowPaper from "@/components/dataflow/components/DataflowPaper.vue";
+
 export default {
+    computed: {
+        
+    },
     components: {
         DataflowPaper
     },
     methods: {
+        connectLink(data){
+            this.$store.commit('dataflow/connectLink', {
+                ...data,
+                instanceKey: this.instanceKey
+            });
+            setTimeout((self) => {
+                let allNodes = self.$store.state.dataflow.allDataflow[self.instanceKey].allWidget;
+                let targetNode = allNodes[data.targetId];
+                self.setLinkOrderForNodes([targetNode]);
+            }, 0, this);
+        },
+        setLinkOrderForNodes(nodes = null){
+            let allNodes = this.$store.state.dataflow.allDataflow[this.instanceKey].allWidget;
+            if(nodes == null){
+                nodes = [];
+                let node = null;
+                for(let id in allNodes){
+                    node = allNodes[id];
+                    if(node.stackInput){
+                        nodes.push(node);
+                    }
+                }
+            }
+            for(let node of nodes){
+                if(node.stackInput){
+                    let c = 1;
+                    for(let sourceId in node.prevNodes){
+                        this.$refs.dataflowPaper.updateLinkNumber(sourceId, node.id, c);
+                        c += 1;
+                    }
+                }
+            }
+        },
+        removeLink(data){
+            this.$store.commit('dataflow/disconnectLink', {
+                ...data,
+                instanceKey: this.instanceKey
+            });
+            setTimeout((self) => {
+                let allNodes = self.$store.state.dataflow.allDataflow[self.instanceKey].allWidget;
+                let targetNode = allNodes[data.targetId];
+                if(targetNode){
+                    self.setLinkOrderForNodes([targetNode]);
+                }
+            }, 0, this);
+        },
+        removeNode(data){
+            this.$store.commit('dataflow/removeNodeData', {
+                ...data,
+                instanceKey: this.instanceKey
+            });
+        },
+        addNewNode(data){
+            if(this.status == 'editing'){
+                this.$store.commit('dataflow/addNewNodeData', {
+                    ...data,
+                    instanceKey: this.instanceKey
+                });
+            }
+        },
         selectNode(data){
             this.$store.commit('dataflow/setSelectingWidget', {
                 id: data.id,
@@ -40,6 +108,9 @@ export default {
         },
         height: {
             default: 250
+        },
+        status: {
+            default: 'init'
         },
     },
     mounted(){
