@@ -8,7 +8,7 @@
         ref="jointPaper" 
 	/>
 </template>
-<script>
+<script> 
 import JointPaper from "@/components/common/rappid/JointPaper";
 import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOUCUS_DEPARTMENT_DISPLAY } from "./../nodeDefinition/departmentDefinition";
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
@@ -18,7 +18,6 @@ import { util } from '../../../plugins/util';
 import {
     appConfigs
 } from "@/configs";
-require('@/plugins/rappid/rappid.css');
 export default {
     components: {
         JointPaper
