@@ -1,5 +1,5 @@
 <template>
-    <v-select
+    <v-autocomplete
         class="sym-select fs-13"
         dense
         flat
@@ -16,7 +16,7 @@
                 :infoColumn="item"
             />
         </template>
-    </v-select>
+    </v-autocomplete>
 
 </template>
 
@@ -42,14 +42,14 @@ export default {
             type: String,
             default: ""
         },
-        name : {
+        ikey : {
             default : ''
         }
     },
     methods:{
         change(vl){
             let data = {};
-            data.name = this.name;
+            data.ikey = this.ikey;
             data.value = vl;
             this.$emit("change-value",data)
         }

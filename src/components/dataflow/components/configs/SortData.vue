@@ -3,21 +3,17 @@
         <table class="w-100 fs-13">
             <thead>
                 <tr style="text-align:left">
-                    <th style="padding-left:10px">Select sort columns</th>
+                    <th class="pl-1">Select sort columns</th>
                 </tr>
             </thead>
             <tr style="border-bottom:1px solid #eee"  v-for="(col,idx) in nodeData.configs.sortColumns" :key="idx" :name="idx">
-                <td class="pa-1">
-                    <v-select
-                        class="sym-select fs-13"
-                        dense
-                        flat
-                        v-model="col.uid"
-                        :items="nodeData.configs.allColumns"
-                        item-value="columnName"
-                        item-text="title"
-                        outlined
-                    ></v-select>
+                <td class="px-1 py-2">
+                    <selectColumn 
+                        :allColumns="nodeData.configs.allColumns"
+                        :model="col.uid"
+                        @change-value="changeValue"
+                        :ikey="idx"
+                    />
                 </td>
                 <td style="width:30%">
                     <div class="w-100 d-flex">
@@ -48,7 +44,12 @@
 </template>
 
 <script>
+import SelectColumn from '@/components/common/bi/SelectColumn.vue'
+
 export default {
+    components:{
+        SelectColumn,
+    },
     props:{
         nodeData:{
             type: Object,
@@ -83,6 +84,9 @@ export default {
                 type: "ASC"
             });
         },
+        changeValue(data){
+            this.nodeData.configs.sortColumns[data.ikey].uid =  data.value;
+        }
     }
 
 }
