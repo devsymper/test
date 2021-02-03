@@ -29,7 +29,7 @@ export default class FilterData extends NodeBase {
             configs.condition = this.lastConfigCache;
         }
 
-        this.configs = Object.assign(_cloneDeep(commonNodeProps), configs);
+        this.configs = Object.assign(_cloneDeep(this.commonNodeProps), configs);
     }
 
 

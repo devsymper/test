@@ -12,11 +12,11 @@
                     'min-width': labelMinwidth,
                     'width': compLabelWidth,
                     'line-height': '13px',
-                    'vertical-align': (singleLine && (inputInfo.type == 'text' || inputInfo.type == 'select')) ? 'middle' : 'top' ,
+                    'vertical-align': 'middle',
                     'margin-right': space,
                     'margin-top' : (singleLine && inputInfo.type == 'textarea') ? '8px' : '0' ,
                     'position' : 'relative',
-                    'font-size':'11px',
+                    'font-size': titleFontSize,
                 }"
                 v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' ) && !inputInfo.isShowTitle">
                 {{inputInfo.title}}
@@ -193,6 +193,11 @@ import SymperListCombobox from "./../common/symperInputs/SymperListCombobox";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 import SymperDefaultControlDocument from "@/components/common/symperInputs/SymperDefaultControlDocument.vue";
 
+var titleSizeMap = {
+    small: '11px',
+    normal: '12px',
+    large: '14px'
+};
 const inputTypeConfigs = {
     numeric: {
         tag: "v-text-field",
@@ -733,9 +738,16 @@ export default {
         },
         instance:{
             type:Number
-        }
+        },
+        titleSize:{
+            type: String,
+            default: 'small' // nhận một trong các giá trị: small, normal, large
+        },
     },
     computed: {
+        titleFontSize(){
+            return titleSizeMap[this.titleSize];
+        },
         labelMinwidth() {
             return this.singleLine ? this.labelWidth : "100%";
         },

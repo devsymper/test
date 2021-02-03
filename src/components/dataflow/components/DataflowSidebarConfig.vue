@@ -1,6 +1,7 @@
 <template>
 	<div class="ml-2 mr-2 h-100 d-flex flex-column">
 		<FormTpl 
+			:titleSize="'normal'"
 			:allInputs="allInputs"
 		/>
 		<div v-if="allInputs.saveAsDataset.value" class="ml-4 mr-4 d-flex flex-column">

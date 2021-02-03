@@ -141,7 +141,6 @@ body {
 .sym-small-size .v-input__control {
     margin-bottom: 0px!important;
     min-height: 28px!important;
-    height: 28px!important;
 }
 
 .sym-small-size .v-text-field__slot input {
