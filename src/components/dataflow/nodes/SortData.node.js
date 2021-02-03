@@ -57,6 +57,6 @@ export default class SortData extends NodeBase {
     }
 
     getFullConfigsFromSavedData(configs){
-        return Object.assign(_cloneDeep(commonNodeProps), configs);
+        return Object.assign(_cloneDeep(this.commonNodeProps), configs);
     }
 }
