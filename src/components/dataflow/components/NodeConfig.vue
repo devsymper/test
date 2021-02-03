@@ -1,6 +1,6 @@
 <template>
 	<div class="dataflow-node-config">	
-		<DatasetAutocomplete :isMultiple="false" @dataset-selector="handleDatasetSelector" />
+		<DatasetAutocomplete :isMultiple="false" :idDataset="configs.idDataset" @dataset-selector="handleDatasetSelector" />
 		<div class="table-dataset-info d-flex flex-column">
 			<div class="d-flex fs-13 mt-1" v-for="(item, i) in datasetInfor" :key="i">
 				<span class="flex-grow-1">
@@ -16,15 +16,21 @@
 
 <script>
 import DatasetAutocomplete from '@/components/dataset/DatasetAutocomplete'
+
 export default {
+	props:{
+		configs:{
+			type: Object,
+			default(){
+				return {}
+			}
+		}
+	},
 	components:{
 		DatasetAutocomplete
 	},
 	methods:{
 		handleDatasetSelector(params){
-			this.datasetInfor.id.content = params.id
-			this.datasetInfor.name.content = params.name
-			this.datasetInfor.title.content = params.aliasName
 			this.$emit('dataset-selected' , params)
 		}
 	},
@@ -33,19 +39,19 @@ export default {
 			datasetInfor:{
 				id:{
 					title:"ID",
-					content: ""
+					content: this.configs.idDataset
 				},
 				name:{
 					title:"Name",
-					content: ""
+					content: this.configs.wgName
 				},
 				title:{
 					title:"Title",
-					content: ""
+					content: this.configs.title
 				},
 				docId:{
 					title:"Doc id",
-					content: ""
+					content: this.configs.symperDocId
 				},
 			}
 		}

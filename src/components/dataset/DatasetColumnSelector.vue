@@ -92,11 +92,14 @@ export default {
 				this.rowData.forEach(function(e){
 					delete e.list_foreign_key
 					for(let i in e){
-						if(e[i].toLowerCase()){
-							if(e[i].toLowerCase().includes(self.searchKey.toLowerCase())){
-								arr.push(e)
+						if(e[i]){
+							if(e[i].toLowerCase()){
+								if(e[i].toLowerCase().includes(self.searchKey.toLowerCase())){
+									arr.push(e)
+								}
 							}
 						}
+						
 					}
 				})
 				return arr

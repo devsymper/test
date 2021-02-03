@@ -1,5 +1,5 @@
 <template>
-	<div class="dataset-autocomplete">
+	<div :class="{'dataset-autocomplete': true, 'dataset-autocomplete-hide-title': isMultiple }">
 		<v-autocomplete
 			v-model="listDatasetSelected"
 			:items="listDataset"
@@ -8,7 +8,7 @@
 			solo
 			hide-selected
 			:placeholder="$t('common.searchPlaceholder')"
-			@change="hanldeChange"
+			@change="handleChange"
 			item-text="aliasName"
 			return-object
 		>
@@ -37,18 +37,21 @@ import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/D
 
 export default {
 	props:{
+
 		listDatasets:{
 			type: Array, 
 			default(){
 				return []
 			}
 		},
+		idDataset:{
+			type: String,
+			default: ""
+		},
 		isMultiple:{
 			type: Boolean,
 			default: true
 		}
-	},
-	computed:{
 	},
 	created(){
 		let self = this
@@ -61,8 +64,15 @@ export default {
 				self.$set(self , 'listDataset', data.data.res.data.listObject)
 			}else if(action == 'handleGetAllDataset'){
 				self.$set(self, 'listDataset', data.res.data.listObject)
+			}else if(action == 'handlerGetDatasetInfor'){
+				self.$set(self, 'listDatasetSelected', data.data.res.data.listObject)
 			}
 		});
+		if(this.idDataset){
+			this.getDatasetInfor()
+		}
+	},
+	mounted(){
 		this.searchDataset()
 	},
 	data(){
@@ -83,6 +93,16 @@ export default {
 				action: 'getAllDataset',
 			})
 		},
+		mapDatasetInfo(){
+		},
+		getDatasetInfor(){
+			this.dashboardDatasetWorker.postMessage({
+				action: 'getDatasetInfor',
+				data:{
+					searchKey: this.idDataset
+				}
+			})
+		},
 		searchDataset(){
 			let val = this.searchKey
 			if(this.searchCache[val]){
@@ -96,7 +116,7 @@ export default {
 				})
 			}
 		},
-		hanldeChange(value){
+		handleChange(value){
 			this.$emit('dataset-selector', value)
 		},
 		debounceSearch: _debounce(function(e){
@@ -107,7 +127,8 @@ export default {
 	watch:{
 		searchKey(val){
 			this.debounceSearch()
-		}
+		},
+		
 	}
 }
 </script>
@@ -126,7 +147,7 @@ export default {
 .dataset-autocomplete >>> input{
 	font-size: 13px !important;
 }
-.dataset-autocomplete >>> .v-select__selection{
+.dataset-autocomplete-hide-title >>> .v-select__selection{
 	display: none
 }
 </style>

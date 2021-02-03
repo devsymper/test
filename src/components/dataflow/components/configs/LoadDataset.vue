@@ -2,6 +2,7 @@
     <div>
 		<NodeConfig
 			@dataset-selected="handleDatasetSelected"
+			:configs="nodeData.configs"
 		/>
 		<DatasetColumnSelector  :rowData="nodeData.configs.allColumns" />
     </div>
@@ -24,17 +25,18 @@ export default {
     data(){
         return {
 			currentId: 0,
+			allDatasetColumn:{}
         }
-    },
-    computed: {
-		
-    },
+	},
 	created(){
 		this.dashboardDatasetWorker = new DashboardDatasetWorker()
 		this.listenFromWorker()
 	},
     methods: {
 		handleDatasetSelected(params){
+			setTimeout(self=>{
+				self.changeNodeInfor(params)
+			},200, this)
 			this.currentId = params.id
 			if(!this.allDatasetColumn[params.id]){
 				this.dashboardDatasetWorker.postMessage({
@@ -43,11 +45,19 @@ export default {
 						id: params.id
 					}
 				})
+			}else{
+				this.$set(this.nodeData.configs, 'allColumns', this.allDatasetColumn[params.id])
 			}
+		},
+		changeNodeInfor(params){
+			this.$set(this.nodeData.configs, 'idDataset', params.id)
+			this.$set(this.nodeData.configs, 'title', params.aliasName)
+			this.$set(this.nodeData.configs, 'name', params.aliasName)
 		},
 		handleGetDatasetColumns(data){
 			if(data.status == 200){
 				this.$set(this.allDatasetColumn, this.currentId, data.data.columns[this.currentId])
+				this.$set(this.nodeData.configs, 'allColumns', data.data.columns[this.currentId])
 			}else{
 				this.$snotifyError("Không thể lấy danh sách column")
 			}
