@@ -2,8 +2,9 @@
     <div>
 		<NodeConfig
 			@dataset-selected="handleDatasetSelected"
+			:configs="nodeData.configs"
 		/>
-		<DatasetColumnSelector  :rowData="rowData" />
+		<DatasetColumnSelector  :rowData="nodeData.configs.allColumns" />
     </div>
 </template>
 
@@ -13,26 +14,29 @@ import DatasetColumnSelector from '@/components/dataset/DatasetColumnSelector'
 import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/DashboardDataset.Worker.js';
 
 export default {
+	props:{
+		nodeData:{
+			type: Object,
+			default(){
+				return {}
+			}
+		},
+	},
     data(){
         return {
 			currentId: 0,
+			allDatasetColumn:{}
         }
-    },
-    computed: {
-		rowData(){
-			if(this.allDatasetColumn[this.currentId]){
-				return this.allDatasetColumn[this.currentId]
-			}else{
-				return []
-			}
-		},
-    },
+	},
 	created(){
 		this.dashboardDatasetWorker = new DashboardDatasetWorker()
 		this.listenFromWorker()
 	},
     methods: {
 		handleDatasetSelected(params){
+			setTimeout(self=>{
+				self.changeNodeInfor(params)
+			},200, this)
 			this.currentId = params.id
 			if(!this.allDatasetColumn[params.id]){
 				this.dashboardDatasetWorker.postMessage({
@@ -41,11 +45,19 @@ export default {
 						id: params.id
 					}
 				})
+			}else{
+				this.$set(this.nodeData.configs, 'allColumns', this.allDatasetColumn[params.id])
 			}
+		},
+		changeNodeInfor(params){
+			this.$set(this.nodeData.configs, 'idDataset', params.id)
+			this.$set(this.nodeData.configs, 'title', params.aliasName)
+			this.$set(this.nodeData.configs, 'name', params.aliasName)
 		},
 		handleGetDatasetColumns(data){
 			if(data.status == 200){
 				this.$set(this.allDatasetColumn, this.currentId, data.data.columns[this.currentId])
+				this.$set(this.nodeData.configs, 'allColumns', data.data.columns[this.currentId])
 			}else{
 				this.$snotifyError("Không thể lấy danh sách column")
 			}

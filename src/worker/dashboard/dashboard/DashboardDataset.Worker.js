@@ -10,6 +10,10 @@ onmessage = function (event) {
 };
 
 var handler = {
+	async getDatasetInfor(value){
+		let res = await biApi.searchDataset(value.searchKey)
+		self.postMessage({action:'handlerGetDatasetInfor', data:{res: res}});
+	},
 	async getAllDataset(){
 		let res = await biApi.getAllDataset()
 		self.postMessage({
