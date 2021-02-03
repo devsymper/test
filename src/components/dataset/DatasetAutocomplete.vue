@@ -142,7 +142,8 @@ export default {
 }
 .dataset-autocomplete >>> .v-input__slot{
 	box-shadow: unset !important;
-	border: 1px solid lightgray
+	border: 1px solid lightgray;
+	height: 28px !important;
 }
 .dataset-autocomplete >>> input{
 	font-size: 13px !important;

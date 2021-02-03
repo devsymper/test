@@ -11,12 +11,15 @@
 		>
 			<template v-slot:append="{ item }">
 				<div v-if="!item.condition" class="tree-item-slot mt-2">
-					<v-icon class="btn-delete-item-condition" @click="deleteConditionItem(item)">mdi mdi-close</v-icon>
+					<v-btn class="mr-2 mt-1" tile icon x-small  @click="deleteConditionItem(item)">
+						<v-icon small class="btn-delete-item-condition">mdi-close</v-icon>
+					</v-btn>
+
 					<v-autocomplete :items="listColumn" item-text="title" item-value="name" v-model="item.column" class="tree__list-columns" @change="onChangeConfig" dense solo></v-autocomplete>
 					<v-autocomplete
 						:items="listOperator"
 						@change="onChangeConfig"
-						class="tree__list-operations"
+						class="tree__list-operations ml-1 mr-1"
 						item-text="title"
 						:menu-props="{ minWidth: 60 }"
 						v-model="item.operator"
@@ -25,8 +28,7 @@
 					></v-autocomplete>
 					<v-text-field v-model="item.value" @change="onChangeConfig" solo></v-text-field>
 				</div>
-				<!-- <input v-model="item.formulas" v-on:change="handleChangeInput" class="input-validate" v-if="!item.condition" type="text"> -->
-				<div v-else type="text">
+				<div v-else type="text" class="list-action-treesql">
 					<v-btn light icon style="height: 28px;width: 28px;" v-if="!item.root" @click="deleteCondition(item)">
 						<v-icon style="font-size:16px;">mdi mdi-close</v-icon>
 					</v-btn>
@@ -54,7 +56,6 @@
 </template>
 
 <script>
-import { util } from '@/plugins/util';
 export default {
 	props: {
 		listColumn: {
@@ -223,6 +224,15 @@ export default {
 .tree-view >>> .v-treeview-node__level {
 	display: none;
 }
+.tree-view >>> .v-treeview-node__label:hover .list-action-treesql{
+	opacity: 1;
+}
+.list-action-treesql{
+	opacity:0;
+}
+.list-action-treesql:hover{
+	opacity: 1;
+}
 .tree-view >>> .v-treeview-node__label {
 	flex: unset;
 }
@@ -270,11 +280,11 @@ export default {
 	padding-left: 0 !important;
 }
 .btn-delete-item-condition {
-	font-size: 14px;
+	/* font-size: 14px;
 	margin-left: -8px;
 	margin-right: 8px;
 	padding-bottom: 4px;
-	cursor: pointer;
+	cursor: pointer; */
 	opacity: 0;
 }
 .tree-item-slot:hover .btn-delete-item-condition {
