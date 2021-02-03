@@ -6,7 +6,7 @@
             :allColumns="nodeData.configs.allColumns"
             :model="nodeData.configs.goods"
             @change-value="changeValue"
-            :name="'goods'"
+            :ikey="'goods'"
         />
         <div class="font-weight-medium ml-1 mt-2">Stock (Mã kho)</div>
         <select-column 
@@ -14,7 +14,7 @@
             :allColumns="nodeData.configs.allColumns"
             :model="nodeData.configs.stock"
             @change-value="changeValue"
-            :name="'stock'"
+            :ikey="'stock'"
         />
         <div class="font-weight-medium ml-1 mt-2">Exchange Stock (Mã kho điều chuyển)</div>
         <select-column 
@@ -22,7 +22,7 @@
             :allColumns="nodeData.configs.allColumns"
             :model="nodeData.configs.exchangeStock"
             @change-value="changeValue"
-            :name="'exchangeStock'"
+            :ikey="'exchangeStock'"
         />
         <div class="font-weight-medium ml-1 mt-2">Quantity (Số lượng)</div>
         <select-column 
@@ -30,7 +30,7 @@
             :allColumns="nodeData.configs.allColumns"
             :model="nodeData.configs.quantity"
             @change-value="changeValue"
-            :name="'quantity'"
+            :ikey="'quantity'"
         />
         <div class="font-weight-medium ml-1 mt-2">Total Amount (Thành tiền)</div>
         <select-column 
@@ -38,7 +38,7 @@
             :allColumns="nodeData.configs.allColumns"
             :model="nodeData.configs.totalAmount"
             @change-value="changeValue"
-            :name="'totalAmount'"
+            :ikey="'totalAmount'"
         />
     </div>
 </template>
@@ -64,7 +64,7 @@ export default {
     },
     methods:{
         changeValue(data){
-            this.$set(this.nodeData.configs,data.name,data.value);
+            this.$set(this.nodeData.configs,data.ikey,data.value);
         }
     }
 }

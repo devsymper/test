@@ -44,7 +44,7 @@ export default {
 <style scoped>
 .single-row:hover {
     background: #f5f5f5;
-    cursor: pointer;
+    cursor: all-scroll;
 }
 .item-column-dataset{
     display: flex;
