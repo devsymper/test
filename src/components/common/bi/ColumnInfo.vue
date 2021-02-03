@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { DATATYPE_ICONS } from "@/components/dataflow/configPool/dataflowConfig.js";
 export default {
     props:{
         infoColumn:{
@@ -28,11 +29,7 @@ export default {
     },
     data(){
         return {
-            icon:{
-                'number' : "mdi-numeric",  
-                'text' : "mdi-format-letter-case",  
-                'date' : "mdi-calendar",  
-            }
+            icon: DATATYPE_ICONS
         }
     },
     methods:{

@@ -33,3 +33,10 @@ export const autoLoadNodeClasses = function () {
         return loadedClasses;
     }
 }
+
+
+export const DATATYPE_ICONS = {
+    'number' : "mdi-numeric",  
+    'text' : "mdi-format-letter-case",  
+    'date' : "mdi-calendar",  
+}
