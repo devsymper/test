@@ -6,7 +6,8 @@ DateCellRenderer.prototype.init = function(params) {
     if(!params.node.rowPinned){
         this.eGui = document.createElement('div');
         let control = params.control;
-        let placeHolder = (control.type == 'date') ? "DD/MM/YYYY" : "DD/MM/YYYY HH:mm";
+        let patternDateStr = (control.type == 'date' && control.controlProperties.formatDate.value) ? control.controlProperties.formatDate.value : "DD/MM/YYYY";
+        let placeHolder = (control.type == 'date') ? patternDateStr : "DD/MM/YYYY HH:mm";
         let value = (params.value) ? params.value : '<span style="color: #ababab;font-size: 11px;">'+placeHolder+'</span>';
         if(control.type == 'date'){
             let pattern = control.controlProperties.formatDate.value;

@@ -120,10 +120,6 @@ export default class TableControl1 extends Control {
                 let rowData = {};
                 for (let i = 0; i < Object.keys(data).length; i++) {
                     let key = Object.keys(data)[i];
-                    let control = this.controlInTable[key];
-                    if (control && control.type == 'date') {
-                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
-                    }
                     rowData[key] = data[key][index];
                 }
                 dataTable.push(rowData)
