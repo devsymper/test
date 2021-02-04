@@ -694,8 +694,7 @@ export default {
         // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", controlInstance => {
             if(this._inactive == true) return;
-            let valueControl = controlInstance.value;
-            this.handleInputChangeByUser( controlInstance, valueControl);
+            this.handleInputChangeByUser( controlInstance);
         });
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
             if(this._inactive == true) return;
@@ -767,8 +766,6 @@ export default {
                 else if((e.e.keyCode < 37 || e.e.keyCode > 40)){
                     thisCpn.$refs.autocompleteInput.hide();
                 }
-                
-                
             } catch (error) {
                 console.warn(error);
             }
@@ -1472,13 +1469,9 @@ export default {
                         })
             // th này không phải trong table      
             let controlIns = getControlInstanceFromStore(this.keyInstance, data.controlName);
+            controlIns.isRunChange = true;
             if(controlIns.inTable == false){
-                if(data.fromEnterKey){
-                    this.handleInputChangeBySystem(data.controlName,data.value,false, true);
-                }
-                else{
-                    this.handleInputChangeBySystem(data.controlName,data.value,false,true);
-                }
+                this.handleInputChangeBySystem(data.controlName,data.value, true);
             }
             else{
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
@@ -1494,26 +1487,24 @@ export default {
         /**
          * Hàm xử lí sau khi chạy công thức được điền dữ liệu vào input bởi hệ thống
          */
-        handleInputChangeBySystem(controlName,valueControl, fromPopupAutocomplete = false, isRunChange = true){
+        handleInputChangeBySystem(controlName,valueControl, isRunChange = true){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             markBinedField(this.keyInstance,controlName);
             controlInstance.setValue(valueControl);
             this.updateListInputInDocument(controlName, 'value',controlInstance.value);
-            
-            if(fromPopupAutocomplete){
-                $('#'+controlInstance.id).attr('data-autocomplete',valueControl);
-            }
             // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
             controlInstance.checkRequire();
             if(isRunChange){
                 this.handleControlInputChange(controlInstance);
             }
         },
-        handleInputChangeByUser( controlInstance, valueControl){
+        /**
+         * Xử lý lưu control xuống worker, chạy công thức sau khi người dùng thay đổi giá trị của control
+         */
+        handleInputChangeByUser(controlInstance){
             setDataInputBeforeChange(this.keyInstance, controlInstance);
-            if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
-                $('#'+controlInstance.id).attr('data-autocomplete',"");
-                return;
+            if(controlInstance.valueChange){
+                controlInstance.setValue(controlInstance.valueChange);
             }
             let controlToWorker = {name:controlInstance.name,type:controlInstance.type,value:controlInstance.value}
             this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.keyInstance, type:'submit'}})
@@ -2515,6 +2506,8 @@ export default {
                 "document/addToListInputInDocument",
                 { name: name, control: control ,instance: this.keyInstance}
             );
+            let controlToWorker = {name:control.name,type:control.type,value:control.value}
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.keyInstance, type:'submit'}})
         },
         /**
          * chạy công thức input filter
