@@ -129,29 +129,29 @@ var attrItems = {
     legendPosition: {
         title: 'Position',
         type: 'btnSelect',
-        default: 'vertical-bottom',
+        default: 'bottom',
         options: [{
                 name: 'Left',
-                icon: 'ms-Icon ms-Icon--AlignHorizontalLeft',
-                value: 'vertical-left',
+                icon: 'mdi-align-horizontal-left',
+                value: 'left',
                 text: ''
             },
             {
                 name: 'Top',
-                icon: 'ms-Icon ms-Icon--AlignVerticalTop',
-                value: 'horizontal-top',
+                icon: 'mdi-align-vertical-top',
+                value: 'top',
                 text: ''
             },
             {
                 name: 'Right',
-                icon: 'ms-Icon ms-Icon--AlignHorizontalRight',
-                value: 'vertical-right',
+                icon: 'mdi-align-horizontal-right',
+                value: 'right',
                 text: ''
             },
             {
                 name: 'Bottom',
-                icon: 'ms-Icon ms-Icon--AlignVerticalBottom',
-                value: 'horizontal-bottom',
+                icon: 'mdi-align-vertical-bottom',
+                value: 'bottom',
                 text: ''
             },
         ],

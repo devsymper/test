@@ -35,9 +35,10 @@
 						:key="key"
 						v-show="groupData.show"
 					>
-						<v-expansion-panel-header ><span class="fs-13">{{groupData.label}}</span> </v-expansion-panel-header>
+						<v-expansion-panel-header ><span class="fs-13 pl-1">{{groupData.label}}</span> </v-expansion-panel-header>
 						<v-expansion-panel-content>
 							<form-tpl
+								class="s-style-config"
 								:allInputs="groupData.children"
 							></form-tpl>
 						</v-expansion-panel-content>
@@ -133,6 +134,18 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.s-style-config >>> .v-input--switch .v-input__control {
+	padding-left: 10px;
+    padding-top: 4px;
+}
+.s-style-config >>> .v-input--switch .v-input__control .v-input__slot{
+	background-color: white!important;
+}
+.s-style-config >>> .v-select .v-input__control{
+	height: 28px;
+}
+.v-menu__content{
+	font-size: 13px;
+}
 </style>

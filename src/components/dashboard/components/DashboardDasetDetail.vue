@@ -36,7 +36,7 @@
             >
                 <v-expansion-panel class="sym-expand-panel " v-for="(dataset,idx) in datasetAndColumn" :key="idx" v-show="dataset.show && !dataset.isSubDataset">
                     <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                        <v-tooltip bottom open-delay="400">
+                        <v-tooltip left open-delay="400">
                             <template v-slot:activator="{ on }">
                                 <v-icon v-on="on" v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
                                 <v-icon v-on="on" v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
