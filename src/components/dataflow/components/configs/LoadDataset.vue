@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="h-100">
 		<NodeConfig
 			@dataset-selected="handleDatasetSelected"
 			:configs="nodeData.configs"

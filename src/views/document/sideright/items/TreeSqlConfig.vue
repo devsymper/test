@@ -4,18 +4,35 @@
 			dense
 			open-all
 			:items="treeData"
-			class="tree-view mb-2"
+			:class="{'tree-view': true, 'mb-2': true, 'tree-view-doc': !customCss, 'tree-view-custom': customCss}"
 			ref="tree"
 			style="
             overflow:hidden;padding-bottom:8px"
 		>
 			<template v-slot:append="{ item }">
-				<div v-if="!item.condition" class="tree-item-slot mt-2">
-					<v-btn class="mr-2 mt-1" tile icon x-small  @click="deleteConditionItem(item)">
-						<v-icon small class="btn-delete-item-condition">mdi-close</v-icon>
-					</v-btn>
-
-					<v-autocomplete :items="listColumn" item-text="title" item-value="name" v-model="item.column" class="tree__list-columns" @change="onChangeConfig" dense solo></v-autocomplete>
+				<div v-if="!item.condition" class="tree-item-slot">
+					<v-autocomplete :items="listColumn"  :item-value="itemValue" v-model="item.column" class="tree__list-columns" @change="onChangeConfig" dense solo >
+						<template v-slot:item="data">
+							<ColumnInfo  v-if="customAutocomplete" :infoColumn="data.item" />
+							<div class="d-flex" v-else>
+								<span  class="fs-13">
+									{{data.item.title}}
+								</span>
+							</div>
+						</template>	
+						<template v-slot:selection="data">
+							<div v-if="customAutocomplete" class="d-flex">
+								<span class="fs-13 ml-1">
+									{{data.item.columnName}}
+								</span>
+							</div>
+							<div v-else>
+								<span  class="fs-13">
+									{{data.item.name ? data.item.name : data.item.title}}
+								</span>
+							</div>
+						</template>
+					</v-autocomplete>
 					<v-autocomplete
 						:items="listOperator"
 						@change="onChangeConfig"
@@ -27,6 +44,9 @@
 						solo
 					></v-autocomplete>
 					<v-text-field v-model="item.value" @change="onChangeConfig" solo></v-text-field>
+					<v-btn class="ml-2 mt-1" tile icon x-small  @click="deleteConditionItem(item)">
+						<v-icon small class="btn-delete-item-condition">mdi-close</v-icon>
+					</v-btn>
 				</div>
 				<div v-else type="text" class="list-action-treesql">
 					<v-btn light icon style="height: 28px;width: 28px;" v-if="!item.root" @click="deleteCondition(item)">
@@ -56,6 +76,7 @@
 </template>
 
 <script>
+import ColumnInfo from '@/components/common/bi/ColumnInfo'
 export default {
 	props: {
 		listColumn: {
@@ -64,6 +85,18 @@ export default {
 		defaultData: {
 			type: Array,
 		},
+		customAutocomplete:{
+			type: Boolean, 
+			default: false
+		},
+		itemValue:{
+			type: String,
+			default: 'name'
+		},
+		customCss:{
+			type: Boolean,
+			default: false
+		}
 	},
 	watch: {
 		defaultData: {
@@ -89,11 +122,19 @@ export default {
 					children: [],
 				},
 			],
+			mapIcon:{
+				text: 'mdi-text-box-outline',
+				number: 'mdi-format-list-numbered',
+				date: 'mdi-clock-time-five-outline',
+			},
 			allNode: [
 				{ title: 'item', type: 'item' },
 				{ title: 'group', type: 'group' },
 			],
 		};
+	},
+	components:{
+		ColumnInfo
 	},
 	methods: {
 		addNode(node, item, i) {
@@ -221,7 +262,7 @@ export default {
 .v-list-item .v-list-item__title {
 	font: 11px !important;
 }
-.tree-view >>> .v-treeview-node__level {
+.tree-view-doc >>> .v-treeview-node__level {
 	display: none;
 }
 .tree-view >>> .v-treeview-node__label:hover .list-action-treesql{
@@ -239,12 +280,12 @@ export default {
 .tree-view >>> .v-text-field__details{
 	display: none;
 }
-.tree-view >>> .v-treeview-node__toggle {
-	display: none;
-}
 .tree-view >>> .tree-item-slot {
 	display: flex;
 	margin-top: -8px;
+}
+.tree-view-custom >>> .tree-item-slot {
+	margin-bottom: -14px;
 }
 .tree-view >>> .tree-item-slot .v-input {
 	margin: unset;
@@ -262,32 +303,40 @@ export default {
 .tree__list-operations >>> .v-input__icon {
 	display: none;
 }
+.tree__list-columns >>> .v-input__slot{
+	width: 150px !important
+}
 .tree__list-columns {
 	margin-left: -7px !important;
 }
 .tree__list-operations {
 	width: 70px;
 }
-::v-deep .v-treeview-node__root {
+.tree-view-doc ::v-deep .v-treeview-node__root {
 	padding-right: 0 !important;
 }
-
-::v-deep .v-treeview-node__children > .v-treeview-node:not(.v-treeview-node--leaf) {
+.tree-view-doc ::v-deep .v-treeview-node__children > .v-treeview-node:not(.v-treeview-node--leaf) {
 	border: var(--symper-border);
 	margin: 0px 2px 8px 12px;
 }
-::v-deep .v-treeview-node__children > .v-treeview-node:not(.v-treeview-node--leaf) .v-treeview-node__root {
+.tree-view-doc ::v-deep .v-treeview-node__children > .v-treeview-node:not(.v-treeview-node--leaf) .v-treeview-node__root {
 	padding-left: 0 !important;
 }
+.tree-view-doc >>> .v-treeview-node__toggle {
+	display: none;
+}
+.tree-view-custom >>> .v-treeview-node__toggle {
+	margin-left: 6px;
+	margin-right: -8px;
+}
 .btn-delete-item-condition {
-	/* font-size: 14px;
-	margin-left: -8px;
-	margin-right: 8px;
-	padding-bottom: 4px;
-	cursor: pointer; */
 	opacity: 0;
 }
 .tree-item-slot:hover .btn-delete-item-condition {
 	opacity: 1;
 }
+.tree-view-custom >>> .v-treeview-node__children{
+	margin-left: -4px ;
+}
+
 </style>

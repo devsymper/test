@@ -71,11 +71,15 @@ export default {
         return {
 			showSideBar : false,
 			containerHeight: 0,
-			selectingShowList: 'list-dashboard'
         };
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h;
+	},
+	computed:{
+		selectingShowList(){
+			return this.$store.state.dashboard.selectingShowList
+		}
 	},
     methods: {
 		afterToggleSideBar(value){
