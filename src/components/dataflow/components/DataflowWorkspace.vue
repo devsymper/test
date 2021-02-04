@@ -26,6 +26,12 @@ export default {
         DataflowPaper
     },
     methods: {
+        getLinks(){
+            return this.$refs.dataflowPaper.getLinks();
+        },
+        getNodeAttr(id){
+            return this.$refs.dataflowPaper.getNodeAttr(id);
+        },
         actionOnCanvas(action){
             this.$refs.dataflowPaper.actionOnToolbar(action);
         },

@@ -77,6 +77,17 @@ export default {
         }
     },
     methods: {
+        getNodeAttr(id){
+            let node = this.graph.getCell(id);
+            if(node){
+                return node.attributes;
+            }else{
+                return {}
+            }
+        },
+        getLinks(){
+            return this.graph.getLinks();
+        },
         addLinkTools(link) {
             let paper = this.paper;
             link.set('router', { name: 'manhattan' });
@@ -413,7 +424,6 @@ export default {
             this.paper.toSVG(done);
         },
         actionOnToolbar(type){
-            debugger
             let ele = $(this.$refs.symperPaperToolbar).find('.joint-widget[data-type='+type+']');
             ele.mousedown();
             ele.click();

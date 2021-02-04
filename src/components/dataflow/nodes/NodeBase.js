@@ -133,6 +133,20 @@ export default class NodeBase {
         return fullConfigs;
     }
 
+    getCommonProp(){
+        let prop = _cloneDeep(commonNodeProps);
+        for (let name in prop) {
+            prop[name] = this.configs[name] ? this.configs[name] : '';
+        }
+        prop.nextNodes = Object.keys(this.nextNodes);
+        prop.prevNodes = Object.keys(this.prevNodes);
+
+        if(this.configs.hasOwnProperty('autoReplaceNullValue')){
+            prop.autoReplaceNullValue = this.configs.autoReplaceNullValue;
+        }
+        return prop;
+    }
+
     getFullConfigsFromSavedData(configs){} // hàm khôi phục toàn bộ cấu hình của node từ dữ liệu được lưu
     process(){} // hàm thực thi logic của node để tạo đầu ra
 }

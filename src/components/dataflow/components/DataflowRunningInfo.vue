@@ -7,9 +7,9 @@
 		</v-tab>
 	</v-tabs>
 	<div class="w-100 h-100 content-running-info">
-		<Message v-if="selectingTab == 2" />
-		<OutputColumn v-if="selectingTab == 1" />
-		<OutputData v-if="selectingTab == 0" />
+		<Message :instanceKey="instanceKey" v-if="selectingTab == 2" />
+		<OutputColumn :instanceKey="instanceKey" v-if="selectingTab == 1" />
+		<OutputData ref="showlistData" :instanceKey="instanceKey" v-if="selectingTab == 0" />
 	</div>
 </div>
 </template>
@@ -21,6 +21,14 @@ import OutputData from "@/components/dataflow/components/runningInfo/OutputData"
 import { util } from '@/plugins/util.js';
 
 export default {
+	props: {
+        action: {
+            default: 'create'
+        },
+        instanceKey: {
+            default: ''
+        },
+	},
 	components:{
 		Message,
 		OutputColumn,
@@ -52,6 +60,12 @@ export default {
 	methods:{
 		calcContainerHeight(){
 			this.containerHeight = util.getComponentSize(this).h;
+		},
+		getRunningData(idNode, info){
+			this.$refs.showlistData.getData({
+				idNode,
+				info
+			});
 		}
 	}
 }

@@ -36,102 +36,19 @@ export default {
 				{
 					headerName: 'Name',
 					field: 'columnName',
-					type: 'numeric',
 					columnTitle: 'table.id',
 					width: 50,
 				},
 				{
 					headerName: 'Type',
 					field: 'type',
-					type: 'numeric',
 					columnTitle: 'table.id',
 				},
 				{
 					headerName: 'Rename',
 					field: 'title',
-					type: 'numeric',
 					columnTitle: 'table.id',
-				},
-				{
-					headerName: 'Description',
-					field: 'from',
-					type: 'numeric',
-					columnTitle: 'table.id',
-				},
-			],
-			rowData: [
-				{
-					uid: 'stmp_1602843448654_dc',
-					idDataset: 'stmp_1602843448654',
-					columnName: 'dc',
-					type: 'text',
-					symperDocId: 'stmp_1602843448654',
-					title: 'DC',
-					from: '044f658d-8b39-4510-a9d2-8731ea98cc6b',
-				},
-				{
-					uid: 'stmp_1602843448654_tuan',
-					idDataset: 'stmp_1602843448654',
-					columnName: 'tuan',
-					type: 'number',
-					symperDocId: 'stmp_1602843448654',
-					title: 'Tuần',
-					from: '044f658d-8b39-4510-a9d2-8731ea98cc6b',
-				},
-				{
-					uid: 'stmp_1602843448654_tb1_ca',
-					idDataset: 'stmp_1602843448654',
-					columnName: 'tb1_ca',
-					type: 'text',
-					symperDocId: 'stmp_1602843448654',
-					title: 'Ca làm',
-					from: '044f658d-8b39-4510-a9d2-8731ea98cc6b',
-				},
-				{
-					uid: 'stmp_1602843448654_ma_hang',
-					idDataset: 'stmp_1602843448654',
-					columnName: 'ma_hang',
-					type: 'text',
-					symperDocId: 'stmp_1602843448654',
-					title: 'Mã SP',
-					from: '044f658d-8b39-4510-a9d2-8731ea98cc6b',
-				},
-				{
-					uid: 'stmp_1602843448654_tb1_ngay',
-					idDataset: 'stmp_1602843448654',
-					columnName: 'tb1_ngay',
-					type: 'date',
-					symperDocId: 'stmp_1602843448654',
-					title: 'Ngày sx',
-					from: '044f658d-8b39-4510-a9d2-8731ea98cc6b',
-				},
-				{
-					uid: 'stmp_1602843448654_loai_lenh',
-					idDataset: 'stmp_1602843448654',
-					columnName: 'loai_lenh',
-					type: 'text',
-					symperDocId: 'stmp_1602843448654',
-					title: 'Loại lệnh',
-					from: '044f658d-8b39-4510-a9d2-8731ea98cc6b',
-				},
-				{
-					uid: 'stmp_1602843448654_tb1_sl_xuong',
-					idDataset: 'stmp_1602843448654',
-					columnName: 'tb1_sl_xuong',
-					type: 'number',
-					symperDocId: 'stmp_1602843448654',
-					title: 'SL xương',
-					from: '044f658d-8b39-4510-a9d2-8731ea98cc6b',
-				},
-				{
-					uid: 'stmp_1602843448654_cdsx',
-					idDataset: 'stmp_1602843448654',
-					columnName: 'cdsx',
-					type: 'text',
-					symperDocId: 'stmp_1602843448654',
-					title: 'CÔNG ĐOẠN',
-					from: '044f658d-8b39-4510-a9d2-8731ea98cc6b',
-				},
+				}
 			],
 			tableHeight: 400,
 			searchKey: ''
@@ -140,14 +57,23 @@ export default {
 	methods: {
 		cellContextMenu(params) {},
 	},
+	props: {
+        action: {
+            default: 'create'
+        },
+        instanceKey: {
+            default: ''
+        },
+	},
 	computed:{
 		tableData(){
+			let rowData = this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget.output;
 			let self = this
 			if(this.searchKey == ""){
-				return this.rowData
+				return rowData
 			}else{
 				let arr = []
-				this.rowData.forEach(function(e){
+				rowData.forEach(function(e){
 					for(let i in e){
 						if(e[i].toLowerCase().includes(self.searchKey.toLowerCase())){
 							arr.push(e)
@@ -180,6 +106,7 @@ export default {
 	components: {
 		AgGridVue,
 	},
+
 };
 </script>
 

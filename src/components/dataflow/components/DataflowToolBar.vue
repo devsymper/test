@@ -17,7 +17,13 @@
         </v-tooltip>
     </div>
     <div class="h-100" style="position: relative; top: -1px">
-        <v-btn text small depressed class="mr-2">
+        <v-btn 
+            :disabled="selectingNode.id == 'home'"
+            @click="runDataflow" 
+            text 
+            small 
+            depressed 
+            class="mr-2">
             <i class="mdi mdi-play-outline mr-1 fs-16"></i>
             Chạy
         </v-btn>
@@ -32,6 +38,9 @@
 <script>
 export default {
     methods: {
+        runDataflow(){
+            this.$emit('run-dataflow');
+        },
         handleHeaderAction(action){
             this.$emit('action-on-workspace', action);
         }
@@ -57,6 +66,19 @@ export default {
                 }	
             }
         }
+    },
+    computed: {
+		selectingNode(){
+			return this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
+		}
+    },
+    props: {
+        action: {
+            default: 'create'
+        },
+        instanceKey: {
+            default: ''
+        },
     }
 }
 </script>
