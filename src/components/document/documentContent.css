@@ -732,6 +732,16 @@ button:hover {
     cursor: pointer;
     font-size: 15px;
 }
+.icon-wrap-table{
+    position: absolute;
+    right: 16px;
+    top: -3px;
+    z-index: 200;
+    padding: 2px 16px;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 18px;   
+}
 
 .sym-form-Detail .s-control-file-upload{
     border: var(--symper-border);
@@ -808,4 +818,8 @@ button:hover {
   }
   .tab-content-active{
       display: block !important;
+  }
+
+  .cell-wrap {
+    white-space: normal !important;
   }

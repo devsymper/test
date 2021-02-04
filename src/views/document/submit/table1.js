@@ -26,6 +26,7 @@ import {AutoCompleteCellEditor} from './table/AutoCompleteCellEditor';
 import { checkCanBeBind } from "./handlerCheckRunFormulas";
 import PerfectScrollbar from "perfect-scrollbar";
 import {getDataInputFormula, prepareDataGetMultiple } from "./../../../components/document/dataControl";
+import { str } from "../../../plugins/utilModules/str";
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
     event.preventDefault();
@@ -56,7 +57,9 @@ export default class SymperTable {
         this.formulasWorker = formulasWorker;
         this.tableWorker = null;
         this.pinnedRowNode = null;
-        this.dataChange = {}
+        this.dataChange = {};
+        this.allControlKeyCache = this.tableControl.getAllControlKeyCache();
+
         
     }
     init(){
@@ -107,7 +110,6 @@ export default class SymperTable {
                 field:'index_increment',
                 headerName:"",
                 minWidth:90,
-                width:90,
                 valueGetter: function(params) {
                     if(params.node.rowPinned){
                         return ""
@@ -128,8 +130,6 @@ export default class SymperTable {
                 field: controlInstance.name,
                 editable:this.checkEditableCell(controlInstance),
                 hide:controlInstance.checkProps('isHidden'),
-                minWidth: 150,
-
             };
 
             if (controlInstance.checkProps('isSumTable')) {
@@ -312,11 +312,62 @@ export default class SymperTable {
         return [];
     }
     /**
+     * Trước khi set data cho table thì lấy các giá trị khác từ cache đưa vào data
+     * @param {*} newData 
+     */
+    
+    getDataFromCache(newData){
+        let allOldKey = this.getAllKeyFromOldData();
+        if(this.allControlKeyCache.length == 0){
+            return;
+        }
+        for (let index = 0; index < newData.length; index++) {
+            let rowData = newData[index];
+            let newRowKey = this.getKeyCache(rowData);
+            if(allOldKey[newRowKey]){
+                for(let col in allOldKey[newRowKey]){
+                    if(!rowData.hasOwnProperty(col)){
+                        newData[index][col] = allOldKey[newRowKey][col];
+                    }
+                }
+            }
+            
+        }
+    }
+    /**
+     * Hàm lấy tát cả dữ liệu cũ và tạo key để set cache cho lần setData tiếp theo
+     */
+    getAllKeyFromOldData(){
+        let oldData = this.getAllData();
+        let allKey = {};
+        for (let index = 0; index < oldData.length; index++) {
+            let row = oldData[index];
+            let key = this.getKeyCache(row);
+            allKey[key] = row;
+        }
+        return allKey;
+    }
+    
+    /**
+     * Hàm tạo key từ dữ liệu
+     * @param {*} rowData 
+     */
+    getKeyCache(rowData){
+        let data = ""
+        for(let col in rowData){
+            if(this.allControlKeyCache.includes(col)){
+                data += rowData[col];
+            }
+        }
+        return str.hashCode(data);
+    }
+    /**
      * Hoangnd
      * Hàm xử lí data cho bảng
      * @param {} vl 
      */
     setData(data) {
+        this.getDataFromCache(data);
         if(this.formulasWorker){
             this.formulasWorker.postMessage({action:'executeSQliteDB',data:
                 {
@@ -476,6 +527,7 @@ export default class SymperTable {
         if(tableHeight > 500){
             tableHeight = 500;
         }
+        tableHeight = 500;
         $('#ag-'+this.tableControl.id).css({height:tableHeight + "px"});
     }
     render() {
@@ -483,7 +535,6 @@ export default class SymperTable {
         this.gridOptions = {
             columnDefs: this.columnDefs,
             animateRows: true,
-            // rowHeight:25,
             headerHeight:25,
             rowBuffer: 0,       // số view trong 1 viewport
             groupDefaultExpanded: -1,
@@ -501,6 +552,7 @@ export default class SymperTable {
                 BottomPinnedRowRenderer: BottomPinnedRowRenderer,
                 ValidateCellRenderer: ValidateCellRenderer,
             },
+            popupParent: document.querySelector('body'),
             rowDragManaged: true,
             pinnedBottomRowData: (this.tableHasRowSum) ? this.createBottomTotalRow() : false,
             getRowStyle: function (params) {
@@ -518,14 +570,12 @@ export default class SymperTable {
             defaultColDef: {
                 filter: true,
                 minWidth: 150,
+                flex: 1,
                 sortable: true,
                 resizable: true,
                 wrapText:true,
                 autoHeight:true,
                 editable:true,
-            },
-            getRowHeight:function (params) {
-                return 25;
             },
             enableRangeSelection: true,
             onGridReady:this.onGridReady,
@@ -533,7 +583,14 @@ export default class SymperTable {
 
             
         };
-        
+        if(this.tableControl.isWrapText()){
+            Object.assign(this.gridOptions,{rowHeight:25});
+        }
+        else{
+            Object.assign(this.gridOptions,{getRowHeight:function (params) {
+                return 25;
+            }});
+        }
         if(['submit','update'].includes(this.viewType)){
             let moreOptions = {
                 rowData: this.getRowDefaultData(),

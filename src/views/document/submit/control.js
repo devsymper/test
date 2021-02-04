@@ -86,6 +86,13 @@ export default class Control {
 
 
     }
+    isKeyCacheInTable(){
+        let isKeyCacheInTable = this.controlProperties.isKeyCacheInTable.value;
+        if(typeof isKeyCacheInTable == 'object'){
+            return false;
+        }
+        return this.controlProperties.isKeyCacheInTable.value
+    }
     /**
      * Hàm trả về giá trị của 1 prop
      * @param {*} prop 

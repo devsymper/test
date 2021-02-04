@@ -4,6 +4,7 @@ import {
     SYMPER_APP
 } from './../../../main.js'
 import SymperTable from "./table1";
+import { getControlInstanceFromStore } from "../common/common";
 window.switchTableMode = function(el) {
     // let tableName = $(el).attr('table-name');
     // let viewType = $(el).attr('view-type');
@@ -19,6 +20,12 @@ window.switchTableMode = function(el) {
 }
 window.traceTable = function(el) {
     SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { isTable: true, tableName: $(el).attr('table-name') })
+}
+window.wrapTable = function(el) {
+    let tableName = $(el).attr('table-name');
+    let keyInstance = $(el).attr('instance');
+    let tableControl = getControlInstanceFromStore(keyInstance,tableName);
+    // tableControl.tableInstance.refreshTable(true)
 }
 export default class TableControl1 extends Control {
     constructor(idField, ele, controlProps, keyInstance,pivotConfig= {},groupConfig = {}, isPrintView = false) {
@@ -43,8 +50,9 @@ export default class TableControl1 extends Control {
     renderTable() {
         this.tableInstance = new SymperTable(this, this.keyInstance, this.groupConfig, this.pivotConfig, this.formulasWorker);
         let viewType = sDocument.state.viewType[this.keyInstance];
+        this.ele.parent().append('<span onclick="wrapTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-format-text-wrapping-wrap  icon-options icon-wrap-table"></span>');
         if ((viewType == 'submit' || viewType == "update")) {
-            this.ele.parent().append('<span onclick="traceTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
+            this.ele.parent().append('<span onclick="traceTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-information-outline icon-options icon-trace-table"></span>');
         }
         if (this.isPrintView) {
             this.ele.attr('table-id', this.ele.attr('id'));
@@ -133,5 +141,25 @@ export default class TableControl1 extends Control {
     }
     isInsertRow(){
         return this.controlProperties.isInsertRow.value
+    }
+    isWrapText(){
+        return this.controlProperties.tableWrapText.value
+    }
+    getPrimaryKey(){
+        let primaryKey = this.controlProperties.tablePrimaryKey.value;
+        if(typeof primaryKey == 'object'){
+            return false;
+        }
+        return this.controlProperties.tablePrimaryKey.value
+    }
+    getAllControlKeyCache(){
+        let listControlKeyCache = [];
+        for (let controlName in this.controlInTable) {
+            let controlIns = this.controlInTable[controlName];
+            if(controlIns.isKeyCacheInTable()){
+                listControlKeyCache.push(controlIns.name);
+            }
+        }
+        return listControlKeyCache;
     }
 }
