@@ -16,6 +16,7 @@
 				}"
 				:class="{ 'ag-theme-balham': true }"
 				:defaultColDef="defaultColDef"
+                :suppressRowClickSelection="true"
 				:gridOptions="gridOptions"
 				:columnDefs="columnDefs"
 				:rowData="tableData"
@@ -46,14 +47,15 @@ export default {
 			gridOptions: null,
 			columnDefs: [
 				{
-					checkboxSelection:true,
-					editable:false,
-					field:"selected",
-					width:50,
+					checkboxSelection: true,
+					editable: false,
+					field: "selected",
+					headerName: "select",
+					width: 50,
 				},
 				{
 					headerName: 'Name',
-					field: 'name',
+					field: 'columnName',
 					type: 'text',
 					width:70,
 				},
@@ -82,7 +84,8 @@ export default {
 				},
 			],
 			tableHeight: 400,
-			searchKey: ''
+			searchKey: '',
+			gridApi: null,
 		};
 	},
 	methods: {
@@ -124,15 +127,45 @@ export default {
 				var thisIsFirstColumn = displayedColumns[0] === params.column;
 				return thisIsFirstColumn;
 			},
-			rowSelection: "multiple"
 		};
 		this.gridOptions = {
 			enableRangeSelection: true,
+			rowSelection: "multiple"
 		};
+	},
+	methods:{
+		 setRowSelected(rowIndex, selected){
+            let runner = 0;
+            this.gridApi.forEachNode(function(node) {
+                if(runner == rowIndex){
+                    node.setSelected(selected);
+                    node.data.selected = selected;
+                }
+                runner += 1;
+            });
+        },
+	},
+	mounted(){
+        this.gridApi = this.gridOptions.api;
 	},
 	components: {
 		AgGridVue,
 	},
+	watch:{
+		rowData:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				let self = this
+				arr.forEach(function(e){
+					if(e.selected){
+						debugger
+						self.setRowSelected(e.id, false)
+					}
+				})
+			}
+		}
+	}
 };
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="dataflow-node-config">	
+	<div class="dataflow-node-config mt-2">	
 		<DatasetAutocomplete :isMultiple="false" :idDataset="configs.idDataset" @dataset-selector="handleDatasetSelector" />
 		<div class="table-dataset-info d-flex flex-column">
 			<div class="d-flex fs-13 mt-1" v-for="(item, i) in datasetInfor" :key="i">
@@ -31,6 +31,9 @@ export default {
 	},
 	methods:{
 		handleDatasetSelector(params){
+			this.$set(this.datasetInfor.id, 'content', params.id)
+			this.$set(this.datasetInfor.name, 'content', params.aliasName)
+			this.$set(this.datasetInfor.title, 'content', params.aliasName)
 			this.$emit('dataset-selected' , params)
 		}
 	},

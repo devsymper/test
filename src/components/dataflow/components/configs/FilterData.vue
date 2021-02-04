@@ -1,6 +1,12 @@
 <template>
 	<div>
-		<TreeSqlConfig :defaultData="defaultData" :listColumn="Object.keys(nodeData.configs.allColumns)" />
+		<TreeSqlConfig 
+			:defaultData="defaultData" 
+			:customAutocomplete="true" 
+			:itemValue="'uid'" 
+			:listColumn="listColumn" 
+			:customCss="true"	
+		/>
 	</div>
 </template>
 
@@ -27,19 +33,17 @@ export default {
 			return arr;
 		},
 		defaultData() {
-			return [
-				{
-					id: 1,
-					nodeType: 'group',
-					name: 'AND',
-					root: true,
-					condition: true,
-					children: this.nodeData.configs.condition
-				},
-			];
-			
+			this.nodeData.configs.condition.forEach(function(e){
+				if(e.id == "root"){
+					e.root = true
+					e.condition = true,
+					e.name = e.label
+				}
+			})
+			return this.nodeData.configs.condition
 		},
 	},
+	
 };
 </script>
 

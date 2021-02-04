@@ -81,6 +81,12 @@ export default {
 	components: {
 		VuePerfectScrollbar,
 	},
+	props:{
+		includeFixed:{
+			type: Boolean,
+			default: true
+		}
+	},
 	watch: {
 		mini(vl) {
 			if (!vl) {
@@ -98,8 +104,10 @@ export default {
 			return true;
 		},
 		expandSidebar() {
-			this.isExpand = !this.isExpand;
-			this.$emit('after-toggle-sidebar', !this.isExpand );
+			if(this.includeFixed){
+				this.isExpand = !this.isExpand;
+				this.$emit('after-toggle-sidebar', !this.isExpand );
+			}
 		},
 		gotoPage(item, subItem = false, parent) {
 			if (!item.children) {
