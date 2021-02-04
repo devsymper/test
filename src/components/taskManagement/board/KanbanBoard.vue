@@ -257,7 +257,7 @@ export default {
                         conditions : [
                             {
                                 name : "equal",
-                                value : "'"+self.$route.params.id+"'",
+                                value : self.$route.params.id,
                             }
                         ],
                     },
@@ -560,7 +560,7 @@ export default {
                         ],
                     };
                     data.filter = util.cloneDeep(this.filter);
-                    // data.filter.filter.push(item);
+                    data.filter.filter.push(item);
                 }else{
                     data.filter = filter;
                 }

@@ -83,7 +83,6 @@ export default {
                     status: this.status,
                     description: this.description
                 }
-                debugger
                  timesheetApi.updateCategory(data)
                 .then(res => {
                     if (res.status === 200) {

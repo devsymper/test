@@ -14,7 +14,6 @@
 </template>
 <script>
 import Comment from '@/components/common/comment/Comment.vue'
-import { parseJSON } from 'jquery'
 export default {
 	props:{
 		objectIdentifier:{
