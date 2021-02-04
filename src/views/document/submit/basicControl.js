@@ -206,7 +206,6 @@ export default class BasicControl extends Control {
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
                 if(thisObj.checkAutoCompleteControl()){
-                    thisObj.value = valueChange;
                     return false;
                 }
                 if (thisObj.type == 'label') {
@@ -244,13 +243,20 @@ export default class BasicControl extends Control {
                     instance: thisObj.keyInstance
                 });
             })
-            // cần xóa dữ liệu của auto complete trong thuộc tính của input nếu un focus
-            this.ele.on('blur', function(e) {
-                if(thisObj.checkAutoCompleteControl()){
-                    $('#'+thisObj.id).removeAttr('data-autocomplete');
-                }
-            })
-
+            if(thisObj.checkAutoCompleteControl()){
+                this.isRunChange = true ;
+                this.ele.on('blur', function(e) {
+                    setTimeout(() => {
+                        console.log(thisObj.isRunChange,'isRunChange');
+                        if(!thisObj.isRunChange){
+                            let valueChange = $(e.target).val();
+                            thisObj.valueChange = valueChange;
+                            SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
+                            thisObj.isRunChange = true;
+                        }
+                    }, 300);
+                });
+            }
             this.ele.on('keyup', function(e) {
                 if (e.key == 'F2' && store.state.app.baInfo && store.state.app.baInfo.id) {
                     if (thisObj.type == 'number' && thisObj.formulaValue) {
@@ -259,6 +265,7 @@ export default class BasicControl extends Control {
                     thisObj.traceControl();
                 }
                 if (thisObj.checkAutoCompleteControl()) {
+                    thisObj.isRunChange = false;
                     let fromSelect = false;
                     let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
                     e['controlName'] = thisObj.controlProperties.name.value;
@@ -269,16 +276,6 @@ export default class BasicControl extends Control {
                         controlTitle: thisObj.title,
                         controlName: thisObj.name,
                         val: $(e.target).val()
-                    })
-                }
-
-            })
-
-            this.ele.closest('.sym-form-submit').on('keyup', function(e) {
-                if (thisObj.checkAutoCompleteControl() && e.keyCode == 9) {
-                    e.keyCode = 200;
-                    SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                        e: e,
                     })
                 }
 

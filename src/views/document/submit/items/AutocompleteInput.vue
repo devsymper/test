@@ -118,7 +118,7 @@ export default {
                     }
                     else if(e.keyCode == 13){
                         let rowActive = thisCpn.dataTable[thisCpn.indexActive];
-                        thisCpn.handleClickRow(rowActive,true);
+                        thisCpn.handleClickRow(rowActive);
                     }
                 }
             })
@@ -214,7 +214,7 @@ export default {
         setSingleSelectCombobox(isSingleSelectCombobox=false){
             this.isSingleSelectCombobox = isSingleSelectCombobox;
         },
-        handleClickRow(item,fromEnterKey = false){
+        handleClickRow(item){
             this.curInput.off('keydown');
             let value = ""
             if(item.hasOwnProperty(this.alias)){
@@ -267,7 +267,7 @@ export default {
                 value = {inputDislay:value, inputValue:value};
             }
             this.curInput.val(value.inputValue);
-            this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey,controlName:this.controlForcusing});
+            this.$emit('after-select-row',{value:value,controlName:this.controlForcusing});
 
         },
         openSubForm(){
