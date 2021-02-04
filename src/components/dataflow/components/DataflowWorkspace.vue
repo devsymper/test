@@ -26,6 +26,9 @@ export default {
         DataflowPaper
     },
     methods: {
+        actionOnCanvas(action){
+            this.$refs.dataflowPaper.actionOnToolbar(action);
+        },
         changeCurrentNodeName(newName){
             this.$refs.dataflowPaper.setNodeName(this.selectingNode.id, newName);
         },

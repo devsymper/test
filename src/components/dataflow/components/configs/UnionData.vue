@@ -39,7 +39,11 @@
             </el-option-group>
         </el-select> -->
         <ag-grid-vue 
-            :style="{width: '100%', height: (extraInfo.height-10)+'px'}" class="ag-theme-balham" id="myGrid"
+            :style="{
+                width: '100%', 
+                height: (height - 5) + 'px'
+            }" 
+            class="ag-theme-balham" 
             :gridOptions="gridOptions"
             :columnDefs="getColumnDefs"
             :rowDragManaged="rowDragManaged"
@@ -137,6 +141,9 @@ export default {
             default(){
                 return {};
             }
+        },
+        height: {
+            default: 200
         },
         extraInfo:{
             default(){

@@ -1,6 +1,6 @@
 <template>
     <div class=" symper-dataflow-workspace">
-        <div ref="symperPaperToolbar d-none" >
+        <div ref="symperPaperToolbar" class=" d-none">
         </div>
         <div ref="nodeStencile" style="width: 100%;position: relative;" class="symper-node-stencil" v-show="action != 'embed'">
 
@@ -413,6 +413,7 @@ export default {
             this.paper.toSVG(done);
         },
         actionOnToolbar(type){
+            debugger
             let ele = $(this.$refs.symperPaperToolbar).find('.joint-widget[data-type='+type+']');
             ele.mousedown();
             ele.click();
