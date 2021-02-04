@@ -92,4 +92,16 @@ export default class LoadDataset extends NodeBase {
         }
         return rsl;
     }
+
+    getConfigsToSave(){
+        let rsl = this.getCommonProp();
+        rsl.idDataset = this.configs.idDataset;
+        rsl.selectedCols = {};
+        this.configs.allColumns.forEach(ele => {
+            if (ele.selected) {
+                rsl.selectedCols[ele.uid] = true;
+            }
+        });
+        return rsl;
+    }   
 }
