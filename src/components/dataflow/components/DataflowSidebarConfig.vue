@@ -18,7 +18,8 @@
 			<component 
 				:height="nodeConfigHeight"
 				:is="nodeConfigTag"
-				:nodeData="selectingNode">
+				:nodeData="selectingNode"
+				@change-configs="handleConfigsChange">
 			</component>
 		</PerfectScrollbar>
 	</div>
@@ -109,6 +110,9 @@ export default {
 		}	
 	},
 	methods:{
+		handleConfigsChange(){
+			this.selectingNode.run();
+		},
 		handleValueChange(name, inputInfo, data){
 			for(let key in this.commonInputs){
 				this.selectingNode.configs[key] = this.commonInputs[key].value;

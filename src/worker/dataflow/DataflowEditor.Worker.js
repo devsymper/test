@@ -80,13 +80,21 @@ var handler = {
             savedNode = nodes[id];
             type = savedNode.jointInfo.type.replace('app.','');
             nodeObj = new mapTypeToNodeClass[type](id);
-            nodeObj.prevNodes = {};
-
             for(let prevId of savedNode.symperConfigs.prevNodes){
                 nodeObj.prevNodes[prevId] = mapRunNode[prevId];
             }
             nodeObj.restoreNodeFromSavedConfig(savedNode.symperConfigs, mapDatasetAndColumn);
+            
             mapRunNode[id] = nodeObj;
+        }
+
+        
+        for(let id of nodesIdOrder){
+            savedNode = nodes[id];
+            let nodeObj = mapRunNode[id];
+            for(let nextId of savedNode.symperConfigs.nextNodes){
+                nodeObj.nextNodes[nextId] = mapRunNode[nextId];
+            }
         }
         return mapRunNode;
     },

@@ -74,47 +74,35 @@ export default class NodeBase {
     restoreNodeFromSavedConfig(savedConfigs, mapDatasetAndColumn){
         this.loadInputFromPrevNodes();
         let newConfigs = this.getFullConfigsFromSavedData(savedConfigs, mapDatasetAndColumn);
-        this.changeConfig(newConfigs, false);
-    }
-
-    changeConfig(newConfigs, needPropagate = true){
         this.configs = newConfigs;
-        this.output = this.process('change-config');
-        // this.checkAndShowValidate();
-        if (needPropagate) {
-            this.propagate();
+        this.run(false);
+    }
+    
+    isValidConfig(){
+        return true;
+    }
+
+    run(needPropagate = true, source = 'change-config'){
+        if(this.isValidConfig()){
+            this.output = this.process(source);
+            if (needPropagate) {
+                this.propagate();
+            }
         }
     }
 
-    impact(input, needPropagate = true, idJointNode){
-        if (this.stackInput) {
-            for (let column of input) {
-                column.from = idJointNode;
-            }
-            this.inputMapNode[idJointNode] = input;
-            this.input = [];
-            this.inputDatasetCount = 0;
-            for (let fromNodeId in this.inputMapNode) {
-                this.input = this.input.concat(this.inputMapNode[fromNodeId]);
-                this.inputDatasetCount += 1;
-            }
-        } else {
-            this.inputMapNode = {};
-            this.inputMapNode[idJointNode] = input;
-
-            this.inputDatasetCount = 1;
-            this.input = input;
-        }
-        this.runAfterSetInput(needPropagate);
+    impact(needPropagate = true, sourceNodeChange){
+        this.loadInputFromPrevNodes();
+        this.run(needPropagate, 'impact');
     }
 
     propagate(id = null){
         if (id === null) {
             for (let idNode in this.nextNodes) {
-                this.nextNodes[idNode].impact(this.output, true, this.id);
+                this.nextNodes[idNode].impact(true, this.id);
             }
         } else {
-            this.nextNodes[id].impact(this.output, true, this.id);
+            this.nextNodes[id].impact(true, this.id);
         }
     }
 

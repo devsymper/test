@@ -9,6 +9,7 @@ export const setDataflowConfig = function(state, data){
 
 export const setSelectingWidget = function(state, data){
     let nodeData = state.allDataflow[data.instanceKey].allWidget[data.id];
+    console.log(nodeData, 'node selected', nodeData.type, nodeData.id);
     Vue.set(state.allDataflow[data.instanceKey], 'selectedWidget', nodeData);
 }
 

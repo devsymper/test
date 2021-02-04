@@ -172,7 +172,6 @@ export default class JoinData extends CreateableNewColumnNode {
                 }
             });
         });
-        
         if(this.input.length > 0){
             this.lastConfigCache = this.configs;
         }
