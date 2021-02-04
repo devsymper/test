@@ -6,7 +6,6 @@
             </div>
             <div>
                 <select-column 
-                    class="pa-1"
                     :itemText="'as'"
                     :allColumns="listColumnForSelect"
                     :model="config.applyColumnUid"
@@ -15,12 +14,13 @@
             </div>
         </div>
 
-        <div class="w-100 d-flex mb-4 mb-3">
+        <div class="w-100 d-flex mb-2">
             <div class="item-title">
                 Display mode:  
             </div>
             <div>
                 <v-radio-group
+                    class="pa-0 ma-0"
                     v-model="config.mode"
                     row
                     dense

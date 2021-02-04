@@ -9,7 +9,7 @@
             style="position: relative;">
             <div style="line-height: 18px;">{{condItem.applyColumnObj.title ? condItem.applyColumnObj.title : 'No column selected'}}</div>
             <div style="line-height: 15px; color: grey">{{condItem.applyColumnObj.name ? condItem.applyColumnObj.name : ''}}</div>
-            <v-icon style="position: absolute; top: 0px;right: 0px" class="fs-14"  @click.stop="removeCondFormatItem()" >mdi-close</v-icon>
+            <v-icon style="position: absolute; top: 7px;right: 4px" class="fs-14"  @click.stop="removeCondFormatItem()" >mdi-close</v-icon>
         </div>
         <v-btn 
             @click="addMoreColumnForCondition()"

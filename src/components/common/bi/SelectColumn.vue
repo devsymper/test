@@ -68,7 +68,7 @@ export default {
 }
 .sym-select >>> .v-input__slot{
     min-height: 20px!important;
-    height: 30px;
+    height: 28px;
 }
 .sym-select >>> .v-input__append-inner{
     margin-top: 3px!important;
