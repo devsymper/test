@@ -46,6 +46,41 @@
 				</v-expansion-panels>
 			</template>
 		</VuePerfectScrollbar>
+
+		<v-dialog
+			v-model="isShowDialog"
+			max-width="700px"
+			scrollable
+		>
+			<v-card>
+			<v-card-title>
+				<span class="fs-16">Config column conditional format</span>
+			</v-card-title>
+			<v-card-text>
+				<div class="w-100 ">
+					<TableConditionalFormatSetting ref="tableConditionalFormatSetting" :config="selectingConditionFormat"/>
+				</div>
+			</v-card-text>
+			<v-card-actions>
+				<v-spacer></v-spacer>
+				<v-btn
+					color="blue darken-1"
+					text
+					class="btn-add"
+				>
+					Apply
+				</v-btn>
+				<v-btn
+				color="red darken-1"
+				text
+				@click="isShowDialog = false"
+				>
+					Cancel
+				</v-btn>
+			
+			</v-card-actions>
+			</v-card>
+		</v-dialog>
 	</div>
 	
 </template>
@@ -54,10 +89,14 @@
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FormTpl from "@/components/common/FormTpl.vue";
 import DashboardStyleConfig from 'worker-loader!@/worker/dashboard/dashboard/DashboardStyleConfig.Worker.js';
+import TableConditionalFormatSetting from "@/components/dashboard/components/TableConditionalFormatSetting";
+import { util } from '../../../../plugins/util';
+
 export default {
 	components:{
 		VuePerfectScrollbar,
 		FormTpl,
+		TableConditionalFormatSetting,
 	},
 	props:{
 		instanceKey:{
@@ -68,6 +107,9 @@ export default {
 		storeDashboard(){
 			return this.$store.state.dashboard;
 		},
+		currentCellConfig(){
+			return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs;
+		},
 		styleConfig(){
 			return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs.rawConfigs.style;
 		}
@@ -77,6 +119,9 @@ export default {
 			dashboardStyleConfig:null,
 			openPanel:[],
 			loadding:false,
+			isShowDialog:false,
+            selectingConditionFormat: null,
+
 		}
 	},
 	methods:{
@@ -124,11 +169,35 @@ export default {
                     console.error(` action ${action} not found `);
                 }
             });
-        },
+		},
+		selectConditionFormat(data){
+			let condItem = data.condItem
+			let columns = this.currentCellConfig.rawConfigs.setting.value.selectedColums;
+            for (let col of columns) {
+                col.columnName = col.name;
+                col.uid = col.name;
+			}
+            this.$set(condItem, 'listColumns', columns);
+            this.selectingConditionFormat = null;
+            this.selectingConditionFormat = util.cloneDeep(condItem);
+			this.isShowDialog = true;
+            // this.condFormatTmpInfo = {
+            //     attrItem,
+            //     idx,
+            //     attr
+            // };
+            setTimeout((self) => {
+                self.$refs.tableConditionalFormatSetting.initData();                
+            }, 100, this);
+		}
 	},
 	created(){
+		let self = this;
         this.dashboardStyleConfig = new DashboardStyleConfig();
-        this.listenFromWorker();
+		this.listenFromWorker();
+		this.$evtBus.$on('dashboard-select-condition-format', (data) =>{
+            self.selectConditionFormat(data);
+        })
     }
 
 }

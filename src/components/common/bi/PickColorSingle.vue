@@ -13,7 +13,7 @@
             </div>
         </div>
      
-        <v-dialog
+        <v-menu
             v-model="isShow"
             scrollable
             content-class="dialog-pick-color"
@@ -25,7 +25,7 @@
                 />
             </div>
          
-        </v-dialog>
+        </v-menu>
     </div>
 </template>
 

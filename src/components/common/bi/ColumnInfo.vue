@@ -2,7 +2,7 @@
     <div class="single-row px-4 item-column-dataset justify-space-between">
         <span class="text-ellipsis">
             <v-icon color="#000" class="fs-14 pr-2">{{icon[infoColumn.type]}}</v-icon>
-            <span :title="infoColumn.title" class="mr-2" :class="{ 'highlight' : infoColumn.isSelected}">{{infoColumn.title}}</span>
+            <span :title="infoColumn.title ? infoColumn.title : infoColumn.as" class="mr-2" :class="{ 'highlight' : infoColumn.isSelected}">{{infoColumn.title ? infoColumn.title : infoColumn.as  }}</span>
         </span>
         <div  class="float-right d-flex" style="color: #909399">
            <span :title="infoColumn.name ? infoColumn.name : infoColumn.columnName">{{infoColumn.name ? infoColumn.name : infoColumn.columnName}}</span> 

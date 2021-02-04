@@ -5,7 +5,7 @@
         flat
         :value="model"
         :items="allColumns"
-        item-text="title"
+        :item-text="itemText"
         item-value="columnName"
         outlined
         @change="change"
@@ -32,6 +32,10 @@ export default {
         },
     },
     props : {
+        itemText:{
+            type: String,
+            default: "title"
+        },
         allColumns: {
             type: Array,
             default(){
