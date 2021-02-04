@@ -7,6 +7,7 @@ import  {ClipboardModule} from '@ag-grid-enterprise/clipboard';
 import 'ag-grid-enterprise';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
+import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 import {getControlInstanceFromStore, getListInputInDocument, minimizeDataAfterRunFormula, SQLITE_COLUMN_IDENTIFIER} from './../common/common'
 import sDocument from '@/store/document'
 import store from './../../../store'
@@ -59,8 +60,6 @@ export default class SymperTable {
         this.pinnedRowNode = null;
         this.dataChange = {};
         this.allControlKeyCache = this.tableControl.getAllControlKeyCache();
-
-        
     }
     init(){
         this.viewType = sDocument.state.viewType[this.keyInstance];
@@ -100,6 +99,44 @@ export default class SymperTable {
         });
         gridOptions.api.setColumnDefs(columnDefs);
     }
+    getContextMenuItems(params){
+        return [
+            {
+                name: 'Thêm dòng phía trên ',
+                action: function() {
+                    let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                    params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex });
+                },
+                cssClasses: ['blueFont'],
+                // icon:'mdi mdi-table-row-plus-before'
+
+            },
+            {
+                name: 'Thêm dòng phía dưới ' ,
+                action: function() {
+                    let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                    params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
+                },
+                cssClasses: ['blueFont'],
+                // icon:'mdi-table-row-plus-after'
+            },
+            
+            {
+                name: 'Xóa dòng ' + params.value,
+                action: function() {
+                    params.api.applyTransaction({ remove: [params.node.data]});
+                },
+                cssClasses: ['redFont']
+            },
+            'autoSizeAll',
+            'expandAll',
+            'contractAll',
+            'copy',
+            'paste',
+            'resetColumns',
+            'excelExport',
+        ]
+    }
     /**
      * Hàm lấy các định nghĩa của cột
      */
@@ -131,7 +168,10 @@ export default class SymperTable {
                 editable:this.checkEditableCell(controlInstance),
                 hide:controlInstance.checkProps('isHidden'),
             };
-
+            if(this.tableControl.isWrapText()){
+                col.wrapText = true;
+                col.autoHeight = true;
+            }
             if (controlInstance.checkProps('isSumTable')) {
                 this.sumColumns[controlName] = controlInstance;
                 this.tableHasRowSum = true;
@@ -561,6 +601,7 @@ export default class SymperTable {
                 ValidateCellRenderer: ValidateCellRenderer,
             },
             popupParent: document.querySelector('body'),
+            getContextMenuItems: this.getContextMenuItems,
             rowDragManaged: true,
             pinnedBottomRowData: (this.tableHasRowSum) ? this.createBottomTotalRow() : false,
             getRowStyle: function (params) {
@@ -581,8 +622,6 @@ export default class SymperTable {
                 flex: 1,
                 sortable: true,
                 resizable: true,
-                wrapText:true,
-                autoHeight:true,
                 editable:true,
             },
             enableRangeSelection: true,
@@ -592,12 +631,12 @@ export default class SymperTable {
             
         };
         if(this.tableControl.isWrapText()){
-            Object.assign(this.gridOptions,{rowHeight:25});
+            // Object.assign(this.gridOptions,{rowHeight:25});
         }
         else{
-            Object.assign(this.gridOptions,{getRowHeight:function (params) {
-                return 25;
-            }});
+            // Object.assign(this.gridOptions,{getRowHeight:function (params) {
+            //     return 25;
+            // }});
         }
         if(['submit','update'].includes(this.viewType)){
             let moreOptions = {
@@ -629,7 +668,7 @@ export default class SymperTable {
         if(['detail','print'].includes(this.viewType)){
             actionBtn = ""
         }
-        this.tableContainer = $(`<div id="ag-` + this.tableControl.id + `" style="width: auto;position:relative;" class="ag-theme-alpine group-table" s-control-type="table">
+        this.tableContainer = $(`<div id="ag-` + this.tableControl.id + `" style="width: auto;position:relative;" class="ag-theme-balham group-table" s-control-type="table">
                                     `+actionBtn+`
                             </div>`)[0];
         this.tableControl.ele.before(this.tableContainer);
