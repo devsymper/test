@@ -159,6 +159,16 @@ export default {
 .symper-report-type-selector >>> .v-expansion-panel-header{
 	padding: unset !important;
 	background-color: #EFEFEF !important;
+	min-height: unset !important;
+	height: 40px;
+}
+.symper-report-type-selector >>> .v-expansion-panel-content__wrap{
+	padding: unset !important;
+	margin-left: 6px
+}
+.symper-report-type-selector >>> .v-expansion-panel--active > .v-expansion-panel-header {
+	min-height: unset !important;
+	height: 40px;
 }
 .symper-report-type-selector >>> .v-tab{
 	min-width: unset !important;

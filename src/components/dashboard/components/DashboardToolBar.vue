@@ -1,6 +1,6 @@
 <template>
     <div class="border-bottom-1 pl-2 py-1 d-flex justify-space-between">
-		<ReportSideBar style="margin-top: -6px" />
+		<ReportSideBar style="margin-top: -6px" :includeFixed="false" />
         <div style="line-height: 30px;" class="ml-8">
             <input 
                 :style="{

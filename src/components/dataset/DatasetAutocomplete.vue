@@ -7,6 +7,7 @@
 			:multiple="isMultiple"
 			solo
 			hide-selected
+			hide-no-data	
 			:placeholder="$t('common.searchPlaceholder')"
 			@change="handleChange"
 			item-text="aliasName"

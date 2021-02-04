@@ -12,13 +12,15 @@
 			<ag-grid-vue
 				:style="{
 					width: '100%',
-					height: tableHeight + 'px',
+					height: '100%',
 				}"
 				:class="{ 'ag-theme-balham': true }"
 				:defaultColDef="defaultColDef"
+                :suppressRowClickSelection="true"
 				:gridOptions="gridOptions"
 				:columnDefs="columnDefs"
 				:rowData="tableData"
+				@grid-ready="onGridReady"
 				@cell-context-menu="cellContextMenu"
 			>
 			</ag-grid-vue>
@@ -38,9 +40,6 @@ export default {
 		useCheckbox:{
 			type: Boolean,
 			default: true
-		},
-		tableHeight: {
-			default: 400
 		}
 	},
 	data() {
@@ -49,14 +48,15 @@ export default {
 			gridOptions: null,
 			columnDefs: [
 				{
-					checkboxSelection:true,
-					editable:false,
-					field:"selected",
-					width:50,
+					checkboxSelection: true,
+					editable: false,
+					field: "selected",
+					headerName: "select",
+					width: 50,
 				},
 				{
 					headerName: 'Name',
-					field: 'name',
+					field: 'columnName',
 					type: 'text',
 					width:70,
 				},
@@ -84,11 +84,10 @@ export default {
                     editable: true,
 				},
 			],
-			searchKey: ''
+			tableHeight: 400,
+			searchKey: '',
+			gridApi: null,
 		};
-	},
-	methods: {
-		cellContextMenu(params) {},
 	},
 	computed:{
 		tableData(){
@@ -126,15 +125,56 @@ export default {
 				var thisIsFirstColumn = displayedColumns[0] === params.column;
 				return thisIsFirstColumn;
 			},
-			rowSelection: "multiple"
 		};
 		this.gridOptions = {
 			enableRangeSelection: true,
+			rowSelection: "multiple"
 		};
+	},
+	methods:{
+		cellContextMenu(params) {},
+		onGridReady(params){
+			this.gridApi = params.api
+			this.setSelectedRow()
+		},
+		setSelectedRow(){
+			if(this.gridApi){
+				this.gridApi.forEachNode(node=>{
+					if(node.data.selected){
+						node.setSelected(true)
+					}
+				})
+			}
+			
+		},
+		// setRowSelected(rowIndex, selected){
+        //     let runner = 0;
+        //     this.gridApi.forEachNode(function(node) {
+        //         if(runner == rowIndex){
+        //             node.setSelected(selected);
+        //             node.data.selected = selected;
+        //         }
+        //         runner += 1;
+        //     });
+        // },
+	},
+	mounted(){
+        // this.gridApi = this.gridOptions.api;
 	},
 	components: {
 		AgGridVue,
 	},
+	watch:{
+		rowData:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				setTimeout(self=>{
+					self.setSelectedRow()
+				},10, this)
+			}
+		}
+	}
 };
 </script>
 
