@@ -512,23 +512,31 @@ export default class SymperTable {
      * Hàm tính toán chiều cao cho table
      */
     caculatorHeight(){
-        let dataHeight = (this.gridOptions.api.getDisplayedRowCount() + 1)*25;
-        let headerHeight = 0;
-        if(this.cols && this.cols.length > 0){
-            headerHeight += 25;
+        // let dataHeight = (this.gridOptions.api.getDisplayedRowCount() + 1)*25;
+        // let headerHeight = 0;
+        // if(this.cols && this.cols.length > 0){
+        //     headerHeight += 25;
+        // }
+        // if(this.rows && this.rows.length > 0){
+        //     headerHeight += 25*this.rows.length;
+        // }
+        // let tableHeight = dataHeight + headerHeight + 4
+        // if(this.tableHasRowSum){
+        //     tableHeight += 25
+        // }
+        // if(tableHeight > 500){
+        //     tableHeight = 500;
+        // }
+        // tableHeight = 500;
+        let h = $('#ag-'+this.tableControl.id).height();
+        if(h >= 500){
+            $('#ag-'+this.tableControl.id).css({height:"500px"});
+            this.gridOptions.api.setDomLayout('normal');
         }
-        if(this.rows && this.rows.length > 0){
-            headerHeight += 25*this.rows.length;
+        else{
+            $('#ag-'+this.tableControl.id).css({height:""});
+            this.gridOptions.api.setDomLayout('autoHeight');
         }
-        let tableHeight = dataHeight + headerHeight + 4
-        if(this.tableHasRowSum){
-            tableHeight += 25
-        }
-        if(tableHeight > 500){
-            tableHeight = 500;
-        }
-        tableHeight = 500;
-        $('#ag-'+this.tableControl.id).css({height:tableHeight + "px"});
     }
     render() {
         
@@ -621,7 +629,7 @@ export default class SymperTable {
         if(['detail','print'].includes(this.viewType)){
             actionBtn = ""
         }
-        this.tableContainer = $(`<div id="ag-` + this.tableControl.id + `" style="height: `+this.tableHeightDefault+`; width: auto;position:relative;" class="ag-theme-alpine group-table" s-control-type="table">
+        this.tableContainer = $(`<div id="ag-` + this.tableControl.id + `" style="width: auto;position:relative;" class="ag-theme-alpine group-table" s-control-type="table">
                                     `+actionBtn+`
                             </div>`)[0];
         this.tableControl.ele.before(this.tableContainer);

@@ -556,6 +556,10 @@ button:hover {
 .sym-form-Detail .ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) {
     height: 22px !important;
 }
+.sym-form-submit .ag-theme-alpine .ag-layout-auto-height .ag-center-cols-clipper ,
+.sym-form-Detail .ag-theme-alpine .ag-layout-auto-height .ag-center-cols-clipper  {
+    min-height: 24px !important;
+}
 
 .sym-form-submit .ag-theme-alpine .ag-cell,
 .sym-form-Detail .ag-theme-alpine .ag-cell {

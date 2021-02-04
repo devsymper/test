@@ -87,6 +87,9 @@ export default class Control {
 
     }
     isKeyCacheInTable(){
+        if(!this.controlProperties.isKeyCacheInTable){
+            return false;
+        }
         let isKeyCacheInTable = this.controlProperties.isKeyCacheInTable.value;
         if(typeof isKeyCacheInTable == 'object'){
             return false;
