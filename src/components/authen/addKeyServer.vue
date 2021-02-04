@@ -83,6 +83,11 @@ export default {
       }
   },
   methods: {
+    freshAll(){
+        this.nameKey='';
+        this.descriptionKey="";
+        this.statusKey=""
+    },
     async addKey(){
         let data = {
               name:this.nameKey,

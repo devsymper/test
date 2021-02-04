@@ -1,4 +1,5 @@
 import { commentApi } from "../../api/Comment";
+import { SYMPER_APP } from "./../../main.js";
 
 const addReply = (state, data) => {
 

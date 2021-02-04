@@ -107,6 +107,12 @@
                             </template>
                             <span>{{$t('document.instance.showlist.update')}}</span>
                         </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                    <v-icon @click="handleClickPrint" v-on="on">mdi-printer</v-icon>
+                            </template>
+                            <span>{{$t('document.detail.fab.print')}}</span>
+                        </v-tooltip>
                     </div>
                 </div>
                 <div  v-else-if="actionOnRightSidebar == 'update'">
@@ -472,6 +478,9 @@ export default {
 		},
         updateCurrentRecord(){
             this.actionOnRightSidebar = 'update';
+        },
+        handleClickPrint(){
+            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:this.docObjInfo.docObjId}]});
         },
         deleteSelectedRecord(){
             let itemSelected = Object.values(this.recordSelected);

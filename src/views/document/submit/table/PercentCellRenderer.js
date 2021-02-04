@@ -11,19 +11,19 @@ PercentCellRenderer.prototype.init = function(params) {
     var text =  (params.value == "" || params.value == null || !/\d/.test(params.value)) ? "" : params.value + " %";
     let control = params.control;
     control.optionValues['Require'] = {};
-    control.optionValues['Require'][params.rowIndex] = {
+    control.optionValues['Require'][params.node.id] = {
         isValid:false
     }
     if(!text){
         let validateEle = ((control.isRequiredControl() && !params.node.rowPinned) || 
-        (control.optionValues['Validate'] && control.optionValues['Validate'][params.rowIndex] 
-        && control.optionValues['Validate'][params.rowIndex].isValid)) ? control.makeErrNoti(params.rowIndex) : '';
+        (control.optionValues['Validate'] && control.optionValues['Validate'][params.node.id] 
+        && control.optionValues['Validate'][params.node.id].isValid)) ? control.makeErrNoti(params.node.id) : '';
         let div = `<div style="position:relative;height:100%;width:100%;">` + text + validateEle+`
                 <span style="position: absolute;right:8px;top:2px;font-size: 14px;color: #ababab;" class="mdi mdi-percent-outline"></span>
             </div>`
         this.eGui.innerHTML = div;
         if(control.isRequiredControl()){
-            control.optionValues['Require'][params.rowIndex] = {
+            control.optionValues['Require'][params.node.id] = {
                 isValid:true,
                 msg:'Không được bỏ trống trường thông tin '+control.title
             }

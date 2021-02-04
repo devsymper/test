@@ -57,7 +57,7 @@ onmessage = async function (event) {
                             }
                         }
                         postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                            {controlName:controlName, res:res, formulaType:formulaInstance.type, rowNodeId:rowNodeId}
+                            {controlName:controlName, res:res, formulaType:formulaInstance.type, rowNodeId:rowNodeId, isMultiple:true}
                         })
                         
                     }

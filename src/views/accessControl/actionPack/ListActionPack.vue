@@ -172,13 +172,11 @@ export default {
 		this.actionPackWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
-                case 'deleteActionPack':
-					if(data.dataAfter == 'success'){
-						self.$snotifySuccess("Xóa thành công")
-					}else{
-						self.$snotifyError("Có lỗi xảy ra")
-					}
-					self.$refs.listActionPack.refreshList();
+                case 'handleDeleteActionPack':
+					self.$snotifySuccess("Xóa thành công")
+					setTimeout(function(e){
+						self.$refs.listActionPack.refreshList();
+					}, 1000)
 					break;
                
                 default:
