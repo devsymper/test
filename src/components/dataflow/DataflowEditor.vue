@@ -4,11 +4,14 @@
             <DataflowToolBar 
                 class="border-bottom-1"
                 :style="{
-                    height: '40px'
+                    height: toolbarHeight + 'px',
+                    lineHeight: toolbarHeight + 'px'
                 }"
                 :action="action"
                 :idDataflow="idObject"
-                :instanceKey="instanceKey"/>
+                :instanceKey="instanceKey"
+                @action-on-workspace="handleActionOnWorkspace"
+                @run-dataflow="runDataflow"/>
             
             <DataflowWorkspace
                 :height="workspaceHeight"
@@ -26,6 +29,7 @@
                 @resize:end="handleResizeBottomPane"
             >
                 <DataflowRunningInfo
+                    ref="runningOutput"
                     :instanceKey="instanceKey"
                     :action="action"
                 />
@@ -69,6 +73,63 @@ export default {
         }
     },
     methods: {
+        getDataflowConfigs(){
+            let allNodes = this.$store.state.dataflow.allDataflow[this.instanceKey].allWidget;
+            let links = [];
+            let dataflow = {
+                name: allNodes.home.name,
+                variables: allNodes.home.getVariables()
+            };
+
+            let nodes = {};
+            let count = 1;
+            let currentNode = null;
+            for(let id in allNodes){
+                currentNode = allNodes[id];
+                if(id == 'home'){
+                    continue;
+                }
+                let nodeAttrs = this.$refs.dataflowWorkspace.getNodeAttr(id);
+                nodes[id] = {
+                    jointInfo:{
+                        id:id,
+                        name: nodeAttrs.attrs['.symper-widget-label'].text,
+                        position: nodeAttrs.position,
+                        type: nodeAttrs.type,
+                        nodeNum: count
+                    },
+                    symperConfigs: currentNode.getConfigsToSave()
+                };
+                count += 1;
+            }
+
+            let jointLinks = this.$refs.dataflowWorkspace.getLinks();
+            for(let link of jointLinks){
+                links.push({
+                    source:link.attributes.source.id,
+                    target:link.attributes.target.id
+                });
+            }
+            return {
+                dataflow:dataflow,
+                nodes:nodes,
+                links:links,
+            }
+        },
+        checkCanRun(){
+            return true;
+        },
+        runDataflow(){
+            if(!this.checkCanRun()){
+                return;
+            }
+            let dataflowInfo = this.getDataflowConfigs();
+            dataflowInfo.dataflow_id = this.idObject;
+            this.$refs.runningOutput.getRunningData(this.selectingNode.id, dataflowInfo);
+        },
+        handleActionOnWorkspace(action){
+            this.$refs.dataflowWorkspace.actionOnCanvas(action);
+        },
         handleChangeNodeName(data){
             if(data.name == 'wgName'){
                 this.$refs.dataflowWorkspace.changeCurrentNodeName(data.value);
@@ -90,13 +151,13 @@ export default {
             }); 
         },
         calcWorkspaceHeight(){
-            this.workspaceHeight = $(this.$el).height() - (40 + this.runningInfoHeight)            
+            this.workspaceHeight = $(this.$el).height() - (this.toolbarHeight + this.runningInfoHeight)            
         },
         handleResizePane(eventName,left,top,width,height){
             $(this.$refs.workspaceLeftPane).css('width', $(this.$refs.dataflowEditor).width() - $(this.$refs.dataflowSidebarConfig.$el).width());
         },
         handleResizeBottomPane(eventName,left,top,width,height){
-            this.workspaceHeight =  $(this.$el).height() - (40 + $(this.$refs.dataflowRunningInfo.$el).height());
+            this.workspaceHeight =  $(this.$el).height() - (this.toolbarHeight + $(this.$refs.dataflowRunningInfo.$el).height());
         },
         restoreDataflowDisplay(data){ // khôi phục data từ server cho hiển thị dataflow 
             let graphData = data.graph;
@@ -143,6 +204,7 @@ export default {
     },
     data(){
         return {
+            toolbarHeight: 35,
             runningInfoHeight: 200,
             workspaceHeight: 250,
             contentWidth: "calc(100% - 350px)",
@@ -152,7 +214,9 @@ export default {
         };
     },
     computed: {
- 
+		selectingNode(){
+			return this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
+		}
     },
     components: {
         DataflowToolBar,

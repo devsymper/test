@@ -124,6 +124,9 @@ export default {
 					this.selectingNode.configs.saveAs = [];
 				}
 				this.toggleSaveAsDatasetConfig();
+				setTimeout((self) => {
+					self.calcNodeConfigHeight();
+				}, 0, this);
 			}
 		},
 		calcNodeConfigHeight(){

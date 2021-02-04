@@ -1,6 +1,6 @@
 <template>
     <div class=" symper-dataflow-workspace">
-        <div ref="symperPaperToolbar d-none" >
+        <div ref="symperPaperToolbar" class=" d-none">
         </div>
         <div ref="nodeStencile" style="width: 100%;position: relative;" class="symper-node-stencil" v-show="action != 'embed'">
 
@@ -77,6 +77,17 @@ export default {
         }
     },
     methods: {
+        getNodeAttr(id){
+            let node = this.graph.getCell(id);
+            if(node){
+                return node.attributes;
+            }else{
+                return {}
+            }
+        },
+        getLinks(){
+            return this.graph.getLinks();
+        },
         addLinkTools(link) {
             let paper = this.paper;
             link.set('router', { name: 'manhattan' });
