@@ -3,16 +3,16 @@
 		<v-text-field
 			v-model="searchKey"
 			single-line
+			append-icon="mdi-magnify"
 			solo
 			class="s-input-search"
 		>
-
 		</v-text-field>
 		<div class="ml-2 mr-2" style="height: calc(100% - 57px)">
 			<ag-grid-vue
 				:style="{
 					width: '100%',
-					height: '100%',
+					height: tableHeight + 'px',
 				}"
 				:class="{ 'ag-theme-balham': true }"
 				:defaultColDef="defaultColDef"
@@ -38,6 +38,9 @@ export default {
 		useCheckbox:{
 			type: Boolean,
 			default: true
+		},
+		tableHeight: {
+			default: 400
 		}
 	},
 	data() {
@@ -55,12 +58,18 @@ export default {
 					headerName: 'Name',
 					field: 'name',
 					type: 'text',
+					width:70,
 				},
 				{
 					headerName: 'Type',
 					field: 'type',
 					type: 'text',
-                    editable: true,
+					editable: true,
+					cellEditor:'agSelectCellEditor',
+					cellEditorParams: {
+						values: ['number', 'text', 'datetime', 'date', 'time']
+					},
+					width:70,
 				},
 				{
 					headerName: 'Rename',
@@ -75,7 +84,6 @@ export default {
                     editable: true,
 				},
 			],
-			tableHeight: 400,
 			searchKey: ''
 		};
 	},
@@ -92,11 +100,14 @@ export default {
 				this.rowData.forEach(function(e){
 					delete e.list_foreign_key
 					for(let i in e){
-						if(e[i].toLowerCase()){
-							if(e[i].toLowerCase().includes(self.searchKey.toLowerCase())){
-								arr.push(e)
+						if(e[i]){
+							if(e[i].toLowerCase()){
+								if(e[i].toLowerCase().includes(self.searchKey.toLowerCase())){
+									arr.push(e)
+								}
 							}
 						}
+						
 					}
 				})
 				return arr
@@ -144,7 +155,12 @@ export default {
 	box-shadow: unset !important;
 	margin-top: 8px;
 	border: 1px solid lightgray;
+	height: 28px;
 }
+.dataflow-output-column >>>   .v-input__control .v-input__slot .v-icon {
+	font-size: 18px ;
+}
+
 .s-input-search >>> .v-input__slot{
 	margin: 0px!important;
 }

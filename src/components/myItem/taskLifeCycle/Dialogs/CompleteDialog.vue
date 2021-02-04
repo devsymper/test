@@ -119,7 +119,6 @@ export default {
 				varsForBackend = this.varsForBackend
 			}else{
 				let docObjId = this.taskInfo.action.parameter.documentObjectId;
-				debugger
 				let res = await documentApi.detailDocumentObject(docObjId)
 				if(res.status == 200){
 					dataDoc = res.data;

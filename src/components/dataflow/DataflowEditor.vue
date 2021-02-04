@@ -15,6 +15,7 @@
                 ref="dataflowWorkspace"
                 :instanceKey="instanceKey"
                 :action="action"
+                :status="status"
             />
 
             <vue-resizable
@@ -38,6 +39,7 @@
             @resize:end="handleResizePane"
         >
             <DataflowSidebarConfig
+                @node-name-changed="handleChangeNodeName"
                 :instanceKey="instanceKey"
                 :action="action"/>
         </vue-resizable>
@@ -51,7 +53,8 @@ import DataflowToolBar from "@/components/dataflow/components/DataflowToolBar.vu
 import DataflowWorkspace from "@/components/dataflow/components/DataflowWorkspace.vue";
 import VueResizable from 'vue-resizable';
 import DataflowEditorWorker from 'worker-loader!@/worker/dataflow/DataflowEditor.Worker.js';
-import { getDefaultDataflowConfig } from "@/components/dataflow/configPool/dataflowConfig.js";
+import { getDefaultDataflowConfig, castAllMapObjsToNodes } from "@/components/dataflow/configPool/dataflowConfig.js";
+
 export default {
     created(){
         this.dataflowEditorWorker = new DataflowEditorWorker();
@@ -61,8 +64,16 @@ export default {
     },
     mounted(){
         this.calcWorkspaceHeight();
+        if(this.action == 'create'){
+            this.status = 'editing';
+        }
     },
     methods: {
+        handleChangeNodeName(data){
+            if(data.name == 'wgName'){
+                this.$refs.dataflowWorkspace.changeCurrentNodeName(data.value);
+            }
+        },
         initData(){
             let defaultData = getDefaultDataflowConfig();
             let data = {
@@ -95,10 +106,16 @@ export default {
             }, 0, this);
         },
         restoreRunningNodeData(data){ // Khôi phục lại data từ server phục vụ cho việc chạy dataflow
+            let allNode = castAllMapObjsToNodes(data);
             this.$store.commit('dataflow/setAllNodeRunning', {
-                data,
+                allNode,
                 instanceKey: this.instanceKey
             });
+
+            setTimeout((self) => {
+                self.status = 'editing';
+                this.$refs.dataflowWorkspace.setLinkOrderForNodes();
+            }, 0, this);
         }, 
         getDataflowInfo(){
             if(this.idObject){
@@ -131,6 +148,7 @@ export default {
             contentWidth: "calc(100% - 350px)",
             sidebarWidth: 350,
             instanceKey: Date.now(),
+            status: 'init', // trạng thái cả editor, nhận một trong các giá trị: init, editing, saving
         };
     },
     computed: {

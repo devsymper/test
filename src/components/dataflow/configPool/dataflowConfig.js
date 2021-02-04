@@ -40,3 +40,29 @@ export const DATATYPE_ICONS = {
     'text' : "mdi-format-letter-case",  
     'date' : "mdi-calendar",  
 }
+
+export const castAllMapObjsToNodes = (mapObj) => {
+    let obj = null;
+    let node = null;
+    let rsl = {};
+    let mapTypeToNodeClass = autoLoadNodeClasses();
+
+    for(let id in mapObj){
+        obj = mapObj[id];
+        node = new mapTypeToNodeClass[obj.type](obj.id);
+        node = Object.assign(node, obj);
+        rsl[id] = node;
+    }
+
+    for(let id in rsl){
+        node = rsl[id];
+        for(let nextId in node.nextNodes){
+            node.nextNodes[nextId] = rsl[nextId];
+        }
+
+        for(let prevId in node.prevNodes){
+            node.prevNodes[prevId] = rsl[prevId];
+        }
+    }
+    return rsl;
+}
