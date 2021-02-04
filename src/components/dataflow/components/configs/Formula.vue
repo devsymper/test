@@ -8,7 +8,7 @@
                 </tr>
             </thead>
             <tr style="border-bottom:1px solid #eee"  v-for="(col,idx) in nodeData.configs.addedColumns" :key="idx" :name="idx">
-                <td colspan="2" class="py-1">
+                <td colspan="2" class="py-2">
                     <v-expansion-panels
                         multiple
                         flat
@@ -50,10 +50,10 @@
                                     <div class="w-100">
                                         <span class="font-weight-medium">Data type: </span>
                                         <v-select
-                                            class="sym-select"
+                                            class="sym-select fs-13"
                                             dense
                                             flat
-                                            style="float:right;width:200px"
+                                            style="float:right;width:110px;margin-right:5px"
                                             v-model="col.type"
                                             :items="dataTypes"
                                             outlined
@@ -166,6 +166,7 @@ export default {
 .sym-select >>> .v-input__slot{
     min-height: 20px!important;
     height: 25px;
+    padding-right:4px!important;
 }
 .sym-select >>> .v-input__append-inner{
     margin: 0px!important;

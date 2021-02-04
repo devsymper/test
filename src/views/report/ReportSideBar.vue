@@ -109,13 +109,17 @@ export default {
 				this.$emit('after-toggle-sidebar', !this.isExpand );
 			}
 		},
-		gotoPage(item, subItem = false, parent) {
+		gotoPage(item, subItem = false, parent){
 			if (!item.children) {
 				this.setActive(item, subItem, parent);
 			}
+			
 		},
 		setActive(item, subItem, parent) {
-			this.$emit('selecting-show-list', item.title)
+			this.$store.commit('dashboard/setSelectingShowList' , item.title)
+			if(!this.$route.path.includes('report')){
+				this.$goToPage("/report", "Báo cáo")
+			}
 			let self = this;
 			this.reportMenu.forEach(function(e) {
 				if (e.hasOwnProperty('active')) {

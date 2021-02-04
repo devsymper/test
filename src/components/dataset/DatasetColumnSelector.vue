@@ -20,6 +20,7 @@
 				:gridOptions="gridOptions"
 				:columnDefs="columnDefs"
 				:rowData="tableData"
+				@grid-ready="onGridReady"
 				@cell-context-menu="cellContextMenu"
 			>
 			</ag-grid-vue>
@@ -88,9 +89,6 @@ export default {
 			gridApi: null,
 		};
 	},
-	methods: {
-		cellContextMenu(params) {},
-	},
 	computed:{
 		tableData(){
 			let self = this
@@ -134,19 +132,34 @@ export default {
 		};
 	},
 	methods:{
-		 setRowSelected(rowIndex, selected){
-            let runner = 0;
-            this.gridApi.forEachNode(function(node) {
-                if(runner == rowIndex){
-                    node.setSelected(selected);
-                    node.data.selected = selected;
-                }
-                runner += 1;
-            });
-        },
+		cellContextMenu(params) {},
+		onGridReady(params){
+			this.gridApi = params.api
+			this.setSelectedRow()
+		},
+		setSelectedRow(){
+			if(this.gridApi){
+				this.gridApi.forEachNode(node=>{
+					if(node.data.selected){
+						node.setSelected(true)
+					}
+				})
+			}
+			
+		},
+		// setRowSelected(rowIndex, selected){
+        //     let runner = 0;
+        //     this.gridApi.forEachNode(function(node) {
+        //         if(runner == rowIndex){
+        //             node.setSelected(selected);
+        //             node.data.selected = selected;
+        //         }
+        //         runner += 1;
+        //     });
+        // },
 	},
 	mounted(){
-        this.gridApi = this.gridOptions.api;
+        // this.gridApi = this.gridOptions.api;
 	},
 	components: {
 		AgGridVue,
@@ -156,13 +169,9 @@ export default {
 			deep: true,
 			immediate: true,
 			handler(arr){
-				let self = this
-				arr.forEach(function(e){
-					if(e.selected){
-						debugger
-						self.setRowSelected(e.id, false)
-					}
-				})
+				setTimeout(self=>{
+					self.setSelectedRow()
+				},10, this)
 			}
 		}
 	}

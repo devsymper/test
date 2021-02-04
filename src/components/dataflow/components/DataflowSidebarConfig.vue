@@ -1,24 +1,26 @@
 <template>
-	<div class="ml-2 mr-2 h-100 d-flex flex-column">
-		<FormTpl 
-			:titleSize="'normal'"
-			:allInputs="allInputs"
-		/>
-		<div v-if="allInputs.saveAsDataset.value" class="ml-4 mr-4 d-flex flex-column">
+	<div class="h-100 d-flex flex-column">
+		<div ref="commonConfig" class="mx-2">
 			<FormTpl 
-				:allInputs="formTplDataset"
+				:titleSize="'normal'"
+				:allInputs="commonInputs"
+				@input-value-changed="handleValueChange"
 			/>
-			<div class="d-flex mt-2 align-center">
-				<span class="fs-13 mr-2">
-					Auto update period time 
-				</span>
+			<div v-if="commonInputs.saveAsDataset.value" class="mt-1 pb-2 d-flex justify-space-between">
+				<div class="fs-12 mr-2 h-100" style="line-height: 30px">
+					Làm mới mỗi
+				</div>
 				<PeriodTimeConfig />
 			</div>
 		</div>
-		<component 
-			:is="nodeConfigTag"
-			:nodeData="selectingNode">
-		</component>
+
+		<PerfectScrollbar :style="{height: nodeConfigHeight + 'px'}" class="px-2">
+			<component 
+				:height="nodeConfigHeight"
+				:is="nodeConfigTag"
+				:nodeData="selectingNode">
+			</component>
+		</PerfectScrollbar>
 	</div>
 </template>
 
@@ -27,6 +29,8 @@ import PeriodTimeConfig from '@/components/dataflow/components/PeriodTimeConfig'
 import FormTpl from "@/components/common/FormTpl.vue";
 import { autoLoadNodeClasses } from "@/components/dataflow/configPool/dataflowConfig.js";
 import _cloneDeep from "lodash/cloneDeep";
+import { util } from '../../../plugins/util';
+import PerfectScrollbar from '@/components/common/PerfectScrollBar'
 
 
 let mapTypeToNodeClass = autoLoadNodeClasses();
@@ -44,6 +48,14 @@ var nodeConfigComps = autoImportDataflowNodeConfig();
 
 
 export default {
+	watch: {
+		selectingNode: {
+			deep: true,
+			handler(){
+				this.setCommonValue();
+			}
+		}
+	},
 	props: {
         instanceKey: {
             defaul: ''
@@ -56,6 +68,10 @@ export default {
 		...nodeConfigComps,
 		FormTpl,
 		PeriodTimeConfig,
+		PerfectScrollbar
+	},
+	mounted(){
+		this.calcNodeConfigHeight();
 	},
 	created(){
 	},
@@ -71,39 +87,66 @@ export default {
 	},
 	data(){
 		return {
-			allDatasetColumn:{},
-			allInputs:{
-				name: {
+			nodeConfigHeight: 200,
+			allDatasetColumn: {},
+			commonInputs: {
+				wgName: {
 					"title": this.$t('common.name'),
 					"type": "text",
-					"value": "",
-					"info": "",
+					"value": '',
 				},
-				description: {
+				wgDes: {
 					"title": this.$t('common.description'),
 					"type": 'text',
-					"value": "",
-					"info": "",
+					"value": '',
 				},
 				saveAsDataset:{
 					"title": 'Save result as dataset',
 					"type": 'checkbox',
 					"value": false,
 				}
-			},
-			formTplDataset:{
-				name: {
-					"title": this.$t('bi.dataset.title-add'),
-					"type": "text",
-					"value": "",
-					"info": "",
-				},
-				
 			}
 		}	
 	},
 	methods:{
-		
+		handleValueChange(name, inputInfo, data){
+			for(let key in this.commonInputs){
+				this.selectingNode.configs[key] = this.commonInputs[key].value;
+			}
+			this.$emit('node-name-changed', {
+				name,
+				value: data
+			});
+			if(name == 'saveAsDataset'){
+				if(data){
+					this.selectingNode.configs.saveAs = ["Save result as Dataset"];
+				}else{
+					this.selectingNode.configs.saveAs = [];
+				}
+				this.toggleSaveAsDatasetConfig();
+			}
+		},
+		calcNodeConfigHeight(){
+			this.nodeConfigHeight = util.getComponentSize(this).h - util.getComponentSize(this.$refs.commonConfig).h;
+		},
+		setCommonValue(){
+			let node = this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
+			this.commonInputs.wgName.value = node.configs.wgName;
+			this.commonInputs.wgDes.value = node.configs.wgDes;
+			this.commonInputs.saveAsDataset.value = node.configs.saveAs.length ? true : false;
+			this.toggleSaveAsDatasetConfig();
+		},
+		toggleSaveAsDatasetConfig(){
+			if(this.commonInputs.saveAsDataset.value){
+				this.$set(this.commonInputs, 'nameToSaveAs', {
+					"title": this.$t('bi.dataset.title-add'),
+					"type": "text",
+					"value": this.selectingNode.configs.nameToSaveAs,
+				});
+			}else{
+				this.$delete(this.commonInputs, 'nameToSaveAs')
+			}
+		}
 	}
 }
 </script>

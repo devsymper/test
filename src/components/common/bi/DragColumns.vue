@@ -6,6 +6,7 @@
         @change="change($event)"
         ghost-class="ghost-card"
         :group="{ name: groupDragName, pull: pullMethod, put: putable }"
+        class="s-dragable"
         >
         <columnInfo 
             class="column-dataset"
@@ -101,6 +102,9 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.s-dragable {
+    background: #fcfcfc;
+    border-radius: 3px;
+}
 </style>

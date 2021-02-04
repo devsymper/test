@@ -13,6 +13,7 @@ const defaultConfig = {
 
 export default class JoinData extends CreateableNewColumnNode {
     autoRemoveNullValue = true;
+    stackInput = true;
     constructor(symperId){
         super(symperId, 'Join', _cloneDeep(defaultConfig));
     }

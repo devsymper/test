@@ -144,6 +144,9 @@ const removeReport = function(state, data){
     }
     Vue.delete(dashboardConfigs.allCellConfigs, reportId);
 }
+const setSelectingShowList = function(state, data){
+	state.selectingShowList = data
+}
 export {
     hightlightSelectedDatasetAndCols,
     addCellToLayout,
@@ -155,5 +158,6 @@ export {
     copyReport,
     pasteReport,
     cutReport,
-    removeReport
+	removeReport,
+	setSelectingShowList
 };

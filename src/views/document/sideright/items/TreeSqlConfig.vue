@@ -11,7 +11,6 @@
 		>
 			<template v-slot:append="{ item }">
 				<div v-if="!item.condition" class="tree-item-slot">
-					
 					<v-autocomplete :items="listColumn"  :item-value="itemValue" v-model="item.column" class="tree__list-columns" @change="onChangeConfig" dense solo >
 						<template v-slot:item="data">
 							<ColumnInfo  v-if="customAutocomplete" :infoColumn="data.item" />
@@ -285,6 +284,9 @@ export default {
 	display: flex;
 	margin-top: -8px;
 }
+.tree-view-custom >>> .tree-item-slot {
+	margin-bottom: -14px;
+}
 .tree-view >>> .tree-item-slot .v-input {
 	margin: unset;
 }
@@ -324,6 +326,7 @@ export default {
 	display: none;
 }
 .tree-view-custom >>> .v-treeview-node__toggle {
+	margin-left: 6px;
 	margin-right: -8px;
 }
 .btn-delete-item-condition {

@@ -61,6 +61,9 @@ export const registerNodeDisplay =  function(){
                 strokeWidth: 1,
                 fill: 'white',
             },
+            '.symper-widget-remove': {
+                event: 'node:remove',
+            },
             '.symper-widget-frame': {
                 height: DISPLAY_CONFIGS.height,
                 width: DISPLAY_CONFIGS.width,

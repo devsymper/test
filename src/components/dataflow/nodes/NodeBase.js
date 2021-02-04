@@ -3,6 +3,7 @@ const commonNodeProps = {
     wgName: '',
     wgDes: '',
     saveAs: [],
+    saveAsDataset: false,
     nameToSaveAs: '',
     newIdDataset: '',
     selectedDataset: false,

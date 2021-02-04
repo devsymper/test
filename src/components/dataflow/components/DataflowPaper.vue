@@ -285,6 +285,20 @@ export default {
                 console.error("Node type '" + nodeType + "' is not defined");
             }
         },
+        updateLinkNumber(sourceId, targetId, num){
+            let links = this.graph.getLinks();
+            for(let link of links){
+                if( link.attributes.target.id == targetId &&
+                    link.attributes.source.id == sourceId ){
+                    
+                    if (link.labels().length == 0) {
+                        this.addLinkOrders(link, num);
+                    }
+                    link.attr('text/text', '#' + num);
+                    break;                    
+                }
+            }
+        },
         handlePaperEvents(){
             let paper = this.paper;
             let graph = this.graph;
@@ -319,10 +333,6 @@ export default {
             graph.on('remove', function(cell, collection, opt) {
                 if (cell.isLink()) {
                     let cellAtrr = cell.attributes;
-                    // if (cellAtrr.target.id) {
-                    //     ListWidget[cellAtrr.target.id].removeLink(cellAtrr.source.id);
-                    //     ListWidget[cellAtrr.target.id].reorderLinks(cell);
-                    // }
                     self.$emit('link-removed', {
                         sourceId: cellAtrr.source.id,
                         targetId: cellAtrr.target.id
@@ -345,14 +355,18 @@ export default {
                 self.unHilightLink(linkView.model);
             });
 
+            paper.on('node:remove', function(cellView) {
+                let id = cellView.model.id;
+                self.$emit('node-removed', {
+                    id
+                });
+                cellView.model.remove();
+            });
+
             paper.on('link:connect', (linkView, evt, elementViewConnected, magnet, arrowhead) => {
-                // let linkAttr = linkView.model.attributes;
+                let linkAttr = linkView.model.attributes;
                 let sourceId = linkAttr.source.id;
                 let targetId = linkAttr.target.id;
-                // if (ListWidget[targetId].stackInput) {
-                //     addLinkOrders(linkView.model, ListWidget[targetId].inputDatasetCount + 1);
-                // }
-                // ListWidget[sourceId].connectToWidget(targetId);
                 self.$emit('link-connected', {
                     sourceId: sourceId,
                     targetId: targetId
@@ -454,21 +468,6 @@ export default {
         },
         hideRemoveButton(idNode) {
             $(".joint-cell[model-id=" + idNode + "]").find('.symper-widget-remove').addClass('d-none');
-        },
-        removeNode(nodeId) {
-            // let jointLinks = this.graph.getLinks();
-            // let nodeId = currentNode.jointNode.id;
-            // for (let link of jointLinks) {
-            //     if (link.attributes.source.id == nodeId) {
-            //         ListWidget[link.attributes.target.id].removeLink(nodeId);
-            //     } else if (link.attributes.target.id == nodeId) {
-            //         ListWidget[nodeId].removeLink(link.attributes.source.id);
-            //     }
-            // }
-            // ListWidget[nodeId].jointChild.remove();
-            // delete ListWidget[nodeId];
-            // currentNode.jointNode = false;
-            // selectPaper();
         }
     },
 };
