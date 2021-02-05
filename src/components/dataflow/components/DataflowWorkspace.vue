@@ -17,6 +17,11 @@
 import DataflowPaper from "@/components/dataflow/components/DataflowPaper.vue";
 
 export default {
+    data(){
+        return {
+            needRerunNodeIds: {}
+        }
+    },
     computed: {
 		selectingNode(){
 			return this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
@@ -53,6 +58,7 @@ export default {
                 let allNodes = self.$store.state.dataflow.allDataflow[self.instanceKey].allWidget;
                 let targetNode = allNodes[data.targetId];
                 self.setLinkOrderForNodes([targetNode]);
+                targetNode.impact();
             }, 0, this);
         },
         setLinkOrderForNodes(nodes = null){
@@ -78,12 +84,16 @@ export default {
             }
         },
         removeLink(data){
+            let allNodes = this.$store.state.dataflow.allDataflow[this.instanceKey].allWidget;
             this.$store.commit('dataflow/disconnectLink', {
                 ...data,
                 instanceKey: this.instanceKey
             });
+            allNodes[data.targetId].impact();
+                
+            this.needRerunNodeIds[data.targetId] = true;
+            
             setTimeout((self) => {
-                let allNodes = self.$store.state.dataflow.allDataflow[self.instanceKey].allWidget;
                 let targetNode = allNodes[data.targetId];
                 if(targetNode){
                     self.setLinkOrderForNodes([targetNode]);

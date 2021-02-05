@@ -81,7 +81,6 @@ export default class Formula extends NodeBase {
                 outCols.push(newOutputCol);
             }
         }
-
         if(this.input.length > 0){
             this.lastConfigCache = this.configs.addedColumns;
         }
