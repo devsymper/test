@@ -50,7 +50,7 @@ export default class TableControl1 extends Control {
     renderTable() {
         this.tableInstance = new SymperTable(this, this.keyInstance, this.groupConfig, this.pivotConfig, this.formulasWorker);
         let viewType = sDocument.state.viewType[this.keyInstance];
-        this.ele.parent().append('<span onclick="wrapTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-format-text-wrapping-wrap  icon-options icon-wrap-table"></span>');
+        // this.ele.parent().append('<span onclick="wrapTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-format-text-wrapping-wrap  icon-options icon-wrap-table"></span>');
         if ((viewType == 'submit' || viewType == "update")) {
             this.ele.parent().append('<span onclick="traceTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-information-outline icon-options icon-trace-table"></span>');
         }

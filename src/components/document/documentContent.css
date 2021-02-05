@@ -642,10 +642,10 @@ button:hover {
 .sym-form-Detail .ag-theme-balham .ag-cell-inline-editing{
     height: 100% !important;
 }
-.blueFont{
+.sym-form-submit .blueFont{
     color: blue;
 }
-.redFont{
+.sym-form-submit .redFont{
     color:red;
 }
 
