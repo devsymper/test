@@ -6,7 +6,7 @@
         :value="model"
         :items="allColumns"
         :item-text="itemText"
-        item-value="columnName"
+        :item-value="itemValue"
         outlined
         @change="change"
     >
@@ -27,14 +27,15 @@ export default {
         ColumnInfo,
     },
     computed : {
-        dataModel(){
-            return this.model;
-        },
     },
     props : {
         itemText:{
             type: String,
             default: "title"
+        },
+        itemValue:{
+            type: String,
+            default: "columnName"
         },
         allColumns: {
             type: Array,
@@ -48,6 +49,12 @@ export default {
         },
         ikey : {
             default : ''
+        },
+        object:{
+            type: Object,
+            default(){
+                return {}
+            }
         }
     },
     methods:{
@@ -55,6 +62,7 @@ export default {
             let data = {};
             data.ikey = this.ikey;
             data.value = vl;
+            data.object = this.object
             this.$emit("change-value",data)
         }
     }

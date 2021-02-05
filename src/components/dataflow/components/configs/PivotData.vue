@@ -54,6 +54,8 @@
                             :searchKey="searchKey"
                             :pullMethod="null"
                             :columns="nodeData.configs.columns"
+                            @drag-add-item="changeData"
+                            @drag-remove-item="changeData"
                         />
                     </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -74,6 +76,8 @@
                             :searchKey="searchKey"
                             :pullMethod="null"
                             :columns="nodeData.configs.rows"
+                            @drag-add-item="changeData"
+                            @drag-remove-item="changeData"
                         />
                     </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -94,6 +98,8 @@
                             :searchKey="searchKey"
                             :pullMethod="null"
                             :columns="nodeData.configs.values"
+                            @drag-add-item="changeData"
+                            @drag-remove-item="changeData"
                         />
                     </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -135,6 +141,9 @@ export default {
             this.panelRows = [0];
             this.panelValues = [0];
         },
+        changeData(){
+            this.$emit('change-configs');
+        }
     
     }
 

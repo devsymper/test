@@ -4,8 +4,10 @@
             <v-icon>mdi-chevron-right</v-icon>
             <div style="width:95%;padding-top:3px">
                 <span class="font-weight-medium">Fields</span> 
-                <v-icon @click="showDatasetSelector" class="float-right fs-16 mx-3">mdi-database</v-icon>
-                <v-icon @click="showRelationSelector" class="float-right fs-16" >mdi-relation-zero-or-one-to-one-or-many</v-icon>
+                
+                <v-icon @click="showDatasetSelector" class="float-right fs-16 mx-3 pa-1">mdi-database</v-icon>
+                <v-icon @click="showRelationSelector" class="float-right fs-16 pa-1" >mdi-relation-zero-or-one-to-one-or-many</v-icon>
+                <v-icon @click="showDashboardVariables" class="float-right fs-16 mx-3 pa-1">mdi-table-large-plus</v-icon>
             </div>
         </div>
         <v-text-field
@@ -117,6 +119,41 @@
                 </v-expansion-panel>
             </v-expansion-panels>
         </VuePerfectScrollbar>
+
+        <v-dialog
+            v-model="showVariables"
+            max-width="850px"
+            scrollable
+        >
+        <v-card>
+            <v-card-title>
+                <span class="fs-16">Dashboard variables</span>
+            </v-card-title>
+            <v-card-text>
+                <variables-pannel ref="dashboardVariables" :originDatasets="datasetAndColumn" class="bg-white w-100"/>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    color="blue darken-1"
+                    text
+                    class="btn-add"
+                    @click="applyVariables"
+                >
+                    Apply
+                </v-btn>
+
+                <v-btn
+                color="red darken-1"
+                text
+                @click="showVariables = false"
+                >
+                    {{$t("common.close")}}
+                </v-btn>
+            
+            </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -127,13 +164,15 @@ import columnInfo from "@/components/common/bi/ColumnInfo";
 import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/DashboardDataset.Worker.js';
 import { util } from '../../../plugins/util';
 import DatasetDetailTooltip from './DatasetDetailTooltip.vue';
+import VariablesPannel from './VariablesPannel.vue';
 
 export default {
     components:{
         VuePerfectScrollbar,
         draggable,
         columnInfo,
-        DatasetDetailTooltip
+        DatasetDetailTooltip,
+        VariablesPannel
     },
     computed:{
         datasetAndColumn(){
@@ -145,7 +184,7 @@ export default {
             }
         },
         allDashboard(){
-            return this.$store.state.dashboard;
+            return this.$store.state.dashboard.allDashboard;
         }
     },
     watch:{
@@ -183,9 +222,26 @@ export default {
             openedPanelChild:[],
             search:"",
             infoDataflows:[],
+            showVariables:false,
         }
     },
     methods:{
+        showDashboardVariables(){
+            this.showVariables = true;
+            let vars = util.cloneDeep(this.allDashboard[this.instanceKey].dashboardConfigs.info.variables);
+            setTimeout((self) => {
+                self.$refs.dashboardVariables.setItems(Object.values(vars));
+            }, 300, this);
+        },
+        applyVariables(){
+            debugger
+            let vars = this.$refs.dashboardVariables.getItems();
+            this.allDashboard[this.instanceKey].dashboardConfigs.info.variables = vars.reduce((map, el) => {
+                map[el.name] = el;
+                return map;
+            }, {});
+            this.showVariables = false;
+        },
         onSearch(vl){
             // call function setOpenPanle để count max panle set all open khi search
             if(this.delayTimer){
