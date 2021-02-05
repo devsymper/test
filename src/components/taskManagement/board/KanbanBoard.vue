@@ -291,7 +291,7 @@ export default {
                     },
                 ],
                 page : 1,
-                pageSize: 1000,
+                pageSize: 500,
                 distinct: true
             },
             filterProps:{ // bộ lọc

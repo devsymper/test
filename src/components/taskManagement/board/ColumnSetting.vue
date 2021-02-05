@@ -221,7 +221,20 @@ export default {
             this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
-            data.data = JSON.stringify(this.listColumn);
+            let newData = util.cloneDeep(this.listColumn);
+            newData = newData.reduce((arr,obj)=>{
+                let newObj = obj;
+                let newStatusInColumn = newObj.statusInColumn.reduce((arr1, obj1) => {
+                    delete obj1.tasks;
+                    arr1.push(obj1)
+                    return arr1
+                },[]);
+                obj.statusInColumn = newStatusInColumn;
+                arr.push(obj)
+                return arr;
+            },[]);
+            debugger
+            data.data = JSON.stringify(newData);
             data.boardId = idBoard;
             
             this.kanbanWorker.postMessage({

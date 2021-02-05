@@ -91,12 +91,10 @@
 </template>
 
 <script>
-import { util } from "@/plugins/util";
 import IssueRecent from './IssueRecent.vue';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import AssignedRecent from './AssignedRecent.vue';
 import infoUser from "@/components/common/user/InfoUser";
-import { taskManagementApi } from "@/api/taskManagement.js";
 import HomeWorker from 'worker-loader!@/worker/taskManagement/home/Index.Worker.js';
 
 export default {

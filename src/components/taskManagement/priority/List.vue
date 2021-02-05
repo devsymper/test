@@ -11,13 +11,13 @@
                         label="Tìm kiếm"
                         dense
                         solo
-                        style="max-width:255px;"
+                        style="max-width:200px;"
                         single-line
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
                     <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate" >
-                        <span>Create priority</span>
+                        <span>{{$t("taskManagement.createPriority")}}</span>
                     </v-btn>
                 </v-card-title>
                 <v-data-table
@@ -103,7 +103,6 @@
 </template>
 
 <script>
-import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import modalAddOrDetailPriority from "./ModalAddOrDetailPriority";
@@ -226,7 +225,7 @@ export default {
                         this.$snotifySuccess("Update level priority success!");
                         this.$store.commit("taskManagement/addToTaskManagementStore",data); 
                     }else{
-                        this.$snotifyError("", "Error! Have error !!!");
+                        this.$snotifyError("", res.message);
                     }
                 })
                 .catch(err => {
@@ -275,7 +274,7 @@ export default {
                         this.$snotifySuccess("Remove priority success!");
                         this.$store.commit("taskManagement/removePriorityToStore",this.prioritySelected.id);
                     }else{
-                        this.$snotifyError("", "Error! Have error !!!");
+                        this.$snotifyError("", res.message);
                     }
                 })
                 .catch(err => {

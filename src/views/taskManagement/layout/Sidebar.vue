@@ -102,9 +102,9 @@ export default {
                 this.$refs.projectPopupView.hide()
             }
             if (this.$refs.SelectBoard && 
-                ($(evt.target).closest(".v-list-item").length == 0 &&
+                $(evt.target).closest('.task-sidebar-item').length == 0 &&
                 $(evt.target).closest(".card-add-board").length == 0)
-            ) {
+             {
                 this.$refs.SelectBoard.hide()
             }
         });
