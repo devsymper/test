@@ -78,7 +78,7 @@
                 >
                     <p class="title-column">{{column.name}}</p>
                     <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-                    <VuePerfectScrollbar style="max-height: calc(100vh - 232px);" class="wrap-scroll-column">
+                    <VuePerfectScrollbar style="max-height: calc(100vh - 240px);" class="wrap-scroll-column">
                         <div v-for="(status, index) in column.statusInColumn"
                             :key="index"
                             class="mt-2 list-control-autocomplete"
@@ -821,5 +821,11 @@ export default {
     height: 24px;
     /* padding: 4px 0px; */
     text-align: center;
+}
+::v-deep .ps > .ps__rail-x{
+    opacity: 1;
+}
+::v-deep .ps__thumb-x{
+    height: 10px !important;
 }
 </style>

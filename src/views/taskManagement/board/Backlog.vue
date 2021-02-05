@@ -1,5 +1,5 @@
 <template>
-      <div>
+      <div class="h-100">
         <Preloader ref="preLoaderView"/>
       <backlog 
         @loaded-content="afterLoadContent"
