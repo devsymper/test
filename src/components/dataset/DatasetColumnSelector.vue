@@ -97,8 +97,8 @@ export default {
 			}else{
 				let arr = []
 				this.rowData.forEach(function(e){
-					delete e.list_foreign_key
-					for(let i in e){
+					let tableColumn = ['columnName', 'type', 'title']
+					tableColumn.forEach(function(i){
 						if(e[i]){
 							if(e[i].toLowerCase()){
 								if(e[i].toLowerCase().includes(self.searchKey.toLowerCase())){
@@ -106,14 +106,13 @@ export default {
 								}
 							}
 						}
-						
-					}
+					})
 				})
 				return arr
 			}
 		},
 	},
-	beforeMount() {
+	beforeMount(){
 		this.defaultColDef = {
 			minWidth: 40,
 			filter: true,
