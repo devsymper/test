@@ -3,7 +3,7 @@
 		<ListItems
 			ref="listOutput"
 			:pageTitle="$t('bi.dataflow.title-show-list')"
-			:containerHeight="containerHeight"
+			:containerHeight="contentRunningHeight - 60"
 			:getDataUrl="getListUrl"
 			:showExportButton="false"
 			:useDefaultContext="false"
@@ -16,6 +16,7 @@
 			:customDataForApi="customDataForApi"
 			:customHeaderBtn="customHeaderBtn"
 			:customContentType="true"
+			@data-loaded="handleDataloaded"
 			:customAPIResult="customAPIResult"
 		>
 			<template slot="right-panel-content" slot-scope="{}"> </template>
@@ -43,6 +44,9 @@ export default {
 		getData(dataPost){
 			this.dataPost = dataPost;
 			this.$refs.listOutput.getData()
+		},
+		handleDataloaded(){
+			this.$emit('data-loaded')
 		}
 	},
 	props: {
@@ -55,7 +59,11 @@ export default {
         },
         instanceKey: {
             default: ''
-        },
+		},
+		contentRunningHeight:{
+			type: Number,
+			default: 0
+		}
 	},
 	data() {
 		let self = this;

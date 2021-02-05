@@ -812,3 +812,10 @@ body {
 .position-relative {
     position: relative;
 }
+.v-menu__content {
+    font-size: 13px;
+}
+.v-menu__content .v-list-item {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}

@@ -21,6 +21,8 @@
 				:columnDefs="columnDefs"
 				:rowData="tableData"
 				@grid-ready="onGridReady"
+                @cell-value-changed="onCellValueChanged"
+                @row-selected="onSelectionChanged"
 				@cell-context-menu="cellContextMenu"
 			>
 			</ag-grid-vue>
@@ -97,8 +99,8 @@ export default {
 			}else{
 				let arr = []
 				this.rowData.forEach(function(e){
-					delete e.list_foreign_key
-					for(let i in e){
+					let tableColumn = ['columnName', 'type', 'title']
+					tableColumn.forEach(function(i){
 						if(e[i]){
 							if(e[i].toLowerCase()){
 								if(e[i].toLowerCase().includes(self.searchKey.toLowerCase())){
@@ -106,14 +108,13 @@ export default {
 								}
 							}
 						}
-						
-					}
+					})
 				})
 				return arr
 			}
 		},
 	},
-	beforeMount() {
+	beforeMount(){
 		this.defaultColDef = {
 			minWidth: 40,
 			filter: true,
@@ -132,6 +133,14 @@ export default {
 		};
 	},
 	methods:{
+		onCellValueChanged(event){
+            this.$emit('change-configs',{type:'change-cell-value'});
+        },
+		onSelectionChanged(event) {
+			this.$emit('change-configs',{type:'select-row-change', data: event});
+			let rowIndex = event.node.id;
+            this.rowData[rowIndex].selected = event.node.selected;
+        },
 		cellContextMenu(params) {},
 		onGridReady(params){
 			this.gridApi = params.api
@@ -147,16 +156,6 @@ export default {
 			}
 			
 		},
-		// setRowSelected(rowIndex, selected){
-        //     let runner = 0;
-        //     this.gridApi.forEachNode(function(node) {
-        //         if(runner == rowIndex){
-        //             node.setSelected(selected);
-        //             node.data.selected = selected;
-        //         }
-        //         runner += 1;
-        //     });
-        // },
 	},
 	mounted(){
         // this.gridApi = this.gridOptions.api;

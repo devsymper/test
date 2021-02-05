@@ -1221,6 +1221,11 @@
 			"table": "Bảng",
 			"treeMap": "TreeMap"
 
+		},
+		"runningInfo":{
+			"run-success": "Run successfully in",
+			"with": "with ",
+			"rows":"rows"
 		}
 	},
     "virtualdoc": {

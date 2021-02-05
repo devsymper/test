@@ -143,6 +143,7 @@ export default {
 			} else {
 				item.children.push({ id: Date.now(), condition: true, name: 'AND', parent: item.id, children: [] });
 			}
+			this.$emit('change-config', {})
 			this.$refs.tree.updateAll(true);
 		},
 		setValueForNode() {},
@@ -150,7 +151,8 @@ export default {
 		 * Thay đổi điều kiện
 		 */
 		swapCondition(item) {
-			item.name = item.name == 'OR' ? 'AND' : 'OR';
+			let value = item.name == 'OR' ? 'AND' : 'OR'
+			this.$set(item, 'name' , value)
 			this.onChangeConfig();
 		},
 		/**
@@ -163,6 +165,7 @@ export default {
 		 * Xóa node
 		 */
 		deleteCondition(item) {
+			this.$emit('change-config', {})
 			let parentId = item.parent;
 			let parentNode = this.bfs(this.treeData, parentId);
 			for (let i = 0; i < parentNode.children.length; i++) {

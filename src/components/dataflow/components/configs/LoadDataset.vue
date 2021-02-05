@@ -4,7 +4,7 @@
 			@dataset-selected="handleDatasetSelected"
 			:configs="nodeData.configs"
 		/>
-		<DatasetColumnSelector  :rowData="nodeData.configs.allColumns" />
+		<DatasetColumnSelector  :rowData="nodeData.configs.allColumns" @change-configs="handleChangeConfigs" />
     </div>
 </template>
 
@@ -33,7 +33,11 @@ export default {
 		this.listenFromWorker()
 	},
     methods: {
+		handleChangeConfigs(){
+			this.$emit('change-configs', {})
+		},
 		handleDatasetSelected(params){
+			this.$emit('change-configs', {})
 			setTimeout(self=>{
 				self.changeNodeInfor(params)
 			},200, this)

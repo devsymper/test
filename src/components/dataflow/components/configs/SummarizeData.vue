@@ -18,9 +18,10 @@
 								display: checkMatch(column) ? 'flex' : 'none',
 							}"
 						>
-							<v-icon x-small class="mt-1 mr-1"> {{ getColumnIcon(column.type) }}</v-icon>
-							<span class="column-title text-ellipsis mr-2">{{ column.title }}</span> ( <span class="colmn-name text-ellipsis">{{ column.columnName }}</span
-							>)
+							<ColumnInfo :infoColumn="column" />
+							<!-- <v-icon x-small class="mt-1 mr-1"> {{ getColumnIcon(column.type) }}</v-icon> -->
+							<!-- <span class="column-title text-ellipsis mr-2">{{ column.title }}</span> ( <span class="colmn-name text-ellipsis">{{ column.columnName }}</span -->
+							<!-- >) -->
 						</div>
 					</draggable>
 				</VuePerfectScrollbar>
@@ -59,19 +60,19 @@
 									</v-list-item>
 								</v-list>
 							</v-menu>
-							<span :style="{ width: column.inputWidth }" class="text-ellipsis" title="Double click to edit" @dblclick="editColumnAs(idx)" v-show="!column.edit">
+							<span :style="{ 'max-width': '30%' }" class="text-ellipsis" title="Double click to edit" @dblclick="editColumnAs(idx)" v-show="!column.edit">
 								{{ column.columnName }}
 							</span>
 							<input
 								@change="changeConfig('rename')"
 								@blur="finishEditColumnAs"
 								v-show="column.edit"
-								:style="{ width: column.inputWidth }"
+								:style="{ 'max-width': '30%'}"
 								size="nano"
 								v-model="column.as"
 								class="d-inline-block input-edit-as"
 							/>
-							<v-icon small @click="removeColumn(idx, 'aggColumns')" style="position: absolute; right: 3px" class="mr-2"> mdi-close</v-icon>
+							<v-icon x-small @click="removeColumn(idx, 'aggColumns')" style="position: absolute; right: 10px; top 4px" class="mr-4"> mdi-close</v-icon>
 						</div>
 						<div class="placeholder-div-condition mt-1 mb-4 d-flex justify-content-center  ">
 							<span class="add-field-here-title">
@@ -98,10 +99,12 @@
 							display: checkMatch(column) ? 'block' : 'none',
 						}"
 					>
-						<v-icon x-small class="mr-1">{{ getColumnIcon(column.type) }}</v-icon>
+						<ColumnInfo :infoColumn="column" :showIconRemove="true" @remove-item="removeColumn(idx, 'groupBy')"/>
+
+						<!-- <v-icon x-small class="mr-1">{{ getColumnIcon(column.type) }}</v-icon>
 						<span class="column-title">{{ column.title }}</span> ( <span class="colmn-name">{{ column.columnName }}</span
-						>)
-						<v-icon x-small style="float:right" class="mr-2" @click="removeColumn(idx, 'groupBy')">mdi-close</v-icon>
+						>) -->
+						<!-- <v-icon x-small style="float:right" class="mr-2" @click="removeColumn(idx, 'groupBy')">mdi-close</v-icon> -->
 					</div>
 					<div class="placeholder-div-condition mt- 1 mb-4 d-flex justify-content-center ">
 						<span class="add-field-here-title">
@@ -115,11 +118,13 @@
 </template>
 
 <script>
+import ColumnInfo from '@/components/common/bi/ColumnInfo'
 import aggTpl from '@/components/dashboard/configPool/aggTpl';
 import VuePerfectScrollbar from 'vue-perfect-scrollbar';
 export default {
 	components: {
 		VuePerfectScrollbar,
+		ColumnInfo
 	},
 	data() {
 		let newAggTpl = _.cloneDeep(aggTpl);

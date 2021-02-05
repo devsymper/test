@@ -1376,7 +1376,11 @@
 			"stackedColumn100": "Stacked Column 100",
 			"table": "Bảng",
 			"treeMap": "TreeMap"
-
+		},
+		"runningInfo":{
+			"run-success": "Chạy thành công trong",
+			"with": "với",
+			"rows":"kết quả"
 		}
 
 	},

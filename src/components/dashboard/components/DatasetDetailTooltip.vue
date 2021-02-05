@@ -1,5 +1,5 @@
 <template>
-    <div style="width: auto">
+    <div style="width: auto;background-color:white" class="pa-2">
         <div class="fs-14 font-weight-bold" style="text-align:center">
             Dataset infomation
         </div>

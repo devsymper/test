@@ -24,6 +24,7 @@
                             v-model="col.type"
                             :items="dataTypes"
                             outlined
+                            @change="chageSelectType"
                         ></v-select>
                         <v-icon  @click="removeCol(idx)" class="fs-16 mx-1">mdi-close</v-icon>
                     </div>
@@ -75,6 +76,9 @@ export default {
         }
     },
     methods:{
+        chageSelectType(){
+            this.$emit('change-configs');
+        },
         removeCol(idx){
             this.nodeData.configs.sortColumns.splice(idx, 1);
         },
@@ -86,6 +90,7 @@ export default {
         },
         changeValue(data){
             this.nodeData.configs.sortColumns[data.ikey].uid =  data.value;
+            this.$emit('change-configs');
         }
     }
 
