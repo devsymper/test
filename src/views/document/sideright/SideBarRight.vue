@@ -107,8 +107,6 @@
 <script>
 import FormTpl from "./../../../components/common/FormTpl.vue"
 import {checkInTable,checkNameControl,checkTitleControl} from "./../common/common";
-import { formulasApi } from "./../../../api/Formulas.js";
-import { util } from '../../../plugins/util';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
@@ -127,15 +125,18 @@ export default {
         VuePerfectScrollbar,
     },
     computed: {
+        sEditor(){
+            return this.$store.state.document.editor[this.instance]
+        },
         sCurrentDocument(){
-            return this.$store.state.document.editor[this.instance].currentSelectedControl;
+            return this.sEditor.currentSelectedControl;
         },
         listDataFlow(){
-            return this.$store.state.document.editor[this.instance].listDataFlow
+            return this.sEditor.listDataFlow
         },
 
         controlPropsGroup(){
-            return this.$store.state.document.editor[this.instance].currentSelectedControl.properties;
+            return this.sEditor.currentSelectedControl.properties;
         },
         listStyle(){
             return this.$store.state.document.documentStyle[this.instance];   
@@ -151,6 +152,24 @@ export default {
             setTimeout(() => {
                 // $('.sym-v-expand-content input').first().focus();
             }, 200);
+        },
+        /**
+         * trường hợp table cần lấy thông tin các control trong table để cho phép chọn cột primary key
+         */
+        "controlPropsGroup.display.tablePrimaryKey":function(before,after){
+            if(before){
+                let currentControlId = this.sCurrentDocument.id;
+                if(currentControlId && this.sEditor.allControl[currentControlId]){
+                    let allControlInTable = this.sEditor.allControl[currentControlId].listFields;
+                    let items = [];
+                    for(let controlId in allControlInTable){
+                        let controlprops = allControlInTable[controlId].properties;
+                        let item = {value:controlprops.name.value, text:controlprops.title.value};
+                        items.push(item);
+                    }
+                    this.sCurrentDocument.properties.display.tablePrimaryKey.options = items;
+                }
+            }
         },
      
     },

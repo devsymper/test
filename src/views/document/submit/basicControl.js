@@ -10,10 +10,10 @@ import { documentApi } from "../../../api/Document";
 import { str } from "../../../plugins/utilModules/str";
 import PerfectScrollbar from "perfect-scrollbar";
 import { fileManagementApi } from "@/api/FileManagement";
-let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
+    'xd': 'mdi-monitor-dashboard',
     'csv': 'mdi-file-document-outline',
     'pdf': 'mdi-file-pdf-outline',
     'mp3': 'mdi-radio',
@@ -409,9 +409,7 @@ export default class BasicControl extends Control {
             this.setImageControlValue(value)
         }
         else if (this.type == 'fileUpload') {
-            if (this.checkDetailView()) {
-                this.ele.find('.upload-file-wrapper-outtb').empty()
-            }
+           
             this.setFileControlValue(value, true)
         }
         else if(this.type == 'user'){
@@ -473,22 +471,28 @@ export default class BasicControl extends Control {
         else{
             fileEl = this.genFileElItem(fileData);
         }
+        if(!fileEl && this.checkDetailView()){
+            this.ele.css({border:'none'})
+        }
         this.ele.find('.upload-file-wrapper-outtb .list-file').append(fileEl);
-        this.ele.off('click', '.remove-file')
-        this.ele.on('click', '.remove-file', function(e) {
-            let item = $(this).attr('data-item');
-            let index = thisObj.value.indexOf(item);
-            thisObj.value.splice(index,1);
-            e.preventDefault();
-            e.stopPropagation();
-            $(this).closest('.file-item').remove()
-            store.commit("document/updateListInputInDocument", {
-                controlName: thisObj.name,
-                key: 'value',
-                value: thisObj.value,
-                instance: thisObj.keyInstance
-            });
-        })
+        if(!this.checkDetailView()) {
+            this.ele.off('click', '.remove-file')
+            this.ele.on('click', '.remove-file', function(e) {
+                let item = $(this).attr('data-item');
+                let index = thisObj.value.indexOf(item);
+                thisObj.value.splice(index,1);
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).closest('.file-item').remove()
+                store.commit("document/updateListInputInDocument", {
+                    controlName: thisObj.name,
+                    key: 'value',
+                    value: thisObj.value,
+                    instance: thisObj.keyInstance
+                });
+            })
+        }
+        
     }
     setPrintValueControl(vl = undefined) {
         let value = vl;
@@ -600,15 +604,22 @@ export default class BasicControl extends Control {
 
     }
     genFileElItem(fileData){
-        let icon = fileTypes[fileData.type];
+        let icon = (fileTypes[fileData.type]) ? fileTypes[fileData.type] : fileTypes['txt'];
+        let elAction = 
+        `
+            <div class="file-item__action">
+                <span class="file-item__edit mdi mdi-lead-pencil"></span>
+                <span class="file-item__remove mdi mdi-trash-can-outline"></span>
+            </div>
+        `;
+        if(this.checkDetailView()){
+            elAction = ""
+        }
         let file = `
                 <div class="file-item" file-id="`+fileData.id+`" path="`+fileData.serverPath+`">
                     <span class="mdi ` + icon + ` " style="font-size: 14px;"></span>
                     <div class="file-item__name">`+fileData.name+`</div>
-                    <div class="file-item__action">
-                        <span class="file-item__edit mdi mdi-lead-pencil"></span>
-                        <span class="file-item__remove mdi mdi-trash-can-outline"></span>
-                    </div>
+                    `+elAction+`
                     <span class="file-item__size">`+str.getFileSize(fileData.size)+`</span>
                     
                 </div>

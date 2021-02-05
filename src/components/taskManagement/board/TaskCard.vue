@@ -1,10 +1,10 @@
 <template>
-	<div class="task-item rounded px-2 pt-2 pb-1" :style="{
+	<div class="task-item rounded px-2 pt-2 pb-1 task-hover-poiter" :style="{
 		'border-left':(status) ? '4px solid '+status.color : ''
 	}"
-	>
+	@click.prevent.stop="handleShowDetailIssue">
 		<div class="task-item__header">
-			<p @click.prevent.stop="handleShowDetailIssue" class="task-hover-poiter task-content">{{task.tmg_name}}</p>
+			<p class="task-content">{{task.tmg_name}}</p>
 		</div>
 		<div class="mt-4 card-item__body">
 			<div class="left-content">
@@ -16,7 +16,6 @@
 				<span>{{task.document_object_create_time}}</span>
 				<symper-avatar :size="16" :userId="task.tmg_assignee"/>
 			</div>
-			
 		</div>
 		<detail-issue
             :documentObjectId="documentObjectId"
@@ -132,10 +131,12 @@ export default {
 		height: 14px;
 		border-radius: 50%;
 	}
-	.task-hover-poiter:hover{
+	.task-hover-poiter{
 		cursor: pointer;
-		text-decoration: underline;
-		color: blue;
+		transition: all ease-in-out 250ms;
+	}
+	.task-hover-poiter:hover{
+		box-shadow: var(--symper-box-shadow-bottom);
 	}
 	.task-content{
 		display: -webkit-box;
