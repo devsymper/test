@@ -11,7 +11,8 @@
                 :idDataflow="idObject"
                 :instanceKey="instanceKey"
                 @action-on-workspace="handleActionOnWorkspace"
-                @run-dataflow="runDataflow"/>
+                @run-dataflow="runDataflow"
+                @save-dataflow="saveDataflow"/>
             
             <DataflowWorkspace
                 :height="workspaceHeight"
@@ -58,6 +59,7 @@ import DataflowWorkspace from "@/components/dataflow/components/DataflowWorkspac
 import VueResizable from 'vue-resizable';
 import DataflowEditorWorker from 'worker-loader!@/worker/dataflow/DataflowEditor.Worker.js';
 import { getDefaultDataflowConfig, castAllMapObjsToNodes } from "@/components/dataflow/configPool/dataflowConfig.js";
+import { dataflowApi } from "@/api/dataflow.js";
 
 export default {
     created(){
@@ -73,6 +75,33 @@ export default {
         }
     },
     methods: {
+        async saveDataflow(){
+            let dataToSave = this.getDataflowConfigs();
+            dataToSave.id = this.idObject;
+            dataToSave.action = this.action;
+            dataToSave.runToNode = false;
+            let res = {};
+
+            if(!dataToSave.dataflow.name.toLowerCase().includes('test')){
+                this.$snotifyWarning({}, "Không thể lưu dataflow", "Do đang trong giai đoạn test nên tên dataflow cần chứa từ test để có thể lưu");
+                return;
+            }
+
+            if(this.action == 'clone' || this.action == 'create'){
+                res = await dataflowApi.createDataflow(dataToSave);
+            }else if(this.action == 'edit'){
+                res = await dataflowApi.updateDataflow(this.idObject, dataToSave);
+            }
+
+            if(res.status == '200'){
+                this.$snotifySuccess("Lưu dataflow thành công");
+                if(this.action == 'clone' || this.action == 'create'){
+                    this.$router.push(`/dataflows/${res.data.id}/edit`);
+                }
+            }else{
+                this.$snotifyError(res, "Lưu dataflow thất bại");
+            }
+        },
         getDataflowConfigs(){
             let allNodes = this.$store.state.dataflow.allDataflow[this.instanceKey].allWidget;
             let links = [];
@@ -106,14 +135,14 @@ export default {
             let jointLinks = this.$refs.dataflowWorkspace.getLinks();
             for(let link of jointLinks){
                 links.push({
-                    source:link.attributes.source.id,
-                    target:link.attributes.target.id
+                    source: link.attributes.source.id,
+                    target: link.attributes.target.id
                 });
             }
             return {
-                dataflow:dataflow,
-                nodes:nodes,
-                links:links,
+                dataflow: dataflow,
+                nodes: nodes,
+                links: links,
             }
         },
         checkCanRun(){
