@@ -1521,7 +1521,8 @@ export default class SymperTable {
         if(this.tableMode == 'Group'){
             extraData = this.getDataInputFromGroupTable(listInput,formulaInstance);
         }
-        let dataInput = getDataInputFormula(formulaInstance,listInput,{}, rowId, extraData);
+        let optionalDataBinding = sDocument.state.submit[this.keyInstance].optionalDataBinding;
+        let dataInput = getDataInputFormula(formulaInstance,listInput,optionalDataBinding, rowId, extraData);
         // let sDocumentSubmit = getSDocumentSubmitStore(this.keyInstance);
         // if(!checkDataInputChange(sDocumentSubmit.rootChangeFieldName, sDocumentSubmit.dataInputBeforeChange, dataInput)){
         //     return;
