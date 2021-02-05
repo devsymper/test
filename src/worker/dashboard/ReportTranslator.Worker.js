@@ -82,7 +82,7 @@ var handler = {
             }
 
             let col = columnsSetting['value'][0];
-            if (col) {
+            if (col && cell.sharedConfigs.queryKey) {
                 let condCol = Object.assign({}, col);
                 condCol.cond = {
                     type: "contains",

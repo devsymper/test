@@ -1,17 +1,18 @@
 <template>
     <div 
         class="w-100 h-100 border-all symper-dashboard-cell"
+        :style="viewAttrs.general"
         @click="selectThisCell">
         <DashboardCellOptions 
             :cell="cellConfigs"
             :instanceKey="instanceKey" 
             :isView="isView"/>
         <preloader v-if="cellConfigs.viewConfigs.loadingData" :size="25"/>
-        <div class="w-100 h-100 cell-placeholder" v-if="cellConfigs.sharedConfigs.data && cellConfigs.sharedConfigs.data.length == 0">
+        <div class="w-100 h-100 cell-placeholder" v-if="showIconOnly()">
             <img :src="'img/dashboard/report-builder/'+cellConfigs.sharedConfigs.type+'.png'" height="40px" width="40px">
         </div>
         <div class="h-100 w-100" v-else>
-            <div ref="cellTitle" class="symper-cell-title  py-1" :symper-cell-id="cellConfigs.sharedConfigs.cellId" :style="viewAttrs.symperTitle.style">
+            <div ref="cellTitle" class="symper-cell-title" :symper-cell-id="cellConfigs.sharedConfigs.cellId" :style="viewAttrs.symperTitle.style">
                 <div class="cell-title-text text-ellipsis  d-inline-block pl-2 pr-2" style="width: calc(100% - 10px)">
                     <span style="cursor: text" v-if="isView">{{viewAttrs.symperTitle.text}}</span>
                     <span 
@@ -60,6 +61,12 @@ export default {
         DashboardCellOptions
     },
     methods: {
+        showIconOnly(){
+            let needData = Object.keys(this.cellConfigs.rawConfigs.setting).length > 0;
+            let data = this.cellConfigs.sharedConfigs.data;
+            let emptyData = !data  || (data  && data.length == 0);
+            return needData && emptyData;
+        },
         selectThisCell(){
             this.$store.commit('dashboard/setSelectedCell', {id: this.cellConfigs.sharedConfigs.cellId, instanceKey: this.instanceKey});
         },

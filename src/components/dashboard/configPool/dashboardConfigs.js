@@ -72,3 +72,7 @@ export const getDefaultDisplayOption = function() {
         }
     };
 }
+
+export const calcTitleCellHeight = function(textHeight){
+    return Number(textHeight) + 5;
+}
