@@ -5,7 +5,8 @@
 			:customAutocomplete="true" 
 			:itemValue="'uid'" 
 			:listColumn="listColumn" 
-			:customCss="true"	
+			:customCss="true"
+			@change-configs="handleChangeConfig"
 		/>
 	</div>
 </template>
@@ -38,6 +39,9 @@ export default {
 		},
 	},
 	methods:{
+		handleChangeConfig(){
+			this.$emit('change-configs', {})
+		},
 		customDataToTreeSql(conditions){
 			let self = this
 			if(conditions.length > 0){
