@@ -70,7 +70,7 @@ FileCellRenderer.prototype.getGui = function() {
     return this.eGui;
 };
 FileCellRenderer.prototype.destroy = function() {
-    if(this.eGui){
+    if(this.eGui && this.eGui.querySelector('.file-add')){
         this.eGui.querySelector('.file-add').removeEventListener('click',(event));
     }
 };

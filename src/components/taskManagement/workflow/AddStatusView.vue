@@ -56,11 +56,7 @@ export default {
         },
     },
     watch:{
-        allStatus:function(vl) {
-            if (vl.length > 0) {
-                this.status.name.options = getAllStatusForCombobox(vl);
-            }
-        }
+
     },
 
     computed:{
@@ -86,6 +82,7 @@ export default {
     methods:{
         show(){
             this.isShow = true;
+            this.status.name.options = getAllStatusForCombobox(this.allStatus);
         },
         validateData(){
             let data=this.status;
