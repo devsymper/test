@@ -1,5 +1,5 @@
 <template>
-    <div class="symper-conditional-format-setting">
+    <div class="symper-conditional-format-setting" style="height:300px">
         <div class="w-100 d-flex mb-3">
             <div class="item-title">
                 Apply for column: 
@@ -36,13 +36,13 @@
                 </v-radio-group>
             </div>
         </div>
-
-        <SingleColorConditionalFormat 
-            ref="singleColorConditionalFormat"
-            v-if="config.mode == 'singleColor'" 
-            v-model="config.singleColorConfig"
-            :columns="config.listColumns"/>        
-
+		<VuePerfectScrollbar style="height: calc(100% - 80px)">
+            <SingleColorConditionalFormat 
+                ref="singleColorConditionalFormat"
+                v-if="config.mode == 'singleColor'" 
+                v-model="config.singleColorConfig"
+                :columns="config.listColumns"/>        
+        </VuePerfectScrollbar>
         <!-- <ColorScaleConditionFormat v-else v-model="config.colorScaleConfig" />         -->
     </div>
 </template>
@@ -52,6 +52,7 @@ import SingleColorConditionalFormat from "@/components/dashboard/components/Sing
 // import ColorScaleConditionFormat from "@/components/dashboard/cellConfigs/ColorScaleConditionFormat.vue";
 import defaultConfigs from "@/components/dashboard/configPool/defaultConfigs.js";
 import SelectColumn from '@/components/common/bi/SelectColumn.vue'
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 var entireRowFormatConfig = {
     "as": "Format entire row",
@@ -107,6 +108,7 @@ export default {
     components: {
         SelectColumn,
         SingleColorConditionalFormat,
+        VuePerfectScrollbar
         // ColorScaleConditionFormat
     }
 }

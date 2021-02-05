@@ -1,8 +1,11 @@
 <template>
-<div>
-    <div v-for="(item, idx) in value" :key="idx" class="d-flex justify-space-between mb-1" style="height:35px">
+<div class="h-100" style="overflow-x: hidden;">
+    <div v-for="(item, idx) in value" :key="idx" class="d-flex justify-space-between mb-1" >
         <filter-data 
             :nodeData="nodeData"
+            :useConditionProps="true"
+            :condition="item.condition"
+            
         />
 
         <div class="d-flex ">
@@ -15,7 +18,7 @@
         @click="addMoreCondition()" 
         small
         depressed
-        class="w-100 mt-2" 
+        class="w-100 py-2" 
         >
         Add more condition
     </v-btn>
@@ -28,6 +31,7 @@ import TextStyleSetting from "@/components/common/bi/TextStyleSetting";
 export default {
     computed: {
         nodeData(){
+            let self = this;
             let allColumn = this.columns.reduce((map, el) => {
                 map[el.name] = el;
                 el.title = el.as;
@@ -35,7 +39,7 @@ export default {
             }, {});
             let nodeConfig = {
                 configs : {
-                    allColumns : allColumn
+                    allColumns : allColumn,
                 }
             }
             return nodeConfig

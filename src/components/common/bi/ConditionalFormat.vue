@@ -9,7 +9,7 @@
             style="position: relative;">
             <div style="line-height: 18px;">{{condItem.applyColumnObj.title ? condItem.applyColumnObj.title : 'No column selected'}}</div>
             <div style="line-height: 15px; color: grey">{{condItem.applyColumnObj.name ? condItem.applyColumnObj.name : ''}}</div>
-            <v-icon style="position: absolute; top: 7px;right: 4px" class="fs-14"  @click.stop="removeCondFormatItem()" >mdi-close</v-icon>
+            <v-icon style="position: absolute; top: 7px;right: 7px" class="fs-14"  @click.stop="removeCondFormatItem(condIdx)" >mdi-close</v-icon>
         </div>
         <v-btn 
             @click="addMoreColumnForCondition()"
@@ -44,9 +44,12 @@ export default {
     },
     methods:{
         selectConditionFormat(condItem,condIdx){
-            this.$evtBus.$emit('dashboard-select-condition-format',{condItem:condItem,condIdx:condIdx});
+            this.$emit('change', { 
+                condItem:condItem,condIdx:condIdx
+            });
         },
-        removeCondFormatItem(){
+        removeCondFormatItem(condIdx){
+            this.$evtBus.$emit('dashboard-remove-conditional',{condIdx:condIdx});
 
         },
         addMoreColumnForCondition(){

@@ -40,6 +40,7 @@
 							<form-tpl
 								class="s-style-config"
 								:allInputs="groupData.children"
+								@input-value-changed="getChangeInput"
 							></form-tpl>
 						</v-expansion-panel-content>
 					</v-expansion-panel>
@@ -67,6 +68,7 @@
 					color="blue darken-1"
 					text
 					class="btn-add"
+					@click="applyConditionSetting"
 				>
 					Apply
 				</v-btn>
@@ -170,33 +172,42 @@ export default {
                 }
             });
 		},
-		selectConditionFormat(data){
-			let condItem = data.condItem
-			let columns = this.currentCellConfig.rawConfigs.setting.value.selectedColums;
-            for (let col of columns) {
-                col.columnName = col.name;
-                col.uid = col.name;
+		getChangeInput(name,input,data){
+			if (name == 'conditionalFormatCondition') {
+				let condItem = data.condItem;
+				let condIndex = data.condIdx;
+				let columns = this.currentCellConfig.rawConfigs.setting.value.selectedColums;
+				for (let col of columns) {
+					col.columnName = col.name;
+					col.uid = col.name;
+				}
+				this.$set(condItem, 'listColumns', columns);
+				this.selectingConditionFormat = null;
+				this.selectingConditionFormat = util.cloneDeep(condItem);
+				this.isShowDialog = true;
+				this.condFormatTmpInfo = {
+					condIndex,name:name
+				};
+				setTimeout((self) => {
+					self.$refs.tableConditionalFormatSetting.initData();                
+				}, 100, this);
 			}
-            this.$set(condItem, 'listColumns', columns);
-            this.selectingConditionFormat = null;
-            this.selectingConditionFormat = util.cloneDeep(condItem);
-			this.isShowDialog = true;
-            // this.condFormatTmpInfo = {
-            //     attrItem,
-            //     idx,
-            //     attr
-            // };
-            setTimeout((self) => {
-                self.$refs.tableConditionalFormatSetting.initData();                
-            }, 100, this);
+		},
+		applyConditionSetting(){
+			this.styleConfig.conditionalFormat.children[this.condFormatTmpInfo.name].value[this.condFormatTmpInfo.condIndex] = this.selectingConditionFormat;
+			this.isShowDialog = false;
+		},
+		removeCondFormatItem(data){
+			let condIndex = data.condIdx;
+            this.styleConfig.conditionalFormat.children.conditionalFormatCondition.value.splice(condIndex, 1);
 		}
 	},
 	created(){
 		let self = this;
         this.dashboardStyleConfig = new DashboardStyleConfig();
 		this.listenFromWorker();
-		this.$evtBus.$on('dashboard-select-condition-format', (data) =>{
-            self.selectConditionFormat(data);
+		this.$evtBus.$on('dashboard-remove-conditional', (data) =>{
+            self.removeCondFormatItem(data);
         })
     }
 
