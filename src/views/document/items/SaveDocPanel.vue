@@ -315,6 +315,16 @@ export default {
             else{
                  this.isValideTitleFml = true
             }
+            console.log(props,'propsprops');
+            let formStyle = props.formStyle;
+            try {
+                formStyle = JSON.parse(formStyle);
+                if(formStyle){
+                    formStyle = formStyle['globalClass'];
+                }
+            } catch (error) {
+                
+            }
             let self = this;
             let docProps = {
                 name : { 
@@ -366,7 +376,7 @@ export default {
                 type : {
                     title: this.$t('document.editor.dialog.saveDoc.type'),
                     type: "select",
-                    value: 1,
+                    value: Number(props.type),
                     options: [{
                             text: this.$t('document.editor.dialog.saveDoc.selectType.list'),
                             value: 2
@@ -415,7 +425,7 @@ export default {
                 formStyle : {
                     title: this.$t('document.editor.dialog.saveDoc.formStyle'),
                     type: "select",
-                    value: 'document-form-style-default',
+                    value: (formStyle) ? formStyle : 'document-form-style-default',
                     options: [{
                             text: 'Mặc định',
                             value: 'document-form-style-default'
