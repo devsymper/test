@@ -11,9 +11,13 @@ export const dataflowApi = {
 		return api.get(`dataflow/${id}/get_info`);
 	},
 	createDataflow(config) {
-		return api.post('');
+		return api.post('dataflow', JSON.stringify(config), {}, {
+			contentType: "application/json",
+		});
 	},
 	updateDataflow(id, config) {
-		return api.put('');
+		return api.put(`dataflow/${id}`, JSON.stringify(config), {}, {
+			contentType: "application/json",
+		});
 	},
 };

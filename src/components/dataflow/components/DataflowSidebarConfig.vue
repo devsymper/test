@@ -114,37 +114,47 @@ export default {
 			this.selectingNode.run();
 		},
 		handleValueChange(name, inputInfo, data){
-			for(let key in this.commonInputs){
-				this.selectingNode.configs[key] = this.commonInputs[key].value;
-			}
-			this.$emit('node-name-changed', {
-				name,
-				value: data
-			});
-			if(name == 'saveAsDataset'){
-				if(data){
-					this.selectingNode.configs.saveAs = ["Save result as Dataset"];
-				}else{
-					this.selectingNode.configs.saveAs = [];
+			if(this.selectingNode.type == 'home'){
+				this.selectingNode.name = this.commonInputs.wgName.value;
+				this.selectingNode.description = this.commonInputs.wgDes.value;
+			}else{	
+				for(let key in this.commonInputs){
+					this.selectingNode.configs[key] = this.commonInputs[key].value;
 				}
-				this.toggleSaveAsDatasetConfig();
-				setTimeout((self) => {
-					self.calcNodeConfigHeight();
-				}, 0, this);
+				this.$emit('node-name-changed', {
+					name,
+					value: data
+				});
+				if(name == 'saveAsDataset'){
+					if(data){
+						this.selectingNode.configs.saveAs = ["Save result as Dataset"];
+					}else{
+						this.selectingNode.configs.saveAs = [];
+					}
+					this.toggleSaveAsDatasetConfig();
+					setTimeout((self) => {
+						self.calcNodeConfigHeight();
+					}, 0, this);
+				}
 			}
 		},
 		calcNodeConfigHeight(){
 			this.nodeConfigHeight = util.getComponentSize(this).h - util.getComponentSize(this.$refs.commonConfig).h;
 		},
 		setCommonValue(){
-			let node = this.$store.state.dataflow.allDataflow[this.instanceKey].selectedWidget;
-			this.commonInputs.wgName.value = node.configs.wgName;
-			this.commonInputs.wgDes.value = node.configs.wgDes;
-			this.commonInputs.saveAsDataset.value = node.configs.saveAs.length ? true : false;
+			let node = this.selectingNode;
+			if(node.type == 'home'){
+				this.commonInputs.wgName.value = node.name;
+				this.commonInputs.wgDes.value = node.description;
+			}else{
+				this.commonInputs.wgName.value = node.configs.wgName;
+				this.commonInputs.wgDes.value = node.configs.wgDes;
+				this.commonInputs.saveAsDataset.value = node.configs.saveAs.length ? true : false;
+			}
 			this.toggleSaveAsDatasetConfig();
 		},
 		toggleSaveAsDatasetConfig(){
-			if(this.commonInputs.saveAsDataset.value){
+			if(this.commonInputs.saveAsDataset.value && this.selectingNode.type != 'home'){
 				this.$set(this.commonInputs, 'nameToSaveAs', {
 					"title": this.$t('bi.dataset.title-add'),
 					"type": "text",

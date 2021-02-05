@@ -11,6 +11,7 @@
 			:tableContextMenu="tableContextMenu"
 			:flexMode="true"
 			:actionPanelWidth="550"
+			@on-add-item-clicked="goToAddDataflow"
 			:customAPIResult="customAPIResult"
 		>
 			<template slot="right-panel-content" slot-scope="{}"> </template>
@@ -26,6 +27,11 @@ export default {
 		ListItems,
 	},
 	methods: {
+		goToAddDataflow(){
+			this.$goToPage("/dataflows/create",
+				this.$t('common.create')+ " dataflow"
+			)
+		},
 		handleAddSuccess() {
 			this.showDialog = false;
 			this.$refs.listService.refreshList();
@@ -48,6 +54,15 @@ export default {
 					callback: (obj, callback) => {
 						self.$goToPage("/dataflows/" + obj.id + "/edit",
                             self.$t('common.edit')+ " " + (obj.name ? obj.name : "")
+						)
+					},
+				},
+				clone: {
+					name: 'clone',
+					text: this.$t('apps.contextMenu.clone'),
+					callback: (obj, callback) => {
+						self.$goToPage("/dataflows/" + obj.id + "/clone",
+                            self.$t('common.clone')+ " " + (obj.name ? obj.name : "")
 						)
 					},
 				},

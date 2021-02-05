@@ -126,6 +126,13 @@ var handler = {
             res.data.nodes,
             res.data.links
         );
+        
+        let home = new mapTypeToNodeClass['home']();
+        home.name = dataflow.name;
+        home.variables = dataflow.variables;
+        home.description = dataflow.description;
+
+        runningNodeData['home'] = home;
         self.postMessage({
 			action: 'restoreRunningNodeData',
 			data: runningNodeData
