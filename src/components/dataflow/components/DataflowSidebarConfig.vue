@@ -18,6 +18,7 @@
 			<component 
 				:height="nodeConfigHeight"
 				:is="nodeConfigTag"
+				@change-configs="handleChangeConfig"
 				:nodeData="selectingNode">
 			</component>
 		</PerfectScrollbar>
@@ -128,6 +129,9 @@ export default {
 					self.calcNodeConfigHeight();
 				}, 0, this);
 			}
+		},
+		handleChangeConfig(data){
+			debugger
 		},
 		calcNodeConfigHeight(){
 			this.nodeConfigHeight = util.getComponentSize(this).h - util.getComponentSize(this.$refs.commonConfig).h;

@@ -1,5 +1,5 @@
 <template>
-	<div class="dataflow-output-column">
+	<div class="dataflow-output-column-table h-100">
 		<v-text-field
 			v-model="searchKey"
 			single-line
@@ -11,7 +11,7 @@
 			<ag-grid-vue
 				:style="{
 					width: '100%',
-					height: tableHeight + 'px',
+					height: contentRunningHeight - 120 + 'px',
 				}"
 				:class="{ 'ag-theme-balham': true }"
 				:defaultColDef="defaultColDef"
@@ -63,7 +63,14 @@ export default {
         },
         instanceKey: {
             default: ''
-        },
+		},
+		contentRunningHeight:{
+			type: Number,
+			default: 0
+		}
+	},
+	watch:{
+		
 	},
 	computed:{
 		tableData(){
@@ -111,19 +118,19 @@ export default {
 </script>
 
 <style scoped>
-.dataflow-output-column  >>>   .v-input__control .v-input__slot label,
-.dataflow-output-column  >>>  .v-input__control .v-input__slot .v-icon,
-.dataflow-output-column  >>>   .v-input__control .v-input__slot input{
+.dataflow-output-column-table  >>>   .v-input__control .v-input__slot label,
+.dataflow-output-column-table  >>>  .v-input__control .v-input__slot .v-icon,
+.dataflow-output-column-table  >>>   .v-input__control .v-input__slot input{
     font:13px roboto
 }
-.dataflow-output-column >>>   .v-input__control .v-text-field__details {
+.dataflow-output-column-table >>>   .v-input__control .v-text-field__details {
     display: none;
 }
-.dataflow-output-column >>>   .v-input__control {
+.dataflow-output-column-table >>>   .v-input__control {
 	margin: 4px 12px 4px 8px;
 	min-height: unset;
 }
-.dataflow-output-column >>>   .v-input__control .v-input__slot {
+.dataflow-output-column-table >>>   .v-input__control .v-input__slot {
 	box-shadow: unset !important;
 	margin-top: 8px;
 	border: 1px solid lightgray;

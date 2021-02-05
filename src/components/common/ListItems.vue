@@ -243,11 +243,12 @@
 				'list-sbs': alwaysShowActionPanel
 				
 			}"
-			:style="{height:tableHeight + 'px'}"
 		 >
+			<!-- :style="{height: tableHeight + 'px'}" -->
+
 			<ag-grid-vue :style="{
 				width: '100%',
-				height:tableHeight+ 'px',
+				height: tableHeight + 'px',
 			}"
 				:class="{'ag-theme-balham': true,'ag-list-items-table':true}"
 				:defaultColDef="defaultColDef"

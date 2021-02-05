@@ -21,6 +21,8 @@
 				:columnDefs="columnDefs"
 				:rowData="tableData"
 				@grid-ready="onGridReady"
+                @cell-value-changed="onCellValueChanged"
+                @row-selected="onSelectionChanged"
 				@cell-context-menu="cellContextMenu"
 			>
 			</ag-grid-vue>
@@ -131,6 +133,14 @@ export default {
 		};
 	},
 	methods:{
+		onCellValueChanged(event){
+            this.$emit('change-configs',{type:'change-cell-value'});
+        },
+		onSelectionChanged(event) {
+			this.$emit('change-configs',{type:'select-row-change', data: event});
+			let rowIndex = event.node.id;
+            this.rowData[rowIndex].selected = event.node.selected;
+        },
 		cellContextMenu(params) {},
 		onGridReady(params){
 			this.gridApi = params.api
@@ -146,16 +156,6 @@ export default {
 			}
 			
 		},
-		// setRowSelected(rowIndex, selected){
-        //     let runner = 0;
-        //     this.gridApi.forEachNode(function(node) {
-        //         if(runner == rowIndex){
-        //             node.setSelected(selected);
-        //             node.data.selected = selected;
-        //         }
-        //         runner += 1;
-        //     });
-        // },
 	},
 	mounted(){
         // this.gridApi = this.gridOptions.api;
