@@ -14,97 +14,53 @@
             :placeholder="$t('common.search')"
             style="width: inherit"
         ></v-text-field>
-        <VuePerfectScrollbar 
-            style="height:calc(100% - 44px)"
-        >
-            <!-- all columns -->
-            <v-expansion-panels
-                multiple
-                flat
-                style="overflow: hidden;"
-                v-model="panelAllColumns"
-            >
-                <v-expansion-panel class="sym-expand-panel ">
-                    <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                        <span class="font-weight-medium">All columns ({{nodeData.configs.allColumns.length}})</span>  
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
-                        <drag-columns 
-                            :searchKey="searchKey"
-                            :columns="nodeData.configs.allColumns"
-                            :putable="false"
-                            :deleteItem="false"
-                        />
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-            </v-expansion-panels>
-            <!-- columns -->
-            <v-expansion-panels
-                multiple
-                flat
-                style="overflow: hidden;"
-                v-model="panelColumns"
-            >
-                <v-expansion-panel class="sym-expand-panel ">
-                    <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                        <span class="font-weight-medium">Columns ({{nodeData.configs.columns.length}})</span>  
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
-                        <drag-columns 
-                            :searchKey="searchKey"
-                            :pullMethod="null"
-                            :columns="nodeData.configs.columns"
-                            @drag-add-item="changeData"
-                            @drag-remove-item="changeData"
-                        />
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-            </v-expansion-panels>
-            <!-- rows -->
-            <v-expansion-panels
-                multiple
-                flat
-                style="overflow: hidden;"
-                v-model="panelRows"
-            >
-                <v-expansion-panel class="sym-expand-panel ">
-                    <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                        <span class="font-weight-medium">Rows ({{nodeData.configs.rows.length}})</span>  
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
-                        <drag-columns 
-                            :searchKey="searchKey"
-                            :pullMethod="null"
-                            :columns="nodeData.configs.rows"
-                            @drag-add-item="changeData"
-                            @drag-remove-item="changeData"
-                        />
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-            </v-expansion-panels>
-            <!-- values -->
-            <v-expansion-panels
-                multiple
-                flat
-                style="overflow: hidden;"
-                v-model="panelValues"
-            >
-                <v-expansion-panel class="sym-expand-panel ">
-                    <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                        <span class="font-weight-medium">Values ({{nodeData.configs.values.length}})</span>  
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
-                        <drag-columns 
-                            :searchKey="searchKey"
-                            :pullMethod="null"
-                            :columns="nodeData.configs.values"
-                            @drag-add-item="changeData"
-                            @drag-remove-item="changeData"
-                        />
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-            </v-expansion-panels>
-        </VuePerfectScrollbar>
+        <div style="height:150px">
+            <span class="font-weight-medium ml-2">All columns ({{nodeData.configs.allColumns.length}})</span>  
+            <VuePerfectScrollbar style="height:calc(100% - 16px)">
+                <drag-columns 
+                    :searchKey="searchKey"
+                    :columns="nodeData.configs.allColumns"
+                    :putable="false"
+                    :deleteItem="false"
+                />
+            </VuePerfectScrollbar>
+        </div>
+        <div class="mt-1" style="height:70px;">
+            <span class="font-weight-medium ml-2">Columns ({{nodeData.configs.columns.length}})</span>  
+            <VuePerfectScrollbar style="height:calc(100% - 16px);background:#fcfcfc">
+                <drag-columns 
+                    :searchKey="searchKey"
+                    :pullMethod="null"
+                    :columns="nodeData.configs.columns"
+                    @drag-add-item="changeData"
+                    @drag-remove-item="changeData"
+                />
+            </VuePerfectScrollbar>
+        </div>
+        <div class="mt-1" style="height:70px;">
+            <span class="font-weight-medium ml-2">Rows ({{nodeData.configs.rows.length}})</span>  
+            <VuePerfectScrollbar style="height:calc(100% - 16px);background:#fcfcfc">
+                <drag-columns 
+                    :searchKey="searchKey"
+                    :pullMethod="null"
+                    :columns="nodeData.configs.rows"
+                    @drag-add-item="changeData"
+                    @drag-remove-item="changeData"
+                />
+            </VuePerfectScrollbar>
+        </div>
+        <div class="mt-1" style="height:70px;">
+            <span class="font-weight-medium ml-2">Values ({{nodeData.configs.values.length}})</span>  
+            <VuePerfectScrollbar style="height:calc(100% - 16px);background:#fcfcfc">
+                <drag-columns 
+                    :searchKey="searchKey"
+                    :pullMethod="null"
+                    :columns="nodeData.configs.values"
+                    @drag-add-item="changeData"
+                    @drag-remove-item="changeData"
+                />
+            </VuePerfectScrollbar>
+        </div>
     </div>
 </template>
 
