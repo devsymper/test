@@ -149,6 +149,7 @@ export default {
             return true;
         },
         runDataflow(){
+			this.$refs.runningOutput.showPreloader()
             if(!this.checkCanRun()){
                 return;
             }
@@ -186,7 +187,8 @@ export default {
             $(this.$refs.workspaceLeftPane).css('width', $(this.$refs.dataflowEditor).width() - $(this.$refs.dataflowSidebarConfig.$el).width());
         },
         handleResizeBottomPane(eventName,left,top,width,height){
-            this.workspaceHeight =  $(this.$el).height() - (this.toolbarHeight + $(this.$refs.dataflowRunningInfo.$el).height());
+			this.workspaceHeight =  $(this.$el).height() - (this.toolbarHeight + $(this.$refs.dataflowRunningInfo.$el).height());
+			this.$refs.runningOutput.reCalcHeight()
         },
         restoreDataflowDisplay(data){ // khôi phục data từ server cho hiển thị dataflow 
             let graphData = data.graph;

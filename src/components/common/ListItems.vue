@@ -243,11 +243,12 @@
 				'list-sbs': alwaysShowActionPanel
 				
 			}"
-			:style="{height:tableHeight + 'px'}"
 		 >
+			<!-- :style="{height: tableHeight + 'px'}" -->
+
 			<ag-grid-vue :style="{
 				width: '100%',
-				height:tableHeight+ 'px',
+				height: tableHeight + 'px',
 			}"
 				:class="{'ag-theme-balham': true,'ag-list-items-table':true}"
 				:defaultColDef="defaultColDef"
@@ -811,7 +812,7 @@ export default {
 		tableHeight() {
 			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
-			if (tbHeight <= 250) {
+			if (tbHeight <= 100) {
 				tbHeight = util.getComponentSize(this).h;
 			}
 			tbHeight -= 74
