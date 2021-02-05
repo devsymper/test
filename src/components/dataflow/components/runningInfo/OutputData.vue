@@ -65,9 +65,6 @@ export default {
 			default: 0
 		}
 	},
-	mounted(){
-		// this.$refs.listOutput.hideOverlay()
-	},
 	data() {
 		let self = this;
 		return {

@@ -812,7 +812,7 @@ export default {
 		tableHeight() {
 			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
-			if (tbHeight <= 250) {
+			if (tbHeight <= 100) {
 				tbHeight = util.getComponentSize(this).h;
 			}
 			tbHeight -= 74

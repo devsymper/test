@@ -133,9 +133,6 @@ export default {
 				}, 0, this);
 			}
 		},
-		handleChangeConfig(data){
-			debugger
-		},
 		calcNodeConfigHeight(){
 			this.nodeConfigHeight = util.getComponentSize(this).h - util.getComponentSize(this.$refs.commonConfig).h;
 		},
