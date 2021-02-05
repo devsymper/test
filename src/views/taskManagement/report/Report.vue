@@ -1,9 +1,10 @@
 <template>
-    <dashboard-view :url="'https://dev.bi.symper.vn/#/dashboard/159/view'">
+    <dashboard-view :url="getUrl()">
 
     </dashboard-view>
 </template>
 <script>
+import { util } from '../../../plugins/util';
 import DashboardView from '../../dashboard/DashboardView.vue';
 
 export default {
@@ -12,7 +13,9 @@ export default {
         DashboardView
     },
     methods:{
-        
+        getUrl(){
+            return util.addEnvToUrl('https://bi.symper.vn/#/dashboard/159/view');
+        }
     },
     activated(){
         let breadcrumbs = [

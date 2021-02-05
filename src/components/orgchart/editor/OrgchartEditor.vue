@@ -162,6 +162,7 @@ import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
 import { permissionApi } from '../../../api/permissionPack';
 import {documentApi} from "@/api/Document.js"
+import { event } from 'jquery';
 
 
 export default {
@@ -591,7 +592,7 @@ export default {
                     self.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(self.typeView);
 
                 }, 200, this);
-            }
+			}
         },
         createFirstVizNode(){
 			return this.$refs.editorWorkspace.createFirstVizNode();

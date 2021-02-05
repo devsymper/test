@@ -670,8 +670,4 @@ export default {
 }
 
 </style>
-<style >
-    .row{
-    margin:unset!important
-    }
-</style>
+

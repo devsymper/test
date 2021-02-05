@@ -12,6 +12,7 @@
 			 <div>
 				<v-text-field
 					@input="bindToSearchkey"
+                    :value="searchValue"
 					class="d-inline-block mr-2 sym-small-size"
 					single-line
 					v-if="showSearchBox"
@@ -93,17 +94,6 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
                         </v-btn>
-                        <v-btn
-                            depressed
-                            small
-							icon
-							tile
-                            @click="handleCloseClick"
-                            class="mr-2"
-                            v-if="dialogMode"
-                        >
-                            <v-icon dark>mdi-close</v-icon>
-                        </v-btn>
                          <v-menu
                             bottom
                             left
@@ -172,6 +162,7 @@
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on:tooltip }">
                                         <v-btn
+                                            @click="isClose=true"
                                             depressed
                                             small
                                             v-if="showFilter"
@@ -180,7 +171,7 @@
                                             <v-icon left dark class="mr-0" :style="{color:selectedFilterName?'#FF8C00!important':'black'}">mdi-filter</v-icon>
                                             <span style="color:#FF8C00!important;" >{{selectedFilterName}}</span>
                                             <div v-if="closeBtnFilter"  class="ml-2" style="border-right:1px solid #E0E0E0; height:27px"></div>
-                                            <v-icon v-if="closeBtnFilter" class="ml-2" style="font-size:14px" @click="hideCloseBtnFilter()">mdi-close</v-icon>
+                                            <v-icon v-if="closeBtnFilter" class="ml-2" style="font-size:14px" @click="closeBtnAndRefreshFilter()">mdi-close</v-icon>
                                           
                                         </v-btn>
                                     </template>
@@ -188,7 +179,7 @@
                                 </v-tooltip>
                             </template>
                             <config-filter 
-                                @set-table="setTable"
+                                @select-filter="selectedFilter"
                                 @config-filter-action="configFilterAction"
                                 @add-filter-config="addFilterConfig"
                                 :filter="listFilters"/>
@@ -223,17 +214,18 @@
                             </template>
                             <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
+
 						<span v-if="Object.keys(customHeaderBtn).length > 0">
 							 <v-btn
 								depressed
 								small
 								v-for="(item, i) in customHeaderBtn"
 								:key="i"
-								@click="customBtnclick(i)"
+								@click="customBtnClick(i)"
 								class="mr-2"
 							>
-								<v-icon left dark>{{item.icon}}</v-icon>
-								<span> {{item.title}} </span>
+								<v-icon left dark v-if="item.icon">{{item.icon}}</v-icon>
+								<span v-if="item.title"> {{item.title}} </span>
 							</v-btn>
 						</span>
 			 </div>
@@ -257,20 +249,20 @@
 				width: '100%',
 				height:tableHeight+ 'px',
 			}"
-				:class="{'ag-theme-balham': true}"
+				:class="{'ag-theme-balham': true,'ag-list-items-table':true}"
 				:defaultColDef="defaultColDef"
 				:gridOptions="gridOptions"
                 :getContextMenuItems="getContextMenuItems"
 				:columnDefs="columnDefs"
+                @dragStopped="columnResized()"
+                @columnResized="resize()"
 				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
 				:frameworkComponents="frameworkComponents"
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
-				:modules="modules"
 				@cell-context-menu="cellContextMenu"
                 @cell-mouse-down="cellMouseDown"
-
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
@@ -279,6 +271,7 @@
 			 <display-config
 				ref="tableDisplayConfig"
                 @change-format="changeFormat"
+                @change-apply="applyConditionFormat"
                 @save-conditional-formatting="saveConditionalFormatting"
 				@drag-columns-stopped="handleStopDragColumn"
 				@change-colmn-display-config="configColumnDisplay"
@@ -395,9 +388,11 @@ import { actionHelper } from "@/action/actionHelper";
 import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
 import SymperDialogConfirm from "@/components/common/SymperDialogConfirm"
 import ConfigFilter from "./ListItemConfigFilter"
+import 'ag-grid-enterprise';
 import AddFilter from "./ListItemAddFilter"
 import CheckBoxRendererListItems from "@/components/common/agDataTable/CheckBoxRendererListItems"
 let CustomHeaderVue = Vue.extend(CustomHeader);
+import  {ClipboardModule} from '@ag-grid-enterprise/clipboard';
 
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
@@ -678,8 +673,9 @@ export default {
 		
 	},
 	created(){
+        this.listItemsWorker = new ListItemsWorker()
+		this.restoreTableDisplayConfig();
         let self = this;
-     
 		this.$evtBus.$on('list-items-ag-grid-on-change-checkbox',data=>{
             self.$set(data.data, 'checked', true)
 			if(!self.allRowChecked.includes(data.data)){
@@ -690,13 +686,17 @@ export default {
 			}
 			self.$emit('after-selected-row',self.allRowChecked)
         })
-		this.listItemsWorker = new ListItemsWorker()
+        
+      
+        
         this.listItemsWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
                 case 'getData':
-					
-					self.handlerGetData(data.dataAfter)
+                    self.handlerGetData(data.dataAfter)
+					break;
+                case 'customGetData':
+					self.handleCustomGetData(data.dataAfter)
 					break;
                 case 'getItemForValueFilter':
 					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
@@ -710,9 +710,13 @@ export default {
                 case 'saveTableDisplayConfig':
 					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
                     break;
-                case 'saveFilter':
-                    self.handlerSaveFilter(data.dataAfter)
-                break;
+                case 'saveUiConfig':
+                    if(self.isNotiSuccess){
+                        self.handleSaveUiConfig(data.dataAfter, true)
+                    }else{
+                        self.handleSaveUiConfig(data.dataAfter, false)
+                    }
+                    break;
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
                          if(self.flexColumns){
@@ -725,18 +729,30 @@ export default {
 							eval("e.cellStyle = " + e.cellStyle)
 						}
                     })
+                     data.dataAfter.map(column=>{
+                        self.widthColumns.map(c=>{
+                            if(c){
+                                if(column.field==c.colId){
+                                    column.width=c.width
+                                }
+                            }
+                        
+                        })
+                    })
                     self.columnDefs = data.dataAfter;
-                    if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
-                        self.columnDefs = self.handleConditionalFormat(data.dataAfter)
-                    }
+                    if(self.conditionalFormat&&self.conditionalFormat.length>0){
+                        if(self.listSelectedCondition.length==0){
+                            self.listSelectedCondition = self.getListSelectedConditionFormat();
+                        }
+                        self.columnDefs = self.handleConditionalFormat(data.dataAfter);
                     
+                    }
 					break;
                 default:
                     break;
             }
-		});
-		this.getData();
-		this.restoreTableDisplayConfig();
+        });
+        this.getData();
         // this.getDefaultFilter();
 	},
 	computed:{
@@ -765,6 +781,7 @@ export default {
                 return "100%";
             }
 		},
+		
 		tableHeight() {
 			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
@@ -812,7 +829,8 @@ export default {
 					this.showNoRowsOverlay()
 				}
 			}
-		},
+        },
+        
 		columnDefs:{
 			deep: true,
 			immediate: true,
@@ -874,20 +892,25 @@ export default {
     data(){
 		let self = this;
         return {
+            filterIdx:0,
+            searchValue:'',
             typeDelete:'',
+            countColumnResized:0,
+            isNotiSuccess:false,// có hoặc không hiển thị thông báo khi lưu thành công 
             conditionalFormat:[],
+            listSelectedCondition:[],//list cấu hình điều kiện được chọn
             listId:[],// chứa list Id của table
 			gridApi: null,
             closeBtnFilter:false,
             isUpdateFilter:false,
+            widthColumns:[],// lưu cấu hình độ rộng của các cột showlist
+            isClose:true,
             listFilters:[],
             notiFilter:'',
             conditionIndex :-1,
             deleteFilterIdx:0,
             contentDelete:"",
-            showDelPopUp:false,
-            filterContent:"",
-            showDelPopUp:false,
+            showDelPopUp:false,// hiển thị pop up xác nhận xóa
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -895,7 +918,7 @@ export default {
             filterMenu:false,
             addFilter:false,
             filterName:'',
-            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
+            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lưu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
             loadingExportExcel: false, // có đang chạy export hay ko
@@ -920,7 +943,7 @@ export default {
 			},
 			searchKey: "",
 			modules:[
-				MenuModule
+				MenuModule,
 			],
 			MedalCellRenderer(){
 			},	
@@ -1004,7 +1027,9 @@ export default {
 				if (params.node.rowIndex % 2 != 0) {
 					return { background: '#fbfbfb' };
 				}
-			}
+			},
+			suppressCopyRowsToClipboard: true,
+			modules:[ClipboardModule]
 		},
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
@@ -1016,10 +1041,35 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+        // lấy ra danh sách cấu hình format được chọn
+        getListSelectedConditionFormat(){
+            let result = [];
+            this.conditionalFormat.map((data,index)=>{
+                if(data.isSelected){
+                    result.push(index)
+                }
+            })
+            return result;
+        },
+        resize(){
+
+        },
+		customBtnClick(i){
+			this.customHeaderBtn[i].callback()
+		},
         handleAddFilter(data){
             if(data.type=='save'){
-                this.filterName = data.filterName
-                this.saveFilter()
+                this.filterName = data.filterName;
+                 if(!this.checkExistNameFilter()){
+                    this.checkIsAddFilter()
+                    this.saveUiConfig()
+                }else{
+                    this.$snotify({
+                        type: "error",
+                        title: this.$t("table.error.name_exist")
+                    })
+                }
+               
             }else{
                 this.addFilter = false;
             }
@@ -1042,12 +1092,30 @@ export default {
                     break;
               }
         },
+        setSelectedConditional(index, check = true){
+            this.conditionalFormat.map((condition,i)=>{
+                if(i==index){
+                    condition.isSelected = check
+                }
+            })
+        },
+        applyConditionFormat(listSelectedCondition){
+            // this.applyConfigFormat(listSelectedCondition);
+            this.listSelectedCondition.map(data=>{
+                this.setSelectedConditional(data)
+
+            });
+            this.listSelectedCondition = listSelectedCondition;
+            this.saveConditionalFormatting(this.conditionalFormat);
+            this.getData();
+        },
+        saveConditionalFormatting(data){
+             this.conditionalFormat = data;
+             this.saveUiConfig();
+        },
         changeFormat(data){
             switch(data.type){
                 case 'view':
-                    break;
-                case 'apply':
-                    this.applyConfigFormat(data.index);
                     break;
                 case 'edit':
                     this.editConfigFormat(data.index);
@@ -1058,86 +1126,112 @@ export default {
                 case 'disApply':
                     this.disApplyConfigFormat(data.index);
                     break;
-            };
+            };  
                 this.getData();
-           
-
         },
-         disApplyConfigFormat(index){
-             this.conditionIndex = -1;
+        disApplyConfigFormat(index){
+            let listSelectedCondition = [];
+            this.listSelectedCondition.map(data=>{
+                 if(data!=index){
+                     listSelectedCondition.push(data)
+                 }else{ 
+                    this.setSelectedConditional(data, false)
+                 }
+            });
+            this.saveConditionalFormatting(this.conditionalFormat);
+             this.listSelectedCondition = listSelectedCondition;
+            //  this.getData();
          },
+        // xử lý format màu trong table
         handleConditionalFormat(data){
             const self = this;
-                let dataFormat = self.conditionalFormat[self.conditionIndex];
                 data.map(column=>{
                     column.cellStyle = function(e){
-                        if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
-                            if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
-                                let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
-                                if(eval(conditionalFormat)){
-                                    return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
-                                }
-                            }
-                            else{// nếu thang màu
-                                let field = dataFormat.displayMode.colorScale.applyColumn.field;
-                                let valueTable = e.data[field];
-                                let listColors = dataFormat.displayMode.colorScale.listColors;
-                                let color = '';
-                                listColors.map(v=>{
-                                    if(v.name==valueTable){
-                                        color = v.backgroundColor
+                        let allColor = {}
+                         self.listSelectedCondition.map(conditionalIdx=>{
+                             let dataFormat = self.conditionalFormat[conditionalIdx];
+                                if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
+                                    if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
+                                        let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
+                                        if(eval(conditionalFormat)){
+                                            allColor = {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
+                                        }
                                     }
-                                })
-                                    return {backgroundColor:color}
-                            }
-                        }
+                                    else{// nếu thang màu
+                                        let field = dataFormat.displayMode.colorScale.applyColumn.field;
+                                        let valueTable = e.data[field];
+                                        let listColors = dataFormat.displayMode.colorScale.listColors;
+                                        let color = '';
+                                        listColors.map(v=>{
+                                            if(v.name==valueTable){
+                                                color = v.backgroundColor
+                                            }
+                                        })
+                                            allColor = {backgroundColor:color}
+                                    }
+                                }
+                         })
+                        return allColor
                     }
                 })
             return data;
-        },
-        applyConfigFormat(index){
-            this.conditionIndex = index;
         },
         editConfigFormat(index){
             this.conditionIndex = index;
         },
           // lưu cấu hình formatting Table
-        saveConditionalFormatting(data){
-            let tableConfig =  this.getTableDisplayConfigData();
-            tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.filter;
-            tableConfig.detail.conditionalFormat = data;
-            tableConfig.detail= JSON.stringify(tableConfig.detail);
-              this.listItemsWorker.postMessage({
-                action: 'saveFilter',
-                data: tableConfig
-			})
-           
-        },
         deleteConfigFormat(index){
             this.conditionIndex = index;
             this.typeDelete = 'formatTable';
             this.showDelPopUp = true;
             this.contentDelete =" Xóa định dạng "+this.conditionalFormat[index].nameGroup+" khỏi danh sách các định dạng";
-            
         },
-        hideCloseBtnFilter(){
+        closeBtnAndRefreshFilter(){
+            this.filterName = '';
             this.selectedFilterName = '';
             this.closeBtnFilter = false;
+            this.isClose=false;
+            this.searchValue = '';
+            this.searchKey = "";
             //set lại trạng thái không filter
             this.tableFilter.allColumn={}
             this.getData();
         },
-    
+        // xử lý gán tất cả các biến trước khi gửi data
+        saveUiConfig(){
+            let tableConfig =  this.getTableDisplayConfigData();
+            tableConfig.detail = JSON.parse(tableConfig.detail);
+            tableConfig.detail.filter = this.listFilters;
+            tableConfig.detail.conditionalFormat = this.conditionalFormat;
+            tableConfig.detail.widthColumns = this.widthColumns;
+            tableConfig.detail= JSON.stringify(tableConfig.detail);
+            this.listItemsWorker.postMessage({
+                action: 'saveUiConfig',
+                data: tableConfig
+			})
+        },
+        // action khi kéo cột showlist
+        columnResized(){
+            this.widthColumns=[];
+            this.gridOptions.columnApi.columnController.allDisplayedColumns.map(column=>{
+                this.widthColumns.push({
+                    colId:column.colId,
+                    width: column.actualWidth
+                })
+            })
+            this.saveUiConfig();
+        },
         getDefaultFilter(){
-            
             if(this.listFilters&&this.listFilters.length>0){
                 this.listFilters.map((fil,i)=>{
                     if(fil.isDefault){
+                        this.searchValue=fil.searchKey?fil.searchKey:''
                         this.selectedFilterName = fil.name;
                         this.closeBtnFilter = true;
+                        this.searchKey = this.searchValue;
                         this.tableFilter.allColumn = fil.columns;
-                        this.getData()
+                        this.getData();
+                        this.closeBtnFilter = true;
                     }
                 })
             }
@@ -1149,21 +1243,17 @@ export default {
                     fil.isDefault=false;
                 }
             })
-            this.sendFilterWorker();
-            this.notiFiltert("table.success.save_filter");
+            this.saveUiConfig();
         },
         unsetDefaultFilter(filterIdx){
             this.listFilters[filterIdx].isDefault= false;
-            this.sendFilterWorker();
-            this.notiFilter = this.$t("table.success.save_filter");
+            this.saveUiConfig();
         },
         editFilter(filterIdx){
             this.addFilter = true;
-            this.filterName = this.listFilters[filterIdx].name;
-            this.isUpdateFilter= true;
-            this.filterIdx = filterIdx;
+            this.isUpdateFilter = true;
+            this.selectedFilter(filterIdx);
         },
-        
         deleteFilter(filterIdx){
             this.showDelPopUp = true;
             this.contentDelete =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
@@ -1173,50 +1263,57 @@ export default {
             if(this.typeDelete=='filter'){
                 let filter = this.listFilters.filter((item,idx)=>idx!=this.deleteFilterIdx);
                 this.listFilters = filter;
-                this.sendFilterWorker();
+                this.saveUiConfig();
                 this.notiFilter = this.$t("table.success.delete_filter");
             }else{
                 this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=this.conditionIndex)
-                 this.saveConditionalFormatting(this.conditionalFormat);
-                 this.reRender()
+                this.saveConditionalFormatting(this.conditionalFormat);
             }
             this.showDelPopUp=false;
         },
-       setTable(filterIdx){
+       selectedFilter(filterIdx){
+            this.searchValue = this.listFilters[filterIdx].searchKey?this.listFilters[filterIdx].searchKey:'';
+            this.searchKey = this.searchValue;
+            this.filterName = this.listFilters[filterIdx].name;
+            this.tableFilter.allColumn = this.listFilters[filterIdx].columns;
+            this.filterIdx = filterIdx;
             this.closeBtnFilter = true;
             this.selectedFilterName = this.listFilters[filterIdx].name;
-            let filter = this.listFilters;
-            this.tableFilter.allColumn = this.listFilters[filterIdx].columns;
             this.getData()
         },
         addFilterConfig(){
+            this.closeBtnAndRefreshFilter();
             this.addFilter = true;
         },
-        saveFilter(){
+        checkIsAddFilter(){
             if(!this.isUpdateFilter){
                 this.listFilters.push({
                     name:this.filterName,
+                    searchKey:this.searchKey,
                     isDefault: false,
-                    userId:this.$store.state.app.endUserInfo.id,
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
+                this.selectedFilter(this.listFilters.length-1);
             }else{
                 this.listFilters[this.filterIdx].name = this.filterName;
+                this.listFilters[this.filterIdx].searchKey = this.searchKey;
                 this.listFilters[this.filterIdx].columns = this.tableFilter.allColumn;
                 this.notiFilter = this.$t("table.success.edit_filter");
             }
-            this.sendFilterWorker()
+            this.isNotiSuccess = true;
+           
         },
-        sendFilterWorker(){
-            let tableConfig =  this.getTableDisplayConfigData();
-            tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.listFilters;
-            tableConfig.detail= JSON.stringify(tableConfig.detail);
-            this.listItemsWorker.postMessage({
-                action: 'saveFilter',
-                data: tableConfig
+        checkExistNameFilter(){
+            let check = false;
+            let filterName = this.listFilters[this.filterIdx]?this.listFilters[this.filterIdx].name:'';
+            this.listFilters.map(filter=>{
+                if(filter.name==this.filterName&&filterName!=this.filterName)
+                {
+                   check = true; 
+                }
             })
+            return check
         },
 		getAllData(){
 			return this.rowData
@@ -1388,16 +1485,14 @@ export default {
                         menuItem[0].hasOwnProperty("callback")
                     ) {
                         if(key == 'delete' || key == 'remove'){
-                            thisCpn.deleteItems = [];
-                            let deletedIndexs = {};
-                            for(let item of selection ){
-                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
-                                    if(!deletedIndexs[idx]){
-                                        thisCpn.deleteItems.push(thisCpn.rowData[idx]);
-                                        deletedIndexs[idx] = true;
-                                    }
-                                }
-                            }
+							let allRow = []
+							let allRowRange = thisCpn.agApi.getCellRanges()
+							thisCpn.agApi.forEachNode(node=>{
+								if(node.rowIndex >= allRowRange[0].startRow.rowIndex && node.rowIndex <= allRowRange[0].endRow.rowIndex){
+									allRow.push(node.data)
+								}
+							})
+							thisCpn.deleteItems = allRow;
                             thisCpn.deleteDialogShow = true;
                         }else{
                             thisCpn.exeCallbackOnContextMenu(rowData);
@@ -1441,7 +1536,10 @@ export default {
             })
             }
             this.$emit('get-list-id',this.listId)
-        },
+		},
+		handleCustomGetData(data){
+			this.$emit('custom-get-all-data', data.data.listObject)
+		},
 		handlerGetData(data){
             this.getListId(data.data.listObject);
 			let self = this
@@ -1452,25 +1550,19 @@ export default {
 			}
 			this.totalObject = data.total ? parseInt(data.total) : 0;
 			let resData = data.listObject ? data.listObject : []
-			// if(lazyLoad){
-			// 	resData.forEach(function(e){
-			// 		thisCpn.rowData.push(e)
-			// 	})
-			// }else{
 			self.rowData = resData;
-			// }
 			data.columns.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
 				}
-			})
+            })
 			this.listItemsWorker.postMessage({
 				action: 'getTableColumns',
 				data:{
 					column: data.columns,
 					forcedReOrder: false,
 					savedOrderCols: self.savedTableDisplayConfig,
-					filteredColumns: self.filteredColumns
+                    filteredColumns: self.filteredColumns,
 				}
 			})
 			this.hideOverlay()
@@ -1491,25 +1583,30 @@ export default {
 				}
 				this.savedTableDisplayConfig = res.savedConfigs.columns;
 				if(res.columnDefs){
-                    this.columnDefs = res.columnDefs,
+					this.columnDefs = res.columnDefs
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                if(res.savedConfigs.filter){
-                    let listFilter = [];
-                    let userId = this.$store.state.app.endUserInfo.id;
-                    res.savedConfigs.filter.map(f=>{
-                        if(f.userId&&f.userId==userId){   
-                            listFilter.push(f)
-                        }
-                    })
-                    this.listFilters = listFilter
-                }else{
-                    this.listFilters = []
-                }
+                this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
                 this.getDefaultFilter()
+                //xử lý set độ rộng cho cột
+                this.widthColumns = res.savedConfigs.widthColumns?res.savedConfigs.widthColumns:[];
+                if(this.widthColumns){
+                    this.columnDefs.map(column=>{
+                        // column.width='1000'
+                        this.widthColumns.map(c=>{
+                            if(column.field==c.colId){
+                                column.width=c.width
+                            }
+                        })
+                    })
+
+                    // this.gridOptions.api.setColumnDefs(this.columnDefs);
+
+                 }
                 // xử lý phần format conditional
-                this.conditionalFormat = res.savedConfigs.conditionalFormat;
+                this.conditionalFormat = res.savedConfigs.conditionalFormat?res.savedConfigs.conditionalFormat:[];
+                // this.gridOptions.api.setColumnDefs(this.columnDefs);
 
 			}
 		},
@@ -1520,13 +1617,17 @@ export default {
 				title: this.$t("table.success.save_config")
 			})
         },
-        handlerSaveFilter(res){
+        handleSaveUiConfig(res, notiSuccess = true){
             if(res.status==200){
                 this.addFilter = false;
                 this.filterName = '';
-                this.$snotify({
-				type: "success",
-				title: 'Thành công'	})
+                this.searchKey = '';
+                this.searchValue = '';
+                  if(notiSuccess){
+                    this.$snotify({
+                    type: "success",
+                    title: 'Thành công'	})
+                }
             }else{
                 this.$snotify({
 				type: "error",
@@ -1534,7 +1635,6 @@ export default {
             }
         },
 		reRender(){
-            // this.agApi.refreshCells();
              this.agApi.redrawRows();
 		},
 		searchAutocompleteItems(vl){
@@ -1563,7 +1663,7 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
 			}
-			let widgetIdentifier = this.getWidgetIdentifier()
+			let widgetIdentifier = this.getRouteIdentifier()
 			this.$store.commit('app/setFilteredColumns', {filteredColumns: this.filteredColumns, widgetIdentifier: widgetIdentifier})
 
 		},
@@ -1613,7 +1713,8 @@ export default {
 			this.getData();
 			this.$emit("refresh-list", {});
         },
-		showTableDropdownMenu(x, y, colName) {
+		showTableDropdownMenu(x, y, colName){
+			this.searchKey = ""
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -1895,6 +1996,11 @@ export default {
             this.getData();
             this.$emit("change-page", vl.page);
 		},
+		customGetData(page){
+			this.page = page
+			this.pageSize = 1000
+			this.getData(false, false, true, false, true);
+		},
 		addItem() {
             if(this.useActionPanel){
                 this.actionPanel = true;
@@ -1919,7 +2025,7 @@ export default {
             this.getData();
             this.$emit("change-page", this.page);
 		},
-		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
+		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false, customGetData = false){
 			let self = this;
 			let dataConfig = this.getConfigApiCall()
 			dataConfig.configs = {
@@ -1929,11 +2035,19 @@ export default {
 			}
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
-            dataConfig.filteredColumns = self.filteredColumns
-			this.listItemsWorker.postMessage({
-				action: 'getData',
-				data: dataConfig
-			});
+			dataConfig.filteredColumns = self.filteredColumns
+			if(customGetData){
+				this.listItemsWorker.postMessage({
+					action: 'customGetData',
+					data: dataConfig
+				});
+			}else{
+				this.listItemsWorker.postMessage({
+					action: 'getData',
+					data: dataConfig
+				});
+			}	
+			
 		},
 		 /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
@@ -1954,8 +2068,16 @@ export default {
             if(this.widgetIdentifier){
                 widgetIdentifier =  this.widgetIdentifier;
             }else{
-                widgetIdentifier =  this.$route.path;
+                widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             }
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            return widgetIdentifier;
+		},
+		rerenderTable(){
+			this.agApi.sizeColumnsToFit()
+		},
+		getRouteIdentifier(){
+			let widgetIdentifier =  this.$route.path;
 			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
             return widgetIdentifier;
 		},
@@ -2022,29 +2144,37 @@ export default {
 .symper-list-items >>> .ag-theme-balham .ag-root-wrapper{
 	border: unset !important;
 }
-.symper-list-items >>> .ag-header{
+.symper-list-items >>> .ag-cell{
+	-webkit-touch-callout: none;
+	-webkit-user-select: none; 
+	-khtml-user-select: none; 
+	-moz-user-select: none;
+	-ms-user-select: none; 
+	user-select: none; 
+}
+.symper-list-items .ag-list-items-table >>> .ag-header{
 	border: unset !important;
 }
-.symper-list-items >>> .ag-row{
+.symper-list-items .ag-list-items-table >>> .ag-row{
 	border-radius: 4px;
 }
-.symper-list-items >>> .ag-row:hover{
+.symper-list-items .ag-list-items-table >>> .ag-row:hover{
 	border-radius: 4px;
 }
-.symper-list-items >>> .ag-theme-balham .ag-cell{
+.symper-list-items .ag-list-items-table >>> .ag-cell{
 	line-height: unset !important
 }
-.symper-list-items >>> .ag-header {
+.symper-list-items .ag-list-items-table >>> .ag-header {
 	height: 28px !important;
 	min-height: unset !important;
 	background-color: #ffffff !important;
 	border-top: 1px solid lightgray !important;
 	border-bottom: 1px solid lightgray !important;
 }
-.symper-list-items >>> .ag-theme-balham .ag-header-row {
+.symper-list-items .ag-list-items-table >>> .ag-header-row {
     height: 24px !important;
 }
-.symper-list-items >>> .ag-row-selected{
+.symper-list-items .ag-list-items-table >>> .ag-row-selected{
 	background-color: #DBE7FE !important;
 }
 .symper-list-items >>> .clip-text .ag-cell{

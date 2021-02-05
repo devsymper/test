@@ -88,7 +88,11 @@ export default {
                 let processDef = await BPMNEApi.getDefinitionData(this.$route.params.id);
                 try {
                     let instanceName = await self.getInstanceName([]);
-                    let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
+                    let vars = [];
+                    if(this.$route.extraData){
+                        vars = this.$route.params.extraData;
+                    }
+                    let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
                     await self.checkAndGotoMyTask(newProcessInstance);
                     this.$snotifySuccess("Khởi tạo quy trình  thành công!");
                     this.startWorkflowStatus = 'success';

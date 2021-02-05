@@ -4,11 +4,13 @@
                 <h5 class="select-time-title">Chọn giờ</h5>
             </v-col>
             <v-col cols="6">
-            <v-combobox
-            v-model="time"
-            :items="times"
-            :rules="[rules.match]"
-            ></v-combobox>
+                <v-combobox
+                class="time-input sym-small-size "
+                v-model="time"
+                :items="times"
+                :rules="[rules.match]"
+                @change="onChange"
+                ></v-combobox>
             </v-col>
 
         </v-row>
@@ -40,7 +42,9 @@ export default {
             "9:00 PM", "9:30 PM", "10:00 PM", "10:30 PM", "11:00 PM", "11:30 PM"]
     },
     methods:{
-        
+        onChange(){
+            this.$emit('change',this.getTime(false));
+        },
         formatAMPM(date) {
             var hours = date.getHours();
             var minutes = date.getMinutes();
@@ -82,5 +86,10 @@ export default {
     .row-time-select .col{
         padding-top: 0 !important;
         padding-bottom: 0 !important;
+    }
+    .time-input{
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+
     }
 </style>

@@ -7,7 +7,7 @@
         </div>
         <div class="w-100 mt-2">
             <v-text-field
-                class="sym-small-size"
+                class="sym-small-size name"
                 single-line
                 outlined
                 dense
@@ -23,7 +23,7 @@
         <div class="mb-1">
             Áp dụng cho
         </div>
-        <div style="border:1px solid lightgrey; over-flow:auto; border-radius:4px" >
+        <div style="border:1px solid lightgrey; overflow:auto; border-radius:4px; height:240px" >
             <div class="apply-for" v-for="(item,key) in formatTableColumns" :key="key"  @click="check(key)">
                 <div  :style="{'color':item.isSelected?'green':'rgba(0, 0, 0,0.87)'}" class="mx-2 check" >
                     <v-icon :style="{'color':item.isSelected?'green':'grey'}" size="18" class="mr-2">
@@ -55,14 +55,16 @@
              </v-radio-group>
         </v-row>
         <div v-if="colorType=='singleColor'">
-            <SingleColor style="margin-top:-20px" 
+            <SingleColor style="margin-top:-20px"
+                :isUpdate="isUpdate"
                 ref="singleColor"
                 :rowData="rowData"
                 v-model="value.displayMode.singleColor"
                 :tableColumns="formatTableColumns"/>
         </div>
         <div style="margin-top:-20px" v-else>
-            <ColorScale 
+            <ColorScale
+                :isUpdate="isUpdate"
                 :rowData="rowData"
                 ref="colorScale"
                 v-model="value.displayMode.colorScale"
@@ -83,11 +85,9 @@
 import { appConfigs } from "./../../../configs.js";
 import ColorScale from "./ColorScale";
 import SingleColor from "./SingleColor";
-import TreeSqlConfig from "./../../../views/document/sideright/items/TreeSqlConfig"
 
 export default {
   components:{
-    TreeSqlConfig,
     ColorScale,
     SingleColor,
   },
@@ -154,36 +154,50 @@ export default {
         }
     },
     setTableColumns(){
-        let tableColumns = [{
+        if(!this.isUpdate){
+            let tableColumns = [{
             title:'All',
             name:"All",
             type:"all",
             isSelected:false
-        }];
-        this.tableColumns.map(column=>{
-            tableColumns.push({title:column.headerName,
-                name:this.columnTitle(column.headerName),
-                type:column.type,
-                field:column.field,
-                isSelected:false,
-                headerName:column.headerName
+            }];
+            this.tableColumns.map(column=>{
+                tableColumns.push({title:column.headerName,
+                    name:this.columnTitle(column.headerName),
+                    type:column.type,
+                    field:column.field,
+                    isSelected:false,
+                    headerName:column.headerName
+                })
+                
             })
-            
-        })
-        this.formatTableColumns = tableColumns;
-        this.value.tableColumns=this.formatTableColumns;
+            this.formatTableColumns = tableColumns;
+        }else{
+            this.formatTableColumns = this.value.tableColumns
+        }
+        
 
     },
     getDataTypeIcon(type) {
-        return appConfigs.dataTypeIcon[type];
+        let typeMap = {
+            number: 'mdi-numeric',
+            month: 'mdi-numeric',
+            percent: 'mdi-numeric',
+            date: 'mdi-calendar-month',
+            time: 'mdi-clock-outline',
+            datetime: 'mdi-calendar-clock'
+        }
+        if (typeMap[type]) {
+            return typeMap[type];
+        } else {
+            return 'mdi-alphabetical-variant';
+        }
     },
   },
   created(){
-      if(!this.isUpdate){
-          this.refreshAll()
-      }
+     
       this.setTableColumns();
-      this.formatTableColumns = this.value.tableColumns;
+    //   this.formatTableColumns = this.value.tableColumns;
   },
   props: {
       value:{
@@ -228,10 +242,9 @@ export default {
     .check:hover{
         background:#f5f5f5;
     }
-</style>
-<style >
-  .v-label{
+    .name >>> .v-label{
         margin-top:-5px!important;
-        color:#f5f5f5!important
-    }  
+        color:grey!important
+
+    }
 </style>

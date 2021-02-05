@@ -315,7 +315,8 @@ export default {
 		border-top:1px solid rgba(0,0,0,0.1);
 		border-right:1px solid rgba(0,0,0,0.1);
 		border-bottom:1px solid rgba(0,0,0,0.1);
-		margin-top:-10px
+		margin:10px 0;
+
 	}
     .left-table{
         border-left: 1px solid rgba(0,0,0,0.1);

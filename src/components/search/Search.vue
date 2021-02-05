@@ -217,9 +217,10 @@ export default {
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
                                      returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
                                 }else if(data.type=='document_instance'){
-                                     let description = JSON.parse(JSON.parse(data.values).new);
                                      returnObjSearch.displayName = data.values?JSON.parse(data.values).document_name:"Không có tên";
-                                     returnObjSearch.description = data.values?description.description:'Chưa điền mô tả';
+                                    //  returnObjSearch.description = data.values?JSON.parse(JSON.parse(data.values).data).mo_ta:'Chưa điền mô tả';
+                                     returnObjSearch.description = returnObjSearch.displayName;
+
                                 
                                  }else if(data.type=='workflow_definition'||data.type=="knowledge"){
                                      returnObjSearch.displayName = data.name?data.name:"Không có tên";
@@ -251,7 +252,6 @@ export default {
                                    !data.source?data.source="Chưa có nguồn":'Document';
                                      returnObjSearch.searchField="Nguồn: "+(data.objectType?data.objectType:"Để trống");
                                       returnObjSearch.description ="Nguồn: "+(data.objectType?data.objectType:"Để trống");
-                                   // returnObjSearch.description ="Nguồn"
                                 }
                                 if(data.type=='comment'){
                                      returnObjSearch.displayName = data.content?data.content:"Không có nội dung";
@@ -282,7 +282,6 @@ export default {
                         console.log('Đã gửi mà lỗi');
                         console.log(err);
                         this.$store.commit('search/setSearch', []);
-                        //this.$store.commit('search/setSearch', []);
                     });
             }
         }

@@ -88,7 +88,6 @@
                         </v-list-item-action>
                     </v-list-item>
                     <!-- gồm công thức -->
-                     
                 </v-row>
             </v-row>
         </div>

@@ -226,7 +226,8 @@
             "compact": "Compact"
         },
         "error": {
-            "cannot_get_data": "Can not get data from server"
+            "cannot_get_data": "Can not get data from server",
+            "name_exist":"Name already exist"
         },
         "success": {
             "save_config": "Save config successfully!",
@@ -283,6 +284,21 @@
                 "viewDetail": "Detail",
                 "download": "Download Excel"
             }
+        }
+    },
+    "authen":{
+        "table":{
+            "title":"Danh sách các server key",
+            "name":"Tên key",
+            "id":"ID",
+            "description":"Mô tả",
+            "serverKey":"Key server",
+            "status":"Trạng thái",
+            "createAt":"Ngày tạo",
+            "updateAt":"Ngày cập nhập",
+            "userCreate":"Người tạo",
+            "userUpdate":"Người cập nhập"
+
         }
     },
     "user": {
