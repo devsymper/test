@@ -43,7 +43,6 @@ export default {
 			if(conditions.length > 0){
 				conditions.forEach(function(e){
 					if(e.nodeType == 'group'){
-						debugger
 						if(e.id == "root"){
 							e.root = true
 							e.condition = true,

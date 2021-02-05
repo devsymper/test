@@ -27,7 +27,7 @@
             <i class="mdi mdi-play-outline mr-1 fs-16"></i>
             Chạy
         </v-btn>
-        <v-btn color="primary" depressed small class="mr-2">
+        <v-btn color="primary" @click="saveDataflow" depressed small class="mr-2">
             <i class="mdi mdi-content-save mr-1 fs-16"></i>
             Lưu
         </v-btn>
@@ -38,6 +38,9 @@
 <script>
 export default {
     methods: {
+        saveDataflow(){
+            this.$emit('save-dataflow');
+        },
         runDataflow(){
             this.$emit('run-dataflow');
         },
