@@ -168,6 +168,9 @@ export default {
         },
         restoreRunningNodeData(data){ // Khôi phục lại data từ server phục vụ cho việc chạy dataflow
             let allNode = castAllMapObjsToNodes(data);
+            for(let id in allNode){
+                console.log(id, allNode[id].type, allNode[id].output, 'xxxxxxxxx');
+            }
             this.$store.commit('dataflow/setAllNodeRunning', {
                 allNode,
                 instanceKey: this.instanceKey

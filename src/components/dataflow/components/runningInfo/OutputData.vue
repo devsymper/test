@@ -63,7 +63,6 @@ export default {
 			showDialog: false,
 			dataPost: {},
 			customDataForApi() {
-				debugger
 				return self.dataPost;
 			},
 			customHeaderBtn:{
