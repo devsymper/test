@@ -30,7 +30,7 @@
                     <v-icon @click="deleteElementOrLink" style="font-size:20px; height:22px;margin-left:4px;margin-top:8px">
                         mdi-delete-forever
                     </v-icon>
-                    <add-status-view ref="popupAddStatusView" :allStatus="allStatus"  @after-add-status-click="afterAddStatusClick"/>
+                    <add-status-view v-if="allStatus.length > 0" ref="popupAddStatusView" :allStatus="allStatus"  @after-add-status-click="afterAddStatusClick"/>
                     <add-link-view :listNode="listNode" ref="popupAddLinkView" @after-add-link-click="afterAddLinkClick"/>
                 </div>
                 <div id='paperView' style="width: 100%; height: calc(100% - 50px)">
@@ -690,13 +690,20 @@ export default {
             rectBacklog.addTo(this.graph);
 
             let nodeDefaultInfo = getStatusDefault(); // cấu hình mặc định node
-            nodeDefaultInfo.name.value.name = "To Do";
-            nodeDefaultInfo.name.value.id = "5fe44f1c-10aa-35e6-7f89-93300ea2ab8b";
-            nodeDefaultInfo.common.value = 1;
-            nodeDefaultInfo.colorStatus.value = "#dfe1e6";
-            this.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
-            this.$set(nodeDefaultInfo.statusCategory,"value",'5fe314fb-47f0-99a5-d682-7ae20ea2ab8b');
-            this.listNode.push(nodeDefaultInfo);
+            let listStatus = self.allStatus;
+            if (listStatus.length == 0) {
+                listStatus = self.$store.state.taskManagement.allStatus;
+            }
+            let todoNode = self.allStatus.find(ele => ele.name === 'To Do');
+            if (todoNode) {
+                nodeDefaultInfo.name.value.name = "To Do";
+                nodeDefaultInfo.name.value.id = todoNode.id;
+                nodeDefaultInfo.common.value = 1;
+                nodeDefaultInfo.colorStatus.value = todoNode.color;
+                self.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
+                self.$set(nodeDefaultInfo.statusCategory,"value",todoNode.statusCategoryId);
+                self.listNode.push(nodeDefaultInfo);
+            }
 
             let link1 = new joint.shapes.standard.Link({
                 source: { id: rectStart.id },

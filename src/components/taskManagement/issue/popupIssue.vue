@@ -218,21 +218,12 @@ export default {
     ::v-deep .v-input__slot{
         box-shadow: none !important;
     }
-    .doc_issue >>> table td span{
-        width: 100%;
-    }
-    .doc_issue ::v-deep .s-control{
-        font-size: 13px!important;
-        margin-top: 0px;
-        border-top: 1px solid #efefef!important;
-        border: 1px solid #efefef!important;
-    }
     .doc_issue >>> .sym-form-submit{
         padding: 4px;
         padding-right: 10px;
     }
     .doc_issue{
-        height: 550px!important;
+        height: 600px!important;
     }
 
 </style>

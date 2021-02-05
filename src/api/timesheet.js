@@ -43,8 +43,8 @@ export default {
     deleteCategory(id) {
         return api.delete('category' + '/' + id, id)
     },
-    updateCategory({ taskName, key, id }) {
-        return api.put('category' + '/' + id, { taskName, key, id })
+    updateCategory(data) {
+        return api.put('category' + '/' + data.id, data)
     },
     createTask(data) {
         return api.post('task', data)

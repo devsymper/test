@@ -78,7 +78,7 @@
                 >
                     <p class="title-column">{{column.name}}</p>
                     <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-                    <VuePerfectScrollbar style="max-height: calc(100vh - 200px);" class="wrap-scroll-column">
+                    <VuePerfectScrollbar style="max-height: calc(100vh - 240px);" class="wrap-scroll-column">
                         <div v-for="(status, index) in column.statusInColumn"
                             :key="index"
                             class="mt-2 list-control-autocomplete"
@@ -256,8 +256,8 @@ export default {
                         operation : "and",
                         conditions : [
                             {
-                                name : "in",
-                                value : [self.$route.params.id],
+                                name : "equal",
+                                value : self.$route.params.id,
                             }
                         ],
                     },
@@ -273,7 +273,7 @@ export default {
                     }
                 ],
                 page : 1,
-                pageSize: 500,
+                pageSize: 200,
                 distinct: true
             },
             filterScrum:{
@@ -291,7 +291,7 @@ export default {
                     },
                 ],
                 page : 1,
-                pageSize: 500,
+                pageSize: 200,
                 distinct: true
             },
             filterProps:{ // bộ lọc
@@ -554,8 +554,8 @@ export default {
                         operation : "and",
                         conditions : [
                             {
-                                name : "in",
-                                value : [this.$store.state.app.endUserInfo.id],
+                                name : "equal",
+                                value : this.$store.state.app.endUserInfo.id,
                             }
                         ],
                     };
@@ -821,5 +821,11 @@ export default {
     height: 24px;
     /* padding: 4px 0px; */
     text-align: center;
+}
+::v-deep .ps > .ps__rail-x{
+    opacity: 1;
+}
+::v-deep .ps__thumb-x{
+    height: 10px !important;
 }
 </style>

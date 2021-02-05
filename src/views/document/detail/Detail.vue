@@ -55,30 +55,34 @@
             @after-hide-sidebar="afterHideSidebar"
         />
         <HistoryControl ref="historyView" />
-       
+        <Comment style="margin-left:-12px;margin-right:8px" 
+				:showComment="true" 
+				:objectIdentifier="String(docObjId)" 
+				:objectType="'document'" 
+				:height="'480px'"
+                :listCommentHeight="425"
+                ref="commentView"
+                v-show="isShowComment"
+				:buttonClose="false" 
+                class="comment-approval-view"
+			/>
+
     </div>
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
-import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
-import { setDataForPropsControl } from "./../../../components/document/dataControl";
 import BasicControl from "./../submit/basicControl";
-import  TableControl from "./../submit/tableControl.js"
 import  ActionControl from "./../submit/actionControl.js"
 import LayoutControl from "./../submit/layoutControl";
-import  Table from "./../submit/table.js"
-import  TablePrint from "./../print/PrintTable"
-import './../submit/customControl.css'
 import { getSDocumentSubmitStore,getControlInstanceFromStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
 import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
-import PivotTable from "./../submit/pivot-table";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import tinymce from 'tinymce/tinymce';
-import { util } from '../../../plugins/util.js';
+import Comment from '@/components/common/comment/Comment.vue'
 import ControlRelationWorker from 'worker-loader!@/worker/document/submit/ControlRelation.Worker.js';
 import TableControl1 from '../submit/tableControl1.js';
 
@@ -125,7 +129,8 @@ export default {
         HistoryControl,
         Preloader,
         FloattingPopup,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        Comment
     },
     computed: {
         routeName(){
@@ -185,6 +190,7 @@ export default {
             dataPivotTable:{},
             dataGroupTable:{},
             globalClass:null,
+            isShowComment:false,
 
         };
     },
@@ -207,7 +213,7 @@ export default {
                             "document/addControl", { id: controlId, props: listControlToStore[controlId], instance: thisCpn.keyInstance }
                         );
 					}
-                    thisCpn.processHtml(thisCpn.contentDocument);
+                    thisCpn.processHtml();
                     // thisCpn.controlRelationWorker.terminate();
                     break;
                 default:
@@ -403,7 +409,7 @@ export default {
                 thisCpn.userId = res.data.document_object_user_created_id;
                 thisCpn.taskId = res.data.document_object_task_id;
                 thisCpn.createTime = res.data.document_object_create_time
-                thisCpn.workflowId = res.data.document_object_workflow_id;
+                thisCpn.workflowId = res.data.document_object_workflow_object_id;
                 thisCpn.documentId = res.data.documentId;
                 thisCpn.userCreateInfo = res.data.userCreateInfo;
                 let dataToStore = res.data;
@@ -460,11 +466,11 @@ export default {
                             { name: name, control: control ,instance: this.keyInstance}
                         );
         },
-        processHtml(content,isPrint = false) {
+        processHtml() {
             var allInputControl = $("#sym-Detail-" + this.keyInstance +" .content-document").find(
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
-            if(isPrint){
+            if(this.isPrint){
                 allInputControl = $("#sym-Detail-" + this.keyInstance +" .content-print-document").find(
                     ".s-control:not(.bkerp-input-table .s-control)"
                 );
@@ -491,6 +497,8 @@ export default {
                             );
                             control.init();
                             control.render();
+                            this.isShowComment = true;
+                            control.addCommentToView($(this.$refs.commentView.$el).detach());
                     }
                     else if(controlType == 'tabPage'){
                         let control = new LayoutControl(
@@ -528,6 +536,7 @@ export default {
                                 thisCpn.keyInstance,
                                 (this.dataPivotTable) ? this.dataPivotTable[controlName] : {},
                                 (this.dataGroupTable) ? this.dataGroupTable[controlName] : {},
+                                this.isPrint
                             );
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
@@ -667,6 +676,9 @@ export default {
         cursor: pointer;
         margin-right: 12px;
         transition: all ease-in-out 250ms;
+    }
+    .comment-approval-view >>> .v-toolbar__content{
+        display: none !important;
     }
    
 </style>

@@ -15,7 +15,7 @@
                 <v-list-item-content>
                     <v-list-item-title>{{ board.name }}</v-list-item-title>
                 </v-list-item-content>
-                
+                <v-icon @click.stop.prevent="deleteBoard(board, index)" small>mdi-trash-can-outline</v-icon>
             </v-list-item>
         </VuePerfectScrollbar>
         <div class="mt-2" style="text-align:center;margin-top:4px">
@@ -73,6 +73,7 @@
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FormTpl from "@/components/common/FormTpl.vue";
 import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
+import { documentApi } from '../../../api/Document';
 
 export default {
     components:{
@@ -152,7 +153,7 @@ export default {
     methods:{
         show(e){
             this.isShow = true;
-            this.position.top = e.y +20 + "px"
+            this.position.top = e.y + "px"
         },
         hide(){
             this.isShow = false;
@@ -160,7 +161,6 @@ export default {
         onCardClick(e){
             e.preventDefault();
             e.stopPropagation();
-            console.log("ádasdasdsa",e);
         },
         onItemClick(item){
             this.$emit("selected-item-board", item);
@@ -195,6 +195,29 @@ export default {
             }
             return true;
         },
+        deleteBoard(board, index){
+            let thisCpn = this;
+            documentApi
+            .deleteDocumentObject({objectIds:JSON.stringify([board.documentObjectId])})
+            .then(res => {
+                if (res.status == 200) {
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Delete board successful"
+                    });
+                    thisCpn.listBoard.splice(index, 1)
+                }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.messagr
+                    });  
+                }
+            })
+            .catch(err => {
+            })
+            .finally(() => {});
+        }
     },
     created(){
         let self = this;
@@ -235,6 +258,7 @@ export default {
         background: white;
         padding: 8px;
         font-size: 13px;
+        box-shadow: var(--symper-box-shadow-bottom);
     }
     .card-title{
         color: var(--symper-sub-text-color-default);
@@ -243,7 +267,7 @@ export default {
         font-size: 13px;
     }
     .card-add-board >>> .v-list-item .v-list-item__icon{
-        margin: 12px 12px 8px 0;;
+        margin: 10px 12px 8px 0;;
     }
     .card-add-board >>> .v-list-item .v-list-item__icon .v-icon{
         font-size: 18px;

@@ -1,27 +1,15 @@
 <template>
 <v-card>
     <v-tabs v-model="tab" color="orange" grow style="flex-grow: 0">
-        <v-tab href="#tab-1" class="tab">
-            {{$t('timesheet.period')}}
-        </v-tab>
         <v-tab href="#tab-2" class="tab">
             {{$t('timesheet.period')}}
         </v-tab>
         <v-tab href="#tab-3" class="tab">
             {{$t('timesheet.remind')}}
         </v-tab>
-        <v-tab href="#tab-4" class="tab">
-           Loại việc
-        </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab" style="flex-grow: 1">
         <!-- start of tab 1 -->
-        <v-tab-item :key="1" :value="'tab-' + 1" class="tab-item" style="flex-grow: 1">
-            <div class="ml-3 mt-3 mr-3">
-             <RepeatConfig />
-
-            </div>
-        </v-tab-item>
 
         <!-- start of tab 2 -->
         <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
@@ -201,86 +189,17 @@
             </div>
         </v-tab-item>
         <!-- end of tab 2 -->
-        <!-- tab4 -->
-          <v-tab-item :key="4" :value="'tab-' + 4" class="tab-item">
-            <v-divider></v-divider>
-           <div class="d-flex flex-column flex-grow-1" style="padding-bottom: 4rem">
-                <v-row class='d-flex justify-start mr-7 align-center flex-grow-0 mt-4 ml-4'>
-                    <div class="d-flex align-center ml-3 mr-4">
-                        <span class="font">
-                            Thêm mới </span>
-                    </div>
-                    <div class="d-flex justify-start">
-                        <v-dialog v-model="dialog" width="357">
-                            <template v-slot:activator="{on}">
-                                <v-btn style="font-weight: normal" depressed small class="mr-2 fs-13" color="success" v-on="on">
-                                    Loại công việc  <v-icon>mdi-plus</v-icon>
-                                </v-btn>
-                            </template>
-                            <CategoryForm :update="updateCategory" @updateList="getListCategory()" @cancel="cancel()"/>
-                       </v-dialog>
-                    </div>
-                </v-row>
-                 <v-row class='d-flex justify-start align-center flex-grow-0 mt-4 ml-4'>
-                    <div class="d-flex align-center ml-3 mr-4">
-                        <span class="font">
-                            Danh sách loại công việc</span>
-                    </div>
-                </v-row>
-                 <v-row class='d-flex justify-start align-center flex-grow-0 mt-4 ml-8 mr-5'>
-                    <v-row>
-                         <v-data-table dense :headers="headers" :items="categoryTask" item-key="name" class="elevation-1">
-                             <template v-slot:item.actions="{ item }">
-                        <v-icon
-                        small
-                        class="mr-2"
-                        @click="editItem(item)"
-                        >
-                        mdi-pencil
-                        </v-icon>
-                        <v-icon
-                        small
-                        @click="deleteItem(item)"
-                        >
-                        mdi-delete
-                        </v-icon>
-                     </template>
-                         </v-data-table>
-                    </v-row>
-                </v-row>
-                <v-row class="flex-grow-1">
-                </v-row>
-            </div>
-        </v-tab-item>
-        <!-- tab4 -->
     </v-tabs-items>
 </v-card>
 </template>
 
 <script>
-import RepeatConfig from "../../components/common/RepeatConfig"
 import timesheetApi from '../../api/timesheet';
-import CategoryForm from "../../components/timesheet/CategoryForm";
 export default {
     components:{
-        CategoryForm,
-        RepeatConfig
     },
     data() {
         return {
-               dialog: false,
-            // permission
-            hr_roles: [{
-                    name: "Nguyễn Quốc Tân",
-                    image: ''
-                },
-                {
-                    name: "Nguyễn Việt Dinh",
-                    image: ''
-                },
-            ],
-            hrConfig:"Nguyễn Quốc Tân",
-            // period
             week_remind:'2',
             frequency_submissions: ['weekly', 'biweekly', 'monthly'],
             first_day_of_months: Array.from(Array(28), (_, i) => i + 1 + ""),
@@ -303,8 +222,7 @@ export default {
             hoursRequiredError: '',
             //table
             updateCategory:{},
-            categoryTask: [
-            ],
+            categoryTask: [],
             headers: [
             {
                 text: 'ID',
@@ -341,113 +259,87 @@ export default {
             },
 
             tab: null,
-
-            //category
-            listCategory:[]
         }
     },
     methods: {
-        deleteItem(item){
-            let self = this;
-            timesheetApi.deleteCategory({id:item.id}).
-             then(res => {
-                 if (res.status === 200) {
-                     console.log('Thành công');
-                     self.getListCategory();
-                 }
-                }).catch(console.log);
-        },
-        editItem(item){
-            this.updateCategory = item;
-            this.dialog = true;
-        },
-        cancel(){
-            this.dialog = false
-        },
-        getListCategory(){
-            let self= this;
-             timesheetApi.getAllCategory({}).then(res => {
-                if (res.status === 200) {
-                    self.categoryTask=[];
-                    self.listCategory = res.data.category;
-                     console.log(self.listCategory); 
-                     for(let i=0; i<self.listCategory.length; i++){
-                         self.categoryTask.push({
-                            name: self.listCategory[i].name,
-                            key: self.listCategory[i].key,
-                            id:self.listCategory[i].id,
-
-                         })
-                     }
-                    }
-                }).catch(console.log);
-        },
-          saveHr(){
-             alert('Lưu thành công')
+        showNotify(success = false){
+            if(!success){
+                this.$snotify({
+                    type: "error",
+                    title: this.$t("notification.successTitle")});
+            }else{
+                this.$snotify({
+                    type: "success",
+                    title: this.$t(+"notification.errorTitle"),
+                });
+            }
         },
         saveRemind(){
-            console.log(this.date_submited);
-            timesheetApi.updateRemindInfo({
-            submitTimesheet:this.submit_timesheet_selected,
-            isDailyLog: this.check_daily==true?1:0,            
-            timeDailyLog: this.time_remind_daily_log ,
-            dateSubmit: this.date_submited,
-            timeSubmit: this.time_submit_timesheet ,
-               weekRemind: this.week_remind,
-                })
-                .then(res => {
-                    if (res.status === 200) {
-                        console.log(res);
-                        alert('Lưu thành công')
-                        
-                    }
-                })
-                .catch(console.log);
+            let data = {
+                submitTimesheet:this.submit_timesheet_selected,
+                isDailyLog: this.check_daily==true?1:0,            
+                timeDailyLog: this.time_remind_daily_log ,
+                dateSubmit: this.date_submited,
+                timeSubmit: this.time_submit_timesheet ,
+                weekRemind: this.week_remind,
+            }
+            timesheetApi.updateRemindInfo(data) .then(res => {
+                if (res.status === 200) {
+                   this.showNotify(true)
+                }else{
+                    this.showNotify(false)
+                }
+            })
+            .catch(console.log);
 
         },
         onSavePeriod() {
             const timeRegex = /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
             let hourFormat = this.hoursRequiredError;
-            const self= this;
-            if (timeRegex.test(this.periodConfig.hoursRequired)) {
-                
-                let requiredHours= self.periodConfig.hoursRequired.split(":");
-                let totalMinutes = Number(requiredHours[0])+(Math.round(Number(requiredHours[1])/60*100)/100)
-                console.log(totalMinutes);
-                timesheetApi.updateConfigInfo({
-                        // HrRoles: this.firstDoM,
-                        freSubmit: self.periodConfig.freqSubmission ,
-                        firstDOM: self.periodConfig.firstDoM,
-                        firstDOW: self.periodConfig.firstDoW,
-                        hoursRequired: totalMinutes,
-                        isWorkingMonday: self.periodConfig.workingDays.Mon==true?1:0,
-                        isWorkingTuesday: self.periodConfig.workingDays.Tue==true?1:0,
-                        isWorkingWednesday:self.periodConfig.workingDays.Wed==true?1:0,
-                        isWorkingThursday:self.periodConfig.workingDays.Thu==true?1:0,
-                        isWorkingFriday: self.periodConfig.workingDays.Fri==true?1:0,
-                        isWorkingSaturday:self.periodConfig.workingDays.Sat==true?1:0,
-                        isWorkingSunday: self.periodConfig.workingDays.Sun==true?1:0,
-                    })
+            let periodConfig = this.periodConfig;
+            let requiredHours= periodConfig.hoursRequired.split(":");
+            let totalMinutes = Number(requiredHours[0])+(Math.round(Number(requiredHours[1])/60*100)/100)
+            let data = {
+                freSubmit: periodConfig.freqSubmission ,
+                firstDOM: periodConfig.firstDoM,
+                firstDOW: periodConfig.firstDoW,
+                hoursRequired: totalMinutes,
+                isWorkingMonday: periodConfig.workingDays.Mon==true?1:0,
+                isWorkingTuesday: periodConfig.workingDays.Tue==true?1:0,
+                isWorkingWednesday:periodConfig.workingDays.Wed==true?1:0,
+                isWorkingThursday:periodConfig.workingDays.Thu==true?1:0,
+                isWorkingFriday: periodConfig.workingDays.Fri==true?1:0,
+                isWorkingSaturday:periodConfig.workingDays.Sat==true?1:0,
+                isWorkingSunday: periodConfig.workingDays.Sun==true?1:0,
+            }
+            if (timeRegex.test(periodConfig.hoursRequired)) {
+           
+                timesheetApi.updateConfigInfo(data)
                     .then(res => {
                         if (res.status === 200) {
-                            console.log(res);
-                            self.hoursRequiredError="";
-                            self.$emit('cancel');
-                            alert('Lưu thành công');
+                        this.showNotify(true)
+                        }else{
+                            this.showNotify(false)
                         }
                     })
                     .catch(console.log);
                 this.$store.commit('timesheet/updatePeriod', this.periodConfig);
                 hourFormat= '';
-
             } else {
-                this.hoursRequiredError = 'Invalid format';
+                this.hoursRequiredError = 'Kiểu nhập không hợp lệ';
             }
             hourFormat= '';
+        },
+        setTimeRemind(res){
+            self.submit_timesheet_selected = res.data.listConfig[0].submitTimesheet;
+            self.check_daily = res.data.listConfig[0].isDailyLog=="1"?true:false;
+            self.time_remind_daily_log = res.data.listConfig[0].timeDailyLog;
+            self.date_submited = res.data.listConfig[0].dateSubmit;
+            self.time_submit_timesheet = res.data.listConfig[0].timeSubmit;
+            self.week_remind = res.data.listConfig[0].weekRemind;
         }
     },
     created() {
-        this.getListCategory();
         this.periodConfig = this.$store.state.timesheet.period;
         // console.log(this.periodConfig.firstDoM);
         const self = this;
@@ -455,14 +347,12 @@ export default {
             .then(res => {
                 if (res.status === 200) {
                     //tab 2
-                    let hourRequired= res.data.listConfig[0].hoursRequired.split(".");
+                    let hourRequired = res.data.listConfig[0].hoursRequired.split(".");
                     let minutes = hourRequired[1]?(hourRequired[1]*6).toString().slice(0, 2).padStart(2, '0'):'00';
-                    
                     let hour = hourRequired[0].slice(0,1).padStart(2,'0');
-                    let time= hour+':'+minutes;
+                    let time = hour+':'+minutes;
                     self.periodConfig.firstDoM = res.data.listConfig[0].firstDOM;
                     self.periodConfig.firstDoW = res.data.listConfig[0].firstDOW;
-        
                     self.periodConfig.freqSubmission = res.data.listConfig[0].freSubmit;
                     self.periodConfig.hoursRequired = time;
                     self.periodConfig.check_daily = res.data.listConfig[0].isDailyLog;
@@ -474,12 +364,7 @@ export default {
                     self.periodConfig.workingDays['Sat'] = res.data.listConfig[0].isWorkingSaturday=="1"?true:false;
                     self.periodConfig.workingDays['Sun'] = res.data.listConfig[0].isWorkingSunday=="1"?true:false;
                     //tab 3
-                    self.submit_timesheet_selected = res.data.listConfig[0].submitTimesheet;
-                    self.check_daily = res.data.listConfig[0].isDailyLog=="1"?true:false;
-                    self.time_remind_daily_log = res.data.listConfig[0].timeDailyLog;
-                    self.date_submited = res.data.listConfig[0].dateSubmit;
-                    self.time_submit_timesheet = res.data.listConfig[0].timeSubmit;
-                    self.week_remind = res.data.listConfig[0].weekRemind;
+                   self.setTimeRemind(res)
 
                 }
             })

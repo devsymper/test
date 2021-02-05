@@ -4,6 +4,7 @@ import {
     SYMPER_APP
 } from './../../../main.js'
 import SymperTable from "./table1";
+import { getControlInstanceFromStore } from "../common/common";
 window.switchTableMode = function(el) {
     // let tableName = $(el).attr('table-name');
     // let viewType = $(el).attr('view-type');
@@ -20,6 +21,12 @@ window.switchTableMode = function(el) {
 window.traceTable = function(el) {
     SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { isTable: true, tableName: $(el).attr('table-name') })
 }
+window.wrapTable = function(el) {
+    let tableName = $(el).attr('table-name');
+    let keyInstance = $(el).attr('instance');
+    let tableControl = getControlInstanceFromStore(keyInstance,tableName);
+    // tableControl.tableInstance.refreshTable(true)
+}
 export default class TableControl1 extends Control {
     constructor(idField, ele, controlProps, keyInstance,pivotConfig= {},groupConfig = {}, isPrintView = false) {
         super(idField, ele, controlProps, keyInstance);
@@ -30,13 +37,11 @@ export default class TableControl1 extends Control {
         this.groupConfig = groupConfig;
         this.tableInstance = null;
         this.tablePrint = null;
-        this.agDataTable = null;
         this.isPrintView = isPrintView;
         /**
          * tên các control nằm trong control này, mặc định là null, nếu control là table thì mới có giá trị là {'tên control':true}
          */
         this.controlInTable = {};
-        this.mapControlToIndex = {};
         this.tableMode = this.controlProperties.tableView.value;
         this.formulasWorker = null
         this.init();
@@ -45,20 +50,15 @@ export default class TableControl1 extends Control {
     renderTable() {
         this.tableInstance = new SymperTable(this, this.keyInstance, this.groupConfig, this.pivotConfig, this.formulasWorker);
         let viewType = sDocument.state.viewType[this.keyInstance];
-        if ((viewType == 'submit' || viewType == "update") && !this.agDataTable) {
-            this.ele.parent().append('<span onclick="traceTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
+        // this.ele.parent().append('<span onclick="wrapTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-format-text-wrapping-wrap  icon-options icon-wrap-table"></span>');
+        if ((viewType == 'submit' || viewType == "update")) {
+            this.ele.parent().append('<span onclick="traceTable(this)" table-name="' + this.name + '" instance="' + this.keyInstance + '" class="mdi mdi-information-outline icon-options icon-trace-table"></span>');
         }
         if (this.isPrintView) {
-            if(this.agDataTable){
-                this.agDataTable.render();
-            }
-            else{
-                this.ele.attr('table-id', this.ele.attr('id'));
-                this.ele.removeAttr('id');
-                this.ele.find('table').addClass('table-print');
-                this.ele.find('table tbody').empty();
-                this.tablePrint.render();
-            }
+            this.ele.attr('table-id', this.ele.attr('id'));
+            this.ele.removeAttr('id');
+            this.ele.find('table').addClass('table-print');
+            this.ele.find('table tbody').empty();
         } else {
             this.tableInstance.render();
             if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
@@ -90,7 +90,7 @@ export default class TableControl1 extends Control {
         }
         if (this.isPrintView) {
             let dataTablePrint = [];
-            for (let controlName in this.mapControlToIndex) {
+            for (let controlName in this.controlInTable) {
                 let dataControl = data[controlName];
                 let controlIns = this.controlInTable[controlName];
                 for (let index = 0; index < dataControl.length; index++) {
@@ -119,27 +119,8 @@ export default class TableControl1 extends Control {
                 tr += '</tr>';
                 bodyHtml += tr;
             }
-            if (!this.agDataTable) {
-                this.ele.find('table tbody').append(bodyHtml);
-                this.ele.find('table').attr('contenteditable', 'false');
-            }
-            let dataTable = [];
-            let rowLength = data[Object.keys(data)[0]].length;
-            for (let index = 0; index < rowLength; index++) {
-                let rowData = {};
-                for (let i = 0; i < Object.keys(data).length; i++) {
-                    let key = Object.keys(data)[i];
-                    let control = this.controlInTable[key];
-                    if (control && control.type == 'date') {
-                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
-                    }
-                    rowData[key] = data[key][index];
-                }
-                dataTable.push(rowData)
-            }
-            if (this.agDataTable) {
-                this.agDataTable.setData(dataTable)
-            }
+            this.ele.find('table tbody').append(bodyHtml);
+            this.ele.find('table').attr('contenteditable', 'false');
         } else {
             let dataTable = [];
             let rowLength = data[Object.keys(data)[0]].length;
@@ -147,10 +128,6 @@ export default class TableControl1 extends Control {
                 let rowData = {};
                 for (let i = 0; i < Object.keys(data).length; i++) {
                     let key = Object.keys(data)[i];
-                    let control = this.controlInTable[key];
-                    if (control && control.type == 'date') {
-                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
-                    }
                     rowData[key] = data[key][index];
                 }
                 dataTable.push(rowData)
@@ -162,22 +139,27 @@ export default class TableControl1 extends Control {
             }
         }
     }
-    switchTable() {
-        if (this.tableMode == 'Flat') {
-            this.tableInstance.show();
-            this.tableInstance.tableInstance.render();
-            if (this.agDataTable) {
-                this.agDataTable.hide();
-            }
-        } else {
-            this.tableInstance.hide();
-            if (this.agDataTable) {
-                this.agDataTable.show();
-            }
-
-        }
-    }
     isInsertRow(){
         return this.controlProperties.isInsertRow.value
+    }
+    isWrapText(){
+        return this.controlProperties.tableWrapText.value
+    }
+    getPrimaryKey(){
+        let primaryKey = this.controlProperties.tablePrimaryKey.value;
+        if(typeof primaryKey == 'object'){
+            return false;
+        }
+        return this.controlProperties.tablePrimaryKey.value
+    }
+    getAllControlKeyCache(){
+        let listControlKeyCache = [];
+        for (let controlName in this.controlInTable) {
+            let controlIns = this.controlInTable[controlName];
+            if(controlIns.isKeyCacheInTable()){
+                listControlKeyCache.push(controlIns.name);
+            }
+        }
+        return listControlKeyCache;
     }
 }

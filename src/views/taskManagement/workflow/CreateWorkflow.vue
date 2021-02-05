@@ -1,5 +1,6 @@
 <template>
     <workflow-model
+        v-if="allStatus.length > 0"
         :statusDetail="false"
         :listNode="listNode"
         :listLink="listLink"
@@ -19,7 +20,11 @@ export default {
             infoWorkflow:{},
             listNode:[],
             listLink:[],
-            allStatus:[],
+        }
+    },
+    computed:{
+        allStatus(){
+            return this.$store.state.taskManagement.allStatus;
         }
     },
     methods:{
@@ -28,7 +33,6 @@ export default {
             .getAllStatus()
             .then(res => {
                 if (res.status == 200) {
-                    this.allStatus = res.data.listObject;
                     this.$store.commit("taskManagement/setAllStatus",res.data.listObject);
                 }else{
                     self.$snotifyError("", "Can not get all status");
@@ -43,7 +47,9 @@ export default {
         let projectId=this.$route.params.id;
         this.$store.dispatch("taskManagement/getAllStatusCategory");
         this.$store.dispatch("taskManagement/getAllRole",projectId);
-        this.getAllStatus();
+        if (!this.$store.state.taskManagement.allStatus || this.$store.state.taskManagement.allStatus.length == 0) {
+            this.getAllStatus();
+        }
 
     }
 

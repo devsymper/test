@@ -13,7 +13,7 @@
             no-title
         >
         </v-date-picker>
-        <sym-time-picker v-if="isTime">
+        <sym-time-picker @change="onTimeChange" v-if="isTime">
         </sym-time-picker>
         <button v-if="isTime" v-on:click="applyDateTime" class="apply-time">
             Áp dụng
@@ -41,27 +41,15 @@ export default {
         }
         
     },
-    created() {
-        let thisCpn = this;
-        this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
-            if (this.keyInstance == 0 && !$(evt.target).hasClass("input-item-func") && 
-                (!$(evt.target).hasClass("card-datetime-picker") &&
-                $(evt.target).closest(".card-datetime-picker").length == 0) &&
-                (!$(evt.target).hasClass("v-list-item") &&
-                $(evt.target).closest(".v-list-item").length == 0)
-            ) 
-            {
-                thisCpn.closePicker();
-            }
-        });
-    },
     data(){
         return {
+            time:"01:00",
             date:null,
             isShow:false,
             position:null,
             minDate:'',
-            maxDate:''
+            maxDate:'',
+            inputForcusing:null
         }
     },
     beforeMount(){
@@ -72,6 +60,9 @@ export default {
     },
   
     methods:{
+        onTimeChange(time){
+            this.time = time
+        },
         setRange(min, max){
             this.minDate = min;
             this.maxDate = max;
@@ -82,6 +73,7 @@ export default {
         openPicker(e){
             this.isShow = true;
             this.calPosition(e);
+            this.inputForcusing = e.controlName;
         },
         calPosition(e){
             this.calculatorPositionBox(e)
@@ -112,7 +104,6 @@ export default {
                 let cardWidth = $('.card-datetime-picker').width();
                 let cardHeight = $('.card-datetime-picker').height();
                 let inputWidth = $(e.target).width();
-                let scrollTop = $('#sym-submit-'+this.keyInstance).closest('.scroll-content')[0].scrollTop
                 if(cardWidth + leftDiff > submitFormWidth){
                     this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':Math.abs(leftDiff + inputWidth - cardWidth)+'px'};
                 }
@@ -125,12 +116,13 @@ export default {
             }
         },
         applyDateTime(){
-            let dateTime = this.date + " " + this.time;
-            this.$emit('apply-datetime',dateTime)
+            let dateTime = this.date + " " + this.time+":00";
+            this.$emit('after-apply-datetime',{dateTime:dateTime,inputForcusing:this.inputForcusing})
         },
-        dateSelected(e){
-            this.$emit('clickDateCell',e);
-            
+        dateSelected(data){
+            if(!this.isTime){
+                this.$emit('after-select-date',{date:data,inputForcusing:this.inputForcusing});
+            }
         }
     }
 }

@@ -462,7 +462,7 @@ export default {
 			this.modelDialog[type + 'ShowDialog'] = false;
 			setTimeout(self=>{
 				self.$emit('task-submited');
-			},200 , this)
+			},400 , this)
 		},
 		handlerDelegateSuccess() {
 			this.modelDialog.delegateShowDialog = false;
@@ -549,7 +549,7 @@ export default {
 		changeTaskDetailInfo(taskId) {
 			let hostname = window.location.hostname;
 			let copyText = this.taskInfo.action.parameter.taskId;
-			copyText = util.addEnvToUrl('https://' + hostname + '/#/myitem/tasks/' + copyText);
+			copyText = util.addEnvToUrl('https://apps.symper.vn/#/myitem/tasks/' + copyText);
 			this.linkTask = copyText;
 
 			if (!taskId) {
@@ -812,9 +812,13 @@ export default {
 				outcome: 'submit',
 				variables: this.varsForBackend.vars,
 			};
+			if (data.document_object_id) {
+				this.taskInfo.action.parameter.documentObjectId = data.document_object_id;
+				this.$refs.task.changeStatusTask({status: 'submited',documentObjectId:data.document_object_id});
+			}
 			this.updateTask(taskData);
 			// let res =  await this.submitTask(taskData);
-			this.reloadDetailTask();
+			// this.reloadDetailTask();
 			// if (this.reload) {
 			// 	this.$emit('task-submited', res);
 			// }

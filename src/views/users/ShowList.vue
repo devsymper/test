@@ -4,7 +4,6 @@
         ref="listUser"
         :showImportButton="true"
         :showExportButton="false"
-        :actionPanelType="'modal'"
         @after-open-add-panel="addUser"
         :headerPrefixKeypath="'user.table'"
         :useDefaultContext="false"
@@ -56,7 +55,6 @@ export default {
         ImportExcelPanel: ImportExcelPanel,
     },
     data(){
-		let self = this
         return {
             options:{
                 objType:'user',
@@ -67,10 +65,29 @@ export default {
             listRowUser:[],
             showImportUser:false,
             customAPIResult: {
+                 setStatusImport(status){
+                    let nameStatus = '';
+                    switch(status){
+                        case '0':
+                            nameStatus = "Đã khóa";
+                            break;
+                        case '-1':
+                            nameStatus = "Đã xóa";
+                            break;
+                         case '1':
+                            nameStatus = "Đang hoạt động";
+                            break;
+                            
+                        case '2':
+                            nameStatus = "Mới tạo";
+                            break;
+                    }
+                    return nameStatus;
+                },
                 reformatData(res){
                     let data = res.data;
-                    for(let i = 0;  i < data.listObject.length; i++){
-                        data.listObject[i].status = self.setStatusImport(data.listObject[i].status);
+                    for(let i = 0; i<data.listObject.length; i++){
+                        data.listObject[i].status = this.setStatusImport(data.listObject[i].status);
                     }
                     return  data;
                 } 
@@ -114,8 +131,7 @@ export default {
                     }
                 }
             },
-			columns: [],
-			getListUrl:appConfigs.apiDomain.user,
+            columns: [],
             data: [],
             totalPage: 6,
             actionType:'',
@@ -127,6 +143,8 @@ export default {
         this.calcContainerHeight();
     },
     created(){
+        this.getListUrl = appConfigs.apiDomain.user+'';
+    
         let thisCpn = this;
         this.$evtBus.$on('change-user-locale',(locale)=>{
              thisCpn.tableContextMenu = [
@@ -142,25 +160,6 @@ export default {
         
     },
     methods:{
-		 setStatusImport(status){
-			let nameStatus = '';
-			switch(status){
-				case '0':
-					nameStatus = "Đã khóa";
-					break;
-				case '-1':
-					nameStatus = "Đã xóa";
-					break;
-					case '1':
-					nameStatus = "Đang hoạt động";
-					break;
-					
-				case '2':
-					nameStatus = "Mới tạo";
-					break;
-			}
-			return nameStatus;
-		},
         changeWidth(){
             this.actionPanelWidth=900;
         },
@@ -297,6 +296,7 @@ export default {
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'edit';
+            this.$refs.listUser.openactionPanel();
             this.$refs.panel.resetData();
             this.$refs.panel.setUser(user);
         },
