@@ -431,10 +431,13 @@ export default {
         }
     },
     mounted() {
-        // window.addEventListener('paste', this.insertNewRowsBeforePaste);
-        this.optionalDataBinding['context'] = (this.documentObjectWorkflowId) ? 'inWorkflow' : 'outWorkflow'
-        this.optionalDataBinding['document_object_id'] = this.docObjId
-        this.optionalDataBinding['action'] = this.action
+        window.addEventListener('paste', this.insertNewRowsBeforePaste);
+        this.optionalDataBinding['context'] = (this.documentObjectWorkflowId) ? 'inWorkflow' : 'outWorkflow';
+        this.optionalDataBinding['document_object_id'] = this.docObjId;
+        this.optionalDataBinding['action'] = this.action;
+         this.$store.commit(
+                "document/addToDocumentSubmitStore", { key: 'optionalDataBinding', value: this.optionalDataBinding, instance: this.keyInstance }
+            );
         let thisCpn = this;
         this.controlRelationWorker = new ControlRelationWorker();
         this.controlRelationWorker.addEventListener("message", function (event) {
@@ -1243,7 +1246,10 @@ export default {
             return dataParams
         },
         setWorkflowVariable(after){
-            this.optionalDataBinding = {...this.optionalDataBinding, ...after}
+            this.optionalDataBinding = {...this.optionalDataBinding, ...after};
+            this.$store.commit(
+                "document/addToDocumentSubmitStore", { key: 'optionalDataBinding', value: this.optionalDataBinding, instance: this.keyInstance }
+            );
         },
         saveInputFilter(data){
             this.handleInputChangeBySystem(data.controlName,data.value);
@@ -2148,7 +2154,6 @@ export default {
         },
 
 
-        // Hàm chỉ ra control được đánh định danh trong document (sct...)
         /**
          * lấy data để chạy công thức trên server
          */
