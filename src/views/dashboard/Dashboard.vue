@@ -6,7 +6,7 @@
                 v-for="dashboard in listDashboard"
                 :key="dashboard.id"
                 class="w-100 h-100">
-                    <iframe ref="dashboardItems" class="w-100 h-100" :src="getUrl(dashboard.id)" frameborder="0"></iframe>
+                <DashboardView class="w-100 h-100" :idDashboard="dashboard.id"/>
             </v-tab-item>
         </v-tabs-items>
 
@@ -26,7 +26,12 @@
 <script>
 import { dashboardApi } from "@/api/dashboard.js";
 import { util } from '../../plugins/util';
+import DashboardView from "@/views/dashboard/DashboardView.vue";
+
 export default {
+    components: {
+        DashboardView
+    },
     watch: {
         dashboardTab(){
             setTimeout((self) => {

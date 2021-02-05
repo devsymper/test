@@ -1,6 +1,13 @@
 <template>
-    <div class="border-bottom-1 pl-2 py-1 d-flex justify-space-between">
-		<ReportSideBar style="margin-top: -6px" :includeFixed="false" />
+    <div class="border-bottom-1 pl-2 py-1 position-relative d-flex justify-space-between">
+		<ReportSideBar  
+            v-if="action != 'view'"
+            style="margin-top: -6px" 
+            :includeFixed="false"/>
+        <i
+            style="position: absolute; left: 18px; top: 7px" 
+            v-else class="mdi mdi-view-dashboard-outline fs-18">
+        </i>
         <div style="line-height: 30px;" class="ml-8">
             <input 
                 :style="{
@@ -42,6 +49,7 @@
                 <span>{{dashboardInfo.lockWorkspace ? 'Mở tương tác' : 'Khóa tương tác'}}</span>
             </v-tooltip>
             <v-btn
+                v-if="action != 'view'"
                 depressed
                 small
                 color="primary"
