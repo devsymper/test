@@ -234,7 +234,6 @@ export default {
             }, 300, this);
         },
         applyVariables(){
-            debugger
             let vars = this.$refs.dashboardVariables.getItems();
             this.allDashboard[this.instanceKey].dashboardConfigs.info.variables = vars.reduce((map, el) => {
                 map[el.name] = el;

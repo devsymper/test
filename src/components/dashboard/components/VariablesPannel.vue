@@ -72,7 +72,6 @@
 </template>
 
 <script>
-import removeUnicode from '@/assets/js/removeUnicode';
 import { util } from '../../../plugins/util';
 import SelectColumn from '../../common/bi/SelectColumn.vue';
 export default {
@@ -130,8 +129,7 @@ export default {
    
         standardName(item){
             let text = item.name;
-            text = removeUnicode(text);
-            text = text.trim().replace(/\s+|-/g,'_').replace(/[^0-9a-zA-Z_]/g,'_').replace(/\./g,'_').replace(/(_)+/g,'_').toLowerCase();
+            text = util.str.nonAccentVietnamese(text, true);
             item.name =  text;
         },
         removeVariable(item){

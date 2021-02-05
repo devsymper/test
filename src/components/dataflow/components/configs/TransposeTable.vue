@@ -48,7 +48,7 @@
 <script>
 import DatasetColumnSelector from '../../../dataset/DatasetColumnSelector.vue'
 export default {
-  components: { DatasetColumnSelector },
+    components: { DatasetColumnSelector },
     props:{
         nodeData:{
             type: Object,

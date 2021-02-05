@@ -53,6 +53,7 @@ import SingleColorConditionalFormat from "@/components/dashboard/components/Sing
 import defaultConfigs from "@/components/dashboard/configPool/defaultConfigs.js";
 import SelectColumn from '@/components/common/bi/SelectColumn.vue'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import { util } from '../../../plugins/util';
 
 var entireRowFormatConfig = {
     "as": "Format entire row",
@@ -101,7 +102,7 @@ export default {
         config: {
             type: Object,
             default(){
-                return _.cloneDeep(defaultConfigs.defaultConditionFormat)
+                return util.cloneDeep(defaultConfigs.defaultConditionFormat)
             }
         }
     },
