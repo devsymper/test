@@ -136,7 +136,7 @@ export default {
 		transition: all ease-in-out 250ms;
 	}
 	.task-hover-poiter:hover{
-		box-shadow: var(--symper-box-shadow);
+		box-shadow: var(--symper-box-shadow-bottom);
 	}
 	.task-content{
 		display: -webkit-box;
