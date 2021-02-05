@@ -39,11 +39,12 @@ div.ag-root {
     color: var(--symper-text-color-default) !important;
 
 }
-.s-control-file-upload{
+.wrap-content-submit .s-control-file-upload{
     height: 100px !important;
     border: none !important;
     width: 500px !important;
 }
+
 .sym-form-submit .s-control-tracking-value,
 .sym-form-submit .s-control-approval-history,
 .sym-form-submit .s-control-report,
@@ -71,7 +72,6 @@ div.ag-root {
 .wrap-content-detail .s-control-tracking-value,
 .wrap-content-detail .s-control-approval-history,
 .wrap-content-detail .s-control-report,
-.wrap-content-detail .s-control-file-upload,
 .wrap-content-detail .s-control-reset,
 .wrap-content-detail .s-control-draf,
 .wrap-content-detail .s-control-submit,
@@ -102,7 +102,7 @@ div.ag-root {
 }
 
 .sym-form-submit .s-control:not(.s-control-table):not(button):not(.page-item), 
-.wrap-content-detail .s-control:not(.s-control-table):not(button):not(.page-item) 
+.wrap-content-detail .s-control:not(.s-control-table):not(button):not(.page-item):not(.s-control-file-upload)
 {
     display: inline-block;
     /* background: rgb(233, 236, 239); */
@@ -755,9 +755,29 @@ button:hover {
 
 .sym-form-Detail .s-control-file-upload{
     border: var(--symper-border);
+    width: 400px;
 }
- .sym-form-Detail .upload-file-wrapper-outtb{
-     padding-left: 8px;
+.sym-form-Detail .upload-file-wrapper-outtb{
+    padding-left: 8px;
+}
+
+.sym-form-Detail .upload-file-wrapper-outtb .list-file .file-item{
+    display: flex;
+    cursor: pointer;
+}
+.sym-form-Detail .upload-file-wrapper-outtb .list-file .file-item__name{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: calc(100% - 100px);
+}
+.sym-form-Detail .upload-file-wrapper-outtb .list-file .file-item__name,
+.sym-form-Detail .upload-file-wrapper-outtb .list-file .file-item__size
+{
+    padding: 3px 6px;
+}
+.sym-form-Detail .upload-file-wrapper-outtb .list-file .file-item__size{
+    margin-left: auto;
 }
 
 .ag-input-time{
