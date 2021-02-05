@@ -13,7 +13,7 @@
             </div>
         </div>
      
-        <v-dialog
+        <v-menu
             v-model="isShow"
             scrollable
             content-class="dialog-pick-color"
@@ -25,7 +25,7 @@
                 />
             </div>
          
-        </v-dialog>
+        </v-menu>
     </div>
 </template>
 
@@ -97,9 +97,9 @@ export default {
 
 <style scoped>
 .item-color {
-    height: 18px;
-    width: 18px;
-    padding: 0px!important;
+    /* height: 18px;
+    width: 18px; */
+    padding: 8px!important;
     display: inline-block;
     border-radius: 4px;
     margin: 4px;

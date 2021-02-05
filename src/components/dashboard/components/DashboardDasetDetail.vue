@@ -4,8 +4,10 @@
             <v-icon>mdi-chevron-right</v-icon>
             <div style="width:95%;padding-top:3px">
                 <span class="font-weight-medium">Fields</span> 
-                <v-icon @click="showDatasetSelector" class="float-right fs-16 mx-3">mdi-database</v-icon>
-                <v-icon @click="showRelationSelector" class="float-right fs-16" >mdi-relation-zero-or-one-to-one-or-many</v-icon>
+                
+                <v-icon @click="showDatasetSelector" class="float-right fs-16 mx-3 pa-1">mdi-database</v-icon>
+                <v-icon @click="showRelationSelector" class="float-right fs-16 pa-1" >mdi-relation-zero-or-one-to-one-or-many</v-icon>
+                <v-icon @click="showDashboardVariables" class="float-right fs-16 mx-3 pa-1">mdi-table-large-plus</v-icon>
             </div>
         </div>
         <v-text-field
@@ -36,7 +38,12 @@
             >
                 <v-expansion-panel class="sym-expand-panel " v-for="(dataset,idx) in datasetAndColumn" :key="idx" v-show="dataset.show && !dataset.isSubDataset">
                     <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                        <v-tooltip bottom open-delay="400">
+                        <v-menu 
+                            open-on-hover 
+                            :close-on-content-click="false" 
+                            left 
+                            open-delay="400"
+                            >
                             <template v-slot:activator="{ on }">
                                 <v-icon v-on="on" v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
                                 <v-icon v-on="on" v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
@@ -46,7 +53,7 @@
                             <dataset-detail-tooltip 
                                 :info="getInfoDatasetTooltip(dataset)"
                             />
-                        </v-tooltip>
+                        </v-menu>
                         <v-icon class="fs-15" style="position: absolute;right: 40px;" @click.prevent.stop="removeDataset(dataset)">mdi-close</v-icon>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
@@ -59,7 +66,11 @@
                             <!-- Danh sách các table trong doc -->
                             <v-expansion-panel class="sym-expand-panel dataset-child" v-for="(subId,idx) in dataset.subDatasetIds" :key="idx"  v-show="datasetAndColumn[subId].show" >
                                 <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                                    <v-tooltip bottom open-delay="400">
+                                    <v-menu 
+                                        open-on-hover 
+                                        :close-on-content-click="false" 
+                                        left open-delay="400"
+                                        >
                                         <template v-slot:activator="{ on }">
                                             <v-icon v-on="on" class="fs-15 icon-table">mdi-table-large</v-icon>
                                             <v-icon class="selected-dataset-mark" v-if="dataset.isSelected">mdi-check-circle</v-icon>
@@ -68,7 +79,7 @@
                                         <dataset-detail-tooltip 
                                             :info="getInfoDatasetTooltip(datasetAndColumn[subId])"
                                         />
-                                    </v-tooltip>
+                                    </v-menu>
                                 </v-expansion-panel-header>
                                 <v-expansion-panel-content class="sym-v-expand-content">
                                     <!-- Danh sách các control trong table -->
@@ -108,6 +119,41 @@
                 </v-expansion-panel>
             </v-expansion-panels>
         </VuePerfectScrollbar>
+
+        <v-dialog
+            v-model="showVariables"
+            max-width="850px"
+            scrollable
+        >
+        <v-card>
+            <v-card-title>
+                <span class="fs-16">Dashboard variables</span>
+            </v-card-title>
+            <v-card-text>
+                <variables-pannel ref="dashboardVariables" :originDatasets="datasetAndColumn" class="bg-white w-100"/>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    color="blue darken-1"
+                    text
+                    class="btn-add"
+                    @click="applyVariables"
+                >
+                    Apply
+                </v-btn>
+
+                <v-btn
+                color="red darken-1"
+                text
+                @click="showVariables = false"
+                >
+                    {{$t("common.close")}}
+                </v-btn>
+            
+            </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -118,13 +164,15 @@ import columnInfo from "@/components/common/bi/ColumnInfo";
 import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/DashboardDataset.Worker.js';
 import { util } from '../../../plugins/util';
 import DatasetDetailTooltip from './DatasetDetailTooltip.vue';
+import VariablesPannel from './VariablesPannel.vue';
 
 export default {
     components:{
         VuePerfectScrollbar,
         draggable,
         columnInfo,
-        DatasetDetailTooltip
+        DatasetDetailTooltip,
+        VariablesPannel
     },
     computed:{
         datasetAndColumn(){
@@ -136,7 +184,7 @@ export default {
             }
         },
         allDashboard(){
-            return this.$store.state.dashboard;
+            return this.$store.state.dashboard.allDashboard;
         }
     },
     watch:{
@@ -174,9 +222,25 @@ export default {
             openedPanelChild:[],
             search:"",
             infoDataflows:[],
+            showVariables:false,
         }
     },
     methods:{
+        showDashboardVariables(){
+            this.showVariables = true;
+            let vars = util.cloneDeep(this.allDashboard[this.instanceKey].dashboardConfigs.info.variables);
+            setTimeout((self) => {
+                self.$refs.dashboardVariables.setItems(Object.values(vars));
+            }, 300, this);
+        },
+        applyVariables(){
+            let vars = this.$refs.dashboardVariables.getItems();
+            this.allDashboard[this.instanceKey].dashboardConfigs.info.variables = vars.reduce((map, el) => {
+                map[el.name] = el;
+                return map;
+            }, {});
+            this.showVariables = false;
+        },
         onSearch(vl){
             // call function setOpenPanle để count max panle set all open khi search
             if(this.delayTimer){
