@@ -143,7 +143,7 @@ export default {
 			} else {
 				item.children.push({ id: Date.now(), condition: true, name: 'AND', parent: item.id, children: [] });
 			}
-			this.$emit('change-configs', {})
+			this.$emit('change-config', {})
 			this.$refs.tree.updateAll(true);
 		},
 		setValueForNode() {},
@@ -165,7 +165,7 @@ export default {
 		 * Xóa node
 		 */
 		deleteCondition(item) {
-			this.$emit('change-configs', {})
+			this.$emit('change-config', {})
 			let parentId = item.parent;
 			let parentNode = this.bfs(this.treeData, parentId);
 			for (let i = 0; i < parentNode.children.length; i++) {
@@ -248,7 +248,7 @@ export default {
 		},
 		onChangeConfig() {
 			let where = this.getData(this.treeData[0]);
-			this.$emit('change-configs', { where: where, treeData: this.treeData });
+			this.$emit('change-config', { where: where, treeData: this.treeData });
 		},
 	},
 };

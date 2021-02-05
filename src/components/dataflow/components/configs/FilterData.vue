@@ -6,7 +6,7 @@
 			:itemValue="'uid'" 
 			:listColumn="listColumn" 
 			:customCss="true"
-			@change-configs="handleChangeConfig"
+			@change-config="handleChangeConfig"
 		/>
 	</div>
 </template>
