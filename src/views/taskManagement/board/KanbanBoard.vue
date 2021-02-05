@@ -38,4 +38,7 @@ export default {
         width: 100%;
         height: 100%;
     }
+    .wraper-loader >>> .preloader{
+        z-index: 98 !important;
+    }
 </style>
