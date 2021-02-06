@@ -205,8 +205,8 @@ export default {
             }
         },
         menu(newVL, oldVl){
-            // if(JSON.stringify(newVL) != JSON.stringify(oldVl))
-            // this.setActiveItem();
+            if(JSON.stringify(newVL) != JSON.stringify(oldVl))
+            this.setActiveItem();
         }
         
     },
