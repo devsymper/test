@@ -3,7 +3,7 @@
     <VuePerfectScrollbar 
         ref="cellContainer"
         :style="{
-            height:workspaceHeight
+            height: workspaceHeight
         }" 
         tabindex="0"
         @ps-scroll-y="handleDashboardScrolled" 
@@ -23,11 +23,7 @@
             :vertical-compact="true"
             :margin="[8,8]"
             :use-css-transforms="true"
-            :style="{
-                width : dashboardStyle.size.w,
-                height : dashboardStyle.size.h,
-                backgroundColor : dashboardStyle.style.background.color
-            }">
+            :style="workspaceStyle">
                             
             <div 
                 v-for="item in currentLayout " 
@@ -169,7 +165,12 @@ export default {
             workspaceHeight:'',
             invalidTabName: false,
             showTabOptions: false,
-            activeAutoScroll: false
+            activeAutoScroll: false,
+            workspaceStyle: {
+                height: '100%',
+                width: '100%',
+                backgroundColor: 'white'
+            }
         }
     },
     computed: {
@@ -192,6 +193,25 @@ export default {
         }
     },
     methods: {
+        setDashboardSize(dashboardSize){
+            let sizeMode = dashboardSize.dashboardSizeMode.value;
+            if(sizeMode == 'realSize'){
+                this.workspaceStyle.height = dashboardSize.height.value + 'px'; 
+                this.workspaceStyle.width = dashboardSize.width.value + 'px'; 
+            }else if(sizeMode = "fitWidth"){
+                let containerWidth = util.getComponentSize(this.$el).w;
+                this.workspaceStyle.height = '100%'; 
+                this.workspaceStyle.width = containerWidth + 'px'; 
+            }else if(sizeMode = "fitScreen"){
+                let containerSize = util.getComponentSize(this.$el);
+                this.workspaceStyle.height = containerSize.h + 'px'; 
+                this.workspaceStyle.width = containerSize.w + 'px'; 
+            }
+        },
+        setDashboardStyle(style){
+            this.setDashboardSize(style.dashboardSize.children);
+            this.workspaceStyle.backgroundColor = style.dashboarStyle.children.bgColor.value;
+        },
         checkCopyReport(evt){
             this.$store.commit('dashboard/copyReport', {
                 dashboardConfigs: this.dashboardConfig,
@@ -391,9 +411,11 @@ export default {
             this.reportRenderManagement.renderCellsInViewport(scrollY, layout, tabKey, viewportHeight);
         },
         handleLayoutRendered(){
-            setTimeout((self) => {
-                self.renderCellsInViewport();
-            }, 0, this);
+            if(this.status == 'init'){
+                setTimeout((self) => {
+                    self.renderCellsInViewport();
+                }, 0, this);
+            }
         },
         addTab(){
             let tabs = this.dashboardConfig.info.tabsAndPages.tabs;
@@ -545,6 +567,9 @@ export default {
     props: {
         instanceKey: {
             defaul: ''
+        },
+        status: {
+            defaul: 'init'
         },
         action: {
             defaul: 'view'
