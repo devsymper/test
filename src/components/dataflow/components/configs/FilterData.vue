@@ -43,7 +43,8 @@ export default {
 			}
 			return arr;
 		},
-		defaultData() {
+		defaultData(){
+			debugger
 			if (this.useConditionProps) {
 				this.$set(this.nodeData.configs,'condition',this.condition)
 			}
@@ -55,20 +56,18 @@ export default {
 		handleChangeConfig(){
 			this.$emit('change-configs', {})
 		},
-		customDataToTreeSql(conditions){
+		customDataToTreeSql(conditions, parentId = false){
 			let self = this
 			if(conditions.length > 0){
 				conditions.forEach(function(e){
+					e.parent = parentId
 					if(e.nodeType == 'group'){
 						if(e.id == "root"){
 							e.root = true
-							e.condition = true,
-							e.name = e.label
-						}else{
-							e.condition = true
-							e.name = e.label
-						}
-						self.customDataToTreeSql(e.children)
+						}	
+						e.condition = true,
+						e.name = e.label
+						self.customDataToTreeSql(e.children, e.id)
 					}
 				})
 			}	

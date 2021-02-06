@@ -44,13 +44,13 @@
 						solo
 					></v-autocomplete>
 					<v-text-field v-model="item.value" @change="onChangeConfig" solo></v-text-field>
-					<v-btn class="ml-2 mt-1" tile icon x-small  @click="deleteConditionItem(item)">
-						<v-icon small class="btn-delete-item-condition">mdi-close</v-icon>
+					<v-btn class="ml-2 mt-1 btn-delete-item-condition" tile icon x-small  @click="deleteConditionItem(item)">
+						<v-icon small >mdi-close</v-icon>
 					</v-btn>
 				</div>
 				<div v-else type="text" class="list-action-treesql">
 					<v-btn light icon style="height: 28px;width: 28px;" v-if="!item.root" @click="deleteCondition(item)">
-						<v-icon style="font-size:16px;">mdi mdi-close</v-icon>
+						<v-icon style="font-size:16px;"> mdi-close</v-icon>
 					</v-btn>
 					<v-btn light icon style="height: 28px;width: 28px;" @click="swapCondition(item)">
 						<v-icon style="font-size:16px;">mdi mdi-swap-vertical-bold</v-icon>
@@ -270,6 +270,9 @@ export default {
 }
 .tree-view >>> .v-treeview-node__label:hover .list-action-treesql{
 	opacity: 1;
+}
+.tree-view >>> .v-treeview-node__label{
+	font-size: 13px !important;	
 }
 .list-action-treesql{
 	opacity:0;
