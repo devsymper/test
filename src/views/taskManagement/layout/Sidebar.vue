@@ -313,6 +313,7 @@ export default {
             
         },
         afterSelectBoard(board){
+            this.menu.workspace1.items[0].icon = (board.type == 'kanban') ? 'mdi-view-dashboard-variant-outline': 'mdi-chart-timeline';
             this.menu.workspace1.items[0].title = board.name
             this.menu.workspace1.items[0].subTitle = board.description;
             this.$store.commit("taskManagement/setCurrentBoard",board);

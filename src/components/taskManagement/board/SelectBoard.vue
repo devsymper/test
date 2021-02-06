@@ -9,7 +9,8 @@
                 @click="onItemClick(board)"
                 >
                 <v-list-item-icon>
-                    <v-icon>mdi-view-week-outline</v-icon>
+                    <v-icon v-if="board.type == 'kanban'">mdi-view-dashboard-variant-outline</v-icon>
+                    <v-icon v-else>mdi-chart-timeline</v-icon>
                 </v-list-item-icon>
 
                 <v-list-item-content>

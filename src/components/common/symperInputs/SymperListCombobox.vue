@@ -26,19 +26,28 @@
                 v-on="on"
             >
                 <div class="d-inline-block text-ellipsis" style="width: calc(100% - 4px)">
-                    <span v-text="item[valueKey] " v-if="showId" class="mr-2 font-weight-medium fs-12"></span>
+                    <span v-text="item[valueKey] " v-if="showId && !showAvatarUser" class="mr-2 font-weight-medium fs-12"></span>
+                    <span v-else-if="showAvatarUser" class="mr-2 font-weight-medium fs-12">
+                        <symperAvatar :size="20" class="user-avatar" :userId="item[valueKey]" />
+                    </span>
                     <span v-text="item[textKey] ? item[textKey] : item.name" class="fs-12"></span>
                 </div>
             </v-chip>
             <div v-else class="text-ellipsis">
-                <span v-text="item[valueKey] " v-if="showId" class="mr-2 font-weight-medium fs-12"></span>
+                <span v-text="item[valueKey] " v-if="showId && !showAvatarUser" class="mr-2 font-weight-medium fs-12"></span>
+                <span v-else-if="showAvatarUser" class="mr-2 font-weight-medium fs-12">
+                    <symperAvatar :size="20" class="user-avatar" :userId="item[valueKey]" />
+                </span>
                 <span v-text="item[textKey] ? item[textKey] : item.name" class="fs-12"></span>
             </div>
         </template>
         <template v-slot:item="{ item }" class="w-100">
             <div class="pa-2 w-100">
                 <div class="d-flex fs-13 font-weight-medium w-100 autocomplete-item" >
-                    <span v-text="item[valueKey]" class="mr-2" v-if="showId"></span>
+                    <span v-text="item[valueKey]" class="mr-2" v-if="showId && !showAvatarUser"></span>
+                    <span v-else-if="showAvatarUser" class="mr-2 font-weight-medium fs-12">
+                        <symperAvatar :size="20" class="user-avatar" :userId="item[valueKey]" />
+                    </span>
                     <span v-text="item[nameKey]"></span>
                 </div>
                 <div class="w-100 fs-12 text--grey w-100">
@@ -51,7 +60,12 @@
 
 <script>
 import { util } from "../../../plugins/util";
+import symperAvatar from "@/components/common/SymperAvatar.vue";
+
 export default {
+    components:{
+        symperAvatar
+    },
     props: {
         value: {
             default: ""
@@ -83,6 +97,12 @@ export default {
         },
         showId:{
             default: true
+        },
+        /**
+         * Trường hợp thông tin user muốn hiển thị avatar thay cho id
+         */
+        showAvatarUser:{
+            default: false
         },
         multipleSelection: {
             default: false

@@ -43,10 +43,10 @@
                     :filters="filterProps"
                     @apply-filter="applyFilter"
                 />
-                <div class="list-user d-inline-block" v-for="(obj) in listUserShow" :key="obj.id">
+                <!-- <div class="list-user d-inline-block" v-for="(obj) in listUserShow" :key="obj.id">
                     <span class="count-user" v-if="obj.count">{{obj.count}}+</span>
                     <symperAvatar v-else :size="22" class="user-avatar" :userId="obj.userId" />
-                </div>
+                </div> -->
                 <div class="ml-3 d-inline-block">
                     <v-menu offset-y>
                         <template v-slot:activator="{ on, attrs }">
@@ -186,9 +186,6 @@ export default {
         allIssueTypeInProject(){
             return this.sTaskManagement.listIssueTypeInProjects[this.projectId];
         },
-        dataSprintAfterMapIssue(){
-            return this.sTaskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
-        },
         currentBoard(){
             return this.$store.state.taskManagement.currentBoard;
         },
@@ -197,15 +194,6 @@ export default {
         },
     },
     watch:{
-        dataSprintAfterMapIssue:{
-            deep:true,
-            immediate:true,
-            handler(val){
-                if (val) {
-                    this.getListTasks(true);
-                }
-            }
-        },
         currentBoard(after, before){
             if(after.id == before.id){
                 return;
@@ -301,6 +289,7 @@ export default {
                     value:"",
                     multipleSelection:true,
                     isSelectionChip:true,
+                    showAvatarUser:true,
                     options: [],
                 },
                 tmg_status_id : {
@@ -668,9 +657,6 @@ export default {
                 case 'getListRoleUserInProject':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
-                        if (res.data.length == 0) {
-                            self.$emit('loaded-content');
-                        }
                         self.$store.commit("taskManagement/setListRoleUserInProject", res);
                     } 
                     break;
