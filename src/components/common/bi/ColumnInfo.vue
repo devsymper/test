@@ -17,7 +17,6 @@
 <script>
 
 import { DATATYPE_ICONS } from "@/components/dataflow/configPool/dataflowConfig.js";
-import { event } from 'jquery';
 export default {
     props:{
         infoColumn:{

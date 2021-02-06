@@ -55,7 +55,18 @@
             @after-hide-sidebar="afterHideSidebar"
         />
         <HistoryControl ref="historyView" />
-       
+        <Comment style="margin-left:-12px;margin-right:8px" 
+				:showComment="true" 
+				:objectIdentifier="String(docObjId)" 
+				:objectType="'document'" 
+				:height="'480px'"
+                :listCommentHeight="425"
+                ref="commentView"
+                v-show="isShowComment"
+				:buttonClose="false" 
+                class="comment-approval-view"
+			/>
+
     </div>
 </template>
 <script>
@@ -71,6 +82,7 @@ import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import tinymce from 'tinymce/tinymce';
+import Comment from '@/components/common/comment/Comment.vue'
 import ControlRelationWorker from 'worker-loader!@/worker/document/submit/ControlRelation.Worker.js';
 import TableControl1 from '../submit/tableControl1.js';
 
@@ -117,7 +129,8 @@ export default {
         HistoryControl,
         Preloader,
         FloattingPopup,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        Comment
     },
     computed: {
         routeName(){
@@ -177,6 +190,7 @@ export default {
             dataPivotTable:{},
             dataGroupTable:{},
             globalClass:null,
+            isShowComment:false,
 
         };
     },
@@ -483,6 +497,8 @@ export default {
                             );
                             control.init();
                             control.render();
+                            this.isShowComment = true;
+                            control.addCommentToView($(this.$refs.commentView.$el).detach());
                     }
                     else if(controlType == 'tabPage'){
                         let control = new LayoutControl(
@@ -660,6 +676,9 @@ export default {
         cursor: pointer;
         margin-right: 12px;
         transition: all ease-in-out 250ms;
+    }
+    .comment-approval-view >>> .v-toolbar__content{
+        display: none !important;
     }
    
 </style>

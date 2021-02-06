@@ -47,7 +47,8 @@ export const getDefaultDashboardConfig = function(){
                     ],
                     // pages: ['page 1']
                 }, // object chứa config của các tab trong dashboard
-                theme: "symper_default_dashboard_theme" // id theme được áp dụng cho dashboard
+                theme: "symper_default_dashboard_theme", // id theme được áp dụng cho dashboard
+                variables:{}
             }
         }, // cấu hình của toàn bộ dashboard này
         datasetsInRelationsMap: {}, // 
@@ -70,4 +71,8 @@ export const getDefaultDisplayOption = function() {
             w: 0
         }
     };
+}
+
+export const calcTitleCellHeight = function(textHeight){
+    return Number(textHeight) + 5;
 }

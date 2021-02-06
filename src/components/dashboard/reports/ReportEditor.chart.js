@@ -3,7 +3,16 @@ import {TranslatorHelper} from '@/components/dashboard/configPool/translatorHelp
 export default class ReportEditor extends ReportBase {
     constructor(symperId){
         let columnSettingKeys = [];
-        let styleKeys = {};
+        let styleKeys = {
+			"general":{
+				"title":"General",
+				"items":["bgColor","borderColor","borderWidth","colorPalette","fontFamily"]
+			},
+			"title":{
+				"title":"Title",
+				"items":["alignment","bgColor","fontColor","show","textSize","titleText"]
+            }
+        };
         super('editor', symperId, columnSettingKeys, styleKeys);
     }
     

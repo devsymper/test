@@ -192,7 +192,7 @@ import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocompl
 import SymperListCombobox from "./../common/symperInputs/SymperListCombobox";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 import SymperDefaultControlDocument from "@/components/common/symperInputs/SymperDefaultControlDocument.vue";
-
+import ConditionalFormat from "./../common/bi/ConditionalFormat";
 var titleSizeMap = {
     small: '11px',
     normal: '12px',
@@ -449,6 +449,14 @@ const inputTypeConfigs = {
     },
     color:{
         tag:"pick-color-single",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
+    conditionalFormatItems:{
+        tag:"conditional-format-items",
         props(config){
             return{
                 value:config.value
@@ -792,7 +800,8 @@ export default {
         SymperListCombobox,
         'button-select':ButtonSelect,
         'color-palette':ColorPalette,
-        'pick-color-single':PickColorSingle
+        'pick-color-single':PickColorSingle,
+        'conditional-format-items':ConditionalFormat
 
 
     }

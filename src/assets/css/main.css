@@ -76,6 +76,10 @@ body {
     font-size: 16px!important;
 }
 
+.fs-18 {
+    font-size: 18px!important;
+}
+
 .fs-10 {
     font-size: 10px!important;
 }
@@ -807,4 +811,11 @@ body {
 
 .position-relative {
     position: relative;
+}
+.v-menu__content {
+    font-size: 13px;
+}
+.v-menu__content .v-list-item {
+    padding-top: 4px;
+    padding-bottom: 4px;
 }

@@ -5,8 +5,8 @@
         flat
         :value="model"
         :items="allColumns"
-        item-text="title"
-        item-value="columnName"
+        :item-text="itemText"
+        :item-value="itemValue"
         outlined
         @change="change"
     >
@@ -27,11 +27,16 @@ export default {
         ColumnInfo,
     },
     computed : {
-        dataModel(){
-            return this.model;
-        },
     },
     props : {
+        itemText:{
+            type: String,
+            default: "title"
+        },
+        itemValue:{
+            type: String,
+            default: "columnName"
+        },
         allColumns: {
             type: Array,
             default(){
@@ -44,6 +49,12 @@ export default {
         },
         ikey : {
             default : ''
+        },
+        object:{
+            type: Object,
+            default(){
+                return {}
+            }
         }
     },
     methods:{
@@ -51,6 +62,7 @@ export default {
             let data = {};
             data.ikey = this.ikey;
             data.value = vl;
+            data.object = this.object
             this.$emit("change-value",data)
         }
     }
@@ -64,7 +76,7 @@ export default {
 }
 .sym-select >>> .v-input__slot{
     min-height: 20px!important;
-    height: 30px;
+    height: 28px;
 }
 .sym-select >>> .v-input__append-inner{
     margin-top: 3px!important;

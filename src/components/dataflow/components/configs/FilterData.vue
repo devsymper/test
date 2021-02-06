@@ -24,6 +24,16 @@ export default {
 				return {};
 			},
 		},
+		condition:{
+			type: Array,
+			default(){
+				return []
+			}
+		},
+		useConditionProps:{
+			type: Boolean,
+			default: false,
+		}
 	},
 	computed: {
 		listColumn() {
@@ -34,6 +44,9 @@ export default {
 			return arr;
 		},
 		defaultData() {
+			if (this.useConditionProps) {
+				this.$set(this.nodeData.configs,'condition',this.condition)
+			}
 			this.customDataToTreeSql(this.nodeData.configs.condition)
 			return this.nodeData.configs.condition
 		},

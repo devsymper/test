@@ -410,13 +410,15 @@ function makeValuesToNumber(data, columns, keyword = 'yAxis') {
      * trùng với các thông tin ở hàm  getCommonAttr() trong file getAtyleAttesFuncs
      */
 function getCommonCellStyleAttr(commonAttr, ratio) {
-    return {
+    let rsl = {
         general: getStyleItemsInConfig(commonAttr.general.children, 'px', ratio),
         symperTitle: {
             text: commonAttr.title.children.titleText.value,
             style: getStyleItemsInConfig(commonAttr.title.children, 'px', ratio)
         }
     };
+    rsl.symperTitle.style.lineHeight = (commonAttr.textSize.value + 5) + 'px';
+    return rsl;
 }
 
 function  getStyleItemsInConfig(st, sizeUnit = '', ratio) {

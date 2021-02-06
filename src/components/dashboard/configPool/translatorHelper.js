@@ -1,4 +1,5 @@
 import { util } from '@/plugins/util';
+import { calcTitleCellHeight } from "@/components/dashboard/configPool/dashboardConfigs.js";
 export const staticChartOptions = {
     lang: {
         numericSymbols: ["K", "M", "B", "T", "P", "E"],
@@ -343,7 +344,6 @@ export const TranslatorHelper = {
 		editor(rawConfigs,displayOptions,extraData,oldOutput,ratio) {
 			let content = oldOutput? oldOutput.content : "";
 			let style = util.cloneDeep(rawConfigs.style);
-		
 			displayOptions.symperExtraDisplay = rawConfigs.extra;
 			let viewOptions = TranslatorHelper.editor(style,content, ratio);
 
@@ -357,8 +357,8 @@ export const TranslatorHelper = {
 	},
     editor(style, content, ratio) {
         let rsl = {
-            content: content,
-        };
+			content: content,
+		};
         let commonAttr = this.getCommonCellStyleAttr(style, ratio);
         rsl = Object.assign(rsl, commonAttr);
         return rsl;
@@ -628,7 +628,7 @@ export const TranslatorHelper = {
      * trùng với các thông tin ở hàm  getCommonAttr() trong file getAtyleAttesFuncs
      */
     getCommonCellStyleAttr(commonAttr, ratio) {
-        return {
+        let rsl = {
             general: TranslatorHelper.getStyleItemsInConfig(commonAttr.general.children, 'px', ratio),
             symperTitle: {
                 text: commonAttr.title.children.titleText.value,
@@ -637,7 +637,9 @@ export const TranslatorHelper = {
 			title: {
 				text: ""
 			}
-        };
+		};
+		rsl.symperTitle.style.height = calcTitleCellHeight(commonAttr.title.children.textSize.value) + 'px!important';
+		return rsl;
 	},
 	getColorsFromStyle(style) {
 		return style.general.children.colorPalette.value;

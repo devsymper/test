@@ -58,6 +58,7 @@
 					<v-btn
 					color="green darken-1"
 					text
+					:loading="loading"
 					@click="completeTask"
 				>
 					{{$t("myItem.taskLifeCycle.corfirm")}}
@@ -98,7 +99,7 @@ export default {
 	},
 	data(){
 		return{
-			
+			loading:false,
 		}
 	},
 	created(){
@@ -109,6 +110,8 @@ export default {
 			this.$emit('cancel')
 		},
 		async completeTask(){
+			let self = this;
+			this.loading = true;
 			let elId = this.taskInfo.action.parameter.activityId;
 			let docId = this.taskInfo.action.parameter.documentId;
 
@@ -133,7 +136,6 @@ export default {
 					flag = false
 				}
 				varsForBackend = await getVarsFromSubmitedDoc(dataDoc, elId, docId);
-
 			}
 			if(flag){
 				if(varsForBackend){
@@ -142,25 +144,37 @@ export default {
 						outcome: 'submit',
 						variables: varsForBackend.vars
 					}
-					workFlowApi.changeTaskAction(this.taskId, data).then(res=>{
-
-					}).catch(err=>{
-
-					})
-					this.$snotify({
-						type: "success",
-						title: this.$t("myItem.taskLifeCycle.notify.complete")
-					})
-					this.$emit('success')
+					let res = await self.postTask(data);
 				}else{
 					this.$snotifyError("Không thể lấy variable")
 				}
 			}else{
 				this.$emit('cancel')
 			}
-		
-		
-		}
+			this.loading = false;
+		},
+		async postTask(taskData) {
+			let self = this;
+			return new Promise(async (resolve, reject) => {
+				try {
+					let result = await workFlowApi.actionOnTask(self.taskId, taskData);
+					self.$snotify({
+						type: "success",
+						title: self.$t("myItem.taskLifeCycle.notify.complete")
+					})
+					self.$emit('success')
+					resolve(result);
+				} catch (error) {
+					let detail = '';
+					if (error.responseText) {
+						detail = JSON.parse(error.responseText);
+						detail = detail.exception;
+					}
+					self.$snotifyError(error, 'Can not submit task!', detail);
+					reject(error);
+				}
+			});
+		},
 	},
 }
 </script>

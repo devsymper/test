@@ -145,6 +145,7 @@ import ReportTranslatorWorker from 'worker-loader!@/worker/dashboard/ReportTrans
 import _isEmpty from "lodash/isEmpty";
 import Sortable from "sortablejs";
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+import { calcTitleCellHeight } from "@/components/dashboard/configPool/dashboardConfigs.js";
 var mapTypeToClasses = autoLoadChartClasses();
 
 export default {
@@ -296,7 +297,7 @@ export default {
             let size = util.getComponentSize(this.$refs[cellId][0]);
             let titleAttr = this.dashboardConfig.allCellConfigs[cellId].rawConfigs.style.title.children;
             if(titleAttr.show.value && titleAttr.titleText.value){
-                size.h -= 35;
+                size.h -= calcTitleCellHeight(titleAttr.textSize.value);
             }
             return size;
         },
@@ -311,10 +312,14 @@ export default {
         canReportTranslate(cell){
             let columnSetting = cell.rawConfigs.setting;
             let canTranslate = false;
-            for(let key in columnSetting){
-                if(columnSetting[key].selectedColums && columnSetting[key].selectedColums.length > 0){
-                    canTranslate = true;
-                    break;
+            if(Object.keys(columnSetting).length == 0){
+                canTranslate = true;
+            }else{
+                for(let key in columnSetting){
+                    if(columnSetting[key].selectedColums && columnSetting[key].selectedColums.length > 0){
+                        canTranslate = true;
+                        break;
+                    }
                 }
             }
             return canTranslate;

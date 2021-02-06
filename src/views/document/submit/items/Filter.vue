@@ -26,6 +26,7 @@
             :gridOptions="gridOptions"
             :getRowHeight="getRowHeight"
             @grid-ready="onGridReady"
+            @row-selected="rowSelected"
             :rowData="rowData">
             </ag-grid-vue>
         </div>
@@ -72,6 +73,7 @@ export default {
             defaultColDef: null,
             rowData: null,
             gridOptions: null,
+            rowSelection:{}
         }
     },
     beforeMount(){
@@ -95,6 +97,18 @@ export default {
         };
     },
     methods:{
+        rowSelected(params){
+            let data = params.data;
+            let rowKey = this.getRowkey(data);
+            if(this.rowSelection[this.controlName][rowKey]){
+                if(!params.node.selected){
+                    delete this.rowSelection[this.controlName][rowKey];
+                }
+            }
+            else{
+                this.rowSelection[this.controlName][rowKey] = data;
+            }
+        },
         onGridReady(params){
 			const agBodyViewport = document.querySelector('.content-filter .ag-body-viewport');
 			const agBodyHorizontalViewport = document.querySelector('.content-filter .ag-body-horizontal-scroll-viewport');
@@ -140,26 +154,33 @@ export default {
                 self.setSelection();
             }, 500,this);
         },
+        getRowkey(rowData){
+            let key = []
+            for(let col in rowData){
+                key.push(rowData[col]);
+            }
+            return key.join("_____");
+        },
         setSelection(){
-            let controlIns = getControlInstanceFromStore(this.keyInstance, this.controlName);
-            let currentValue = util.cloneDeep(controlIns.value);
+            let self = this;
             this.gridOptions.api.forEachNode(node => {
                 let nodeData = node.data;
-                if(currentValue.indexOf(nodeData[controlIns.name]) != -1){
+                let rowKey = self.getRowkey(nodeData);
+                if(self.rowSelection[self.controlName][rowKey]){
                     node.setSelected(true);
                 }
             });
         },
         saveInputFilter(){
-            let listRowSelection = this.gridOptions.api.getSelectedRows();
-            if(listRowSelection.length > 0){
-                listRowSelection = listRowSelection.reduce((arr,obj)=>{
-                    arr.push("'"+obj[this.controlName]+"'");
-                    return arr;
-                },[]);
+            let dataResponse = [];
+            if(Object.keys(this.rowSelection[this.controlName]).length > 0){
+                for(let key in this.rowSelection[this.controlName]){
+                    let rowData = this.rowSelection[this.controlName][key];
+                    dataResponse.push("'"+rowData[this.controlName]+"'");
+                }
             }
             this.$emit('save-input-filter',
-            {value: (listRowSelection.length > 0) ? listRowSelection.join(',') : "",controlName:this.controlName}
+            {value: (dataResponse.length > 0) ? dataResponse.join(',') : "",controlName:this.controlName}
             );
         },
         setFormulas(formulas){
@@ -168,6 +189,9 @@ export default {
         },
         setControlName(controlName){
             this.controlName = controlName;
+            if(!this.rowSelection.hasOwnProperty(this.controlName)){
+                this.rowSelection[this.controlName] = {};
+            }
         },
         getSearchField(formulas){
             let titleFieldSearch = []

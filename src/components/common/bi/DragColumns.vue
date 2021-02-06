@@ -75,6 +75,7 @@ export default {
             if (index > -1) {
                 this.columns.splice(index, 1);
             }
+            this.$emit('drag-remove-item',item);
         },
         checkShowItem(item){
             if(!this.searchKey){
@@ -96,6 +97,7 @@ export default {
                         this.columns.splice(index, 1);
                     }    
                 }
+                this.$emit('drag-add-item',item);
             }
         }
     }

@@ -68,7 +68,7 @@ export default {
 <style scoped>
 .sub-select-button{
     margin: auto;
-    width:60%; 
+    width:75%; 
     border:var(--symper-border);
     border-radius:3px
 }

@@ -8,7 +8,7 @@ let api = new Api(appConfigs.apiDomain.biService);
 
 export const dashboardApi = {
 	getAllDashboard() {
-		return api.get("/root/falses");
+		return api.get("/report-and-dashboard/root/falses");
 	},
 	// searchDashboard(filter) {
 	// 	return api.get("/root/falses", filter);

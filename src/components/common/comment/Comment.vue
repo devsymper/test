@@ -116,11 +116,21 @@ export default {
 		},
 	},
 	mounted(){
-		 let windowHeight = $(window).height();
-		 this.heightListComment = windowHeight - 250
+		if(this.listCommentHeight == 0){
+			let windowHeight = $(window).height();
+			this.heightListComment = windowHeight - 250;
+		}
+		else{
+			this.heightListComment = this.listCommentHeight
+		}
+		
 	},
 	
 	 props: {
+		listCommentHeight:{
+			type: Number,
+            default: 0
+		},
 		 /**
 		  * truyen vao show comment hay ko
 		  */

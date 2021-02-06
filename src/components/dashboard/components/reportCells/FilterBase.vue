@@ -7,7 +7,7 @@
             :selectedCol="selectedCol"
             :cellId="cellConfigs.sharedConfigs.cellId"
             :cellView="cellConfigs.viewConfigs"
-            v-if="selectedCol.type == 'date'">
+            v-if="useDatePicker()">
         </date-filter>
 		<VuePerfectScrollbar v-else-if="selectedCol.type != 'number'" :style="{height: menuItemsHeight}" >
 			<select-filter 
@@ -83,11 +83,14 @@ export default {
         }
     },
     methods:{
+        useDatePicker(){
+           return this.selectedCol.type == 'date'
+        },
         handleChangeFilterValue(cellId){
             // SDashboardEditor.applyFilterFromCell(cellId);
 		},
 		handleChangeQuery(data){
-			this.cellConfigs.sharedConfigs.queryKey = data.query
+            this.cellConfigs.sharedConfigs.queryKey = data.query
 			this.$evtBus.$emit('bi-report-change-display', {
 				id: data.cellId,
 				type: 'autocomplete'

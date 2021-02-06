@@ -3,7 +3,7 @@
         <div class="d-flex h-100 w-100">
             <div class="d-flex flex-column"
                 :style="{
-                    width: 'calc(100% - 450px)'
+                    width: workspaceWidth
                 }">
                 <DashboardToolBar 
                     :style="{
@@ -21,7 +21,7 @@
                     :action="action"
                     :instanceKey="instanceKey"/>
             </div>
-            <div class="d-flex flex-column h-100"
+            <div class="d-flex flex-column h-100" v-if="action != 'view'"
                 :style="{
                     width: '200px'
                 }">
@@ -33,6 +33,7 @@
                     :instanceKey="instanceKey"/>
             </div>
             <DashboardDasetDetail
+                v-if="action != 'view'"
                 ref="datasetDetail"
                 class="h-100"
                 :instanceKey="instanceKey"
@@ -44,6 +45,7 @@
             />
         </div>
 		<DatasetSelector
+            v-if="action != 'view'"
 			ref="datasetSelector"
 			v-model="listDatasetSelected"
 			@list-dataset-selected="changeSelectedDatasets"
@@ -51,6 +53,7 @@
 			:tableHeight="tableHeight"
 		/>
 		<RelationSelector
+            v-if="action != 'view'"
 			ref="relationSelector"
 			:tableHeight="tableHeight"
 		/> 	
@@ -105,6 +108,13 @@ export default {
 	watch:{
     },
     computed: {
+        workspaceWidth(){
+            if(this.action == 'view'){
+                return '100%';
+            }else{
+                return 'calc(100% - 450px)';
+            }
+        },
         myData(){
            return this.$store.state.dashboard.allDashboard[this.instanceKey];
         }
@@ -118,11 +128,13 @@ export default {
             });
         },
         applySelectedDatasets(datasets){
-            this.myData.dashboardConfigs.info.datasets = datasets.reduce((map, el) => {
-                map[el.id] = true;
-                return map;
-            }, {});
-            this.$refs.datasetDetail.getColumnDataset(datasets);
+            if(this.action != 'view'){
+                this.myData.dashboardConfigs.info.datasets = datasets.reduce((map, el) => {
+                    map[el.id] = true;
+                    return map;
+                }, {});
+                this.$refs.datasetDetail.getColumnDataset(datasets);
+            }
         },
 		handlerCancelSelectDataset(listDatasetIds){
             this.listDatasetSelected = listDatasetIds;

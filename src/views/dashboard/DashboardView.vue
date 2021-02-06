@@ -1,48 +1,35 @@
 <template>
-    <div class="w-100 " style="height: calc(100% - 41px)">
-        <div class="w-100 h-100">
-            <iframe ref="dashboardItems" class="w-100 h-100" :src="(url) ? url : getUrl(dashboardId)" frameborder="0"></iframe>
-        </div>
-    </div>
+<div class="symper-edit-dashboard w-100">
+    <DashboardEditor
+        action="view"
+        :idObject="idObject"
+    />
+</div>
 </template>
 
 <script>
-import { dashboardApi } from "@/api/dashboard.js";
-import { util } from '../../plugins/util';
+import DashboardEditor from "@/components/dashboard/DashboardEditor.vue";
 export default {
-    watch: {
-        dashboardTab(){
-            setTimeout((self) => {
-                let ifr = self.$refs.dashboardItems[self.dashboardTab];
-                ifr.src = ifr.src;
-            }, 200, this);
+    components: {
+        DashboardEditor
+    },
+    computed: {
+        idObject(){
+            if(!this.idDashboard){
+                return this.$route.params.id;
+            }else{
+                return this.idDashboard
+            }
         }
     },
-    created(){
-        this.dashboardId = this.$route.params.id;
-    },
-    methods: {
-        getUrl(dashboardId){
-            return util.addEnvToUrl('https://bi.symper.vn/#/dashboard/'+dashboardId+'/view');
-        }
-    },
-    data(){
-        return {
-            dashboardId:null
-        }
-    },
-    props:{
-        url:{
-            type:String,
-            default:""
+    props: {
+        idDashboard: {
+            default: 0
         }
     }
-    
 }
 </script>
 
 <style>
-.symper-dashboard-item .v-window__container{
-    height: 100%!important;
-}
+
 </style>
