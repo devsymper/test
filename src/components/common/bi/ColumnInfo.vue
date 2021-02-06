@@ -1,18 +1,23 @@
 <template>
-    <div class="single-row px-4 item-column-dataset justify-space-between">
-        <span class="text-ellipsis">
-            <v-icon color="#000" class="fs-14 pr-2">{{icon[infoColumn.type]}}</v-icon>
-            <span :title="infoColumn.title" class="mr-2" :class="{ 'highlight' : infoColumn.isSelected}">{{infoColumn.title}}</span>
-        </span>
-        <div  class="float-right d-flex" style="color: #909399">
-           <span :title="infoColumn.name ? infoColumn.name : infoColumn.columnName">{{infoColumn.name ? infoColumn.name : infoColumn.columnName}}</span> 
-            <v-icon title="Remove" v-if="showIconRemove" @click.prevent.stop="removeItem(infoColumn)" x-small class=" ml-2 mr-1">mdi-close</v-icon>
-        </div>
-    </div>
+    <div >
+		<div class="single-row px-4 item-column-dataset justify-space-between" @click="handlerColumnClick(infoColumn, $event)">
+			<v-icon v-if="infoColumn.calculation == 'measure'" style="margin-left:-16px;margin-right:-12px; color: blue" small> mdi-calculator</v-icon>
+			<div class="text-ellipsis" :style="{'max-width': infoColumn.calculation == 'measure' ? '43%' : '100%'  }" >
+				<v-icon color="#000" class="fs-14 pr-2">{{icon[infoColumn.type]}}</v-icon>
+				<span :title="infoColumn.title" class="mr-2" :class="{ 'highlight' : infoColumn.isSelected}">{{infoColumn.title}}</span>
+			</div>
+			<div  class="float-right d-flex"  style="color: #909399;">
+				<span class="text-ellipsis"  :title="infoColumn.name ? infoColumn.name : infoColumn.columnName">{{infoColumn.name ? infoColumn.name : infoColumn.columnName}}</span> 
+				<v-icon title="Remove" v-if="showIconRemove || infoColumn.calculation == 'measure'" @click.prevent.stop="removeItem(infoColumn)" x-small class=" ml-2 mr-1">mdi-close</v-icon>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
+
 import { DATATYPE_ICONS } from "@/components/dataflow/configPool/dataflowConfig.js";
+import { event } from 'jquery';
 export default {
     props:{
         infoColumn:{
@@ -35,7 +40,12 @@ export default {
     methods:{
         removeItem(item){
             this.$emit("remove-item",item);
-        }
+		},
+		handlerColumnClick(infoColumn, evt){
+			if(infoColumn.calculation == 'measure'){
+				this.$emit("config-caculated-column", infoColumn, evt)
+			}
+		}
     }
 
 }
@@ -53,5 +63,11 @@ export default {
 }
 .highlight{
     color: #f58634;
+}
+.icon-remove-calculated-column{
+	display: none;
+}
+.item-column-dataset:hover .icon-remove-calculated-column{
+	display: inline-block;
 }
 </style>
