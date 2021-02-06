@@ -60,6 +60,17 @@
                     </div>
                 </div>
             </VuePerfectScrollbar>
+            <div style="text-align:center; width:100%;height: calc(100% - 20px);" v-else>
+                <img
+                    class="my-2"
+                    height="70px"
+                    :src="require('@/assets/image/folder-empty.png')"/>
+                <br/>
+                <p class="font-weight-medium my-2">Bạn không có dự án nào truy cập gần đây !!!</p>
+                <v-btn @click="handleAllProjects" color="blue" dark small depressed>
+                    Xem tất cả dự án
+                </v-btn>
+            </div>
 
         </div>
 
@@ -77,8 +88,16 @@
                 <!-- content -->
                 <v-tab-item >
                     <issue-recent 
+                        v-if="recentIssue.length > 0"
                         :recentIssue="recentIssue"
                     />
+                    <div class="mt-4" style="text-align:center; width:100%;height: 100%" v-else>
+                        <img
+                            height="200px"
+                            :src="require('@/assets/image/work.png')"/>
+                        <br/>
+                        <p class="font-weight-medium">Bạn không có tác vụ gần đây !!!</p>
+                    </div>
                 </v-tab-item>
                 <v-tab-item>
                     <assigned-recent 

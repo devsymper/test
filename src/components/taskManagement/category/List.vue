@@ -9,8 +9,8 @@
                         v-model="search"
                         append-icon="mdi-magnify"
                         label="Tìm kiếm"
+                        outlined
                         dense
-                        solo
                         style="max-width:255px;"
                         single-line
                         hide-details

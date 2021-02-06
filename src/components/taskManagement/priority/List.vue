@@ -9,8 +9,8 @@
                         v-model="search"
                         append-icon="mdi-magnify"
                         label="Tìm kiếm"
+                        outlined
                         dense
-                        solo
                         style="max-width:200px;"
                         single-line
                         hide-details
@@ -33,7 +33,7 @@
                             :animation="200"
                             @change="handleChangeLevel"
                             >
-                            <tr v-for="item in listPriority" :key="item.id">
+                            <tr v-show="checkShowItem(item)" v-for="item in listPriority" :key="item.id">
                                 <td>
                                     <span class="name-project" style="color:#0000aa">
                                         {{item.name}}
@@ -194,6 +194,16 @@ export default {
         }
     },
     methods:{
+        checkShowItem(item){
+            if(!this.search){
+                return true;
+            }
+            if(item && item.name){
+                let s = this.search.toLowerCase();
+                return item.name.toLowerCase().includes(s) || item.description.toLowerCase().includes(s);
+            }
+            return false;
+        },
         handleChangeLevel(data){
             let dataChange=[];
             let min =0, max =0;
