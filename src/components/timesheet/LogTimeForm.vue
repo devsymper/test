@@ -531,9 +531,10 @@ export default {
            }
         },
         filterTaskByCategory(){
+            debugger
             if(this.categoryTask){
                 let categoryId = this.getIdCategory(this.categoryTask);
-                this.items = this.items.filter(x=>x.categoryId==categoryId||x.categoryId==null);
+                this.items = this.items.filter(x=>x.categoryId==categoryId);
             }
         },
          async getAllTask(nameTask){
