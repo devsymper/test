@@ -52,10 +52,18 @@ export default class ReportBase {
         type: "", // loại report
         yAxisCount: 1, // số lượng yAxis được sử dụng
     };
-
+ 
     viewConfigs = { // cấu hình phục vụ cho việc hiển thị
         commentCount: 0, // số lượng comment
-        displayOptions: {}, // cấu hình được translate từ các rawConfig thành cấu hình tương ứng của thư viện
+        displayOptions: { // cấu hình được translate từ các rawConfig thành cấu hình tương ứng của thư viện
+            symperTitle: {},
+            general: {},
+            data: [],
+            contentSize: {
+                h: 0,
+                w: 0
+            }
+        }, 
         filter: {}, // filter áp dụng cho report này
         isSelecting: false, // có đang click để lựa chọn hay không
         loadingData: false, // có đang tải dữ liệu không 
