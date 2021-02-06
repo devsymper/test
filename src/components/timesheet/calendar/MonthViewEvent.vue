@@ -1,7 +1,7 @@
 <template>
 <div>
      <div class= "fs-12 px-1 mt-1">
-        <v-menu v-if="monthEvents[date]" offset-y>
+        <v-menu v-if="monthEvents[date]" offset-y   :close-on-content-click="false" v-model="menu">
             <template v-slot:activator="{on}">
                 <template v-if="monthEvents[date]">
                     <div v-for="event in monthEvents[date]" 
@@ -15,7 +15,7 @@
                     </div>
                 </template>
             </template>
-            <ViewDetailMonth :detail="monthEvents[date].sort((a,b) => a.start - b.start)" :hour="hoursRequired" />
+            <ViewDetailMonth @close="menu=false" :detail="monthEvents[date].sort((a,b) => a.start - b.start)" :hour="hoursRequired" />
         </v-menu>
     </div>
     <div class="ml-3 fs-13 new-log" @click="start(date)">[<v-icon style="font-size:11px"> mdi-plus</v-icon> New log]</div>
@@ -25,6 +25,11 @@
 import ViewDetailMonth from "./../ViewDetailMonth";
 
 export default {
+  data () {
+    return {
+        menu:false
+    }
+  },
     name: "MonthViewEvent",
     components: {
         ViewDetailMonth

@@ -55,7 +55,7 @@
                                     <div class="fm text-ellipsis" 
                                         :style="{'width':(findDuration(event.start, event.end)>62)?'70%':'75%','margin-top':(findDuration(event.start, event.end)>62)?'':'-4px!important'}">
                                         <span v-if="findDuration(event.start, event.end)<62">
-                                            <i :class="[event.type==0?'mdi mdi-calendar color-blue':'mdi mdi-check-all color-green']" class="fs-15"></i>
+                                            <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green']" class="mr-1"></i>
                                         </span>
                                         <b style="color:#303030" class="fs-12 fw-430">{{event.name}}</b>
                                     </div>
@@ -66,8 +66,8 @@
                                             nudge-left='5' 
                                             nudge-top='-10'>
                                             <template v-slot:activator="{on:actionEvents }" >
-                                                <span class="fs-12 fw-400" 
-                                                    v-if="findDuration(event.start, event.end)<62"
+                                                <span class="fs-12 fw-400 color-black"
+                                                    v-if="findDuration(event.start, event.end)<65"
                                                     v-on="actionEvents" style="margin-right:-20px">
                                                     {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
                                                 </span>
@@ -88,8 +88,8 @@
                                 <v-spacer />
                                 <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center">
                                     <div>
-                                        <span v-if="findDuration(event.start, event.end)>70">
-                                            <i :class="[event.type==0?'mdi mdi-calendar':'mdi mdi-check-all color-green']" class="fs-15"></i>12123123
+                                        <span v-if="findDuration(event.start, event.end)>65">
+                                            <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
                                         </span>
                                         <span class= "fs-12 text-ellipsis color-grey" style="margin-left:-50px" v-if="findDuration(event.start, event.end)>70"> 
                                             {{event.category_key}}
@@ -317,9 +317,11 @@ export default {
         },
         // lấy ra danh sách Log time
         load() {
+            let defaultStart = this.$moment().subtract(7,'days').format('YYYY-MM-DD');
+            let defaultEnd = this.$moment().add(7,'days').format('YYYY-MM-DD')
             let data = {
-                start:this.$refs.calendar.lastStart.date,
-                end:this.$refs.calendar.lastEnd.date
+                start:this.$refs.calendar.lastStart.date?this.$refs.calendar.lastStart.date:defaultStart,
+                end:this.$refs.calendar.lastEnd.date?this.$refs.calendar.lastEnd.date:defaultEnd
             }
             this.$emit('dateStartEnd',data);
              this.logFormWorker.postMessage({
@@ -737,5 +739,8 @@ export default {
 height: 600px;
 border-bottom: 1px solid rgb(0,0,0,0.05)
 }
-
+.mdi-calendar{
+    margin-top:5px;
+    color:#000080!important
+}
 </style>

@@ -15,6 +15,7 @@
             ref="logtime"
             :dateStartEnd ="dateStartEnd"
             @showTaskForm="showTaskForm"
+            @loadMonthView="loadMonthView"
             @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
             :updateAPICategory ="updateAPICate"
@@ -70,6 +71,7 @@
         @dateStartEnd="dateStartEnd"
         :userId="userId"
         @showLog="showLog" 
+        :monEvents="monthEvents"
         ref="logCalendar" 
         :time-view="time_view" 
         @create-time="onCreateTime" 
@@ -102,6 +104,7 @@ export default {
     data() {
         return {
             userId:'',
+            monthEvents:{},
             showTask:false,
             showCategory:false,
             time_view: true,
@@ -152,6 +155,14 @@ export default {
             if(!this.update){
               this.$refs.logCalendar.events.pop()
             }
+        },
+        loadMonthView(data){
+            debugger
+            // this.$refs.logCalendar.monthEvents[data.date]=[];
+            // this.$refs.logCalendar.monthEvents[data.date].push(data);
+            this.monthEvents =data;
+
+
         },
         doneCate(){
             this.updateAPICate = false

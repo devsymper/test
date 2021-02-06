@@ -546,6 +546,7 @@
             "delete": "Xóa",
             "view": "Chi tiết"
         },
+        "view_des":"Chưa có mô tả",
         "assignee": "Người được giao",
         "fre_submit": "Tần suất submit",
         "fow": "Ngày đầu tháng",

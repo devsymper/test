@@ -171,7 +171,7 @@ export default {
             const self = this;
             timesheetApi.deleteCategory(data).then(res=>{
                 if(res.status==200){
-                        self.$snotify({
+                    self.$snotify({
                         type: "success",
                         title:" Xóa thành công",
                     });

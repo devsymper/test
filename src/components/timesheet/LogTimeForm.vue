@@ -169,7 +169,7 @@
                     <span style="color:red"> *</span> 
                 </span>
                 <v-combobox
-                    :menu-props="{'maxHeight':204,'minWidth':70}" 
+                    :menu-props="{'maxHeight':204,'minWidth':76,'nudgeLeft':5}" 
                     style="margin-top:-12px"
                     background-color="#F7F7F7"
                     no-filter
@@ -181,7 +181,7 @@
             <div style="width: 63px; float: left"> <span class="label">
                 {{$t('timesheet.end_time')}}<span style="color:red">*</span></span>
                 <v-combobox
-                        :menu-props="{'maxHeight':204, 'minWidth':70}" 
+                        :menu-props="{'maxHeight':204, 'minWidth':76,'nudgeLeft':5}" 
                         style="margin-top:-12px"
                         background-color="#F7F7F7"
                         no-filter
@@ -224,33 +224,11 @@
         <v-btn text class='cancel' @click="cancel()">
             {{$t('timesheet.cancel')}}
         </v-btn>
-        <v-btn v-if="update==false&&showLog" text  
-        class="button-logtime"
-        style="color:blue"
-            @click="log(1)">
-            <span >{{$t('timesheet.log')}}</span> 
-            </v-btn>
-            <v-btn v-if="update==false&&showPlan" text 
-        style="color:green"
-        class="button-logtime"
-            @click="log(0)">
-            <span >{{$t('timesheet.plan')}}</span> 
-            </v-btn>
-            <v-btn v-if="update&&newEvent.type==1" text 
-        class="button-logtime"
-            @click="updatelog(1)">
-            <span >{{$t('common.update')}}</span> 
-            </v-btn>
-            <v-btn v-if="update&&newEvent.type==0&&showPlan" text 
-        class="button-logtime"
-            @click="updatelog(0)">
-            <span >{{$t('common.update')}}</span> 
-            </v-btn>
-            <v-btn v-if="update&&newEvent.type==0&&showLog" text 
-        class="button-logtime mr-2" style="float:right!important; width: 60px"
-            @click="updatelog(1)">
-            <span >{{$t('timesheet.log')}}</span> 
-            </v-btn>
+        <v-btn v-if="update==false&&showLog" text class="button-logtime color-blue" @click="log(1)"><span >{{$t('timesheet.log')}}</span> </v-btn>
+        <v-btn v-if="update==false&&showPlan" text class="button-logtime color-green" @click="log(0)"> <span >{{$t('timesheet.plan')}}</span> </v-btn>
+        <v-btn v-if="update&&newEvent.type==1" text class="button-logtime" @click="updatelog(1)"><span >{{$t('common.update')}}</span> </v-btn>
+        <v-btn v-if="update&&newEvent.type==0&&showPlan" text class="button-logtime" @click="updatelog(0)"><span >{{$t('common.update')}}</span> </v-btn>
+        <v-btn v-if="update&&newEvent.type==0&&showLog" text  class="button-logtime mr-2" style="float:right!important; width: 60px" @click="updatelog(1)"> <span >{{$t('timesheet.log')}}</span> </v-btn>
     </div>
 
 </v-card>
@@ -468,8 +446,12 @@ export default {
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
-            this.task = val.task?val.task:getIdTask(val.task);
-            this.items.push({name:val.task});
+            debugger
+            // this.task = val.task?val.task:getIdTask(val.task);
+            this.task = val.task?val.task:"";
+            if(val.task){
+                this.items.push({name:val.task});
+            }
             // hiển thị nút plan và log theo từng giờ
             let now = this.$moment();
             let dateLog = this.$moment(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
@@ -702,7 +684,7 @@ export default {
                             title:" Thêm thành công",
                         });
                         this.refreshAll();
-                        this.$emit('loadMonthView')
+                        this.$emit('loadMonthView',data)
                     }else{
                         self.$snotify({
                             type: "error",

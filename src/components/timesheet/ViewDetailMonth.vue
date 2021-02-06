@@ -7,12 +7,12 @@
             <v-col>{{detail[0].date}}</v-col>
             <v-col style="margin-right:-75px; width: 42px;color:orange">
                 <!-- test -->
-                <v-dialog v-model="dialog" width="357" class="log-time-form">
-                    <template v-slot:activator="{on}">
-                       <button v-on="on" style="color: orange">Submit </button>
-                    </template>
-                    <SubmitTimesheetForm @cancel="cancel()"></SubmitTimesheetForm>
-                </v-dialog>
+                <!-- <v-dialog v-model="dialog" width="357" class="log-time-form">
+                    <template v-slot:activator="{on}"> -->
+                       <button @click="close()" style="color: orange">Close </button>
+                    <!-- </template> -->
+                    <!-- <SubmitTimesheetForm @cancel="cancel()"></SubmitTimesheetForm> -->
+                <!-- </v-dialog> -->
                 <!-- test -->
             </v-col>
         </v-row>
@@ -63,6 +63,9 @@ import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetFor
         // this.detailTest.sort((a,b) => a.start - b.start)
     },
     methods:{
+        close(){
+            this.$emit('close')
+        },
          changeDuration(duration) {
             let hour = duration / 60;
             let minutes = duration % 60;

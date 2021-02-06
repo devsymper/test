@@ -90,7 +90,9 @@ export default {
     },
     listDoc:{
         type: Array,
-        default:[]
+        default:function(){
+            return []
+        }
     }
 
       
