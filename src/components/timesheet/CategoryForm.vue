@@ -10,7 +10,7 @@
         <v-btn @click="showNewCate()" x-small text class="fs-13 btn" :style="{background:bgNewCate}">
             Tạo mới
         </v-btn>
-         <v-btn @click="showDocCate()" x-small text class="fs-13 btn" :style="{background:bgDocCate}">
+         <v-btn v-show="forBa" @click="showDocCate()" x-small text class="fs-13 btn" :style="{background:bgDocCate}">
             Loại công việc từ doc
         </v-btn>
     </div>
@@ -42,6 +42,7 @@ export default {
     data: () => ({
         typeCate:'normal',
         id:-1,
+        forBa:true,
         bgDocCate:'',
         bgNewCate:'lightgrey'
     }),

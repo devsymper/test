@@ -12,6 +12,7 @@
     </v-row>
     <v-dialog v-model="logtimeDialog" width="357" @click:outside="deleteLog()">
         <LogTimeForm v-show="showTask==false"
+            ref="logtime"
             :dateStartEnd ="dateStartEnd"
             @showTaskForm="showTaskForm"
             @showCategoryForm="showCategoryForm"
@@ -30,7 +31,12 @@
             :onCancel="onCancelSave">
         </LogTimeForm>
          <TaskForm @loadTask="loadTask()" v-show="showTask&&showCategory==false" @cancel="cancelTaskForm()"/>
-         <CategoryForm @updateList="updateAPICategory()" v-show="showCategory" @cancel="cancelCateForm()"/>
+         <CategoryForm
+            ref="cate"
+            :isAddView="true"
+            @updateList="updateAPICategory()"
+            v-show="showCategory" 
+            @cancel="cancelCateForm()"/>
     </v-dialog>
      <!-- test -->
       <v-dialog
@@ -170,6 +176,7 @@ export default {
             this.showTask=false;
             this.showCategory=false;
             this.cancelCate != this.cancelCate;
+            this.$refs.logtime.getCategory()
         },
         showTaskForm(value){
             this.eventLog = value;
@@ -178,9 +185,10 @@ export default {
         },
          showCategoryForm(value){
             this.eventLog = value;
+            this.$refs.cate.forBa = false;
+            this.$refs.cate.typeCate = 'normal';
             this.showCategory=true;
             this.showTask =true;
-          
         },
         getNow: function() {
             let current = this.$moment().format('HH:mm');
