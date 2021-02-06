@@ -9,9 +9,12 @@ export default {
     getListUser({ page, pageSize }) {
         return userApi.get("users?page=" + page + "&pageSize=" + pageSize, { page, pageSize });
     },
+    getPreLog(data){
+        return userApi.get('pre-log',data)
+    },
     // lấy danh sách Log time
-    getLogTimeList() {
-        return api.get('log-time');
+    getLogTimeList(dateStartEnd) {
+        return api.get('log-time',dateStartEnd);
     },
     getAllUserLogTimeList() {
         return api.get('manage-timesheet');
@@ -55,6 +58,9 @@ export default {
             desc,
             categoryTask,
         })
+    },
+    createListLog(data){
+        return api.post('list-log-time', data);
     },
     deleteLogTime({ id }) {
         return api.put('log-time-delete' + '/' + id, { id })

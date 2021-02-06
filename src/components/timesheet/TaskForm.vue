@@ -146,7 +146,6 @@ export default {
     mounted() {
         const self = this;
         this.taskFormWorker.addEventListener("message", function (event) {
-            debugger
 			let data = event.data;
             switch (data.action) {
                 case 'getCategory':
@@ -162,7 +161,6 @@ export default {
     },
     methods: {
         checkCreateTask(check){
-            debugger
              if (check) {
                 this.$emit('loadTask');
                 this.cancel();

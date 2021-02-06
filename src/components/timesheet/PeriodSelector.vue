@@ -51,7 +51,10 @@ const dayjsTypeMapper = {
 
 export default {
     methods: {
-         getSubDepartmentUser(){
+        getPreLog(){
+
+        },
+        getSubDepartmentUser(){
             const self = this;
             orgchartApi.getSubDepartMent().then(res=>{
                 if(res.status=200){
@@ -107,6 +110,7 @@ export default {
             }
         },
         next() {
+            this.getPrelog();
             this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(this.showDate).add(1, dayjsTypeMapper[this.type]).format('YYYY-MM-DD'));
             if (this.type === 'month') {
                 this.$store.commit('timesheet/adjustCalendar', this.$store.state.timesheet.calendarAdjustment + 1);
@@ -175,6 +179,9 @@ export default {
             this.$emit('load-logtime', userId)
           
         },
+        startDate(){
+            let startDate = this.startDate
+        }
     }
 }
 </script>

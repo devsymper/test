@@ -16,7 +16,6 @@ self.onmessage = async function (event) {
 };
 
 export const showTotalHourInReportView = async function(data) {
-    debugger
     let listUser = data.data.listUser;
     let sum = 0;
     let dataTable = [];

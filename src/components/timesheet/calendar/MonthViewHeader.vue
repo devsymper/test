@@ -1,5 +1,5 @@
 <template>
-   <div :class="[monthEvents[date]? 'dark-sea-green' :'grey-color']" 
+   <div :class="[getColorHeader(monthEvents[date],hoursRequired)]" 
         style="height: 25px; margin-left:3px;">
         <v-tooltip top>
             <template v-slot:activator="{ on }">
@@ -16,14 +16,15 @@
                     </div>
                 </div>
             </template>
-            <span v-if="monthEvents[date]">New</span>
-            <span v-else> Nothing</span>
+            <span v-if="getColorHeader(monthEvents[date],hoursRequired)=='grey-color'">New</span>
+            <span v-if="getColorHeader(monthEvents[date],hoursRequired)=='light-red-color'">Overload</span>
+            <span v-if="getColorHeader(monthEvents[date],hoursRequired)=='light-green-color'">Fullload</span>
+            <span v-if="getColorHeader(monthEvents[date],hoursRequired)=='light-yellow-color'">Underload</span>
         </v-tooltip>
             <!-- màn hình month - thanh trạng thái -->
         <div v-if="monthEvents[date]" class="month-status">
-            <div :style="{'width': monthEvents[date]
-            ? (((monthEvents[date].reduce((acc, d) => +d.duration + acc, 0) / 60) / hoursRequired) * 100) + '%'
-            : '0%'}" class="green-color" style="height: 3px; border:1px">
+            <div :style="{'width': getWidthMonth(monthEvents[date])}" 
+                :class="getColorStatus(monthEvents[date],hoursRequired)" style="height: 3px; border:1px">
             </div>
         </div>
     </div>
@@ -59,6 +60,45 @@ export default {
       },
   },
   methods: {
+      getWidthMonth(event){
+          let width = '0%';
+          if(event){
+              width =((event.reduce((acc, d) => +d.duration + acc, 0) / 60) / this.hoursRequired)* 100
+          }
+          return width;
+      },
+      getColorStatus(date,hoursRequired){
+            let color = 'grey-color';
+            let hour = hoursRequired.trim()
+            if(date){
+                let totalHour =  date.reduce((acc, d) => +d.duration + acc, 0);
+                if(totalHour>hour*60){
+                    color = "dark-red-color"
+                }else if(totalHour==hour*60){
+                    color = "green"
+                }
+                else{
+                    color = "dark-yellow-color"
+                }
+            }
+            return color
+        },
+      getColorHeader(date,hoursRequired){
+            let color = 'grey-color';
+            let hour = hoursRequired.trim()
+            if(date){
+                let totalHour =  date.reduce((acc, d) => +d.duration + acc, 0);
+                if(totalHour>hour*60){
+                    color = "light-red-color"
+                }else if(totalHour==hour*60){
+                    color = "light-green-color"
+                }
+                else{
+                    color = "light-yellow-color"
+                }
+            }
+            return color
+        },
      changeDuration(duration) {
             let hour = duration / 60;
             let minutes = duration % 60;
@@ -88,7 +128,8 @@ export default {
     background-color: #8FBC8F
 }
 .month-status{
-    background-color:#90EE90; 
+    /* background-color:#90EE90;  */
+    background-color:#DCDCDC; 
     width: 90%; 
     height: 3px; 
     border:1px;

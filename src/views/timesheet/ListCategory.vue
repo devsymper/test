@@ -53,7 +53,7 @@ export default {
             updateCategory:{},
             showAddCategory:false,
             customAPIResult: {
-                  reformatData(res){
+                reformatData(res){
                     let data={
                         listObject:[],
                         columns:[]
@@ -80,11 +80,11 @@ export default {
                             title:'table.description',
                             type:"text"
                         },
-                        // {
-                        //     name:'user_created',
-                        //     title:'table.user_created',
-                        //     type:"text"
-                        // },
+                        {
+                            name:'userCreate',
+                            title:'table.user_created',
+                            type:"text"
+                        },
                         {
                             name:'createAt',
                             title:'table.date_created',
@@ -95,11 +95,11 @@ export default {
                         //     title:'table.status',
                         //     type:"numeric"
                         // },
-                        // {
-                        //     name:'user_updated',
-                        //     title:'table.user_updated',
-                        //     type:"text"
-                        // },
+                        {
+                            name:'userUpdate',
+                            title:'table.user_updated',
+                            type:"text"
+                        },
                         {
                             name:'updateAt',
                             title:'table.date_updated',
@@ -107,8 +107,19 @@ export default {
                         },
                       
                    );
+                    let listUser = self.$store.state.app.allUsers;
+                    data.listObject.map(d=>{
+                        listUser.map(user=>{
+                            if(d.userCreate==user.id){
+                                d.userCreate=user.displayName
+                             }
+                              if(d.userUpdate==user.id){
+                                d.userUpdate=user.displayName
+                             }
+                        })
+                    })
                     return  data;
-                } 
+                }
             },
              tableContextMenu:{
                 // view: {
@@ -156,13 +167,24 @@ export default {
             })
         },
         deleteOne(cate){
-            this.$refs.category.id = cate.id;
-            this.$refs.category.key= cate.key;
-            this.$refs.category.keyDoc= cate.key;
-            this.$refs.category.name= cate.name;
-            this.$refs.category.description= cate.description;
-            this.$refs.category.status= 0;
-            this.$refs.category.updateAPI();
+            let data = {id: cate.id};
+            const self = this;
+            timesheetApi.deleteCategory(data).then(res=>{
+                if(res.status==200){
+                        self.$snotify({
+                        type: "success",
+                        title:" Xóa thành công",
+                    });
+                    self.$refs.listCategory.refreshList();
+                }else{
+                     self.$snotify({
+                        type: "error",
+                        title: "Xóa thất bại",
+                    });
+                }
+            }
+        )
+            
         },
         delete(category){
             category.map(cate=>{
@@ -171,12 +193,21 @@ export default {
             )
         },
         update(category){
-             this.showPanel = true;
+            this.showPanel = true;
             this.isAddView = false;
-            this.$refs.category.key = category.key;
-            this.$refs.category.name = category.name;
-            this.$refs.category.description = category.description;
             this.$refs.category.id = category.id;
+            if(category.type==0){
+                this.$refs.category.typeCate="normal";
+                this.$refs.category.$refs.normal.key = category.key;
+                this.$refs.category.$refs.normal.name = category.name;
+                this.$refs.category.$refs.normal.description = category.description;
+            }else{
+                this.$refs.category.typeCate="doc";
+                this.$refs.category.$refs.doc.key = category.key;
+                this.$refs.category.$refs.doc.name = category.name;
+                this.$refs.category.$refs.doc.description = category.description;
+            }
+          
         },
         addCategory(){
             this.showPanel = true;
@@ -190,6 +221,7 @@ export default {
         },
         cancel(){
             this.$refs.category.refreshAll();
+            this.$refs.listCategory.refreshList();
             this.showPanel = false
         }
     }

@@ -11,7 +11,7 @@ self.onmessage = async function (event) {
             postMessage({action:'copyLogTime', dataAfter: isSuccessCopy})
             break;
         case 'getLogTimeList':
-            let logTime = await getLogTimeList();
+            let logTime = await getLogTimeList(data);
             postMessage({action:'getLogTimeList', dataAfter: logTime})
             break;
         case 'resizeLogtime':
@@ -66,8 +66,8 @@ export const resizeLogtime = async function(events) {
     })
     return newTasks
 }
-export const getLogTimeList = async function(){
-    let res = await  timesheetApi.getLogTimeList();
+export const getLogTimeList = async function(dateStartEnd){
+    let res = await timesheetApi.getLogTimeList(dateStartEnd);
     let data = {
         sumLogTime: 0,
         hoursRequired: 0,
@@ -96,7 +96,6 @@ export const getLogTimeList = async function(){
     return data
 }
 export const changeDuration = async function(duration){
-    debugger
     let hour = duration / 60;
     let minutes = duration % 60;
     if (Math.floor(hour) > 0) {

@@ -44,10 +44,7 @@ import ActionButtons from "./../../components/timesheet/ActionButtons";
 import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetForm";
 import timesheetApi from '../../api/timesheet';
 import ReportTimesheetWorker from 'worker-loader!@/worker/timesheet/ReportTimesheet.Worker.js';
-
 import _groupBy from 'lodash/groupBy';
-import dayjs from 'dayjs';
-
 export default {
     components: {
         AgDataTable,

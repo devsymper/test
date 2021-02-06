@@ -5,7 +5,8 @@
         <v-calendar ref="calendar"  
             :weekdays="weekday" 
             :type="internalCalendarType" 
-            v-model="calendar" 
+            v-model="calendar"
+            :end="endDate"
             :events="events" 
             :color="color" 
             @mousedown:event="startDrag" 
@@ -50,63 +51,65 @@
                             v-on="detailEvents"
                             class="d-flex flex-column h-100">
                             <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
-                            <div class="d-flex flex-row pl-2" style="padding-top:2px">
-                                <div class="fm text-ellipsis" :style="{'width':(findDuration(event.start, event.end)>62)?'70%':'75%','margin-top':(findDuration(event.start, event.end)>62)?'':'-4px!important'}">
-                                    <span v-if="findDuration(event.start, event.end)<62">
-                                         <i :class="[event.type==0?'mdi mdi-calendar color-blue':'mdi mdi-check-all color-green']" class="fs-15"></i>
-                                    </span>
-                                    <b style="color:#303030" class="fs-12 fw-430">{{event.name}}</b>
+                                <div class="d-flex flex-row pl-2" style="padding-top:2px">
+                                    <div class="fm text-ellipsis" 
+                                        :style="{'width':(findDuration(event.start, event.end)>62)?'70%':'75%','margin-top':(findDuration(event.start, event.end)>62)?'':'-4px!important'}">
+                                        <span v-if="findDuration(event.start, event.end)<62">
+                                            <i :class="[event.type==0?'mdi mdi-calendar color-blue':'mdi mdi-check-all color-green']" class="fs-15"></i>
+                                        </span>
+                                        <b style="color:#303030" class="fs-12 fw-430">{{event.name}}</b>
+                                    </div>
+                                    <div style="margin-top:-8px;important;float:right">
+                                        <v-menu 
+                                            open-on-focus 
+                                            open-on-hover bottom left
+                                            nudge-left='5' 
+                                            nudge-top='-10'>
+                                            <template v-slot:activator="{on:actionEvents }" >
+                                                <span class="fs-12 fw-400" 
+                                                    v-if="findDuration(event.start, event.end)<62"
+                                                    v-on="actionEvents" style="margin-right:-20px">
+                                                    {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
+                                                </span>
+                                                <v-btn class="ml-1" dense dark v-on="actionEvents" :icon="true">
+                                                    <v-icon v-if="event.type"
+                                                        small class="ml-4 color-black" 
+                                                        :style="{'margin-right':(findDuration(event.start, event.end)>62)?'':':25px'}" > mdi-dots-vertical</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <div class="d-flex flex-column" style="background:white">
+                                                <v-btn v-for="action in actionLog" text small :key='action.id' @click="actionLogEvent(event,action.id)">{{$t(action.name)}}</v-btn>
+                                            </div>
+                                        </v-menu>
+                                    </div>
                                 </div>
-                                <div style="margin-top:-8px; background:white!important">
-                                    <v-menu 
-                                        open-on-focus 
-                                        open-on-hover bottom left
-                                        nudge-left='5' 
-                                        nudge-top='-10'>
-                                        <template v-slot:activator="{on:actionEvents, attrs:actionAttrs }" >
-                                            <span class="fs-12 fw-400" 
-                                                v-if="findDuration(event.start, event.end)<62"
-                                                v-on="actionEvents" style="margin-right:-20px">
-                                                {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
-                                            </span>
-                                            <v-btn class="ml-1" dense dark v-on="actionEvents" :icon="actionAttrs">
-                                                <v-icon v-if="event.type"
-                                                    small class="ml-4 color-black" 
-                                                    :style="{'margin-right':(findDuration(event.start, event.end)>62)?'':':25px'}" > mdi-dots-vertical</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <div class="d-flex flex-column" style="background:white">
-                                            <v-btn v-for="action in actionLog" text small :key='action.id' @click="actionLogEvent(event,action.id)">{{$t(action.name)}}</v-btn>
-                                        </div>
-                                    </v-menu>
+                                <div v-if="findDuration(event.start, event.end)>105" style="height:30px" class="fs-12 text-ellipsis pl-2 color-grey">
+                                    {{event.desc ? event.desc: "" }}
                                 </div>
-                            </div>
-                            <div v-if="findDuration(event.start, event.end)>105" style="height:30px" class="fs-12 text-ellipsis pl-2 color-grey">
-                                {{event.desc ? event.desc: "" }}
-                            </div>
-                            <v-spacer />
-                            <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center">
-                                <div>
-                                    <span v-if="findDuration(event.start, event.end)>70">
-                                        <i :class="[event.type==0?'mdi mdi-calendar color-blue':'mdi mdi-check-all color-green']" class="fs-15"></i>
-                                    </span>
-                                    <span class= "fs-12 text-ellipsis color-grey" v-if="findDuration(event.start, event.end)>70"> 
-                                        {{event.category_key}}
-                                    </span>
-                                </div>
+                                <v-spacer />
+                                <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center">
+                                    <div>
+                                        <span v-if="findDuration(event.start, event.end)>70">
+                                            <i :class="[event.type==0?'mdi mdi-calendar':'mdi mdi-check-all color-green']" class="fs-15"></i>12123123
+                                        </span>
+                                        <span class= "fs-12 text-ellipsis color-grey" style="margin-left:-50px" v-if="findDuration(event.start, event.end)>70"> 
+                                            {{event.category_key}}
+                                        </span>
+                                    </div>
                                     <div v-if="findDuration(event.start, event.end)>61" 
                                         class="d-flex flex-row-reverse color-black">
-                                       <span class="fs-11">
-                                           {{getDuration(eventParsed.input.start,eventParsed.input.end )}}</span>
+                                        <span class="fs-11">
+                                        {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
+                                        </span>
                                     </div>
+                                </div>
                             </div>
+                            <div v-if="timed" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
+                            </div>
+                        </template>
+                        <div>
+                            <LogTimeView :event="event" />
                         </div>
-                        <div v-if="timed" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
-                        </div>
-                    </template>
-                    <div>
-                        <LogTimeView :event="event" />
-                    </div>
                 </v-menu>
             </template>
              <!-- màn hình week/day/weekday - header -->
@@ -151,6 +154,7 @@ export default {
     props: ['timeView','userId'],
     data() {
         return {
+            endDate:'',
             calendar: '',// value calendar
             ready: false,
             color:'orange',
@@ -314,14 +318,17 @@ export default {
         },
         // lấy ra danh sách Log time
         load() {
+            let data = {
+                start:this.$refs.calendar.lastStart.date,
+                end:this.$refs.calendar.lastEnd.date
+            }
+            this.$emit('dateStartEnd',data);
              this.logFormWorker.postMessage({
                 action:'getLogTimeList',
+                data:data
             })
         },
         // hàm có sẵn trong thư viện Calendar của Vue
-        pre() {
-            return this.$refs.calendar.prev();
-        },
         startDrag({event, timed}) {
             if (event && timed) {
                 this.dragEvent = event
@@ -660,6 +667,7 @@ export default {
 }
 .v-event-draggable {
     padding-left: 6px;
+    color:black
 }
 .v-event-drag-bottom {
     height:10px;

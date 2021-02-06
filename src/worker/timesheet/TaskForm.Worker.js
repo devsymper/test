@@ -11,7 +11,6 @@ self.onmessage = async function (event) {
             postMessage({action:'getCategory', dataAfter: listCategory})
             break;
         case 'createTask':
-            debugger
             let isSuccess = await createTask(data);
             postMessage({action:'createTask', dataAfter: isSuccess})
             break;
@@ -35,7 +34,6 @@ export const getCategory = async function() {
 }
 
 export const createTask = async function(data) {
-    debugger
     let check = false;
     let res = await timesheetApi.createTask(data);
     if(res.status ==200){
