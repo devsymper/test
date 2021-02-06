@@ -107,7 +107,6 @@ export default {
         }
     },
     checkValidate(){
-        debugger
         let check = false;
         if(this.name==''){
             this.nameError = this.$t('timesheet.required_value'); 

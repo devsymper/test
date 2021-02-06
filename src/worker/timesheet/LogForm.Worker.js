@@ -19,7 +19,6 @@ self.onmessage = async function (event) {
             postMessage({action:'resizeLogtime', dataAfter: task})
             break;
         case 'changeDuration':
-            debugger
             let duration = await changeDuration(data);
             postMessage({action:'changeDuration', dataAfter: duration})
             break;

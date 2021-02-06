@@ -469,6 +469,7 @@ export default {
             this.$refs.calendar.$el.querySelectorAll('.v-calendar-daily__day-interval').forEach(div => {
                 if (self.timeView) {
                     div.setAttribute('style', div.getAttribute('style').replace('border-top: none; border-bottom: none', ''));
+                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: block');
                 } else {
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: none');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: none');
