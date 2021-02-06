@@ -87,7 +87,10 @@ export default {
            return this.selectedCol.type == 'date'
         },
         handleChangeFilterValue(cellId){
-            // SDashboardEditor.applyFilterFromCell(cellId);
+            this.$evtBus.$emit('bi-report-change-display', {
+				id: cellId,
+				type: 'filter'
+			});
 		},
 		handleChangeQuery(data){
             this.cellConfigs.sharedConfigs.queryKey = data.query

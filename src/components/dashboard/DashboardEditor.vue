@@ -174,6 +174,7 @@ export default {
         setRestoredDashboardConfigs(data){
             this.setDashboardStyle(data.allCellConfigs.global.rawConfigs.style);
             this.changeSelectedDatasets(data.relateDatasetIds);
+            this.$refs.dashboardWorkspace.initCrossFilterMng(data.dashboardInfo.relations);
             this.$set(
                 this.myData.dashboardConfigs,
                 'allCellConfigs',

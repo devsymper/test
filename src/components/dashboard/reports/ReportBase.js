@@ -1,5 +1,6 @@
 import { getStyleItems } from "@/components/dashboard/configPool/reportStyleItems.js";
 import { getColumnConfigItems } from "@/components/dashboard/configPool/reportColumnSettingItems.js";
+import { getUsedDatasetsFromSetting } from "@/components/dashboard/configPool/reportConfig.js";
 
 var commonStyleAttrItems = {
     general: {
@@ -50,7 +51,9 @@ export default class ReportBase {
         cellId: "", // id đánh tự động của report
         data: [], // dữ liệu thô được lấy từ server
         type: "", // loại report
-        yAxisCount: 1, // số lượng yAxis được sử dụng
+        yAxisCount: 1, // số lượng yAxis được sử dụng,
+        filter: {},
+        crossFilterCond: ''
     };
  
     viewConfigs = { // cấu hình phục vụ cho việc hiển thị
@@ -170,6 +173,7 @@ export default class ReportBase {
         this.restoreSetting(cell);
         this.restoreStyle(cell);
         this.rawConfigs.extra = cell.extra ? JSON.parse(cell.extra) : {};
+        this.sharedConfigs.usedDatasets = getUsedDatasetsFromSetting(this.rawConfigs.setting);
     }
 
     /**

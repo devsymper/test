@@ -50,3 +50,14 @@ export const autoLoadChartClasses = function () {
         return loadedClasses;
     }
 }
+
+
+export const getUsedDatasetsFromSetting = function(setting){
+    let rsl = {};
+    for(let key in setting){
+        for(let col of setting[key].selectedColums){
+            rsl[col.dataset] = true;
+        }
+    }
+    return rsl;
+}

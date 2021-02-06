@@ -142,6 +142,9 @@ import _isEmpty from "lodash/isEmpty";
 import Sortable from "sortablejs";
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
 import { calcTitleCellHeight } from "@/components/dashboard/configPool/dashboardConfigs.js";
+import CrossFilterManagement from "@/components/dashboard/components/filter/CrossFilterManagement.js";
+import { getUsedDatasetsFromSetting } from "@/components/dashboard/configPool/reportConfig.js";
+
 var mapTypeToClasses = autoLoadChartClasses();
 
 export default {
@@ -151,7 +154,11 @@ export default {
         this.reportTranslatorWorker = new ReportTranslatorWorker();
         this.listenFromWorker(this.reportTranslatorWorker);
         this.$evtBus.$on('bi-report-change-display', (data) => {
-            self.translateReportConfig(data.id, data.type);
+            if(data.type == 'filter'){
+                self.applyFilterFromCell(data.id);      
+            }else{
+                self.translateReportConfig(data.id, data.type);
+            }
         });
     },
     components: {
@@ -162,6 +169,8 @@ export default {
     },
     data(){
         return {
+            filter: {},
+            crossFilterMng: {},
             workspaceHeight:'',
             invalidTabName: false,
             showTabOptions: false,
@@ -193,6 +202,230 @@ export default {
         }
     },
     methods: {
+        /**
+         * khởi tạo instance của Cross filter
+         */
+        initCrossFilterMng(idRelations){
+            this.crossFilterMng = new CrossFilterManagement(idRelations);
+        },
+        translateSliderFilter(data,settingCol){
+            let cols = [];
+            let opertators = ['greaterthanorequal','lessthanorequal'];
+            for(let i in opertators){
+                cols.push({
+                    "as":settingCol.as,
+                    "agg":"not_agg",
+                    "cond":{
+                        "val": data.value[i],
+                        "type":opertators[i]
+                    },
+                    "name":settingCol.name,
+                    "type":settingCol.type,
+                    "dataset":settingCol.dataset,
+                    "validValue":true
+                });
+            }
+            return cols;
+        },
+        /**
+         * Chuyển đổi cấu hình của filter sang dạng giống với condition
+         * @param {Object} cellFilter Đối tượng cấu hình của một cell
+         */
+        translateFilterCondition(cellFilter){
+            let cellView = cellFilter.viewConfigs;
+            let settingCol = cellFilter.rawConfigs.setting.value.selectedColums[0];
+            let selectionMode = cellFilter.rawConfigs.style.selectionControl.children.selectionMode.value;
+
+            if(selectionMode == 'default' && (settingCol.type == 'number' || settingCol.type == 'date')){
+                return this.translateSliderFilter(cellView.displayOptions.data,settingCol);
+            }
+            let disSelectArr = Object.keys(cellView.disSelectedValues);
+            let selectArr = Object.keys(cellView.selectedValues);
+
+            
+
+            if(selectArr.length == 0  ){
+                return false;
+            }
+            let cond = {
+                        "val":'',
+                        "type":''
+                    };
+            let column = {
+                    "as":settingCol.as,
+                    "agg":"not_agg",
+                    "cond":cond,
+                    "name":settingCol.name,
+                    "type":settingCol.type,
+                    "dataset":settingCol.dataset,
+                    "validValue":true
+                };
+
+            if(cellView.clickedAll){
+                if(cellView.selectedAll){
+                    cond.type = 'isall';
+                }else{
+                    cond.type = 'notin';
+                    cond.val = disSelectArr.join(',');
+                }
+            }else{
+                cond.type = 'in';
+                cond.val = selectArr.join(',');
+            }
+            
+            return [column];
+        },
+        getImpactedVars(impactedDatasets){
+            let rsl = {};
+            // let vars = this.dashboardConfigs.info.variables;
+            // for(let name in vars){
+            //     let item = vars[name];
+            //     if(impactedDatasets[item.dataset]){
+            //         rsl[name] = item;
+            //     }
+            // }
+            return rsl;
+        },
+        getUsingDatasetAndColumns(){
+            return this.thisDashboardData.allDatasetColumns;
+        },
+        /**
+         * đánh dấu cho các report bị ảnh hưởng bởi variable thì không ngay nữa, đợi khi có được giá trị của variable thì mới chạy report đó
+         * và gọi api để lấy data cho các variable
+         */
+        processVariablesWhenFilterChange(impactedDatasets){
+            let getImpactedVars = this.getImpactedVars(impactedDatasets);
+            let allCells = this.dashboardConfigs.allCellConfigs;
+            for(let name in getImpactedVars){
+                let item = getImpactedVars[name];
+                for(let rpId of item.impactedReportsIds){
+                    allCells[rpId].sharedConfigs.suspendedGetData = true;
+                    this.getValueForVar(item, impactedDatasets);
+                }
+            }
+        },
+        getImpactedCrossFilter(selectedDataset, impactedDatasets){
+            for(let dtsId in selectedDataset){
+                if(impactedDatasets.hasOwnProperty(dtsId)){
+                    return impactedDatasets[dtsId];
+                }
+            }
+            return false;
+        },
+        async getValueForVar(variable, impactedDatasets = null){            
+            let crossFilterCond = '';
+            let self = this;
+            let selectedDataset = {};
+            selectedDataset[variable.dataset] = {};
+            selectedDataset[variable.dataset][variable.name] = true;
+            if(impactedDatasets){
+                let impactedCrossFilter = this.getImpactedCrossFilter(selectedDataset, impactedDatasets)
+                if(impactedCrossFilter){
+                    crossFilterCond = impactedCrossFilter.dtsConds.join(' AND ');
+                }
+            }
+            let configs = {
+                cellId: variable.name,
+                columns: {
+                    value: [
+                        {
+                            agg: variable.agg,
+                            as: variable.name,
+                            cond: {val: "", type: "isall"},
+                            dataset: variable.dataset,
+                            name: variable.name,
+                            origin_type: 'text',
+                            type: "text"
+                        }
+                    ]
+                },
+                condition: [],
+                crossFilterCond: crossFilterCond,
+                dashboardId: 0,
+                filter: [],
+                needTotal: false,
+                relations: Object.keys(this.dashboardConfigs.info.datasets),
+                reportName: `Variable ${variable.name}`,
+                reportType: "variable"
+            };
+
+            // reportDataGet.getData(configs).then((res) => {
+            //     let varDef = this.dashboardConfigs.info.variables[res.data.cellId];
+            //     let varName = varDef.name;
+            //     let val = res.data[0][varName];
+
+            //     for(let reportId in varDef.impactedReportsIds){
+            //         // self
+            //     }
+            // });
+        },
+        getActivedCellIds(){
+            let layout = this.currentLayout;
+            let rsl = [];
+            for(let cellLayout of layout){
+                if(cellLayout.active){
+                    rsl.push(cellLayout.i);
+                }
+            }
+            return rsl;
+        },
+
+        applyFilterFromCell(filterId){
+
+            let allCells = this.thisDashboardData.dashboardConfigs.allCellConfigs;
+            let cellFilter = allCells[filterId];
+            this.filter[filterId] = this.translateFilterCondition(cellFilter);
+            let allDatasetAndColumn = this.getUsingDatasetAndColumns();
+
+            let datasetId = cellFilter.rawConfigs.setting.value.selectedColums[0].dataset;
+            let impactedDatasets = this.crossFilterMng.makeConditionForAllDataset(datasetId);
+            // this.processVariablesWhenFilterChange(impactedDatasets);
+            let parentDatasetId = allDatasetAndColumn[datasetId].id_parent;
+            let childDatasetId = {};
+
+            for(let dtsId in allDatasetAndColumn){
+                if(allDatasetAndColumn[dtsId].id_parent == datasetId ){
+                    childDatasetId[dtsId] = true;
+                } 
+            }
+            let activedCellIds = this.getActivedCellIds();
+            for(let cellId of activedCellIds){
+                let runCell = allCells[cellId];
+                let sharedConfigs = runCell.sharedConfigs;
+                let usedDts = sharedConfigs.usedDatasets;
+
+                let isChildDataset = false;
+                for(let subDtsId in childDatasetId){
+                    if(usedDts.hasOwnProperty(subDtsId)){
+                        isChildDataset  = true;
+                        break;
+                    }
+                }
+
+                let reportType = runCell.sharedConfigs.type;
+                let impactedCrossFilter = this.getImpactedCrossFilter(usedDts, impactedDatasets)
+                if((
+                        usedDts.hasOwnProperty(datasetId) || 
+                        usedDts.hasOwnProperty(parentDatasetId) || 
+                        isChildDataset ||
+                        impactedCrossFilter
+                    ) && 
+                    runCell.sharedConfigs.type != 'filter'
+                ){
+                    sharedConfigs.filter[filterId] = this.filter[filterId];
+                    if(sharedConfigs.filter[filterId] && impactedCrossFilter){
+                        sharedConfigs.crossFilterCond = impactedCrossFilter.dtsConds.join(' AND ');
+                    }else{
+                        sharedConfigs.crossFilterCond = undefined;
+                    }
+
+                    if(!this.filter[filterId]){
+                        delete sharedConfigs.filter[filterId];
+                    }
+                    this.translateReportConfig(cellId);
+                }
+            }
+        },
         setDashboardSize(dashboardSize){
             let sizeMode = dashboardSize.dashboardSizeMode.value;
             if(sizeMode == 'realSize'){
@@ -345,13 +578,16 @@ export default {
             return canTranslate;
         },
         translateReportConfig(cellId, changeType = 'data'){
+            let cell = this.dashboardConfig.allCellConfigs[cellId];
             // các loại change data hợp lệ
             let validChangeType = {
                 data: true, // khi thay đổi ảnh hưởng tới dữ liệu cuẩ report
 				style: true, // khi thay đổi cấu hình style của report (ko ảnh hưởng tới dữ liệu)
 				autocomplete: true // khi gõ trong filter của droplist để lấy danh sách các item cần thiết
             };
-            let cell = this.dashboardConfig.allCellConfigs[cellId];
+            if(changeType == 'data'){
+                cell.sharedConfigs.usedDatasets = getUsedDatasetsFromSetting(cell.rawConfigs.setting);
+            }
             if(!validChangeType[changeType]){
                 console.error("Invalid change type!");
                 return;
