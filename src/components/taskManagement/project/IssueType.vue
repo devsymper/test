@@ -17,7 +17,7 @@
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
                     <v-btn v-if="checkRole('task_manager_issue_type','add')" small class="mx-1" solo depressed  @click="handleCreate">
-                        <span>Create Issue Type</span>
+                        <span>{{$t("taskManagement.createIssueType")}}</span>
                     </v-btn>
                 </v-card-title>
                 <v-data-table
@@ -96,7 +96,7 @@
         >
             <v-card>
             <v-card-title>
-                <span class="fs-16">Create issue type</span>
+                <span class="fs-16">{{$t("taskManagement.createIssueType")}}</span>
             </v-card-title>
             <v-card-text>
                 <v-container>
@@ -472,9 +472,9 @@ export default {
                 .then(res => {
                     if (res.status == 200) {
                         this.$emit("add-issuetype"); // emit sự kiện cho reload data
-                        this.$snotifySuccess("Remove category success!");
+                        this.$snotifySuccess("Remove Issue type successful!");
                     }else{
-                        this.$snotifyError("", "Error! Have error !!!");
+                        this.$snotifyError("", res.message);
                     }
                 })
                 .catch(err => {
@@ -631,6 +631,9 @@ export default {
 .name-object:hover{
     cursor: pointer;
     text-decoration: underline;
+}
+::v-deep .v-input__slot{
+    box-shadow: none !important;
 }
 
 </style>

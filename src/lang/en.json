@@ -1437,7 +1437,9 @@
             "removeVersion": "You will remove version from this list."
 
         },
-        "settingBoard":"Board setting"
+        "settingBoard":"Board setting",
+        "createIssue":"Create Issue",
+        "noDocumentConfig":"Create Issue"
 
 
 
