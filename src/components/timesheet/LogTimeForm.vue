@@ -533,7 +533,7 @@ export default {
         filterTaskByCategory(){
             if(this.categoryTask){
                 let categoryId = this.getIdCategory(this.categoryTask);
-                this.items = this.items.filter(x=>x.categoryId==categoryId);
+                this.items = this.items.filter(x=>x.categoryId==categoryId||x.categoryId==null);
             }
         },
          async getAllTask(nameTask){
@@ -697,8 +697,17 @@ export default {
                 timesheetApi.createLogTime(data).then(res => {
                     if (res.status === 200) {
                         this.onSave();
+                         this.$snotify({
+                            type: "success",
+                            title:" Thêm thành công",
+                        });
                         this.refreshAll();
                         this.$emit('loadMonthView')
+                    }else{
+                        self.$snotify({
+                            type: "error",
+                            title:"Thêm thất bại",
+                    });
                     }
                 }).catch();
                 if(!this.keepLog){
