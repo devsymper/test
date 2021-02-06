@@ -73,8 +73,7 @@
                                                 </span>
                                                 <v-btn class="ml-1" dense dark v-on="actionEvents" :icon="true">
                                                     <v-icon v-if="event.type"
-                                                        small class="ml-4 color-black" 
-                                                        :style="{'margin-right':(findDuration(event.start, event.end)>62)?'':':25px'}" > mdi-dots-vertical</v-icon>
+                                                        small class="color-black" :class="[findDuration(event.start, event.end)>62?'ml-7':'ml-4']" > mdi-dots-vertical</v-icon>
                                                 </v-btn>
                                             </template>
                                             <div class="d-flex flex-column" style="background:white">
