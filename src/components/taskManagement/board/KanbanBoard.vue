@@ -373,6 +373,7 @@ export default {
             data.optionStatus = this.filterProps.tmg_status_id.options;
             data.optionPriority = this.filterProps.tmg_priority_id.options;
             data.optionIssueType = this.filterProps.tmg_issue_type.options;
+            console.log(this.sTaskManagement,'datadatadatadata');
             this.kanbanWorker.postMessage({
                 action:'setDataForFilter',
                 data: data
@@ -614,6 +615,17 @@ export default {
        
     },
     created(){
+        this.projectId = this.$route.params.id;
+        if(this.sTaskManagement.listUserInProject[this.projectId]){
+            this.listUserShow = this.sTaskManagement.listUserInProject[this.projectId]
+        }
+        let breadcrumbs = [
+                {
+                    text: 'Kanban',
+                    disabled: true
+                },
+            ]
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
         let self = this;
         this.$evtBus.$on('task-manager-submit-issue-success', (issue) =>{
             self.checkUpdateTask(issue);
@@ -717,19 +729,6 @@ export default {
         this.loadData();
     },
     
-    activated(){
-        this.projectId = this.$route.params.id;
-        if(this.sTaskManagement.listUserInProject[this.$route.params.id]){
-            this.listUserShow = this.sTaskManagement.listUserInProject[this.$route.params.id]
-        }
-        let breadcrumbs = [
-                {
-                    text: 'Kanban',
-                    disabled: true
-                },
-            ]
-        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
-    }
 };
 </script>
 

@@ -47,14 +47,14 @@
                                 </v-list-item-icon>
                                 
                             </v-list-item>
-                            <div v-if="item.isWorkSpace && item.items.length > 0" class="sidebar-group-item" :style="{'padding' : (mini) ? '' : '1px 16px'}">
+                            <div v-if="item.isWorkSpace" class="sidebar-group-item" :style="{'padding' : (mini) ? '' : '1px 16px'}">
                                 <transition name="fade">
                                     <div class="title-workspace" v-if="!mini">{{ item.title }}</div>
                                 </transition>
                                 <v-list-item
                                     link
-                                    v-for="(menuItem,index) in item.items"
-                                    :key="index"
+                                    v-for="(menuItem,key1) in item.items"
+                                    :key="key1"
                                     @click="onClickItem(menuItem, $event)"
                                     :class="{'select-item':menuItem.type == 'select','task-sidebar-item':true,'item-active': menuItem.active}"
                                     >
@@ -198,18 +198,50 @@ export default {
         },
         "sTaskManagement.currentBoard":function(after){
             if(this.$route.meta.group == 'home'){
-                this.menu.workspace1.items[0].title = after.name
-                this.menu.workspace1.items[0].subTitle = after.description;
+                this.menu.workspaceHome.items.selectBoard.icon = (after.type == 'kanban') ? 'mdi-view-dashboard-variant-outline': 'mdi-chart-timeline';
+                this.menu.workspaceHome.items.selectBoard.title = after.name
+                this.menu.workspaceHome.items.selectBoard.subTitle = after.description;
                
             }
+        },
+        menu(newVL, oldVl){
+            // if(JSON.stringify(newVL) != JSON.stringify(oldVl))
+            // this.setActiveItem();
         }
         
     },
-    mounted(){
-        this.checkShowListMenu()
-    },
     
     methods: {
+        /**
+         * Khi load mới sidebar thì gắn active item mặc đinh
+         */
+        setActiveItem(){
+            if(this.oldSelected){
+                this.$set(this.oldSelected,'active',false);
+            }
+            let routeName = this.$route.name;
+            if(Object.keys(this.menu).length > 0){
+                for(let key in this.menu){
+                    if(this.menu[key].isWorkSpace){
+                        if(this.menu[key].items[routeName]){
+                            this.$set(this.menu[key].items[routeName],'active',true);
+                            this.oldSelected = this.menu[key].items[routeName];
+                            break;
+                        }
+                    }
+                    else{ 
+                        if(this.menu[routeName]){
+                            this.$set(this.menu[routeName],'active',true);
+                            this.oldSelected = this.menu[routeName];
+                            break;
+                        }
+                    }
+                }
+            }
+        },
+        /**
+         * Hàm xử lý hiển thị các item ở side bar tùy theo context
+         */
         checkShowListMenu(){
             this.menu = [];
             let currentMenu = this.userMenuItems[this.$route.meta.group];
@@ -218,94 +250,54 @@ export default {
                 this.menu = currentMenu;
             }
             else{
-                if (currentMenu.workspace1) {
-                    let listItemInWorkspace1 = currentMenu.workspace1.items;
+                if (currentMenu.workspaceHome) {
                     // check role show list component
                     if (!checkPermission('task_manager_components','list')) {
-                        let item = listItemInWorkspace1.find(data => data.name === 'component')
-                        var index = listItemInWorkspace1.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspace1.splice(index, 1);
-                        }
+                        delete currentMenu.workspaceHome.items.component;
                     }
                     // check role show list version
                     if (!checkPermission('task_manager_version','list')) {
-                        let item = listItemInWorkspace1.find(data => data.name === 'version')
-                        var index = listItemInWorkspace1.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspace1.splice(index, 1);
-                        }
+                        delete currentMenu.workspaceHome.items.version;
                     }
                 }
                 //check trong workspace 2
-                if (currentMenu.workspace2) {
-                    let listItemInWorkspace2 = currentMenu.workspace2.items;
+                if (currentMenu.workspaceReport) {
                         // check role show báo cáo
                     if (!checkPermission('task_manager_report_config','view')) {
-                        let item = listItemInWorkspace2.find(data => data.name === 'report')
-                        var index = listItemInWorkspace2.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspace2.splice(index, 1);
-                        }
+                        delete currentMenu.workspaceHome.items.report;
                     }
                 }
                 //check trong item 3
-                if (currentMenu.workspace3) {
-                    let listItemInWorkspace3 = currentMenu.workspace3.items;
+                if (currentMenu.workspaceSetting) {
                         // check role project setting
                     if (!checkPermission('task_manager_project_setting','config')) {
-                        let item = listItemInWorkspace3.find(data => data.name === 'projectSetting')
-                        var index = listItemInWorkspace3.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspace3.splice(index, 1);
-                        }
+                        delete currentMenu.workspaceSetting.items.projectSetting;
                     }
                 }
                 //check trong setting project
                 if (currentMenu.workspaceProject) {
-                    let listItemInWorkspaceProject = currentMenu.workspaceProject.items;
                         // check role show list access controls
                     if (!checkPermission('task_manager_access','list')) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "access")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
+                        delete currentMenu.workspaceProject.items.access;
                     }
 
                     // check role show list issue type
                     if (!checkPermission('task_manager_issue_type','list')) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "issueType")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
+                        delete currentMenu.workspaceProject.items.issueType;
                     }
 
                     // check role show list workflow
                     if (!checkPermission('task_manager_task_life_cycle','list')) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "workflow")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
+                        delete currentMenu.workspaceProject.items.workflow;
                     }
 
                     // check role show list issue link
                     if (!checkPermission('task_manager_issue_link','list')) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "issueLink")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
+                        delete currentMenu.workspaceProject.items.projectIssueLink;
                     }
                     // check role show list priority
                     if (!checkPermission('task_manager_priority','list')) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "priority")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
+                        delete currentMenu.workspaceProject.items.projectPriority;
                     }
                 }
                 this.menu = currentMenu;
@@ -313,9 +305,9 @@ export default {
             
         },
         afterSelectBoard(board){
-            this.menu.workspace1.items[0].icon = (board.type == 'kanban') ? 'mdi-view-dashboard-variant-outline': 'mdi-chart-timeline';
-            this.menu.workspace1.items[0].title = board.name
-            this.menu.workspace1.items[0].subTitle = board.description;
+            this.menu.workspaceHome.items.selectBoard.icon = (board.type == 'kanban') ? 'mdi-view-dashboard-variant-outline': 'mdi-chart-timeline';
+            this.menu.workspaceHome.items.selectBoard.title = board.name
+            this.menu.workspaceHome.items.selectBoard.subTitle = board.description;
             this.$store.commit("taskManagement/setCurrentBoard",board);
         },
         checkShowSideBar(){
@@ -335,6 +327,13 @@ export default {
             this.mini = !this.mini
         },
         onClickItem(item, event){
+            if(item.type != 'select'){
+                this.$set(item,'active',true);
+                if(this.oldSelected && this.oldSelected.name != item.name){
+                    this.$set(this.oldSelected,'active',false);
+                }
+                this.oldSelected = item;
+            }
             if(item.url){
                 let projectId= this.$route.params.id;
                 this.gotoLink(item.url,{id:projectId});
