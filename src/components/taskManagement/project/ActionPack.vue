@@ -23,7 +23,7 @@
                             append-icon="mdi-layers-search-outline"
                             placeholder="Tìm kiếm đối tượng"
                             dense
-                            solo
+                            outlined
                             style="max-width:255px;"
                             single-line
                             hide-details
