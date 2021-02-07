@@ -1,5 +1,6 @@
 <template>
     <TableBase
+    :instanceKey="instanceKey"
     :cellConfigs="cellConfigs"/>
 </template>
 
@@ -14,6 +15,9 @@ export default {
             default(){
                 return {}
             }
+        },
+        instanceKey: {
+            default: ''
         }
     },
 }

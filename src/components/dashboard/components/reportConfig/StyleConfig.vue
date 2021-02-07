@@ -191,6 +191,12 @@ export default {
 				setTimeout((self) => {
 					self.$refs.tableConditionalFormatSetting.initData();                
 				}, 100, this);
+			}else{
+				this.$evtBus.$emit('bi-report-change-display', {
+                    type: 'style',
+                    id: this.currentCellConfig.sharedConfigs.cellId,
+                    instanceKey: this.instanceKey
+                });
 			}
 		},
 		applyConditionSetting(){

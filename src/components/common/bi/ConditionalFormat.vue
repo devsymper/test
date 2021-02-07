@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import defaultConfigs from "@/components/dashboard/configPool/defaultConfigs.js";
+import {defaultConditionFormat} from "@/components/dashboard/configPool/defaultConfigs.js";
 import { util } from '../../../plugins/util';
 
 export default {
@@ -53,7 +53,7 @@ export default {
 
         },
         addMoreColumnForCondition(){
-            let defaultItem = util.cloneDeep(defaultConfigs.defaultConditionFormat);
+            let defaultItem = util.cloneDeep(defaultConditionFormat);
             this.value.push(defaultItem);
         }
     }

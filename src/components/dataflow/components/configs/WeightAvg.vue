@@ -65,6 +65,7 @@ export default {
     methods:{
         changeValue(data){
             this.$set(this.nodeData.configs,data.ikey,data.value);
+            this.$emit('change-configs');
         }
     }
 }

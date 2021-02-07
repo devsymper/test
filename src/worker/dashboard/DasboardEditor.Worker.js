@@ -5,6 +5,7 @@ import _cloneDeep from 'lodash/cloneDeep';
 import { getNewCellConfigLayout } from "@/components/dashboard/configPool/cellLayout";
 import { datasetApi } from "../../api/dataset";
 import { util } from "../../plugins/util";
+import { getColumnDataset } from "@/components/dashboard/configPool/dashboardConfigs.js";
 
 var mapTypeToClass = autoLoadChartClasses();
 
@@ -173,5 +174,18 @@ var handler = {
                 relateDatasetIds: relateDatasetIds
             }
         });
+        if(data.action == 'view'){
+            let datasetColInfo = await getColumnDataset(
+                response.data.dashboard.relateDatasets,
+                {
+                    columns: {},
+                    subDatasets: []
+                }
+            );
+            self.postMessage({
+                action: 'setDatasetAndColumnsOnViewAction',
+                data: datasetColInfo
+            });
+        }
     }
 };

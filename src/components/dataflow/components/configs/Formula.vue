@@ -89,6 +89,11 @@ export default {
         FormulaEditor,
     
     },
+    computed:{
+        addedColumns(){
+            return this.nodeData.configs.addedColumns;
+        }
+    },
     props:{
         nodeData:{
             type: Object,
@@ -96,6 +101,17 @@ export default {
                 return {}
             }
         },
+
+    },
+    watch:{
+        addedColumns:{
+            deep:true,
+            handler(vl){
+                if (vl && Object.keys(vl).length > 0) {
+                    this.$emit('change-configs');
+                }
+            }
+        }
     },
     data(){
         return{

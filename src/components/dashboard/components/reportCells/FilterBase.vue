@@ -80,20 +80,28 @@ export default {
             default(){
                 return {}
             }
-        }
+        },
+        instanceKey: {
+            default: ''
+        },
     },
     methods:{
         useDatePicker(){
            return this.selectedCol.type == 'date'
         },
         handleChangeFilterValue(cellId){
-            // SDashboardEditor.applyFilterFromCell(cellId);
+            this.$evtBus.$emit('bi-report-change-display', {
+				id: cellId,
+				type: 'filter',
+                instanceKey: this.instanceKey
+			});
 		},
 		handleChangeQuery(data){
             this.cellConfigs.sharedConfigs.queryKey = data.query
 			this.$evtBus.$emit('bi-report-change-display', {
 				id: data.cellId,
-				type: 'autocomplete'
+				type: 'autocomplete',
+                instanceKey: this.instanceKey
 			});
 		}
     },

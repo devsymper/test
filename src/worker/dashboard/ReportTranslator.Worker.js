@@ -68,9 +68,9 @@ var handler = {
             columnsSetting.value[0].selectionMode = cell.rawConfigs.style.selectionControl.children.selectionMode.value;
         }
         let filter = [];
-        // for (let id in cell.viewConfigs.filter) {
-        //     filter = filter.concat(cell.viewConfigs.filter[id])
-        // }
+        for (let id in cell.sharedConfigs.filter) {
+            filter = filter.concat(cell.sharedConfigs.filter[id])
+        }
 
         let condition = cell.rawConfigs.condition;
 
@@ -103,8 +103,8 @@ var handler = {
             reportType: cell.sharedConfigs.type,
             cellId: cell.sharedConfigs.cellId,
             filter: filter,
-            // crossFilterCond: cell.viewConfigs.crossFilterCond,
-            crossFilterCond: '',
+            crossFilterCond: cell.sharedConfigs.crossFilterCond,
+            // crossFilterCond: '',
             sort: sortData,
             reportName: reportName,
             needTotal: this.checkNeedTotal(cell)

@@ -27,6 +27,7 @@
             <component 
                 :is="reportTag"
                 :isView="isView"
+                :instanceKey="instanceKey"
                 :cellConfigs="cellConfigs">
             </component>
         </div>

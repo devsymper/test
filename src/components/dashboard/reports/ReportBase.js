@@ -1,5 +1,7 @@
 import { getStyleItems } from "@/components/dashboard/configPool/reportStyleItems.js";
 import { getColumnConfigItems } from "@/components/dashboard/configPool/reportColumnSettingItems.js";
+import { getUsedDatasetsFromSetting } from "@/components/dashboard/configPool/reportConfig.js";
+import treeConditionConverter from "@/components/dashboard/configPool/treeConditionToJSString.js";
 
 var commonStyleAttrItems = {
     general: {
@@ -50,12 +52,22 @@ export default class ReportBase {
         cellId: "", // id đánh tự động của report
         data: [], // dữ liệu thô được lấy từ server
         type: "", // loại report
-        yAxisCount: 1, // số lượng yAxis được sử dụng
+        yAxisCount: 1, // số lượng yAxis được sử dụng,
+        filter: {},
+        crossFilterCond: ''
     };
-
+ 
     viewConfigs = { // cấu hình phục vụ cho việc hiển thị
         commentCount: 0, // số lượng comment
-        displayOptions: {}, // cấu hình được translate từ các rawConfig thành cấu hình tương ứng của thư viện
+        displayOptions: { // cấu hình được translate từ các rawConfig thành cấu hình tương ứng của thư viện
+            symperTitle: {},
+            general: {},
+            data: [],
+            contentSize: {
+                h: 0,
+                w: 0
+            }
+        }, 
         filter: {}, // filter áp dụng cho report này
         isSelecting: false, // có đang click để lựa chọn hay không
         loadingData: false, // có đang tải dữ liệu không 
@@ -162,6 +174,7 @@ export default class ReportBase {
         this.restoreSetting(cell);
         this.restoreStyle(cell);
         this.rawConfigs.extra = cell.extra ? JSON.parse(cell.extra) : {};
+        this.sharedConfigs.usedDatasets = getUsedDatasetsFromSetting(this.rawConfigs.setting);
     }
 
     /**
@@ -244,7 +257,7 @@ export default class ReportBase {
                 field: element[keyName],
                 headerTooltip: element[keyAs],
                 symperType: element.type,
-                symperColumnName: element.columnName,
+                symperColumnName: element.columnName ? element.columnName : element.name,
                 editable: false,
                 symperCellConfig: {
                     decimal: cellStyle.symperCellConfig.decimalTootip
@@ -274,8 +287,7 @@ export default class ReportBase {
             newCol.symperCellConfig.decimalNumber = cellStyle.symperCellConfig.decimalTootip;
             rsl.push(newCol);
         });
-        // comment do chưa dùng tới chức năng conditional format
-        // rsl = treeConditionConverter.addConditionFormatToColDef(rsl, cellStyle.originStyle, mapNameToColumn);
+        rsl = treeConditionConverter.addConditionFormatToColDef(rsl, cellStyle.originStyle, mapNameToColumn);
         return rsl;
     }
 

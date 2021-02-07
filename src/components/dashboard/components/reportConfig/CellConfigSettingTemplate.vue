@@ -229,7 +229,8 @@
             changeColumnSetting(type = 'data'){
                 this.$evtBus.$emit('bi-report-change-display', {
                     type: type,
-                    id: this.selectedCell.sharedConfigs.cellId
+                    id: this.selectedCell.sharedConfigs.cellId,
+                    instanceKey: this.instanceKey
                 });
             },
             changeLastLineColumnAgg(item){

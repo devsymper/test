@@ -15,10 +15,11 @@
 
                 <DashboardWorkspace 
                     :style="{
-                        height: 'calc(100 % - 35px)'
+                        height: 'calc(100% - 35px)'
                     }"
                     ref="dashboardWorkspace"
                     :action="action"
+                    :status="status"
                     :instanceKey="instanceKey"/>
             </div>
             <div class="d-flex flex-column h-100" v-if="action != 'view'"
@@ -97,12 +98,14 @@ export default {
             instanceKey: Date.now(),
             tableHeight: 0,
             listDatasetSelected:[],
+            status: 'init',
         };
 	},
 	mounted(){
         this.tableHeight = util.getComponentSize(this).h - 100;
         if(this.action == 'create'){
             this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
+            this.status = 'editting';
         }
 	},
 	watch:{
@@ -160,13 +163,26 @@ export default {
                 this.dashboardEditorWorker.postMessage({
                     action: 'getDashboardInfo',
                     data: {
+                        action: this.action,
                         idDashboard: this.idObject 
                     }
                 });
             }
         },
+        setDashboardStyle(style){
+            this.$refs.dashboardWorkspace.setDashboardStyle(style);
+        },
+        setDatasetAndColumnsOnViewAction(data){
+            let dataPos = {
+                key: this.instanceKey,
+                data: data.datasetAndColumn
+            };
+            this.$store.commit("dashboard/addDatasetAndColumnInDashboard",dataPos);
+        },
         setRestoredDashboardConfigs(data){
+            this.setDashboardStyle(data.allCellConfigs.global.rawConfigs.style);
             this.changeSelectedDatasets(data.relateDatasetIds);
+            this.$refs.dashboardWorkspace.initCrossFilterMng(data.dashboardInfo.relations);
             this.$set(
                 this.myData.dashboardConfigs,
                 'allCellConfigs',
@@ -178,6 +194,9 @@ export default {
                 data.dashboardInfo
             );
             this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
+            setTimeout((self) => {
+                self.status = 'editting';
+            }, 1000, this);
 		},
 		
 		toggleDatasetDialog(){

@@ -43,6 +43,8 @@ export default class Table extends ReportBase {
             columns: [],
             cellStyle: this.getStyleItemsInConfig(style.cellFormat.children, 'px', ratio),
             headerStyle: this.getStyleItemsInConfig(style.headerFormat.children, 'px', ratio),
+            totalRowBackup: [],
+            totalRow: []
         };
         
 
@@ -61,34 +63,38 @@ export default class Table extends ReportBase {
         cellStyle.extraData = rawConfig.extra;
         // if (type == 'table') {
         rsl.columns = this.makeDisplayColOptions(cellStyle, columns.value.selectedColums, 'as', 'as', prevDisplayOptions, style)
-        // if(rsl.columns[0].symperColumnName == "Format entire row"){ // check xem có condition format cho toàn bộ row trong table hay ko
-        //     let rowFormatCond = rsl.columns[0].formatConds;
-        //     rsl.getRowStyle = function (params) {
-        //         var row = params.node.data;
-        //         for(let item of rowFormatCond){
-        //             let checkCondition = eval(item.condition);
-        //             if(checkCondition){
-        //                 return item.style;
-        //             }
-        //         }
-        //         return null;
-        //     }
-        //     rsl.columns.splice(0,1);
-        // }
+        if(rsl.columns[0].symperColumnName == "Format entire row"){ // check xem có condition format cho toàn bộ row trong table hay ko
+            rsl.rowFormatCond = rsl.columns[0].formatConds;
+            // rsl.getRowStyle = function (params) {
+            //     var row = params.node.data;
+            //     for(let item of rowFormatCond){
+            //         let checkCondition = eval(item.condition);
+            //         if(checkCondition){
+            //             return item.style;
+            //         }
+            //     }
+            //     return null;
+            // }
+            rsl.columns.splice(0,1);
+        }
         // }
 
-        if (rsl.needTotal) {
-            if (rsl.data && rsl.data.length > 0) {
-                rsl.totalRow = prevDisplayOptions.totalRow ? prevDisplayOptions.totalRow : [rsl.data.pop()];
-                rsl.totalRowStyle = this.getStyleItemsInConfig(style.total.children, 'px', ratio);
+        if(prevDisplayOptions.totalRowBackup){
+            rsl.totalRowBackup = prevDisplayOptions.totalRowBackup;
+        }
+        rsl.totalRow = [];
+        if(needTotal){
+            if(extraData.changeType == 'style'){
+                rsl.totalRow = prevDisplayOptions.totalRowBackup;
+            }else if (rsl.data && rsl.data.length > 0) {
+                rsl.totalRow = [rsl.data.pop()];
+                rsl.totalRowBackup = rsl.totalRow;
             }
-        } else if (prevDisplayOptions.totalRow) {
-            rsl.totalRow = prevDisplayOptions.totalRow;
+            rsl.totalRowStyle = this.getStyleItemsInConfig(style.total.children, 'px', ratio);
         }
 
-
         // tìm cột đầu tiên ko phải là number để thêm chữ tổng
-        if(Array.isArray(rsl.totalRow)){
+        if(rsl.totalRow.length > 0){
             let notNumberColumn = null;
             for(let col of rsl.columns){
                 if(col.symperType != 'number' || col.lastLineAgg == 'none'){

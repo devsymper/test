@@ -10,7 +10,7 @@
             :style="tableStyle" 
             class="ag-theme-balham symper-table-report" 
             :gridOptions="gridOptions"
-            :columnDefs="options.columns"
+            :columnDefs="columnDefs"
             :rowData="options.data"
             :columnTypes="columnTypes"
             :suppressRowClickSelection="true"
@@ -20,6 +20,7 @@
             :autoGroupColumnDef="autoGroupColumnDef"
             :stopEditingWhenGridLosesFocus="true"
             :modules="modules"
+            :pinnedBottomRowData="options.totalRow"
             @model-updated="onTableRender()"
             @column-resized="onColumnResized()"
             @grid-ready="onAgReady"
@@ -46,31 +47,43 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
-
+import treeConditionConverter from "@/components/dashboard/configPool/treeConditionToJSString.js";
 import agDataTypeStyle from '@/components/dashboard/configPool/agCellRenderer.js'
 import agCellRenderer from "@/components/dashboard/configPool/agDataTypeStyle.js";
 import PerfectScrollbar from "perfect-scrollbar";
 // import { pivotSupport } from '../configPool/translatorGroups';
 import Pagination from '@/components/common/Pagination.vue';
-
-
+import _cloneDeep from "lodash/cloneDeep";
+var mo = treeConditionConverter.mo;
+ 
 export default {
     props: {
         cellConfigs: {
             default(){
                 return {}
             }
-        }
+        },
+        instanceKey: {
+            default: '',
+        },
     },
 
     methods : {
         handleCurrentPageChange(data){
             this.cellConfigs.sharedConfigs.currentPage = data.page; 
-            this.$evtBus.$emit('bi-report-change-display', {type: 'data',id: this.cellConfigs.sharedConfigs.cellId});
+            this.$evtBus.$emit('bi-report-change-display', {
+                type: 'data',
+                id: this.cellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
+            });
         },
         handleSizeChange(data){
             this.cellConfigs.sharedConfigs.pageSize = data.pageSize;
-            this.$evtBus.$emit('bi-report-change-display', {type: 'data',id: this.cellConfigs.sharedConfigs.cellId});
+            this.$evtBus.$emit('bi-report-change-display', {
+                type: 'data',
+                id: this.cellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
+            });
         },
         onShowHideColumns(){
             let hiddenCols = {};
@@ -292,14 +305,9 @@ export default {
             let styleTag = this.$refs.styleTag;
             styleTag.innerHTML = `<style>${customStyle}</style>`;
 
-            setTimeout((thisCpn) => {
-                // thisCpn.setColumnWidth();            
+            setTimeout((self) => {
+                // self.setColumnWidth();            
             }, 500, this);
-            if(this.options.needTotal && this.options.totalRow && this.options.totalRow[0]){
-            //    this.gridApi.setPinnedBottomRowData(_.cloneDeep(this.options.totalRow)); 
-            }else{
-            //    this.gridApi.setPinnedBottomRowData([]); 
-            }
             this.addPerfectScrollBar();
         },
 
@@ -353,7 +361,30 @@ export default {
             // SDashboardEditor.dashboardConfigs.allCellConfigs[cellId].viewConfigs.needSaveExtraOptions.columnWidths = widths;
         }
     },
-    computed : {
+    computed: {
+        columnDefs(){
+            // if(){
+            //     return options.columns;
+            // }else{
+            let rsl = _cloneDeep(this.options.columns);
+            for(let colDef of rsl){
+                if(colDef.conditionalFormatInfo){
+                    colDef.cellStyle = function(params){
+                        var row = params.node.data;
+                        let formatConds = colDef.conditionalFormatInfo;
+                        for(let item of formatConds){
+                            let checkCondition = eval(item.condition);
+                            if(checkCondition){
+                                return item.style;
+                            }
+                        }
+                        return null;
+                    }
+                }
+            }
+            return rsl;   
+            // }
+        },
         options (){
             return this.cellConfigs.viewConfigs.displayOptions;
         },
@@ -372,33 +403,17 @@ export default {
     },
     beforeMount(){
         this.gridOptions = {
-             components: {
+            components: {
                 'numberRenderer': agCellRenderer.numberRenderer
             },
         };
-        let thisCpn = this;
-        this.getRowStyle = params => {
-            let style = {};
-            if (params.node.rowPinned) {
-                style = thisCpn.options.totalRowStyle;
-            }else{
-                style = thisCpn.options.cellStyle;
-            }
-
-            if(thisCpn.options.getRowStyle){
-                let conditionFormatRowStyle = thisCpn.options.getRowStyle(params);
-                if(conditionFormatRowStyle){
-                    style = Object.assign(style, conditionFormatRowStyle);
-                }
-            }
-            return style;
-        }
     },
     mounted(){
         this.gridApi = this.gridOptions.api;
         this.gridColumnApi = this.gridOptions.columnApi;
     },
     data(){
+        let self = this;
         return {
             currentPage: 1,
             isResizing: false,
@@ -416,7 +431,25 @@ export default {
                 resizable: true
             },
             customRowStyle: null,
-            getRowStyle : null,
+            getRowStyle: function(params) {
+                let style = {};
+                if (params.node.rowPinned) {
+                    style = self.options.totalRowStyle;
+                }else{
+                    if(self.options.rowFormatCond){
+                        let row = params.node.data;
+                        let rowFormatCond = self.options.rowFormatCond;
+                        for(let item of rowFormatCond){
+                            if(eval(item.condition)){
+                                style = Object.assign(style, item.style);
+                            }
+                        }
+                    }else{
+                        style = self.options.cellStyle;
+                    }
+                }
+                return style;
+            },
             exporting:false,
             columnTypes:agDataTypeStyle,
             autoGroupColumnDef:{
