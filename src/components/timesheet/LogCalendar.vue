@@ -51,15 +51,14 @@
                             v-on="detailEvents"
                             class="d-flex flex-column h-100">
                             <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
-                                <div class="d-flex flex-row pl-2" style="padding-top:2px">
-                                    <div class="fm text-ellipsis" 
-                                        :style="{'width':(findDuration(event.start, event.end)>62)?'70%':'75%','margin-top':(findDuration(event.start, event.end)>62)?'':'-4px!important'}">
+                                <div class="d-flex flex-row justify-space-between align-center pl-2">
+                                    <div class="fm text-ellipsis" style="margin-top:-4px" >
                                         <span v-if="findDuration(event.start, event.end)<62">
                                             <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green']" class="mr-1"></i>
                                         </span>
                                         <b style="color:#303030" class="fs-12 fw-430">{{event.name}}</b>
                                     </div>
-                                    <div style="margin-top:-8px;important;float:right">
+                                    <div style="margin-top:-8px">
                                         <v-menu 
                                             open-on-focus 
                                             open-on-hover bottom left
@@ -73,7 +72,7 @@
                                                 </span>
                                                 <v-btn class="ml-1" dense dark v-on="actionEvents" :icon="true">
                                                     <v-icon v-if="event.type"
-                                                        small class="color-black" :class="[findDuration(event.start, event.end)>62?'ml-7':'ml-4']" > mdi-dots-vertical</v-icon>
+                                                        small class="color-black ml-4"> mdi-dots-vertical</v-icon>
                                                 </v-btn>
                                             </template>
                                             <div class="d-flex flex-column" style="background:white">
@@ -310,6 +309,7 @@ export default {
             });
         },
         openDeleteDialog(event) {
+            event.durationFormatted = this.getDuration(event.start,event.end);
             this.$emit('delete-event', {
                 deleteEvent: event,
                 onDelete: () => this.events.splice(this.events.indexOf(event), 1)
@@ -320,10 +320,9 @@ export default {
             let defaultStart = this.$moment().subtract(7,'days').format('YYYY-MM-DD');
             let defaultEnd = this.$moment().add(7,'days').format('YYYY-MM-DD')
             let data = {
-                start:this.$refs.calendar.lastStart.date?this.$refs.calendar.lastStart.date:defaultStart,
-                end:this.$refs.calendar.lastEnd.date?this.$refs.calendar.lastEnd.date:defaultEnd
+                start:this.$refs.calendar?this.$refs.calendar.lastStart.date:defaultStart,
+                end:this.$refs.calendar?this.$refs.calendar.lastEnd.date:defaultEnd
             }
-            this.$emit('dateStartEnd',data);
              this.logFormWorker.postMessage({
                 action:'getLogTimeList',
                 data:data
@@ -373,6 +372,12 @@ export default {
                 this.createEvent.end = max
             }
         },
+        checkPlanOrLog(startTime){
+            let now = this.$moment();
+            let time = this.$moment(startTime).format('DD/MMM/YYYY h:mm A');
+            let check = this.$moment(time).isAfter(now)==true?0:1;
+            return check
+        },
         async endDrag() {
             let self = this;
             async function updateEvent(event, duration) {
@@ -383,7 +388,7 @@ export default {
                     end: end.format("YYYY-MM-DD HH:mm"),
                     duration: duration,
                     task: event.task,
-                    type: event.type,
+                    type: self.checkPlanOrLog(event.start),
                     id: event.id,
                     date: start.format('YYYY-MM-DD'),
                     categoryTask: event.category,
@@ -401,7 +406,7 @@ export default {
                 if (this.extend) {
                     // truong hop 1.1: neu extend => update event
                     try {
-                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
+                        let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
                         let result = await updateEvent(this.createEvent, duration);
                         if (result) this.load();
                     } catch(e) {
@@ -492,9 +497,10 @@ export default {
             }
             
         },
+        // sự kiện khi thay đổi lịch
         onChangeCalendar() {
             this.$store.commit('timesheet/updateCalendarStartEnd', {
-                start: this.$moment(this.$refs.calendar.lastStart.date).format('DD/MM'),
+                start: this.$moment(this.$refs.calendar.lastStart.date).format('DD/MM/YY'),
                 end: this.$moment(this.$refs.calendar.lastEnd.date).format('DD/MM/YY'),
             });
             this.createCalendarHoverEvent();

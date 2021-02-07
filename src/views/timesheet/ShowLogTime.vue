@@ -13,7 +13,6 @@
     <v-dialog v-model="logtimeDialog" width="357" @click:outside="deleteLog()">
         <LogTimeForm v-show="showTask==false"
             ref="logtime"
-            :dateStartEnd ="dateStartEnd"
             @showTaskForm="showTaskForm"
             @loadMonthView="loadMonthView"
             @showCategoryForm="showCategoryForm"
@@ -68,7 +67,6 @@
         </DeleteLogView>
     </v-dialog>
     <LogCalendar 
-        @dateStartEnd="dateStartEnd"
         :userId="userId"
         @showLog="showLog" 
         :monEvents="monthEvents"
@@ -109,7 +107,6 @@ export default {
             showCategory:false,
             time_view: true,
             eventLog:{},
-            dateStartEnd:{},
             updateAPICate:false,
             load:false,
             // log form

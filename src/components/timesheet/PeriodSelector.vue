@@ -30,7 +30,7 @@
             <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <span>{{totalHours*10/10}}/{{hoursRequired}} {{$t('timesheet.of')}} 
-            <span style="color:#008080"> {{startDate}} - {{endDate}}</span>
+            <span style="color:#008080"> {{startDate.slice(0,5)}} - {{endDate}}</span>
            </span>
         <v-btn icon @click="next()">
             <v-icon>mdi-chevron-right </v-icon>
@@ -180,9 +180,6 @@ export default {
             this.$emit('load-logtime', userId)
           
         },
-        startDate(){
-            let startDate = this.startDate
-        }
     }
 }
 </script>

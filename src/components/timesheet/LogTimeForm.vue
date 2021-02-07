@@ -226,9 +226,9 @@
         </v-btn>
         <v-btn v-if="update==false&&showLog" text class="button-logtime color-blue" @click="log(1)"><span >{{$t('timesheet.log')}}</span> </v-btn>
         <v-btn v-if="update==false&&showPlan" text class="button-logtime color-green" @click="log(0)"> <span >{{$t('timesheet.plan')}}</span> </v-btn>
-        <v-btn v-if="update&&newEvent.type==1" text class="button-logtime" @click="updatelog(1)"><span >{{$t('common.update')}}</span> </v-btn>
-        <v-btn v-if="update&&newEvent.type==0&&showPlan" text class="button-logtime" @click="updatelog(0)"><span >{{$t('common.update')}}</span> </v-btn>
-        <v-btn v-if="update&&newEvent.type==0&&showLog" text  class="button-logtime mr-2" style="float:right!important; width: 60px" @click="updatelog(1)"> <span >{{$t('timesheet.log')}}</span> </v-btn>
+        <v-btn v-if="update&&newEvent.type==1" text class="button-logtime color-blue" @click="updatelog(1)"><span >{{$t('common.update')}}</span> </v-btn>
+        <v-btn v-if="update&&newEvent.type==0&&showPlan" text class="button-logtime color-green" @click="updatelog(0)"><span >{{$t('common.update')}}</span> </v-btn>
+        <v-btn v-if="update&&newEvent.type==0&&showLog" text  class="button-logtime mr-2 color-blue" style="float:right!important; width: 60px" @click="updatelog(1)"> <span >{{$t('timesheet.log')}}</span> </v-btn>
     </div>
 
 </v-card>
@@ -295,8 +295,11 @@ export default {
         ConfigRepeat 
     },
     computed: {
-         startEndDate() {
-            return this.$store.getters['timesheet/submitStartEndDate'];
+        startDate() {
+            return this.$store.state.timesheet.calendarStartDate;
+        },
+        endDate() {
+            return this.$store.state.timesheet.calendarEndDate;
         },
          typeCalendar() {
             return this.$store.state.timesheet.calendarType;
@@ -731,10 +734,11 @@ export default {
         repreatConditional(data,condition){
             const self = this;
             let listLog = [];
-            let startCalendar = this.startEndDate.slice(0,10);
-            let endCalendar = this.startEndDate.slice(13,23);
-            startCalendar = this.$moment(startCalendar, "DD-MM-YYYY");
-            endCalendar = this.$moment(endCalendar, "DD-MM-YYYY");
+            debugger
+            let startCalendar = this.startDate;
+            startCalendar = this.$moment(startCalendar,'DD-MM-YYYY');
+            let endCalendar = this.endDate;
+            endCalendar = this.$moment(endCalendar,'DD-MM-YYYY');
             let startHour = this.$moment(data.start).format('HH');
             let startMinutes = this.$moment(data.start).format('mm');
             let endHour = this.$moment(data.end).format('HH');
@@ -784,6 +788,13 @@ export default {
             }
             return check;
         },
+        checkPlanOrLog(startTime){
+            debugger
+            let now = this.$moment();
+            let time = this.$moment(startTime).format('DD/MMM/YYYY h:mm A');
+            let check = this.$moment(time).isAfter(now)==true?0:1;
+            return check
+        },
         updatelog(type) {
             this.checkNullTask = true;
             this.checkNullCate = true;
@@ -798,7 +809,7 @@ export default {
                         end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
                         task: this.findNameTask(taskId),
-                        type: type,
+                        type: this.checkPlanOrLog(this.newEvent.start),
                         id: this.newEvent.id,
                         date: this.inputs.date,
                         categoryTask: this.categoryTask,
