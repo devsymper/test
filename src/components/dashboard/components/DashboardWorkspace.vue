@@ -361,10 +361,10 @@ export default {
         },
         getActivedCellIds(){
             let layout = this.currentLayout;
-            let rsl = [];
+            let rsl = {};
             for(let cellLayout of layout){
                 if(cellLayout.active){
-                    rsl.push(cellLayout.i);
+                    rsl[cellLayout.i] = true;
                 }
             }
             return rsl;
@@ -388,8 +388,10 @@ export default {
                     childDatasetId[dtsId] = true;
                 } 
             }
+            
             let activedCellIds = this.getActivedCellIds();
-            for(let cellId of activedCellIds){
+            for(let cell of this.currentLayout){
+                let cellId = cell.i;
                 let runCell = allCells[cellId];
                 let sharedConfigs = runCell.sharedConfigs;
                 let usedDts = sharedConfigs.usedDatasets;
@@ -422,7 +424,10 @@ export default {
                     if(!this.filter[filterId]){
                         delete sharedConfigs.filter[filterId];
                     }
-                    this.translateReportConfig(cellId);
+
+                    if(activedCellIds[cellId]){
+                        this.translateReportConfig(cellId);
+                    }
                 }
             }
         },

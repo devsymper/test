@@ -163,6 +163,7 @@ export default {
                 this.dashboardEditorWorker.postMessage({
                     action: 'getDashboardInfo',
                     data: {
+                        action: this.action,
                         idDashboard: this.idObject 
                     }
                 });
@@ -170,6 +171,13 @@ export default {
         },
         setDashboardStyle(style){
             this.$refs.dashboardWorkspace.setDashboardStyle(style);
+        },
+        setDatasetAndColumnsOnViewAction(data){
+            let dataPos = {
+                key: this.instanceKey,
+                data: data.datasetAndColumn
+            };
+            this.$store.commit("dashboard/addDatasetAndColumnInDashboard",dataPos);
         },
         setRestoredDashboardConfigs(data){
             this.setDashboardStyle(data.allCellConfigs.global.rawConfigs.style);

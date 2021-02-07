@@ -68,7 +68,6 @@ var handler = {
             columnsSetting.value[0].selectionMode = cell.rawConfigs.style.selectionControl.children.selectionMode.value;
         }
         let filter = [];
-        debugger
         for (let id in cell.sharedConfigs.filter) {
             filter = filter.concat(cell.sharedConfigs.filter[id])
         }

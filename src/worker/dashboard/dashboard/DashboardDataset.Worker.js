@@ -1,4 +1,6 @@
 import { biApi } from "@/api/bi.js";
+import { getColumnDataset } from "@/components/dashboard/configPool/dashboardConfigs.js";
+
 onmessage = function (event) {
     let data = event.data;
     let action = data.action;
@@ -28,34 +30,12 @@ var handler = {
 			data: res
 		})
 	},
+    
     async getColumnDataset(data){
         let listDataset = data.listDataset;
         let listColumnInDataset = data.listColumnInDataset;
-        let arrIds = [];
-        let str = "";
-        if (listDataset.length > 0) {
-            for (let i = 0; i < listDataset.length; i++) {
-                let datasetId = listDataset[i].id;
-                if (!listColumnInDataset.columns[datasetId]) {
-                    arrIds.push(datasetId);
-                    str += datasetId+",";
-                }  
-            }
-        }
-
-        if (str.length > 0) { // call api get list column in dataset
-            str = str.substring(0, str.length-1);
-            let res = await biApi.getColumnWithDatasetIds(str)
-            if(res['status'] == 200 && res['data']){
-                if (res['data'].columns) {
-                    listColumnInDataset.columns = Object.assign(listColumnInDataset.columns, res['data'].columns);
-                    listColumnInDataset.subDatasets = Object.assign(listColumnInDataset.subDatasets, res['data'].subDatasets);
-                }
-            }
-        }
-        let datasetAndColumn = this.mapDataToDatasetAndColumn(listDataset,listColumnInDataset);
-        self.postMessage({action:'postGetColumnDatasetAfter', data :{datasetAndColumn: datasetAndColumn,listColumnInDataset: listColumnInDataset}});
-   
+        let dataPost = await getColumnDataset(listDataset, listColumnInDataset);
+        self.postMessage({action:'postGetColumnDatasetAfter', data: dataPost});
     },
     mapDataToDatasetAndColumn(datasets,listColumnInDataset){
         let datasetAndColumn = {};

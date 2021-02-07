@@ -50,7 +50,7 @@
 <script>
 import SingleColorConditionalFormat from "@/components/dashboard/components/SingleColorConditionalFormat.vue";
 // import ColorScaleConditionFormat from "@/components/dashboard/cellConfigs/ColorScaleConditionFormat.vue";
-import defaultConfigs from "@/components/dashboard/configPool/defaultConfigs.js";
+import {defaultConditionFormat} from "@/components/dashboard/configPool/defaultConfigs.js";
 import SelectColumn from '@/components/common/bi/SelectColumn.vue'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from '../../../plugins/util';
@@ -102,7 +102,7 @@ export default {
         config: {
             type: Object,
             default(){
-                return util.cloneDeep(defaultConfigs.defaultConditionFormat)
+                return util.cloneDeep(defaultConditionFormat)
             }
         }
     },
