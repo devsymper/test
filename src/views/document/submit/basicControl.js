@@ -266,6 +266,9 @@ export default class BasicControl extends Control {
                 }
                 if (thisObj.checkAutoCompleteControl()) {
                     thisObj.isRunChange = false;
+                    if(e.keyCode == 13){
+                        thisObj.isRunChange = true;
+                    }
                     let fromSelect = false;
                     let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
                     e['controlName'] = thisObj.controlProperties.name.value;

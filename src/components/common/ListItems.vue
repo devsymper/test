@@ -1239,7 +1239,10 @@ export default {
         },
         // action khi kéo cột showlist
         columnResized(){
-            this.widthColumns=[];
+			if(this.tableDisplayConfig.value.wrapTextMode == 0){
+				this.customRowHeights(0)
+			}
+            this.widthColumns = [];
             this.gridOptions.columnApi.columnController.allDisplayedColumns.map(column=>{
                 this.widthColumns.push({
                     colId:column.colId,
@@ -1346,6 +1349,7 @@ export default {
 			return this.rowData
 		},
 		customRowHeights(value){
+			debugger
 			if(value == 1){
 				this.gridOptions.rowHeight  = this.rowHeight
 			}else{
