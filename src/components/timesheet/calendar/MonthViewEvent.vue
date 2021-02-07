@@ -49,7 +49,6 @@ export default {
     },
     methods: {
         start(date){
-            debugger
             this.$emit('showLog',date);   
         },
     },

@@ -450,7 +450,6 @@ export default {
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
-            debugger
             // this.task = val.task?val.task:getIdTask(val.task);
             this.task = val.task?val.task:"";
             if(val.task){

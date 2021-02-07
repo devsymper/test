@@ -323,7 +323,6 @@ export default {
         },
         // lấy ra danh sách Log time
         load() {
-            debugger
             let defaultStart = this.$moment().subtract(7,'days').format('YYYY-MM-DD');
             let defaultEnd = this.$moment().add(7,'days').format('YYYY-MM-DD')
             let data = {
@@ -478,7 +477,6 @@ export default {
         },
         // hàm sự kiên chuyển kiểu list view lịch
         createCalendarHoverEvent() {
-            debugger
             const self = this;
             this.$refs.calendar.$el.querySelectorAll('.v-calendar-daily__day-interval').forEach(div => {
                 if (self.timeView) {
@@ -502,7 +500,6 @@ export default {
             if(!self.timeView){
                 this.resizeLogtime();
             }else{
-                debugger
                  this.getLogByUserId(this.userId);
                  this.load()
             }
@@ -510,12 +507,10 @@ export default {
         },
         // sự kiện khi thay đổi lịch
         onChangeCalendar() {
-            debugger
             this.$store.commit('timesheet/updateCalendarStartEnd', {
                 start: this.$moment(this.$refs.calendar.lastStart.date).format('DD/MM/YY'),
                 end: this.$moment(this.$refs.calendar.lastEnd.date).format('DD/MM/YY'),
             });
-            debugger
             this.createCalendarHoverEvent();
         },
         updateTotalHours() {
