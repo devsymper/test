@@ -159,7 +159,10 @@ export default {
             default(){
                 return {};
             }
-        }
+        },
+        instanceKey: {
+            defaul: ''
+        },
     },
     data(){
         return {
@@ -179,6 +182,7 @@ export default {
                 self.$evtBus.$emit('bi-report-change-display', {
                     type: 'data',
                     id: self.cellConfigs.sharedConfigs.cellId,
+                    instanceKey: this.instanceKey
                 });
             }, 300,this);
         },
@@ -201,7 +205,8 @@ export default {
         submitTaskDone(data){
             this.$evtBus.$emit('bi-report-change-display', {
                 type: 'data',
-                id: this.cellConfigs.sharedConfigs.cellId
+                id: this.cellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
             });
         },
         selected(e){

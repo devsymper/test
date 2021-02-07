@@ -75,7 +75,8 @@ const pasteReport = function(state, data){
                 setTimeout(() => {
                     SYMPER_APP.$evtBus.$emit('bi-report-change-display', {
                         id: newCellId,
-                        type: 'data'
+                        type: 'data',
+                        instanceKey: data.instanceKey
                     });
                 }, 0);
             }

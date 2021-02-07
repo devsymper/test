@@ -60,17 +60,28 @@ export default {
             default(){
                 return {}
             }
-        }
+        },
+        instanceKey: {
+            default: '',
+        },
     },
 
     methods : {
         handleCurrentPageChange(data){
             this.cellConfigs.sharedConfigs.currentPage = data.page; 
-            this.$evtBus.$emit('bi-report-change-display', {type: 'data',id: this.cellConfigs.sharedConfigs.cellId});
+            this.$evtBus.$emit('bi-report-change-display', {
+                type: 'data',
+                id: this.cellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
+            });
         },
         handleSizeChange(data){
             this.cellConfigs.sharedConfigs.pageSize = data.pageSize;
-            this.$evtBus.$emit('bi-report-change-display', {type: 'data',id: this.cellConfigs.sharedConfigs.cellId});
+            this.$evtBus.$emit('bi-report-change-display', {
+                type: 'data',
+                id: this.cellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
+            });
         },
         onShowHideColumns(){
             let hiddenCols = {};

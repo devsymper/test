@@ -1,6 +1,7 @@
 <template>
     <FilterBase
     	:cellConfigs="cellConfigs"
+    	:instanceKey="instanceKey"
 	/>
 </template>
 
@@ -15,7 +16,10 @@ export default {
             default(){
                 return {}
             }
-        }
+        },
+        instanceKey: {
+            default: ''
+        },
     },
 }
 </script>

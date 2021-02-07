@@ -154,10 +154,16 @@ export default {
         this.reportTranslatorWorker = new ReportTranslatorWorker();
         this.listenFromWorker(this.reportTranslatorWorker);
         this.$evtBus.$on('bi-report-change-display', (data) => {
-            if(data.type == 'filter'){
-                self.applyFilterFromCell(data.id);      
+            if(data.hasOwnProperty('instanceKey')){
+                if(data.instanceKey == self.instanceKey){
+                    if(data.type == 'filter'){
+                        self.applyFilterFromCell(data.id);      
+                    }else{
+                        self.translateReportConfig(data.id, data.type);
+                    }
+                }
             }else{
-                self.translateReportConfig(data.id, data.type);
+                console.error("Data in event bi-report-change-display miss key instanceKey");
             }
         });
     },

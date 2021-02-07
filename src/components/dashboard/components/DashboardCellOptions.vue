@@ -145,7 +145,8 @@ export default {
                 });
                 this.$evtBus.$emit('bi-report-change-display', {
                     id: newCellId,
-                    type: 'data'
+                    type: 'data',
+                    instanceKey: this.instanceKey
                 });
             }, 0, this);
         },

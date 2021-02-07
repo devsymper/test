@@ -3,6 +3,7 @@
         ref="ganttchartBase"
         :cellConfigs="cellConfigs"
         :isView="isView"
+        :instanceKey="instanceKey"
         :taskSeleted="taskSeleted"
         :listDocumentSubmitTask="listDocumentSubmitTask"
         @dragDrop-gantt="dragDrop"
@@ -30,6 +31,9 @@ export default {
         },
         isView: {
             default: true
+        },
+        instanceKey: {
+            default: ''
         },
     },
     data(){
@@ -70,7 +74,8 @@ export default {
         ganttChartRemoveTaskAfter(){
             this.$evtBus.$emit('bi-report-change-display', {
                 type: 'data',
-                id: this.cellConfigs.sharedConfigs.cellId
+                id: this.cellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
             });
         },
         dragDrop(e){
@@ -129,8 +134,10 @@ export default {
             this.$refs.ganttchartBase.hideLoading();
             this.$evtBus.$emit('bi-report-change-display', {
                 type: 'data',
-                id: this.cellConfigs.sharedConfigs.cellId
+                id: this.cellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
             });
+            
             this.$snotifySuccess('Update task complete!');
         },
         haveErrorUpdateGantt(data){
