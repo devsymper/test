@@ -152,6 +152,8 @@ export default {
 		 */
 		swapCondition(item) {
 			let value = item.name == 'OR' ? 'AND' : 'OR'
+			debugger
+
 			this.$set(item, 'name' , value)
 			this.onChangeConfig();
 		},

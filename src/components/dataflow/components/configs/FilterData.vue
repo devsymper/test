@@ -44,7 +44,6 @@ export default {
 			return arr;
 		},
 		defaultData(){
-			debugger
 			if (this.useConditionProps) {
 				this.$set(this.nodeData.configs,'condition',this.condition)
 			}
