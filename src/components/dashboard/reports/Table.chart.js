@@ -63,20 +63,20 @@ export default class Table extends ReportBase {
         cellStyle.extraData = rawConfig.extra;
         // if (type == 'table') {
         rsl.columns = this.makeDisplayColOptions(cellStyle, columns.value.selectedColums, 'as', 'as', prevDisplayOptions, style)
-        // if(rsl.columns[0].symperColumnName == "Format entire row"){ // check xem có condition format cho toàn bộ row trong table hay ko
-        //     let rowFormatCond = rsl.columns[0].formatConds;
-        //     rsl.getRowStyle = function (params) {
-        //         var row = params.node.data;
-        //         for(let item of rowFormatCond){
-        //             let checkCondition = eval(item.condition);
-        //             if(checkCondition){
-        //                 return item.style;
-        //             }
-        //         }
-        //         return null;
-        //     }
-        //     rsl.columns.splice(0,1);
-        // }
+        if(rsl.columns[0].symperColumnName == "Format entire row"){ // check xem có condition format cho toàn bộ row trong table hay ko
+            rsl.rowFormatCond = rsl.columns[0].formatConds;
+            // rsl.getRowStyle = function (params) {
+            //     var row = params.node.data;
+            //     for(let item of rowFormatCond){
+            //         let checkCondition = eval(item.condition);
+            //         if(checkCondition){
+            //             return item.style;
+            //         }
+            //     }
+            //     return null;
+            // }
+            rsl.columns.splice(0,1);
+        }
         // }
 
         if(prevDisplayOptions.totalRowBackup){
