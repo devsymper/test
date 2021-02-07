@@ -11,7 +11,7 @@
         </div>
     </v-row>
     <v-dialog v-model="logtimeDialog" width="357" @click:outside="deleteLog()">
-        <LogTimeForm v-show="showTask==false"
+        <LogTimeForm v-show="!showTask"
             ref="logtime"
             @showTaskForm="showTaskForm"
             @loadMonthView="loadMonthView"
@@ -154,12 +154,10 @@ export default {
             }
         },
         loadMonthView(data){
-            debugger
             // this.$refs.logCalendar.monthEvents[data.date]=[];
             // this.$refs.logCalendar.monthEvents[data.date].push(data);
-            this.monthEvents =data;
-
-
+            this.monthEvents = data;
+            this.$refs.logCalendar.load()
         },
         doneCate(){
             this.updateAPICate = false

@@ -24,7 +24,6 @@
             </template>
             <template v-slot:day-label="{day,present,past, month, date}">
                 <MonthViewHeader 
-                    v-on="on" 
                     class="pl-3 pt-1"
                     :monthEvents="monthEvents"
                     :month="month"
@@ -39,8 +38,10 @@
                 <MonthViewEvent 
                     :monthEvents="monthEvents"
                     :date="date"
+                    @showLog="start"
                     :hoursRequired="hoursRequired"
                 />
+               
             </template>
               <!-- màn hình week/day/weekday - event log -->
             <template v-slot:event="{ event, eventSummary,timed, eventParsed  }">
@@ -52,28 +53,28 @@
                             class="d-flex flex-column h-100">
                             <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
                                 <div class="d-flex flex-row justify-space-between align-center pl-2">
-                                    <div class="fm text-ellipsis" style="margin-top:-4px" >
+                                    <div class="fm text-ellipsis" >
                                         <span v-if="findDuration(event.start, event.end)<62">
                                             <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green']" class="mr-1"></i>
                                         </span>
                                         <b style="color:#303030" class="fs-12 fw-430">{{event.name}}</b>
                                     </div>
-                                    <div style="margin-top:-8px">
+                                    <div >
                                         <v-menu 
                                             open-on-focus 
-                                            open-on-hover bottom left
+                                            bottom left
                                             nudge-left='5' 
                                             nudge-top='-10'>
                                             <template v-slot:activator="{on:actionEvents }" >
                                                 <span class="fs-12 fw-400 color-black"
-                                                    v-if="findDuration(event.start, event.end)<65"
-                                                    v-on="actionEvents" style="margin-right:-20px">
+                                                    v-if="findDuration(event.start, event.end)<62" >
                                                     {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
                                                 </span>
-                                                <v-btn class="ml-1" dense dark v-on="actionEvents" :icon="true">
+                                                <!-- <v-btn class="ml-1" dense dark icon> -->
                                                     <v-icon v-if="event.type"
-                                                        small class="color-black ml-4"> mdi-dots-vertical</v-icon>
-                                                </v-btn>
+                                                        v-on="actionEvents"
+                                                        small class="color-black"> mdi-dots-vertical</v-icon>
+                                                <!-- </v-btn> -->
                                             </template>
                                             <div class="d-flex flex-column" style="background:white">
                                                 <v-btn v-for="action in actionLog" text small :key='action.id' @click="actionLogEvent(event,action.id)">{{$t(action.name)}}</v-btn>
@@ -81,22 +82,21 @@
                                         </v-menu>
                                     </div>
                                 </div>
-                                <div v-if="findDuration(event.start, event.end)>105" style="height:30px" class="fs-12 text-ellipsis pl-2 color-grey">
+                                <div v-if="findDuration(event.start, event.end)>105" style="height:30px" class="text-ellipsis fs-12 pl-2 color-grey" >
                                     {{event.desc ? event.desc: "" }}
                                 </div>
                                 <v-spacer />
-                                <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center">
+                                <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center" v-if="findDuration(event.start, event.end)>61">
                                     <div>
-                                        <span v-if="findDuration(event.start, event.end)>65">
+                                        <span >
                                             <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
                                         </span>
                                         <span class= "fs-12 text-ellipsis color-grey" style="margin-left:-50px" v-if="findDuration(event.start, event.end)>70"> 
                                             {{event.category_key}}
                                         </span>
                                     </div>
-                                    <div v-if="findDuration(event.start, event.end)>61" 
-                                        class="d-flex flex-row-reverse color-black">
-                                        <span class="fs-11">
+                                    <div class="d-flex flex-row-reverse ">
+                                        <span class="fs-11 color-black">
                                         {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
                                         </span>
                                     </div>
@@ -131,6 +131,7 @@
 
 <script>
 import LogTimeView from "./../../components/timesheet/LogTimeView";
+import ViewDetailMonth from "./../../components/timesheet/ViewDetailMonth";
 import DeleteLogView from "./../../components/timesheet/DeleteLogView";
 import timesheetApi from '../../api/timesheet';
 import MonthViewHeader from "./../../components/timesheet/calendar/MonthViewHeader";
@@ -147,12 +148,14 @@ export default {
         DeleteLogView,
         MonthViewHeader,
         WeekdayHeader,
-        MonthViewEvent
+        MonthViewEvent,
+        ViewDetailMonth
     },
-    props: ['timeView','userId'],
+    props: ['timeView','userId','monEvents'],
     data() {
         return {
             endDate:'',
+            menu:false,
             calendar: '',// value calendar
             ready: false,
             color:'orange',
@@ -187,6 +190,9 @@ export default {
             this.events =  data.events;
             this.sum = data.sumLogTime;
             this.hoursRequired = data.hoursRequired;
+            if(!this.timeView){
+                this.resizeLogtime()
+            }
         },
         // lấy log time đầu tiên của mảng
         resizeLogtime(){
@@ -317,6 +323,7 @@ export default {
         },
         // lấy ra danh sách Log time
         load() {
+            debugger
             let defaultStart = this.$moment().subtract(7,'days').format('YYYY-MM-DD');
             let defaultEnd = this.$moment().add(7,'days').format('YYYY-MM-DD')
             let data = {
@@ -471,11 +478,14 @@ export default {
         },
         // hàm sự kiên chuyển kiểu list view lịch
         createCalendarHoverEvent() {
+            debugger
             const self = this;
             this.$refs.calendar.$el.querySelectorAll('.v-calendar-daily__day-interval').forEach(div => {
                 if (self.timeView) {
                     div.setAttribute('style', div.getAttribute('style').replace('border-top: none; border-bottom: none', ''));
                      this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: block');
+                    this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: block');
+
                 } else {
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: none');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: none');
@@ -492,6 +502,7 @@ export default {
             if(!self.timeView){
                 this.resizeLogtime();
             }else{
+                debugger
                  this.getLogByUserId(this.userId);
                  this.load()
             }
@@ -499,10 +510,12 @@ export default {
         },
         // sự kiện khi thay đổi lịch
         onChangeCalendar() {
+            debugger
             this.$store.commit('timesheet/updateCalendarStartEnd', {
                 start: this.$moment(this.$refs.calendar.lastStart.date).format('DD/MM/YY'),
                 end: this.$moment(this.$refs.calendar.lastEnd.date).format('DD/MM/YY'),
             });
+            debugger
             this.createCalendarHoverEvent();
         },
         updateTotalHours() {
@@ -565,6 +578,20 @@ export default {
         },
     },
     watch: {
+        // monEvents:{
+        //     deep: true,
+        //     immediate: true,
+        //     handler(event){
+        //         if(this.monthEvents[event.date]){
+        //             let startTime = this.$moment(event.start,'YYYY-MM-DD HH:mm').format('x');
+        //             event.start=startTime;
+        //             event.end=startTime;
+        //             this.monthEvents[event.date]=[];
+        //             this.monthEvents[event.date].push(event);
+
+        //         }
+        //     }
+        // },
          userId(){
             this.getLogByUserId(this.userId);
         },
@@ -658,6 +685,7 @@ export default {
 }
 .calendar ::v-deep .v-event-timed {
     left: 3% !important;
+    white-space:pre-wrap!important;
     width: 97% !important;
     user-select: none;
     -webkit-user-select: none;

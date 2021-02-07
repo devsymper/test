@@ -295,6 +295,7 @@ export default {
         ConfigRepeat 
     },
     computed: {
+        
         startDate() {
             return this.$store.state.timesheet.calendarStartDate;
         },
@@ -687,7 +688,9 @@ export default {
                             title:" Thêm thành công",
                         });
                         this.refreshAll();
-                        this.$emit('loadMonthView',data)
+                        if(this.typeCalendar=='month'){  
+                            this.$emit('loadMonthView',data)
+                        }
                     }else{
                         self.$snotify({
                             type: "error",
@@ -734,7 +737,6 @@ export default {
         repreatConditional(data,condition){
             const self = this;
             let listLog = [];
-            debugger
             let startCalendar = this.startDate;
             startCalendar = this.$moment(startCalendar,'DD-MM-YYYY');
             let endCalendar = this.endDate;
@@ -789,7 +791,6 @@ export default {
             return check;
         },
         checkPlanOrLog(startTime){
-            debugger
             let now = this.$moment();
             let time = this.$moment(startTime).format('DD/MMM/YYYY h:mm A');
             let check = this.$moment(time).isAfter(now)==true?0:1;

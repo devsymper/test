@@ -1,7 +1,7 @@
 <template>
-     <div :class="[getColorHeader(monthEvents[date],hoursRequired)]">
+     <div :class="[getColorHeader(monthEvents[date],hoursRequired,date)]">
         <v-tooltip top>
-            <template v-slot:activator="{ on }">
+            <template v-slot:activator="on">
                 <div  v-on="on" class="px-3 pt-2">
                     <div class="d-flex justify-space-between">
                         <!-- Xử lý header -->
@@ -58,11 +58,12 @@ export default {
             }
             return hour + minutes
         },
-       getColorHeader(date,hoursRequired){
+       getColorHeader(events,hoursRequired,date){
             let color = 'grey-color';
             let hour = hoursRequired.trim()
-            if(date){
-                let totalHour =  date.reduce((acc, d) => +d.duration + acc, 0);
+            if(events){
+                color = "light-yellow-color"
+                let totalHour =  events.reduce((acc, d) => +d.duration + acc, 0);
                 if(totalHour>hour*60){
                     color = "light-red-color"
                 }else if(totalHour==hour*60){

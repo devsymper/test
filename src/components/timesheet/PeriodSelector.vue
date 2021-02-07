@@ -1,7 +1,7 @@
 <template>
 <div style="width:62%;float:left"  class="period-selector">
     <div class="float-lg-left float-md-left  select-time" 
-        v-bind:class = "[type=='month' ? 'width-55' :'width-58']">
+        v-bind:class="[type=='month'?'width-55':'width-58']">
         <!-- <v-menu offset-y>
             <v-list>
                 <v-list-item v-for="(item, index) in items" :key="index">
