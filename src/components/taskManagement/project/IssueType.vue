@@ -10,8 +10,8 @@
                         append-icon="mdi-magnify"
                         label="Tìm kiếm"
                         dense
-                        outlined
-                        style="max-width:255px;"
+                        solo
+                        style="max-width:200px;"
                         single-line
                         hide-details
                         class="sym-small-size sym-style-input"
