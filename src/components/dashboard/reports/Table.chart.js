@@ -43,6 +43,8 @@ export default class Table extends ReportBase {
             columns: [],
             cellStyle: this.getStyleItemsInConfig(style.cellFormat.children, 'px', ratio),
             headerStyle: this.getStyleItemsInConfig(style.headerFormat.children, 'px', ratio),
+            totalRowBackup: [],
+            totalRow: []
         };
         
 
@@ -77,18 +79,22 @@ export default class Table extends ReportBase {
         // }
         // }
 
-        if (rsl.needTotal) {
-            if (rsl.data && rsl.data.length > 0) {
-                rsl.totalRow = prevDisplayOptions.totalRow ? prevDisplayOptions.totalRow : [rsl.data.pop()];
-                rsl.totalRowStyle = this.getStyleItemsInConfig(style.total.children, 'px', ratio);
+        if(prevDisplayOptions.totalRowBackup){
+            rsl.totalRowBackup = prevDisplayOptions.totalRowBackup;
+        }
+        rsl.totalRow = [];
+        if(needTotal){
+            if(extraData.changeType == 'style'){
+                rsl.totalRow = prevDisplayOptions.totalRowBackup;
+            }else if (rsl.data && rsl.data.length > 0) {
+                rsl.totalRow = [rsl.data.pop()];
+                rsl.totalRowBackup = rsl.totalRow;
             }
-        } else if (prevDisplayOptions.totalRow) {
-            rsl.totalRow = prevDisplayOptions.totalRow;
+            rsl.totalRowStyle = this.getStyleItemsInConfig(style.total.children, 'px', ratio);
         }
 
-
         // tìm cột đầu tiên ko phải là number để thêm chữ tổng
-        if(Array.isArray(rsl.totalRow)){
+        if(rsl.totalRow.length > 0){
             let notNumberColumn = null;
             for(let col of rsl.columns){
                 if(col.symperType != 'number' || col.lastLineAgg == 'none'){

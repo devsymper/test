@@ -20,6 +20,7 @@
             :autoGroupColumnDef="autoGroupColumnDef"
             :stopEditingWhenGridLosesFocus="true"
             :modules="modules"
+            :pinnedBottomRowData="options.totalRow"
             @model-updated="onTableRender()"
             @column-resized="onColumnResized()"
             @grid-ready="onAgReady"
@@ -306,11 +307,6 @@ export default {
             setTimeout((thisCpn) => {
                 // thisCpn.setColumnWidth();            
             }, 500, this);
-            if(this.options.needTotal && this.options.totalRow && this.options.totalRow[0]){
-            //    this.gridApi.setPinnedBottomRowData(_.cloneDeep(this.options.totalRow)); 
-            }else{
-            //    this.gridApi.setPinnedBottomRowData([]); 
-            }
             this.addPerfectScrollBar();
         },
 
@@ -383,9 +379,10 @@ export default {
     },
     beforeMount(){
         this.gridOptions = {
-             components: {
+            components: {
                 'numberRenderer': agCellRenderer.numberRenderer
             },
+
         };
         let thisCpn = this;
         this.getRowStyle = params => {
