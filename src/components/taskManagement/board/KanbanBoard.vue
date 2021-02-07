@@ -34,7 +34,9 @@
                     v-on:input="onSearch($event)"
                     class="sym-small-size sym-style-input d-inline-block mr-3"
                     append-icon="mdi-magnify"
-                    solo
+                    outlined
+                    dense
+                    single-line
                     :placeholder="$t('common.search')"
                     hide-details
                 ></v-text-field>
@@ -43,10 +45,10 @@
                     :filters="filterProps"
                     @apply-filter="applyFilter"
                 />
-                <div class="list-user d-inline-block" v-for="(obj) in listUserShow" :key="obj.id">
+                <!-- <div class="list-user d-inline-block" v-for="(obj) in listUserShow" :key="obj.id">
                     <span class="count-user" v-if="obj.count">{{obj.count}}+</span>
                     <symperAvatar v-else :size="22" class="user-avatar" :userId="obj.userId" />
-                </div>
+                </div> -->
                 <div class="ml-3 d-inline-block">
                     <v-menu offset-y>
                         <template v-slot:activator="{ on, attrs }">
@@ -186,9 +188,6 @@ export default {
         allIssueTypeInProject(){
             return this.sTaskManagement.listIssueTypeInProjects[this.projectId];
         },
-        dataSprintAfterMapIssue(){
-            return this.sTaskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
-        },
         currentBoard(){
             return this.$store.state.taskManagement.currentBoard;
         },
@@ -197,15 +196,6 @@ export default {
         },
     },
     watch:{
-        dataSprintAfterMapIssue:{
-            deep:true,
-            immediate:true,
-            handler(val){
-                if (val) {
-                    this.getListTasks(true);
-                }
-            }
-        },
         currentBoard(after, before){
             if(after.id == before.id){
                 return;
@@ -291,7 +281,7 @@ export default {
                     },
                 ],
                 page : 1,
-                pageSize: 1000,
+                pageSize: 500,
                 distinct: true
             },
             filterProps:{ // bộ lọc
@@ -301,6 +291,7 @@ export default {
                     value:"",
                     multipleSelection:true,
                     isSelectionChip:true,
+                    showAvatarUser:true,
                     options: [],
                 },
                 tmg_status_id : {
@@ -384,6 +375,7 @@ export default {
             data.optionStatus = this.filterProps.tmg_status_id.options;
             data.optionPriority = this.filterProps.tmg_priority_id.options;
             data.optionIssueType = this.filterProps.tmg_issue_type.options;
+            console.log(this.sTaskManagement,'datadatadatadata');
             this.kanbanWorker.postMessage({
                 action:'setDataForFilter',
                 data: data
@@ -625,6 +617,17 @@ export default {
        
     },
     created(){
+        this.projectId = this.$route.params.id;
+        if(this.sTaskManagement.listUserInProject[this.projectId]){
+            this.listUserShow = this.sTaskManagement.listUserInProject[this.projectId]
+        }
+        let breadcrumbs = [
+                {
+                    text: 'Kanban',
+                    disabled: true
+                },
+            ]
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
         let self = this;
         this.$evtBus.$on('task-manager-submit-issue-success', (issue) =>{
             self.checkUpdateTask(issue);
@@ -668,9 +671,6 @@ export default {
                 case 'getListRoleUserInProject':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
-                        if (res.data.length == 0) {
-                            self.$emit('loaded-content');
-                        }
                         self.$store.commit("taskManagement/setListRoleUserInProject", res);
                     } 
                     break;
@@ -731,19 +731,6 @@ export default {
         this.loadData();
     },
     
-    activated(){
-        this.projectId = this.$route.params.id;
-        if(this.sTaskManagement.listUserInProject[this.$route.params.id]){
-            this.listUserShow = this.sTaskManagement.listUserInProject[this.$route.params.id]
-        }
-        let breadcrumbs = [
-                {
-                    text: 'Kanban',
-                    disabled: true
-                },
-            ]
-        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
-    }
 };
 </script>
 

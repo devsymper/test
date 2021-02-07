@@ -2,22 +2,25 @@
     <div class="wraper-loader">
         <preloader ref="preLoaderView"/>
         <kanban-board 
-        ref="boardView"
-        @loaded-content="afterLoadContent"
-        @loading="beforeLoadContent"
-    />
+            ref="boardView"
+            @loaded-content="afterLoadContent"
+            @loading="beforeLoadContent"
+        />
+        <no-data :message="'Chưa cài đặt Sprint (gợi ý: Backlog -> Create Sprint)'" v-if="isNoData"/>
     </div>
 </template>
 
 <script>
 import KanbanBoard from '@/components/taskManagement/board/KanbanBoard.vue';
 import Preloader from '../../../components/common/Preloader.vue';
+import NoData from '../../../components/common/NoData.vue';
 
 export default {
     name: "Board",
     components: {
         KanbanBoard,
-        Preloader
+        Preloader,
+        NoData
     },
  
     methods:{
@@ -29,6 +32,11 @@ export default {
         }
     },
  
+    data(){
+        return {
+            isNoData:false
+        }
+    }
 };
 </script>
 
