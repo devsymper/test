@@ -58,7 +58,7 @@ export default {
                         listObject:[],
                         columns:[]
                     };
-                    data.listObject = res.data.category;
+                    data.listObject = res.data.category.list;
                     data.columns.push(
                         {
                             name:'id',
