@@ -1598,7 +1598,8 @@
         "settingBoard":"Cài đặt Board",
         "createIssue":"Tạo tác vụ",
         "createIssueType":"Tạo loại tác vụ",
-        "noDocumentConfig":"You haven't configured Document yet for this type of task"
+        "noDocumentConfig":"You haven't configured Document yet for this type of task",
+        "createPriority":"Tạo priority"
 
     }
 }

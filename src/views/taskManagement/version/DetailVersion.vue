@@ -13,6 +13,24 @@ export default {
             return this.$store.state.taskManagement.infoVersionCurrent;
         }
     },
+    activated(){
+        let projectId=this.$route.params.id;
+        let breadcrumbs = [
+                {
+                    text: 'Versions',
+                    disabled: false,
+                    to: "/task-management/projects/"+projectId+"/versions",
+                },
+                {
+                    text: 'Chi tết version',
+                    disabled: true,
+                    to: '',
+                }
+               
+            ];
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
+    }
+
    
 
 }

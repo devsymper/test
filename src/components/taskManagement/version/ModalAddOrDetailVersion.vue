@@ -35,7 +35,8 @@
                                 :error-messages="msgErrStartTime"
                                 v-model="dateStart"
                                 dense
-                                solo
+                                outlined
+                                single-line
                                 prepend-inner-icon="mdi-calendar"
                                 readonly
                                 background-color="grey lighten-3"
@@ -72,7 +73,8 @@
                                 v-model="dateEnd"
                                 :error-messages="msgErrEndTime"
                                 dense
-                                solo
+                                outlined
+                                single-line
                                 background-color="grey lighten-3"
                                 flat
                                 prepend-inner-icon="mdi-calendar"

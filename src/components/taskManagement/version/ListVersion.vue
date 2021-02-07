@@ -10,7 +10,7 @@
                         append-icon="mdi-magnify"
                         label="Tìm kiếm"
                         dense
-                        solo
+                        outlined
                         style="max-width:255px;"
                         single-line
                         hide-details

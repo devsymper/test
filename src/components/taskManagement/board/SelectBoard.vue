@@ -9,7 +9,8 @@
                 @click="onItemClick(board)"
                 >
                 <v-list-item-icon>
-                    <v-icon>mdi-view-week-outline</v-icon>
+                    <v-icon v-if="board.type == 'kanban'">mdi-view-dashboard-variant-outline</v-icon>
+                    <v-icon v-else>mdi-chart-timeline</v-icon>
                 </v-list-item-icon>
 
                 <v-list-item-content>
@@ -97,7 +98,7 @@ export default {
             isLoadingAdd:false,
             dialogAddBoard:false,
             isShow:false,
-            position:{top:0},
+            position:{top:'120px'},
             dataBoardProps:{
                 name : { 
                     title: "Name",
@@ -153,7 +154,6 @@ export default {
     methods:{
         show(e){
             this.isShow = true;
-            this.position.top = e.y + "px"
         },
         hide(){
             this.isShow = false;

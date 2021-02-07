@@ -309,8 +309,9 @@ const inputTypeConfigs = {
                 data: config.value,
                 multipleSelection: config.multipleSelection,
                 showId: config.hasOwnProperty('showId') ? config.showId : true,
+                showAvatarUser: config.hasOwnProperty('showAvatarUser') ? config.showAvatarUser : false,
                 isSelectionChip:(config.isSelectionChip == false) ? false : true,
-                value: config.value
+                value: config.value,
                 
             };
             if(config.onSearch){
