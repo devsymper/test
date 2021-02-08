@@ -23,8 +23,8 @@
                             append-icon="mdi-layers-search-outline"
                             placeholder="Tìm kiếm đối tượng"
                             dense
-                            outlined
-                            style="max-width:255px;"
+                            solo
+                            style="max-width:200px;"
                             single-line
                             hide-details
                             class="sym-small-size sym-style-input"
