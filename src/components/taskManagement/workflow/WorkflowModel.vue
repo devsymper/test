@@ -295,10 +295,26 @@ export default {
                     }
 
                     let obj2 = this.listNode.find(data => data.id.value == this.selected.id)
+                    let idNode = obj2.id.value;
                     var index2 = this.listNode.indexOf(obj2);
                     if (index2 > -1) {
                         this.listNode.splice(index2, 1);
                     }
+                    // check nếu có link tới node thì xóa link
+                    let link = this.listLink.find(data => data.to.value == idNode);
+                    if (link) {
+                        let index3 = this.listLink.indexOf(link);
+                        if (index3 > -1) {
+                            this.listLink.splice(index3, 1);
+                        }
+                        // xóa link trong dataWorkflow
+                        let objLink = this.dataWorkflow.links.find(data => data.id == link.id.value)
+                        let indexLink = this.dataWorkflow.links.indexOf(objLink);
+                        if (indexLink > -1) {
+                            this.dataWorkflow.links.splice(indexLink, 1);
+                        }
+                    }
+                
 
                 }
                 

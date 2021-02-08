@@ -48,7 +48,11 @@
                     </template>
 
                     <template v-slot:[`item.role`]="{ item }">
+                        <div v-if="checkUserAdmin(item)">
+                            Administrator
+                        </div>
                         <v-autocomplete
+                            v-else
                             class="my-2 fs-13 select-role-user sym-small-size sym-style-input"
                             hide-details
                             style="width:300px;"
@@ -70,7 +74,7 @@
                     <template  v-slot:[`item.action`]="{ item }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-icon  v-if="checkRole('task_manager_access','delete')"  v-on="on" @click="handleDeleteMember(item)" style="font-size:24px">mdi-delete-outline</v-icon>
+                                <v-icon  v-if="checkRole('task_manager_access','delete') && !checkUserAdmin(item)"  v-on="on" @click="handleDeleteMember(item)" style="font-size:24px">mdi-delete-outline</v-icon>
                             </template>
                             <span>Delete</span>
                         </v-tooltip>
@@ -476,6 +480,14 @@ export default {
         }
     },
     methods:{
+        checkUserAdmin(user){
+            if (this.currentProject) {
+                if (user.userId == this.currentProject.userLeader) {
+                    return true;
+                }
+            }
+            return false
+        },
         checkRole(objectType,action){
             return checkPermission(objectType,action);
         },
