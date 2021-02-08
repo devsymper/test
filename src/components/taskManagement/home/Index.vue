@@ -370,7 +370,8 @@ export default {
     text-transform:unset;
 }
 .home-tabs >>> .v-item-group{
- height: 35px;
+    height: 35px;
+    border-bottom: var(--symper-border);
 }
 .home-tabs >>>.v-tabs-items{
     width:100%;
