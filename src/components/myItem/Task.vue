@@ -203,13 +203,14 @@ export default {
                     let selectDefaultControlDocument=this.taskInfo.selectDefaultControlDocument;
                     for (let index = 0; index < selectDefaultControlDocument.length; index++) {
                         if (selectDefaultControlDocument[index].name && selectDefaultControlDocument[index].value) {
-                            overrideValueControls[selectDefaultControlDocument[index].name]={formulas:"SELECT '"+selectDefaultControlDocument[index].value+"'"};
+                            overrideValueControls[selectDefaultControlDocument[index].name] = {
+                                formulas: selectDefaultControlDocument[index].value
+                            };
                         }
                     }
                 }
-                return overrideValueControls;
             }
-          
+            return overrideValueControls;          
         }
     },
     watch: {
