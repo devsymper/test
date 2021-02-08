@@ -1,7 +1,7 @@
 <template>
 <div style="width:62%;float:left"  class="period-selector">
     <div class="float-lg-left float-md-left  select-time" 
-        v-bind:class = "[type=='month' ? 'width-55' :'width-58']">
+        v-bind:class="[type=='month'?'width-55':'width-58']">
         <!-- <v-menu offset-y>
             <v-list>
                 <v-list-item v-for="(item, index) in items" :key="index">
@@ -11,15 +11,14 @@
         </v-menu> -->
         <v-autocomplete
             style="width:30%; float:left"
-            
-              v-model="user"
-              :items="listUser"
-              return-object
-              placeholder="Chọn user"
-                item-text="displayName"
-                item-value="id"              
-              class="auto-complete mr-1 "
-              dense
+            v-model="user"
+            :items="listUser"
+            return-object
+            placeholder="Chọn user"
+            item-text="displayName"
+            item-value="id"              
+            class="auto-complete mr-1 "
+            dense
             ></v-autocomplete>
         <v-btn v-for="action in actions" :key="action.label" depressed small class="mr-1" color="#F7F7F7" 
             @click="action.action">
@@ -30,7 +29,9 @@
         <v-btn icon @click="pre()">
             <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-        <span>{{totalHours*10/10}}/{{hoursRequired}} {{$t('timesheet.of')}} {{startDate}} - {{endDate}}</span>
+        <span>{{totalHours*10/10}}/{{hoursRequired}} {{$t('timesheet.of')}} 
+            <span style="color:#008080"> {{startDate.slice(0,5)}} - {{endDate}}</span>
+           </span>
         <v-btn icon @click="next()">
             <v-icon>mdi-chevron-right </v-icon>
         </v-btn>
@@ -51,7 +52,10 @@ const dayjsTypeMapper = {
 
 export default {
     methods: {
-         getSubDepartmentUser(){
+        getPreLog(){
+
+        },
+        getSubDepartmentUser(){
             const self = this;
             orgchartApi.getSubDepartMent().then(res=>{
                 if(res.status=200){
@@ -96,7 +100,7 @@ export default {
                 case'Nov':
                     return this.$t('timesheet.nov');
                 case'Dec':
-                    return this.$t('commom.dec');
+                    return this.$t('timesheet.dec');
             }
 
         },
@@ -107,6 +111,7 @@ export default {
             }
         },
         next() {
+            // this.getPrelog();
             this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(this.showDate).add(1, dayjsTypeMapper[this.type]).format('YYYY-MM-DD'));
             if (this.type === 'month') {
                 this.$store.commit('timesheet/adjustCalendar', this.$store.state.timesheet.calendarAdjustment + 1);

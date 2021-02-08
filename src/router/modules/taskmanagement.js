@@ -83,14 +83,14 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/workflow/List.vue')
                 }
             },
-            {
-                path: "projects/:id/timesheets",
-                meta:{group:'home'},
-                name: "Timesheets",
-                components:{
-                    TaskManagement: () => import ('../../views/taskManagement/timesheet/Index.vue')
-                }
-            },
+            // {
+            //     path: "projects/:id/timesheets",
+            //     meta:{group:'home'},
+            //     name: "timesheet",
+            //     components:{
+            //         TaskManagement: () => import ('../../views/taskManagement/timesheet/Index.vue')
+            //     }
+            // },
             {
                 path: "projects/:id/issue-link",
                 meta:{group:'projectSetting'},

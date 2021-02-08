@@ -1718,6 +1718,7 @@ export default {
 			this.$emit("refresh-list", {});
         },
 		showTableDropdownMenu(x, y, colName){
+
 			this.searchKey = ""
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){

@@ -7,7 +7,7 @@
         {{$t('timesheet.submit_timesheet_form')}}</div>
     </v-card-title>
     <v-card-text style="color: black;font-size: 13px">
-        {{$t('timesheet.period')}}: <span style="font-weight:430">{{startEndDate.slice(0,8)}}</span> đến <span style="font-weight:430">{{startEndDate.slice(11,19)}}</span>
+        {{$t('timesheet.period')}}: <span style="font-weight:430">{{startEndDate.slice(0,8)}}</span> đến <span style="font-weight:430">{{startEndDate.slice(11,21)}}</span>
     </v-card-text>
     <v-card-text style="color: black;font-size: 13px">
         {{$t('timesheet.hours_logged')}}: {{hours}}

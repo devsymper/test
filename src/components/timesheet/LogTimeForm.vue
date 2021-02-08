@@ -1,5 +1,10 @@
 <template>
-<v-card class="w-100 log-form" >
+<div>
+<ConfigRepeat @cancel="showConfigRepeat=false" v-if="showConfigRepeat" style="background:white!important"/>
+
+<v-card v-else class="w-100 log-form" >
+    <!-- text-sm-center -->
+    <!-- test -->
     <v-card-title class="pb-1 pt-2 headline lighten-2" primary-title>
         <div class="pb-1 w-100" style="border-bottom: 1px solid lightgrey">
             <span style="font-size:18px">{{$t('timesheet.log_time')}}</span> 
@@ -164,7 +169,7 @@
                     <span style="color:red"> *</span> 
                 </span>
                 <v-combobox
-                    :menu-props="{'maxHeight':204,'minWidth':70}" 
+                    :menu-props="{'maxHeight':204,'minWidth':76,'nudgeLeft':5}" 
                     style="margin-top:-12px"
                     background-color="#F7F7F7"
                     no-filter
@@ -176,7 +181,7 @@
             <div style="width: 63px; float: left"> <span class="label">
                 {{$t('timesheet.end_time')}}<span style="color:red">*</span></span>
                 <v-combobox
-                        :menu-props="{'maxHeight':204, 'minWidth':70}" 
+                        :menu-props="{'maxHeight':204, 'minWidth':76,'nudgeLeft':5}" 
                         style="margin-top:-12px"
                         background-color="#F7F7F7"
                         no-filter
@@ -194,56 +199,55 @@
         <span class="label">Mô tả</span>
         <textarea v-model="inputs.description" class='description'></textarea>
     </v-card-text>
-    <v-card-actions class="pb-5">
-        <div class="w-100" style="float:right">
-            <input class="ml-4 mr-1 mt-1" type="checkbox" id="checkbox" v-model="keepLog">
-            <span class="fs-13" >
-                Thêm liên tục
-            </span>
-            <v-btn text class='cancel' @click="cancel()">
-               {{$t('timesheet.cancel')}}
-            </v-btn>
-            <v-btn v-if= "update==false&&showLog" text  
-            class="button-logtime"
-            style="color:blue"
-             @click="log(1)">
-             <span >{{$t('timesheet.log')}}</span> 
-             </v-btn>
-              <v-btn v-if= "update==false&&showPlan" text 
-            style="color:green"
-            class="button-logtime"
-             @click="log(0)">
-             <span >{{$t('timesheet.plan')}}</span> 
-             </v-btn>
-               <v-btn v-if= "update&&newEvent.type==1" text 
-            class="button-logtime"
-             @click="updatelog(1)">
-             <span >{{$t('timesheet.update')}}</span> 
-             </v-btn>
-               <v-btn v-if= "update&&newEvent.type==0&&showPlan" text 
-            class="button-logtime"
-             @click="updatelog(0)">
-             <span >{{$t('timesheet.update')}}</span> 
-             </v-btn>
-               <v-btn v-if= "update&&newEvent.type==0&&showLog" text 
-            class="button-logtime mr-2" style="float:right!important; width: 60px"
-             @click="updatelog(1)">
-             <span >{{$t('timesheet.log')}}</span> 
-             </v-btn>
-        </div>
-    </v-card-actions>
+    <!-- <v-row class="w-100" >
+        <v-col class="col-md-4" @click="repeatConfig()">
+             <i class="ri-vip-crown-2-fill"></i>
+            <input class="ml-6 mr-1 mt-1" type="checkbox" v-model="repeat">
+             <span class="fs-13">Lặp lại</span>
+        </v-col>
+        <v-col class="col-md-7" v-if="repeat">
+            <v-select 
+                class="select-repeat"
+                style="width:180px; margin-top:-15px"
+                v-model="selectedRepeat"
+                :items="selectRepeat">
+            </v-select>
+        </v-col>
+    </v-row> -->
+    <!-- <div class="w-100 pb-5" style="margin-top: -15px!important;background:white"> -->
+    <div class="w-100 pb-5" >
+
+        <input class="ml-6 mr-1 mt-1" type="checkbox" id="checkbox" v-model="keepLog">
+        <span class="fs-13" >
+            Thêm liên tục
+        </span>
+        <v-btn text class='cancel' @click="cancel()">
+            {{$t('timesheet.cancel')}}
+        </v-btn>
+        <v-btn v-if="update==false&&showLog" text class="button-logtime color-blue" @click="log(1)"><span >{{$t('timesheet.log')}}</span> </v-btn>
+        <v-btn v-if="update==false&&showPlan" text class="button-logtime color-green" @click="log(0)"> <span >{{$t('timesheet.plan')}}</span> </v-btn>
+        <v-btn v-if="update&&newEvent.type==1" text class="button-logtime color-blue" @click="updatelog(1)"><span >{{$t('common.update')}}</span> </v-btn>
+        <v-btn v-if="update&&newEvent.type==0&&showPlan" text class="button-logtime color-green" @click="updatelog(0)"><span >{{$t('common.update')}}</span> </v-btn>
+        <v-btn v-if="update&&newEvent.type==0&&showLog" text  class="button-logtime mr-2 color-blue" style="float:right!important; width: 60px" @click="updatelog(1)"> <span >{{$t('timesheet.log')}}</span> </v-btn>
+    </div>
+
 </v-card>
+</div>
 </template>
 
 <script>
 import timesheetApi from '../../api/timesheet';
 import TaskForm from '../timesheet/TaskForm';
-
+import ConfigRepeat  from '../timesheet/form/ConfigRepeat';
 export default {
     name: 'LogTimeForm',
     props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
     data: () => ({
+        selectRepeat:['Hằng ngày',"Hằng tuần vào thứ 2","Từ thứ 2 đến thứ 7","Tùy chỉnh..."],
+        selectedRepeat:'Hằng ngày',
+        repeat:false,
         logTimeList:[],
+        showConfigRepeat:false,
         keepLog:false,
         isCaculate:false,
         datePicker:'',
@@ -287,9 +291,17 @@ export default {
         },
     }),
     components:{
-        TaskForm
+        TaskForm,
+        ConfigRepeat 
     },
     computed: {
+        
+        startDate() {
+            return this.$store.state.timesheet.calendarStartDate;
+        },
+        endDate() {
+            return this.$store.state.timesheet.calendarEndDate;
+        },
          typeCalendar() {
             return this.$store.state.timesheet.calendarType;
         },
@@ -340,6 +352,11 @@ export default {
         // }
     },
     watch: {
+        selectedRepeat(){
+            if(this.selectedRepeat=='Tùy chỉnh...'){
+                this.showConfigRepeat = true;
+            }
+        },
         datePicker(){
             let year = this.datePicker.slice(0,4);
             let month = Number(this.datePicker.slice(5,7))-1;
@@ -433,8 +450,11 @@ export default {
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
-            this.task = val.task?val.task:getIdTask(val.task);
-            this.items.push({name:val.task});
+            // this.task = val.task?val.task:getIdTask(val.task);
+            this.task = val.task?val.task:"";
+            if(val.task){
+                this.items.push({name:val.task});
+            }
             // hiển thị nút plan và log theo từng giờ
             let now = this.$moment();
             let dateLog = this.$moment(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
@@ -451,15 +471,9 @@ export default {
         this.getCategory();
     },
     methods: {
-        // getIdTask(nameTask){
-        //     let id = 0;
-        //    this.logTimeList.map(task=>{
-        //        if(task.task_id==nameTask){
-        //            id = 
-        //        }
-
-        //     })
-        // },
+        repeatConfig(){
+            this.repeat = !this.repeat;
+        },
         formatTime(time){
             let minutes = 0;
             let hour = 0;
@@ -584,7 +598,8 @@ export default {
              this.$emit("showCategoryForm",{
                 startTime:this.inputs.startTime,
                 endTime:this.inputs.endTime,
-                task: this.findNameTask(this.task),
+                task:"",
+                // task: this.findNameTask(this.task),
                 date: this.inputs.date,
                 categoryTask: this.categoryTask,
                 desc: this.inputs.description || ""
@@ -595,7 +610,8 @@ export default {
             this.$emit("showTaskForm",{
                 startTime:this.inputs.startTime,
                 endTime:this.inputs.endTime,
-                task: this.findNameTask(this.task),
+                task:"",
+                // task: this.findNameTask(this.task),
                 date: this.inputs.date,
                 categoryTask: this.categoryTask,
                 desc: this.inputs.description || ""
@@ -648,28 +664,101 @@ export default {
             }
             if (!check){}
             else{
-                timesheetApi.createLogTime({
-                    start: start,
-                    end: end,
-                    duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
-                    task: this.findNameTask(this.task),
-                    type: type,
-                    date: this.inputs.date,
-                    categoryTask: this.categoryTask,
-                    desc: this.inputs.description || ""
-                })
-                .then(res => {
+                this.saveLog(start,end,type)
+            }       
+        },
+        saveLog(start,end,type){
+            let data={
+                start: start,
+                end: end,
+                duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
+                task: this.findNameTask(this.task),
+                type: type,
+                date: this.inputs.date,
+                categoryTask: this.categoryTask,
+                desc: this.inputs.description || ""
+            }
+            if(!this.repeat){
+                timesheetApi.createLogTime(data).then(res => {
                     if (res.status === 200) {
                         this.onSave();
+                         this.$snotify({
+                            type: "success",
+                            title:" Thêm thành công",
+                        });
                         this.refreshAll();
-                        this.$emit('loadMonthView')
+                        if(this.typeCalendar=='month'){  
+                            this.$emit('loadMonthView',data)
+                        }
+                    }else{
+                        self.$snotify({
+                            type: "error",
+                            title:"Thêm thất bại",
+                    });
                     }
-                })
-                .catch();
+                }).catch();
                 if(!this.keepLog){
                     this.cancel();
                 }
-            }       
+            }else{
+                this.createRepeatLog(data);
+                if(!this.keepLog){
+                    this.cancel();
+                }
+            }
+        },
+        createRepeatLog(data){
+            switch(this.selectedRepeat){
+                case "Hằng ngày":
+                    let conditionDaily = {
+                        day:[1,2,3,4,5,6,0],
+                        isNeverEnd:true,
+                        repeatAfter:{number:1,type:'day'},
+                        toDate:''
+                    };
+                    this.repreatConditional(data,conditionDaily);
+                    break;
+                case "Hằng tuần vào thứ 2":
+                    let conditionMon = 'this.$moment(logtime.date,"YYYY-MM-DD").isoWeekday()==1'
+                    this.repreatConditional(data,conditionMon)
+                    break;
+                 case "Từ thứ 2 đến thứ 7":
+                    let cons = [];
+                    for(let i = 1; i<7;i++){
+                        let con = 'this.$moment(logtime.date,"YYYY-MM-DD").isoWeekday()=='+i;
+                        cons.push(con);
+                    }
+                    let conditionMonToSat = cons.join('||');
+                    this.repreatConditional(data,conditionMonToSat)
+                    break;
+            }
+        },
+        repreatConditional(data,condition){
+            const self = this;
+            let listLog = [];
+            let startCalendar = this.startDate;
+            startCalendar = this.$moment(startCalendar,'DD-MM-YYYY');
+            let endCalendar = this.endDate;
+            endCalendar = this.$moment(endCalendar,'DD-MM-YYYY');
+            let startHour = this.$moment(data.start).format('HH');
+            let startMinutes = this.$moment(data.start).format('mm');
+            let endHour = this.$moment(data.end).format('HH');
+            let endMinutes = this.$moment(data.end).format('mm');
+            let totalDay = this.$moment.duration(endCalendar.diff(startCalendar)).asDays();
+            let logtime = data;
+            for(let i=0;i<=totalDay;i++){
+                logtime.date = this.$moment(startCalendar).add(i, 'days').format('YYYY-MM-DD');//date.logtime=2 = >date.date=2; date = 3
+                logtime.start = this.$moment(logtime.date,"YYYY-MM-DD").add(startHour,'hours').add(startMinutes,'minutes').format('YYYY-MM-DD HH:mm');
+                logtime.end = this.$moment(logtime.date,"YYYY-MM-DD").add(endHour,'hours').add(endMinutes,'minutes').format('YYYY-MM-DD HH:mm');
+                logtime.configRepeat = JSON.stringify(condition);
+                listLog.push({...logtime});
+            }
+             timesheetApi.createListLog(JSON.stringify(listLog)).then(res => {
+                    if (res.status === 200) {
+                        self.onSave();
+                        self.$emit('loadMonthView')
+                    }
+                    }).catch();
         },
         showError() {
             if (this.duration < 0) {
@@ -700,6 +789,12 @@ export default {
             }
             return check;
         },
+        checkPlanOrLog(startTime){
+            let now = this.$moment();
+            let time = this.$moment(startTime).format('DD/MMM/YYYY h:mm A');
+            let check = this.$moment(time).isAfter(now)==true?0:1;
+            return check
+        },
         updatelog(type) {
             this.checkNullTask = true;
             this.checkNullCate = true;
@@ -714,7 +809,7 @@ export default {
                         end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
                         task: this.findNameTask(taskId),
-                        type: type,
+                        type: this.checkPlanOrLog(this.newEvent.start),
                         id: this.newEvent.id,
                         date: this.inputs.date,
                         categoryTask: this.categoryTask,
@@ -734,6 +829,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.s-select-page-size ::v-deep .v-input__slot:before {
+    border-color: transparent !important;
+    padding-left: 10px;
+    font-size:13px!important
+}
+.select-repeat ::v-deep .v-select__selections{
+    font-size:13px!important
+   
+}
+
 .div-description {
     clear: left;
     clear: right;
@@ -926,6 +1031,7 @@ button {
     width:50px;
 
 }
+
 .v-time-picker-title .v-picker__title__btn,
 .v-time-picker-title span {
     font-size: 24px !important;

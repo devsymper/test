@@ -1,12 +1,8 @@
 <template>
 <div class="w-100 pl-4" >
     <v-row class="submit-view">
-        <div style="width:63%;float:left; color: black!important">
+        <div style="width:63%;float:left">
             <div class="float-lg-left float-md-left .d-lg-flex .d-lg-none d-none d-lg-block sub-submit-view pt-3">
-                <v-menu offset-y>
-                    <v-list>
-                    </v-list>
-                </v-menu>
                 <v-btn @click="adjust(-1)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('timesheet.last_week')}}</v-btn>
                 <v-btn @click="adjust(0)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('timesheet.last_week1')}}</v-btn>
             </div>
@@ -30,11 +26,13 @@
     </v-row>
     <template>
         <AgDataTable 
-         :customGridOptions="customGridOptions"
-        style="width: 98%; max-height: 80%; 
-         margin-left: 3px; margin-top: 10px; font-size: 13px!important; 
-         font-family: Roboto" ref="agTable" 
-         :allColumns="allColumns" :rowData="dataTable" :editable="false" :customComponents="customAgComponents">
+            :customGridOptions="customGridOptions"
+            style="width: 98%; max-height: 80%; 
+            margin-left: 3px; margin-top: 10px" ref="agTable" 
+            :allColumns="allColumns" 
+            :rowData="dataTable" 
+            :editable="false" 
+            >
         </AgDataTable>
     </template>
 </div>
@@ -42,61 +40,33 @@
 
 <script>
 import AgDataTable from "./../../components/common/agDataTable/AgDataTable";
-import CheckBoxRenderer from "./../../components/common/agDataTable/CheckBoxRenderer";
-import PeriodSelector from "./../../components/timesheet/PeriodSelector";
 import ActionButtons from "./../../components/timesheet/ActionButtons";
 import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetForm";
 import timesheetApi from '../../api/timesheet';
-
+import ReportTimesheetWorker from 'worker-loader!@/worker/timesheet/ReportTimesheet.Worker.js';
 import _groupBy from 'lodash/groupBy';
-import dayjs from 'dayjs';
-
 export default {
     components: {
         AgDataTable,
-        CheckBoxRenderer,
         SubmitTimesheetForm,
     },
+    mounted(){
+        const self = this
+        this.reportTimesheetWorker.addEventListener("message", function (event) {
+            let data = event.data;
+            switch (data.action) {
+                case 'showTotalHourInReportView':
+                    self.setDataTable(data.dataAfter)
+                    break;
+                default:
+                    break;
+            }
+        });
+    },
     methods: {
-       getUser(){
-            let self= this;
-            timesheetApi.getListUser({page:1,pageSize: 2000})
-            .then(res => {
-            if (res.status === 200){
-                self.listUser=res.data.listObject;
-                  for(let i = 0; i<self.listUser.length;i++){
-                    self.nameUser.push(self.listUser[i].userName);
-                    console.log(self.nameUser);
-                }
-            }
-            }).catch(console.log);
-        },
-        getTask(id){
-            const self = this;
-            timesheetApi.getListReport({
-                    startEnd: this.startEndDate
-                })
-                .then(res => {
-                    if (res.status === 200) {
-                        let task = res.data;
-                        for (let i=0; i<res.data.length;i++){
-                            if(id==res.data.id){
-                                return res.data.task_id
-                            }
-                        }
-                    } })
-                .catch(err => {
-                    console.log(err);
-
-                });
-        },
-        getName(id){
-            for(let i = 0; i<this.listUser.length;i++){
-                if(this.listUser[i].id==id){
-                    this.nameUser.push(this.listUser[i].userName);
-                    return this.listUser[i].userName;
-                }
-            }
+        setDataTable(data){
+            this.sum = data.sum;
+            this.dataTable = data.dataTable
         },
         cancel() {
             this.dialog = false;
@@ -110,75 +80,20 @@ export default {
         },
         load() {
             const self = this;
-            timesheetApi.getListReport({
-                    startEnd: this.startEndDate
-                })
-                .then(res => {
-                    if (res.status === 200) {
-                        self.dataTest = res.data;
-                        const ranges = self.allColumns.slice(2, self.allColumns.length).map(c => c.colId);
-                        const logTimeList = _groupBy(res.data.listLogTime, 'id');
-                        const dateList = _groupBy(res.data.listLogTime, 'date');
-                        const userName = _groupBy(res.data.listLogTime, 'account_id');
-                         let nameUser = self.nameUser;
-                        //console.log(dateList);
-                        const rows = Object.keys(logTimeList).map(k => {
-                            const returnObj = {
-                                category: logTimeList[k][0].category_task,
-                                name: [this.getName(logTimeList[k][0].account_id),k+'-'+logTimeList[k][0].task_id],
-                            };
-                            let logged = 0;
-                            logTimeList[k].forEach(log => {
-                                const loggedByDay = (log.duration / 60);
-                                let date= log.date;
-                                returnObj[log.date] = loggedByDay.toFixed(1);
-                                if (ranges.includes(log.date))
-                                    logged += loggedByDay;
-                            })
-                            returnObj['logged'] = logged.toFixed(1);
-                            return returnObj;
-                        }).filter(logTime => logTime.logged > 0);
-
-                        // tính tổng theo từng ngày 
-                        Object.keys(userName).forEach(key => {
-                            let time =  _groupBy(userName[key], 'date');
-                            let totalByDays = {name:[this.getName(key)]};
-                            let totalByUser = 0;
-                            Object.keys(time).forEach(day => {
-                                let totalByDay = time[day].reduce((acc, duration) => acc + duration.duration/60, 0);
-                                totalByUser += totalByDay;
-                                totalByDays[day] = totalByDay.toFixed(1);
-                                // key1 = 26/08
-                                // a[key1] = 'b' // a['26/08'] = 'b'
-                                // a.key1 = 'b' // a['key1'] = 'b'
-                            });
-                            totalByDays['logged'] = totalByUser.toFixed(1);
-                            totalByDays.summary = true;
-                            rows.push(totalByDays);
-                        });
-                        
-                        Object.keys(dateList).forEach(key => {
-                            dateList[key] = dateList[key].reduce((acc, date) => acc + date.duration/60, 0).toFixed(1);
-                        });
-                        // tính số log theo ngày 
-                        dateList.name = ["Tổng"];
-                        dateList.logged = (rows.reduce((acc,r) => r.logged && r.summary ? +r.logged + acc : acc, 0)).toFixed(1);
-                        //console.log(typeof dateList.logged);
-                        this.sum = dateList.logged;
-                        rows.push(dateList);
-                        // this.dataTable = ;
-                        this.dataTable=rows;
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
-
-                });
-
+            let data = {
+                startEnd:this.startEndDate,
+                allColumns: this.allColumns,
+                listUser : this.$store.state.app.allUsers
+            }
+            this.reportTimesheetWorker.postMessage({
+                action:'showTotalHourInReportView',
+                data:{data:data}
+            })
         }
     },
     data() {
         return {
+            reportTimesheetWorker:null,
             listUser: [],
               customGridOptions: {
                 getRowStyle : function(params) {
@@ -186,9 +101,6 @@ export default {
                         return { background: '#E0FFFF' };
                     }
                 }
-            },
-            customAgComponents: {
-                customCheckBox: CheckBoxRenderer
             },
             sum:0,
             nameUser:[],
@@ -226,11 +138,6 @@ export default {
         startEndDate() {
             return this.$store.getters['timesheet/submitStartEndDate'];
         },
-        startDate() {
-            let start = this.$store.getters['timesheet/submitStartEndDate'];
-            startDate = start.slice(0, 8);
-            return startDate;
-        },
         hoursRequired() {
             return this.$store.getters['timesheet/getTotalHoursBy']('submit');
         }
@@ -242,10 +149,8 @@ export default {
         }
     },
     created() {
-        this.getUser();
+        this.reportTimesheetWorker = new ReportTimesheetWorker();
         this.load();
-     
-        end: this.$store.getters['timesheet/submitStartEndDate'];
     },
 }
 </script>
@@ -354,7 +259,6 @@ button {
 .sub-submit-view {
     width: 58%;
 }
-
 .ag-theme-balham ::v-deep .ag-header-row {
     top: 0px;
     height: 32px;
@@ -377,5 +281,8 @@ button {
     padding-left: 0px;
     font-size: 13px !important;
 }
-
+.ag-theme-balham .ag-cell{
+    border:none!important;
+    line-height:22px!important
+}
 </style>
