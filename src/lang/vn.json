@@ -130,7 +130,7 @@
             "App": "Ứng dụng",
             "Administrator": "Quản trị viên",
             "Account management": "Quản lý tài khoản",
-            "Task Management": "Quản lý công việc",
+            "Task Management": "Quản lý tác vụ",
             "Access Management": "Quản lý truy cập",
             "accessControl": "Quản lý truy cập",
             "accessControlBeta": "Quản lý truy cập beta",
@@ -1593,7 +1593,11 @@
             "removePriority": "Bạn sẽ xóa priority này khỏi danh sách.",
             "removeVersion": "Bạn sẽ xóa version này khỏi danh sách"
         },
-        "settingBoard":"Cài đặt Board"
+        "settingBoard":"Cài đặt Board",
+        "createIssue":"Tạo tác vụ",
+        "createIssueType":"Tạo loại tác vụ",
+        "noDocumentConfig":"You haven't configured Document yet for this type of task",
+        "createPriority":"Tạo priority"
 
     }
 }

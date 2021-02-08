@@ -11,7 +11,7 @@
                         label="Tìm kiếm"
                         dense
                         solo
-                        style="max-width:255px;"
+                        style="max-width:200px;"
                         single-line
                         hide-details
                         class="sym-small-size sym-style-input"

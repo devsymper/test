@@ -9,10 +9,10 @@
                         v-model="search"
                         append-icon="mdi-magnify"
                         label="Tìm kiếm"
-                        dense
                         solo
-                        style="max-width:255px;"
+                        dense
                         single-line
+                        style="max-width:200px;"
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>

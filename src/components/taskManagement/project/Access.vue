@@ -32,7 +32,7 @@
                         single-line
                         hide-details
                         class="sym-small-size sym-style-input"
-                        style="max-width:255px;position: absolute;right: 10px;top: 18px;"
+                        style="max-width:200px;;position: absolute;right: 10px;top: 18px;"
                     ></v-text-field>
                    
                 </v-card-title>

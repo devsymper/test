@@ -7,7 +7,7 @@
         <v-card>
         <v-card-title class="px-4">
             <div class="w-100 d-flex justify-space-between">
-                <span class="fs-16">Create Issues</span>
+                <span class="fs-16">{{$t("taskManagement.createIssue")}}</span>
                 <div class="d-flex">
                     <v-autocomplete 
                         v-model="currentProject"
@@ -61,7 +61,7 @@
         </v-card-title >
         <v-card-text class="p-2">
             <submit
-                v-if="currentIssueType && currentIssueType.id"
+                v-if="currentIssueType && currentIssueType.id && documentId"
                 :key="currentIssueType.id"
                 ref="submitComponent"
                 class="doc_issue"
@@ -73,6 +73,12 @@
                 :showSubmitButton="false"
                 @submit-document-success="onSubmitDone"
                 />
+                <div v-else class="no-document-message">
+                    <v-icon size="50">mdi-database-remove</v-icon>
+                    <div>
+                        Bạn chưa cấu hình Document cho loại tác vụ này
+                    </div>
+                </div>
         </v-card-text>
         <v-card-actions class="px-4">
             <v-spacer></v-spacer>
@@ -99,7 +105,6 @@
 
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
-import { taskManagementApi } from "@/api/taskManagement.js";
 import { util } from '../../../plugins/util';
 import Submit from '../../../views/document/submit/Submit.vue';
 
@@ -110,7 +115,6 @@ export default {
         Submit,
     },
     data(){
-        let self = this;
         return{
             isLoading:false,
             isShow:false,
@@ -118,7 +122,6 @@ export default {
             currentIssueType: null,
             documentId:null,
             workflowVariable:{
-                // "project_id" : "111111"
             }
         
         }
@@ -173,6 +176,7 @@ export default {
             }
             this.currentIssueType = this.allIssueTypeInProject.find(ele => ele.projectId == this.currentProject.id);
             this.documentId = Number(this.currentIssueType.documentId);
+            console.log(this.documentId,'this.documentId');
             this.setParamsForField()
         },
         setParamsForField(){
@@ -218,21 +222,20 @@ export default {
     ::v-deep .v-input__slot{
         box-shadow: none !important;
     }
-    .doc_issue >>> table td span{
-        width: 100%;
-    }
-    .doc_issue ::v-deep .s-control{
-        font-size: 13px!important;
-        margin-top: 0px;
-        border-top: 1px solid #efefef!important;
-        border: 1px solid #efefef!important;
-    }
     .doc_issue >>> .sym-form-submit{
         padding: 4px;
         padding-right: 10px;
     }
     .doc_issue{
-        height: 550px!important;
+        height: 600px!important;
     }
 
+    .no-document-message{
+        text-align: center;
+        height: 150px;
+        padding: 48px;
+    }
+    ::v-deep .v-card__subtitle, ::v-deep .v-card__text{
+        line-height: unset !important;
+    }
 </style>

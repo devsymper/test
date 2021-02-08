@@ -32,17 +32,46 @@ export default class ActionControl extends Control {
             this.ele.addClass('d-none');
         }
     }
+    addCommentToView(el){
+        this.ele.find('.content-comment').append(el)
+    }
     renderApprovalEle() {
+        let thisObj = this;
+        this.ele.on('click','.approval-tablinks',function(e){
+            $(e.target).siblings().removeClass('active')
+            $(e.target).addClass('active');
+            if($(e.target).attr('data-tab') == 'comment'){
+                thisObj.ele.find('.content-history').removeClass('tab-content-active');
+                thisObj.ele.find('.content-comment').addClass('tab-content-active');
+            }
+            else if($(e.target).attr('data-tab') == 'history'){
+                thisObj.ele.find('.content-comment').removeClass('tab-content-active')
+                thisObj.ele.find('.content-history').addClass('tab-content-active')
+            }
+        })
         if (this.checkDetailView()) {
-            console.log(this.value);
-            let thisCpn = this;
             let listUser = store.state.app.allUsers;
-            thisCpn.ele.empty();
+            thisObj.ele.empty();
+            let template = `
+                <div class="approval-tab">
+                    <button class="approval-tablinks active" data-tab="history">Lịch sử duyệt</button>
+                    <button class="approval-tablinks" data-tab="comment">Bình luận</button>
+                </div>
+                <div class="approval-tabcontent content-history tab-content-active">
+                    
+                </div>
+
+                <div class="approval-tabcontent content-comment">
+                    
+                </div>
+
+            `
+            thisObj.ele.html(template)
             documentApi.getListApprovalHistory(this.value).then(res => {
                     if (res.status == 200) {
                         let data = res.data;
                         if (data.length == 0) {
-                            thisCpn.ele.hide()
+                            thisObj.ele.hide()
                         } else {
                             for (let index = 0; index < data.length; index++) {
                                 let approvalHistory = data[index];
@@ -58,13 +87,12 @@ export default class ActionControl extends Control {
                                                             width: 18px;
                                                             margin-bottom: -4px;"> <strong>` + user.displayName + `</strong> <span>Thực hiện <span style="font-weight:500;">` + approvalHistory.actionTitle + "</span> " + SYMPER_APP.$moment(approvalHistory.createAt).fromNow() + ` ( ` + approvalHistory.createAt + ` )</span>
                                                         </div>`
-                                console.log("asdsadsad#D", thisCpn);
-                                thisCpn.ele.append(item)
+                                thisObj.ele.find('.content-history').append(item)
                             }
                         }
 
                     } else {
-                        thisCpn.ele.hide()
+                        thisObj.ele.hide()
                     }
 
                 })

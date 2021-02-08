@@ -81,6 +81,9 @@ const getDataFilterIssueAssignee = (data)=>{
     }
 
     let filter={};
+    if (data.keySearch) {
+        filter.search = data.keySearch
+    }
     filter.filter = [];
     filter.sort = [];
     filter.filter.push(item);

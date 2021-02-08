@@ -4,9 +4,7 @@
          <div :style="{'width':(isExpand) ? 'calc(100% - 210px)' : 'calc(100%)'}" class="h-100">
             <Header />
             <div style="padding:0 8px;height:calc(100% - 45px)">
-                <keep-alive>
-                    <router-view :key="routerKey" name="TaskManagement" />
-                </keep-alive>
+                <router-view :key="routerKey" name="TaskManagement" />
             </div>
         </div>
     </div>

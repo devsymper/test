@@ -142,11 +142,11 @@ export default {
                 filter:[
                     {
                         column : "tmg_project_id",
-                        operation : "and",
+                        operation : "equal",
                         conditions : [
                             {
                                 name : "in",
-                                value : [self.$route.params.id],
+                                value : self.$route.params.id,
                             }
                         ],
                     },
