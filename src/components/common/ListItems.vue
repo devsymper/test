@@ -810,13 +810,9 @@ export default {
 		},
 		
 		tableHeight() {
-			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
-			if (tbHeight <= 100) {
-				tbHeight = util.getComponentSize(this).h;
-			}
-			tbHeight -= 74
-			return tbHeight - 15;
+			tbHeight -= 89
+			return tbHeight ;
 		},
 		actionPanelWrapper() {
             let mapType = {

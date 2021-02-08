@@ -4,6 +4,7 @@
         "number_instance": "Tổng số instance",
         "id": "Id",
 		"deleteAll": "Xóa tất cả",
+		"title": "Tiêu đề",
 		"inputPlaceholder": "Nhập giá trị",
 		"inputAddPlaceholder": "Kéo field vào để thêm dữ liệu",
 		"placeholder-search": "Tìm kiếm",

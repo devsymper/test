@@ -37,47 +37,61 @@
             </v-list-item>
 
             <v-list-item 
-                class="py-1 " 
+                class="item-sort" 
                 divided
-                @click="handleCellAction({action:'sort', value: 'asc'})" 
-                :class="{
-                    'selected-for-sort': sortMode == 'asc'
-                }" >
-                <i class="mdi fs-14 mdi-arrow-up"></i> <span class="ml-2 fs-13">Sắp xếp tăng dần</span>
+			>
+				<v-menu
+					bottom
+					offset-x
+					:close-on-content-click="closeOnContentClick"
+				>
+					<template v-slot:activator="{ on, attrs }">
+						<div 
+							v-bind="attrs"
+							v-on="on"
+							class="menu-item-sort h-100 w-100"
+						>
+						<i 	class="mdi fs-14 mdi-sort" ></i> <span class="ml-1 fs-13">Sắp xếp</span>
+						</div>
+						
+					</template>
+					<div class="sort-content p-2">
+						<VuePerfectScrollbar style="max-height: 200px" >
+							<div v-for="(item, i) in selectedColumns" :key="i" class="d-flex mt-1 mb-1 mr-2 ml-2">
+								<v-tooltip bottom>
+									<template v-slot:activator="{ on }">
+										<span class="text-ellipsis flex-grow-1" v-on="on" style="max-width: 100px">
+											{{item.name}}
+										</span>
+									</template>
+									<span>{{item.name}}</span>
+								</v-tooltip>
+								<v-tooltip bottom>
+									<template v-slot:activator="{ on }">
+										<v-btn 
+											x-small
+											@click="changeItemSortType(item)"
+											v-on="on"
+											:color="item.sort != 'none' ? 'orange' : 'gray'"
+										>
+											<span class="text-uppercase text-white">
+												{{item.sort }}
+											</span>
+										</v-btn>
+									</template>
+									<span>Click để thay đổi kiểu sort</span>
+								</v-tooltip>
+							</div>
+						</VuePerfectScrollbar>
+					
+						<div class="d-flex flex-row-reverse mt-2">
+							<v-btn color="primary" small @click="applySort"> 
+								{{$t('common.apply')}}
+							</v-btn>
+						</div>
+					</div>
+				</v-menu>
             </v-list-item>
-
-            <v-list-item 
-                class="py-1 " 
-                @click="handleCellAction({action:'sort', value: 'desc'})"
-                :class="{
-                    'selected-for-sort': sortMode == 'desc'
-                }"  >
-                <i class="mdi fs-14 mdi-arrow-down"></i> <span class="ml-2 fs-13">Sắp xếp giảm dần</span>
-            </v-list-item>
-
-            <!-- <v-list-item 
- class="py-1 ">
-                <el-dropdown class="w-100 " @command="handleCellAction" size="mini" placement="bottom-end">
-                    <span class="w-100 fs-13">
-                        <i class="el-icon-sort" style="line-height: inherit;"></i>
-                        Sort by
-                        <i  class="el-icon-arrow-right float-right" style="line-height: inherit; margin-right:-8px"></i>
-                    </span>
-                    <el-dropdown-menu slot="dropdown">
-                        <v-list-item 
- class="py-1 " 
-                            v-for="(column, idx) in getSortableColumns()" 
-                            :key="idx" 
-                            :command="{action: 'sort-column-select', column:column}"
-                            :class="{
-                                'selected-for-sort': column.name == sortColumn.name
-                            }" >
-                            {{column.as}}
-                        </v-list-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
-            </v-list-item> -->
-            
             <v-list-item 
                 class="py-1 " 
                 @click="handleCellAction({action:'download-excel'})"
@@ -103,13 +117,43 @@
 </template>
 
 <script>
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 export default {
+	components:{
+		VuePerfectScrollbar
+	},
     computed: {
         dashboardConfigs(){
             return this.$store.state.dashboard.allDashboard[this.instanceKey].dashboardConfigs;
-        },
+		},
+		selectedColumns(){
+			let arr = []
+			for(let i in this.cell.rawConfigs.setting){
+				arr = arr.concat(this.cell.rawConfigs.setting[i].selectedColums)
+			}
+			let self = this
+			if(arr.length > 0){
+				arr.forEach(function(e){
+					if(!e.sort){
+						self.$set(e, 'sort', 'none')
+					}
+				})
+			}
+			return arr
+		}
     },
-    methods: {
+    methods:{
+		applySort(){
+			this.closeOnContentClick = true
+			setTimeout((self) => {
+				self.closeOnContentClick = false
+			}, 1000, this);
+			this.$emit('apply-sort', this.selectedColumns)
+		},
+		changeItemSortType(item){
+			let value = item.sort == 'none' ? 'asc' : item.sort == 'asc' ? 'desc' : 'none'
+			this.$set(item, 'sort', value)
+		},
         removeCell(){
             this.$store.commit('dashboard/removeReport', {
                 instanceKey: this.instanceKey,
@@ -205,9 +249,11 @@ export default {
     data(){
         return {
             sortMode: '',
-            sortColumn: {}
+			sortColumn: {},
+			closeOnContentClick: false
         }
-    }
+	},
+	
 }
 </script>
 
@@ -219,6 +265,22 @@ export default {
     top: 2px;
     right: 2px;
 }
+.menu-item-sort:hover{
+	background-color: #f5f5f5;
+}
+.sort-content{
+	background-color: #ffffff;
+	z-index: 10000;
+	max-height: 400px;
+}
+.menu-item-sort{
+	height: 30px !important;
+	padding-top: 4px;
+	padding-left: 16px;
+}
+.item-sort {
+	padding: unset !important;
+}
 .symper-dashboard-cell .cell-options-select .icon-as-btn{
     background-color: #ececec;
     border-radius: 0px!important;
@@ -227,5 +289,7 @@ export default {
 .symper-dashboard-cell:hover .cell-options-select{
     visibility: visible!important;
 }
-
+.btn-swap-sort{
+	cursor: pointer;
+}
 </style>
