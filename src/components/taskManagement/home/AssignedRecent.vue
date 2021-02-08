@@ -4,7 +4,7 @@
             v-on:input="onSearch($event)"
             class="sym-small-size sym-style-input d-inline-block mr-3"
             append-icon="mdi-magnify"
-            outlined
+            solo
             dense
             single-line
             :placeholder="$t('common.search')"
@@ -131,6 +131,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
+}
 </style>
