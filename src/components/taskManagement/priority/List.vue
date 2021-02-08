@@ -9,7 +9,7 @@
                         v-model="search"
                         append-icon="mdi-magnify"
                         label="Tìm kiếm"
-                        outlined
+                        solo
                         dense
                         style="max-width:200px;"
                         single-line

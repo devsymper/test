@@ -10,8 +10,8 @@
                         append-icon="mdi-magnify"
                         label="Tìm kiếm"
                         dense
-                        outlined
-                        style="max-width:255px;"
+                        solo
+                        style="max-width:200px;"
                         single-line
                         hide-details
                         class="sym-small-size sym-style-input"
@@ -453,7 +453,7 @@ export default {
             }
         },
         handelDetailIssueType(item){
-            if (!checkRole('task_manager_issue_type','edit')) {
+            if (!this.checkRole('task_manager_issue_type','edit')) {
                 return ;
             }
             this.dataIssueTypeProps.name.value = item.name;

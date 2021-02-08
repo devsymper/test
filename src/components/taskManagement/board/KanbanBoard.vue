@@ -34,11 +34,12 @@
                     v-on:input="onSearch($event)"
                     class="sym-small-size sym-style-input d-inline-block mr-3"
                     append-icon="mdi-magnify"
-                    outlined
+                    solo
                     dense
                     single-line
                     :placeholder="$t('common.search')"
                     hide-details
+                    style="max-width:200px;"
                 ></v-text-field>
                 <filterKanban 
                 class="mr-2"
