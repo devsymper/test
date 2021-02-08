@@ -1,9 +1,10 @@
 <template>
-    <div class="w-100 fs-13">    
+    <div class="w-100 h-100 fs-13">    
         <div class="d-flex justify-space-between pl-1 w-100">
             <div class="mr-1" style="width:50%">
                 <div class="font-weight-medium">Column name title </div>
                 <v-text-field
+                    v-on:input="onSearch()"
                     v-model="nodeData.configs.keyColumnTitle"
                     class="d-inline-block sym-small-size"
                     single-line
@@ -17,6 +18,7 @@
             <div style="width:50%">
                 <div class="font-weight-medium">Column value title </div>
                 <v-text-field
+                    v-on:input="onSearch()"
                     v-model="nodeData.configs.dataColumnTitle"
                     class="d-inline-block sym-small-size"
                     single-line
@@ -57,11 +59,44 @@ export default {
             }
         },
     },
+    computed:{
+        keyColumns(){
+            return this.nodeData.configs.keyColumns
+        },
+        dataColumns(){
+            return this.nodeData.configs.dataColumns
+        },
+    },
+    watch:{
+        keyColumns:{
+            deep:true,
+            handler(){
+                this.$emit('change-configs');
+            }
+        },
+        dataColumns:{
+            deep:true,
+            handler(){
+                this.$emit('change-configs');
+            }
+        },
+    },
     data(){
         return{
 
         }
     },
+    methods:{
+        onSearch(){
+            if(this.delayTimer){
+                clearTimeout(this.delayTimer);
+            }
+            this.delayTimer = setTimeout((self) => {
+                self.$emit("change-configs")
+            }, 300,this);
+          
+		},
+    }
 
 }
 </script>
