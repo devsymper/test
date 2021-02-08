@@ -14,6 +14,7 @@
             <column-info 
                 class="w-100"
                 :infoColumn="item"
+                :configPadding="configPadding"
             />
         </template>
     </v-autocomplete>
@@ -55,7 +56,12 @@ export default {
             default(){
                 return {}
             }
+        },
+        configPadding:{
+            type: Number,
+            default:4
         }
+
     },
     methods:{
         change(vl){

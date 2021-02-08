@@ -1,5 +1,6 @@
 <template>
-    <div class="single-row px-4 item-column-dataset justify-space-between">
+    <div class="single-row item-column-dataset justify-space-between" 
+        :class="{'px-4':configPadding == 4,'px-3':configPadding == 3,'px-2':configPadding == 2,'px-1':configPadding == 1}">
         <span class="text-ellipsis">
             <v-icon color="#000" class="fs-14 pr-2">{{icon[infoColumn.type]}}</v-icon>
             <span :title="infoColumn.title ? infoColumn.title : infoColumn.as" class="mr-2" :class="{ 'highlight' : infoColumn.isSelected}">{{infoColumn.title ? infoColumn.title : infoColumn.as  }}</span>
@@ -24,6 +25,10 @@ export default {
         showIconRemove:{
             type: Boolean,
             default: false
+        },
+        configPadding:{
+            type:Number,
+            default:4
         }
 
     },
