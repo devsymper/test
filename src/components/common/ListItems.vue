@@ -5,7 +5,7 @@
 			 	class="align-items-center flex-grow-1" 
 				:class="{'ml-4': dialogMode == true }"
 			>
-				<span class=" ml-1 mt-1 font-weight-bold " style="font-size: 18px !important">
+				<span class=" ml-1 mt-1 font-weight-bold title-show-list" style="font-size: 18px !important">
 					{{pageTitle}}
 				</span>
 			</div>
@@ -243,11 +243,12 @@
 				'list-sbs': alwaysShowActionPanel
 				
 			}"
-			:style="{height:tableHeight + 'px'}"
 		 >
+			<!-- :style="{height: tableHeight + 'px'}" -->
+
 			<ag-grid-vue :style="{
 				width: '100%',
-				height:tableHeight+ 'px',
+				height: tableHeight + 'px',
 			}"
 				:class="{'ag-theme-balham': true,'ag-list-items-table':true}"
 				:defaultColDef="defaultColDef"
@@ -409,6 +410,14 @@ window.tableDropdownClickHandle = function(el, event) {
 export default {
     name: "SymperListItem",
     props:{
+		customContentType:{
+			type: Boolean,
+			default: false
+		},
+		flexMode:{
+			type: Boolean, 
+			default: false
+		},
 		/**
          * Mặc định context menu chứa các options: remove, view, edit
          */
@@ -443,10 +452,6 @@ export default {
             type:Boolean,
             default: true
         },
-         flexMode: {
-            type: Boolean,
-            default: false
-        },
          /**
          * flexColumns : true of false, nếu đúng thì colmn sẽ có thêm thược tính flex đê full màn hinh
          * dev created : dungna
@@ -478,7 +483,11 @@ export default {
             type: Function,
             // default: (configs, columns, filterData)=>{}
             default: null
-        },
+		},
+		showDisplayConfig:{
+			type: Boolean,
+			default: true
+		},
 		apiMethod:{
 			type: String,
 			default : "GET"
@@ -551,7 +560,22 @@ export default {
         getDataUrl: {
             type: String,
             default: ""
-        },
+		},
+		/**
+		 * Custom thêm các action trong header show list 
+		 */
+		customHeaderBtn:{
+			type: Object,
+			default(){
+				return {}
+			}
+		},
+		checkedRows:{
+			type: Array,
+			default(){
+				return []
+			}
+		},
         getDataFromFilterUrl: {
             type: String,
             default: ""
@@ -718,6 +742,12 @@ export default {
                     }
                     break;
                 case 'getTableColumns':
+                    let mapColWidth = self.widthColumns.reduce((map, c) =>{
+                        if(c){
+                            map[c.colId] = c;
+                        }
+                        return map;
+                    }, {})
 					data.dataAfter.forEach(function(e){
                          if(self.flexColumns){
                             e.flex = 1
@@ -725,20 +755,17 @@ export default {
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
+						if(self.flexMode){
+							e.flex = 1
+						}
 						if(e.cellStyle){
 							eval("e.cellStyle = " + e.cellStyle)
-						}
-                    })
-                     data.dataAfter.map(column=>{
-                        self.widthColumns.map(c=>{
-                            if(c){
-                                if(column.field==c.colId){
-                                    column.width=c.width
-                                }
-                            }
+                        }
                         
-                        })
-                    })
+                        if(mapColWidth[e.field]){
+                            e.width = mapColWidth[e.field].width
+                        }
+                    });
                     self.columnDefs = data.dataAfter;
                     if(self.conditionalFormat&&self.conditionalFormat.length>0){
                         if(self.listSelectedCondition.length==0){
@@ -783,13 +810,9 @@ export default {
 		},
 		
 		tableHeight() {
-			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
-			if (tbHeight <= 250) {
-				tbHeight = util.getComponentSize(this).h;
-			}
-			tbHeight -= 74
-			return tbHeight - 15;
+			tbHeight -= 89
+			return tbHeight ;
 		},
 		actionPanelWrapper() {
             let mapType = {
@@ -1384,7 +1407,7 @@ export default {
 		 // hoangnd: thêm cột checkbox
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
-            this.columnDefs.unshift(
+            this.columnDefs.push(
 				{ 
 					headerName: 'Chọn', 
 					field: 'checkbox', 
@@ -1803,7 +1826,8 @@ export default {
 				page: self.page,
 				pageSize: self.pageSize,
 				conditionByFormula: self.conditionByFormula,
-				savedTableDisplayConfig: self.savedTableDisplayConfig
+				savedTableDisplayConfig: self.savedTableDisplayConfig,
+				customContentType: self.customContentType
 			}
 			self.columnDefs.forEach(function(e){
 				if(e.cellRenderer){
@@ -1839,7 +1863,10 @@ export default {
         },
 		changeAlwayShowSBSState(){
             this.tableDisplayConfig.value.alwaysShowSidebar = !this.tableDisplayConfig.value.alwaysShowSidebar;
-        },
+		},
+		customBtnclick(i){
+			this.customHeaderBtn[i].callBack()
+		},
 		checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;

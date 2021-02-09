@@ -28,11 +28,11 @@
             />
        </v-menu>
         </div>
-     <TreeSqlConfig style="margin-left:-15px"
-        ref="treeConfig"
-         :defaultData="treeConfigData" 
-        :listColumn="tableColumnsForTree" 
-     />
+		<TreeSqlConfig style="margin-left:-15px"
+			ref="treeConfig"
+			:defaultData="treeConfigData" 
+			:listColumn="tableColumnsForTree" 
+		/>
        
 </div>
 </template>
@@ -132,42 +132,41 @@ export default {
           if(type=='FontColor'){
               color = this.value.fontColor 
           }
-
           return color
       },
   },
   created () {
-        this.tableColumns.map((column,index)=>{
-            if(index!=0){
-                this.formatTableColumn.push(column);
-                this.tableColumnsForTree.push(column);
-                this.tableColumnsForTree[index-1].title=column.name;
-            }
-      });
-      if(this.isUpdate){
-        let lastTree = [];
-        lastTree.push(this.value.originCondition);
-        this.treeConfigData = lastTree;
-      };
+		this.tableColumns.map((column,index)=>{
+			if(index!=0){
+				this.formatTableColumn.push(column);
+				this.tableColumnsForTree.push(column);
+				this.tableColumnsForTree[index-1].title=column.name;
+			}
+		});
+		if(this.isUpdate){
+			let lastTree = [];
+			lastTree.push(this.value.originCondition);
+			this.treeConfigData = lastTree;
+		};
   
   },
-  props: {
-      tableColumns:{
-        type: Array,
-            default(){
-                return []
-            }
-      },
-      isUpdate:{
-          type: Boolean,
-      },
-      value:{
-          type:Object,
-          default(){
-                return {}
-        }
-      }
-  },
+	props: {
+		tableColumns:{
+			type: Array,
+				default(){
+					return []
+				}
+		},
+		isUpdate:{
+			type: Boolean,
+		},
+		value:{
+			type:Object,
+			default(){
+					return {}
+			}
+		}
+	},
      data(){
         return {
             treeData:[],

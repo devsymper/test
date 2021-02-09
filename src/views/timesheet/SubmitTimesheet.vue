@@ -1,5 +1,5 @@
 <template>
-<div class="w-100 pl-4" >
+<div class="w-100 pl-4 symper-submit-timesheet" >
     <v-row class="submit-view">
         <div style="width:63%;float:left">
             <div class="float-lg-left float-md-left .d-lg-flex .d-lg-none d-none d-lg-block sub-submit-view pt-3">
