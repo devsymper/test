@@ -149,7 +149,7 @@ export default {
 			setTimeout((self) => {
 				self.closeOnContentClick = false
 			}, 1000, this);
-			this.$$evtBus.$emit('bi-report-change-display', {
+			this.$evtBus.$emit('bi-report-change-display', {
 				id: this.cell.sharedConfigs.cellId,
 				type: 'data',
 				instanceKey: this.instanceKey
