@@ -391,7 +391,8 @@ export default {
         },
        
         duration(){
-            if(this.duration<=0||Number.isNaN(this.duration)){
+            debugger
+            if(this.duration<=0||Number.isNaN(this.duration)||this.duration.match(/[^a-zA-Z0-9]/)||this.duration=='0h'||this.duration=='0m'){
                 this.timeError = this.$t('timesheet.time_invalid');}
             else{
                 this.timeError = ''
