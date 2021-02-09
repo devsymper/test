@@ -4,7 +4,7 @@
 			{{ $t('bi.dashboard.condition-config') }}
 		</div>
 		<draggable group="drop-column" :list="conditions" @change="handleChangeCondition" class="dragArea list-group mt-1">
-			<VuePerfectScrollbar :style="{ height: height - 50 + 'px' }">
+			<VuePerfectScrollbar :style="{ height: height - 60 + 'px' }">
 				<v-expansion-panels accordion>
 					<div class="columns-condition" v-for="(condColumn, idx) in currentCellConfigs.rawConfigs.condition" :key="idx">
 						<ConditionItem :condColumn="condColumn" :idx="idx" @remove="removeCondition" />

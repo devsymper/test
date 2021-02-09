@@ -87,17 +87,18 @@ export default {
                     url:"/task-management/projects/:id/settings/access"
                 },
                 {
-                    name:'issueType',
-                    title:"Issue type",
-                    icon: 'mdi-file-document-outline',
-                    url:"/task-management/projects/:id/settings/issuetypes"
-                },
-                {
                     name:'workflow',
                     title:"workflow",
                     icon: 'mdi-lan',
                     url:"/task-management/projects/:id/workflow"
                 },
+                {
+                    name:'issueType',
+                    title:"Issue type",
+                    icon: 'mdi-file-document-outline',
+                    url:"/task-management/projects/:id/settings/issuetypes"
+                },
+                
                 // {
                 //     name:'issueLink',
                 //     title:"Issue Link",
@@ -110,12 +111,12 @@ export default {
                     icon: 'mdi-priority-low',
                     url:"/task-management/projects/:id/priorities"
                 },
-                {
-                    name:'createFilter',
-                    title:"Create Filter",
-                    icon: 'mdi-filter-plus-outline',
-                    url:"/task-management/projects/:id/create-filter"
-                },
+                // {
+                //     name:'createFilter',
+                //     title:"Create Filter",
+                //     icon: 'mdi-filter-plus-outline',
+                //     url:"/task-management/projects/:id/create-filter"
+                // },
                 {
                     name:'backToKanban',
                     title:"Quay lại Kanban",

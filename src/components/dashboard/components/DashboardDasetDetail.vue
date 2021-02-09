@@ -37,7 +37,7 @@
                 v-model="openedPanelParent"
             >
                 <v-expansion-panel class="sym-expand-panel " v-for="(dataset,idx) in datasetAndColumn" :key="idx" v-show="dataset.show && !dataset.isSubDataset">
-                    <v-expansion-panel-header class="v-expand-header px-4 py-0">
+                    <v-expansion-panel-header class="v-expand-header sym-expand-panel-header px-4 py-0">
                         <v-menu 
                             absolute
                             left
@@ -56,6 +56,26 @@
                             />
                         </v-menu>
                         <v-icon class="fs-15" style="position: absolute;right: 40px;" @click.prevent.stop="removeDataset(dataset)">mdi-close</v-icon>
+						<v-menu offset-y>
+							<template v-slot:activator="{ on, attrs }">
+									<v-icon 
+										class="fs-15 menu-add-column"
+										v-bind="attrs"
+										v-on="on"
+									>
+									mdi-dots-horizontal
+									</v-icon>
+							</template>
+							<div class="p-2 btn-add-column d-flex" @click="addMeasureToDataset(dataset)" >
+								<v-icon small>
+									mdi-pencil-box-outline
+								</v-icon>
+								<span class="ml-1">
+									Thêm cột
+								</span>
+							</div>
+						</v-menu>
+						
                     </v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
                         <v-expansion-panels
@@ -66,7 +86,7 @@
                         >
                             <!-- Danh sách các table trong doc -->
                             <v-expansion-panel class="sym-expand-panel dataset-child" v-for="(subId,idx) in dataset.subDatasetIds" :key="idx"  v-show="datasetAndColumn[subId].show" >
-                                <v-expansion-panel-header class="v-expand-header px-4 py-0">
+                                <v-expansion-panel-header class="v-expand-header sym-expand-panel-header px-4 py-0">
                                     <v-menu 
                                         left
                                         >
@@ -79,7 +99,26 @@
                                              v-if="dataSetDetail"
                                             :info="dataSetDetail"
                                         />
-                                    </v-menu>
+										<v-menu offset-y>
+											<template v-slot:activator="{ on, attrs }">
+													<v-icon 
+														class="fs-15 menu-add-column"
+														v-bind="attrs"
+														v-on="on"
+													>
+													mdi-dots-horizontal
+													</v-icon>
+											</template>
+											<div class="p-2 btn-add-column" @click="addMeasureToDataset(dataset)">
+												<v-icon small>
+													mdi-pencil-box-outline
+												</v-icon>
+												<span class="ml-1">
+													Thêm cột
+												</span>
+											</div>
+										</v-menu>
+									</v-menu>
                                 </v-expansion-panel-header>
                                 <v-expansion-panel-content class="sym-v-expand-content">
                                     <!-- Danh sách các control trong table -->
@@ -94,7 +133,9 @@
                                             class="column-dataset"
                                             v-for="(column, columnIdx) in datasetAndColumn[subId].columns" 
                                             v-show="column.show" 
+											@config-caculated-column="handleCaculatedColumnClick"
                                             :key="columnIdx"
+											@remove-item="removeItem(columnIdx, datasetAndColumn[subId].columns)"
                                             :infoColumn="column" />
                                     </draggable>
                                 </v-expansion-panel-content>
@@ -112,6 +153,8 @@
                                 class="column-dataset"
                                 v-for="(column, columnIdx) in dataset.columns"
                                 v-show="column.show" 
+								@remove-item="removeItem(columnIdx, dataset.columns)"
+								@config-caculated-column="handleCaculatedColumnClick"
                                 :key="columnIdx"
                                 :infoColumn="column" />
                         </draggable>
@@ -119,7 +162,7 @@
                 </v-expansion-panel>
             </v-expansion-panels>
         </VuePerfectScrollbar>
-
+		<CalculatedColumnConfig ref="calculatedColumnConfig" @apply-configs="handlerApplyConfig" />
         <v-dialog
             v-model="showVariables"
             max-width="850px"
@@ -164,6 +207,7 @@ import columnInfo from "@/components/common/bi/ColumnInfo";
 import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/DashboardDataset.Worker.js';
 import { util } from '../../../plugins/util';
 import DatasetDetailTooltip from './DatasetDetailTooltip.vue';
+import CalculatedColumnConfig from '@/components/common/bi/CalculatedColumnConfig'
 import VariablesPannel from './VariablesPannel.vue';
 
 export default {
@@ -171,6 +215,7 @@ export default {
         VuePerfectScrollbar,
         draggable,
         columnInfo,
+		CalculatedColumnConfig,
         DatasetDetailTooltip,
         VariablesPannel
     },
@@ -222,11 +267,21 @@ export default {
             openedPanelChild:[],
             search:"",
             infoDataflows:[],
-            showVariables:false,
             dataSetDetail:null,
+			showVariables:false,
+			selectingCalculatedColumn: null,
         }
     },
     methods:{
+		handlerApplyConfig(obj){
+			for(let i in obj){
+				this.selectingCalculatedColumn[i] = obj[i]
+			}
+		},
+		handleCaculatedColumnClick(inforColumn, event){
+			this.selectingCalculatedColumn = inforColumn
+			this.$refs.calculatedColumnConfig.show(inforColumn, event)
+		},
         showDashboardVariables(){
             this.showVariables = true;
             let vars = util.cloneDeep(this.allDashboard[this.instanceKey].dashboardConfigs.info.variables);
@@ -305,7 +360,10 @@ export default {
                     datasetAndColumn: this.datasetAndColumn
 				}
             });
-        },
+		},
+		removeItem(idx, arr){
+			arr.splice(idx, 1)
+		},
         clearSelectedItemDisplayAfter(data){
             let dataPos = {};
             dataPos.key = this.instanceKey;
@@ -375,7 +433,26 @@ export default {
                     datasetAndColumn: this.datasetAndColumn
 				}
             });
-        },
+		},
+		addMeasureToDataset(dataset){
+			let newCol = {
+				id: Date.now() + '',
+				id_dataset: dataset.id,
+				isSelected: false,
+				name: 'new_column_' + dataset.columns.length,
+				origin_type: "text",
+				show: true,
+				title: "New column " + dataset.columns.length,
+				type: "text",
+				formula: '',
+				showMeasureConfig: false,
+				calculation: 'measure', // phục vụ cho hiển thị xem cột này tính toán từ đâu: measure hay caculated field
+			};
+			debugger
+			dataset.columns.unshift(newCol);
+			// this.refsToColumns[dataset.id + newCol.name] = newCol;
+			// SDashboardEditor.trackingMeasureInDataset(dataset, newCol);
+		},
         getInfoDataFlowAfter(data){
             if (Array.isArray(data.infoDataFlow)) {
                 this.infoDataflows = data.infoDataFlow;
@@ -452,5 +529,28 @@ export default {
 }
 .sym-expand-panel{
     margin-top: 0px ;
+}
+.btn-add-column{
+	cursor: pointer;
+	background-color: #ffffff;
+	z-index: 10000;
+	width: 100px
+}
+.menu-add-column{
+	opacity: 0;
+	position: absolute;
+	right: 22px;
+	z-index: 10000;
+}
+.sym-expand-panel-header:hover .menu-add-column{
+	opacity: 1;
+}
+.btn-add-column:hover{
+	background-color: lightgray;
+}
+</style>
+<style >
+.sym-expand-panel-header:hover	.v-expansion-panel-header__icon{
+	opacity: 0;
 }
 </style>

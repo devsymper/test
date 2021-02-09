@@ -810,13 +810,9 @@ export default {
 		},
 		
 		tableHeight() {
-			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
-			if (tbHeight <= 100) {
-				tbHeight = util.getComponentSize(this).h;
-			}
-			tbHeight -= 74
-			return tbHeight - 15;
+			tbHeight -= 89
+			return tbHeight ;
 		},
 		actionPanelWrapper() {
             let mapType = {
@@ -1239,7 +1235,10 @@ export default {
         },
         // action khi kéo cột showlist
         columnResized(){
-            this.widthColumns=[];
+			if(this.tableDisplayConfig.value.wrapTextMode == 0){
+				this.customRowHeights(0)
+			}
+            this.widthColumns = [];
             this.gridOptions.columnApi.columnController.allDisplayedColumns.map(column=>{
                 this.widthColumns.push({
                     colId:column.colId,
@@ -1346,6 +1345,7 @@ export default {
 			return this.rowData
 		},
 		customRowHeights(value){
+			debugger
 			if(value == 1){
 				this.gridOptions.rowHeight  = this.rowHeight
 			}else{

@@ -273,7 +273,7 @@ export default {
                     }
                 ],
                 page : 1,
-                pageSize: 200,
+                pageSize: 500,
                 distinct: true
             },
             filterScrum:{
@@ -291,61 +291,44 @@ export default {
                     },
                 ],
                 page : 1,
-                pageSize: 200,
+                pageSize: 1000,
                 distinct: true
             },
             filterProps:{ // bộ lọc
                 tmg_assignee : { 
                     title: "Thành viên",
-                    type: "autocomplete",
+                    type: "combobox",
                     value:"",
+                    multipleSelection:true,
+                    isSelectionChip:true,
                     options: [],
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                      
-                    }
                 },
                 tmg_status_id : {
                     title: "Trạng thái",
-                    type: "autocomplete",
+                    type: "combobox",
                     showId:false,
                     value:"",
                     options: [],
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
+                    multipleSelection:true,
+                    isSelectionChip:true,
                 },
                 tmg_priority_id : {
                     title: "Mức độ ưu tiên",
-                    type: "autocomplete",
+                    type: "combobox",
                     value:"",
                     showId:false,
                     options: [],
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
+                    multipleSelection:true,
+                    isSelectionChip:true,
                 },
                 tmg_issue_type : {
                     title: "Loại task vụ",
-                    type: "autocomplete",
+                    type: "combobox",
                     value:"",
                     showId:false,
                     options: [],
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
+                    multipleSelection:true,
+                    isSelectionChip:true,
                 }
             },
         };
@@ -370,13 +353,17 @@ export default {
             }
             for (let name in this.filterProps) {
                 if (this.filterProps[name].value) {
+                    let listIds = this.filterProps[name].value.reduce((arr,obj)=>{
+                        arr.push(obj.id);
+                        return arr;
+                    },[])
                     let item =   {
                         column : name,
                         operation : "and",
                         conditions : [
                             {
                                 name : "in",
-                                value : [this.filterProps[name].value],
+                                value : listIds,
                             }
                         ],
                     };
@@ -560,7 +547,9 @@ export default {
                         ],
                     };
                     data.filter = util.cloneDeep(this.filter);
-                    data.filter.filter.push(item);
+                    if(this.sCurrentProject.userLeader != this.$store.state.app.endUserInfo.id){
+                        data.filter.filter.push(item);
+                    }
                 }else{
                     data.filter = filter;
                 }

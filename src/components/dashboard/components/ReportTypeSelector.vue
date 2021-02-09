@@ -1,6 +1,6 @@
 <template>
 	<div class="symper-report-type-selector h-100 d-flex flex-column">
-		<v-expansion-panels>
+		<v-expansion-panels class="report-type-select" v-model="panels">
 			<v-expansion-panel>
 				<v-expansion-panel-header>
 					<div class="mt-2 mb-2 ml-1 title-all-chart-types">
@@ -53,21 +53,21 @@
 				</v-tab>
 			</v-tabs>
 		</div>
-		<div style="height: calc(100% - 310px);">
+		<div class="h-100 w-100">
 			<ColumnConfig 
 				v-if="tabs == 0"
 				:instanceKey="instanceKey"
-				:height="height"
+				:height="configHeight"
 			/>
 			<StyleConfig 
 				v-if="tabs == 1"
-				:height="height"
+				:height="configHeight"
 				:instanceKey="instanceKey"
 			/>
 			<ConditionConfig 
 				:instanceKey="instanceKey"
 				v-if="tabs == 2"
-				:height="height"
+				:height="configHeight"
 			/>
 		</div>
 	</div>
@@ -100,7 +100,8 @@ export default {
 			}else{
 				return ''
 			}
-		}
+		},
+	
 	},
 	components:{
 		ColumnConfig,
@@ -110,6 +111,8 @@ export default {
 	data(){
 		return{
 			tabs: null,
+			configHeight: 0,
+			panels: null,
 			tabItems:{
 				columnConfig:{
 					title: this.$t('bi.dashboard.column-config'),
@@ -131,12 +134,31 @@ export default {
 	watch:{
 		tabs(val){
 		},
+		panels:{
+			deep: true,
+			immediate: true,
+			handler(val){
+			
+				setTimeout((self) => {
+					self.getConfigsHeight(val)
+				}, 500, this);
+			}
+		},
 		showReportConfig(val){
 			let value = val == true ? 0 : 1090
 			$('.symper-report-type-selector').css({transform:'translateX('+value+'px)','transition-duration': '1s'})
 		}
 	},
 	methods:{
+		getConfigsHeight(collapse){
+			let titleHeight 
+			if(collapse != 0){
+				titleHeight = 40
+			}else{
+				titleHeight = $(document.getElementsByClassName('report-type-select')).height()
+			}
+			this.configHeight = util.getComponentSize(this).h - titleHeight - 60
+		},
 		selectCellType(type){
 			this.$emit('selected-type' , type)
 		},
@@ -145,9 +167,7 @@ export default {
 		}
 	},
 	mounted(){
-		let titleHeight = $(document.getElementsByClassName('title-all-chart-types')).height()
-		let allChartSelectorHeight = $(document.getElementsByClassName('all-chart-types')).height()
-		this.height = util.getComponentSize(this).h - titleHeight - allChartSelectorHeight - 100;
+		
 	}
 }
 </script>
