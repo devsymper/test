@@ -17,6 +17,7 @@
 import CellConfigSettingTemplate from '@/components/dashboard/components/reportConfig/CellConfigSettingTemplate';
 import VuePerfectScrollbar from 'vue-perfect-scrollbar';
 import settingTplAgg from '@/components/dashboard/configPool/settingTplAgg';
+import { util } from '@/plugins/util.js';
 
 export default {
 	components: {
@@ -49,8 +50,9 @@ export default {
 					this.settingItems[name].lastYaxis = newLast;
 				}
 			}
-		}
+		},
 	},
+
 	data() {
 		return {
 			cpnType: 'config_setting',
@@ -63,6 +65,7 @@ export default {
 			return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs;
 		},
 	},
+
 };
 </script>
 <style scoped></style>

@@ -2,7 +2,7 @@
 	<div class="fs-13 pt-1 report-date-filter">
 		<v-menu ref="menu" v-model="menu" content-class="report-date-filter-menu" :close-on-content-click="false" :return-value.sync="dataValue.value" transition="scale-transition" offset-y min-width="290px">
 			<template v-slot:activator="{ on, attrs }">
-				<v-combobox v-model="dateRangeText" solo prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on"> </v-combobox>
+				<v-combobox v-model="dateRangeText" solo  readonly v-bind="attrs" v-on="on"> </v-combobox>
 			</template>
 			<div class="d-flex" style="background-color: #ffffff">
 				<div style="border-right: 1px solid lightgray ">
@@ -154,5 +154,10 @@ export default {
 .report-date-filter >>> .v-input__slot {
 	box-shadow: unset !important;
 	border: 1px solid lightgray;
+	height: 28px !important;
 }
+.report-date-filter  >>> .v-input__icon {
+	display: none !important;
+}
+
 </style>
