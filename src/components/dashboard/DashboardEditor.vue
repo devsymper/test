@@ -207,7 +207,7 @@ export default {
 		},
 		handleSelectedChartType(type){
             if(this.myData.currentCellConfigs.sharedConfigs.type == 'global'){
-                this.$refs.dashboardWorkspace.addCell(type);            
+                this.$refs.dashboardWorkspace.addCell(type, true);            
             }else{
 
             }
