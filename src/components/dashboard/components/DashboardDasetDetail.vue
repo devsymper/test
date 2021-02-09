@@ -45,8 +45,8 @@
                             nudge-bottom="10"
                             >
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
-                                <v-icon v-on="on" v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
+                                <v-icon v-on="on" @click.prevent.stop="showDetailDataset(dataset)" v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
+                                <v-icon v-on="on" @click.prevent.stop="showDetailDataset(dataset)" v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
                                 <v-icon  class="selected-dataset-mark" v-show="dataset.isSelected">mdi-check-circle</v-icon>
                                 <span v-on="on" @click.prevent.stop="showDetailDataset(dataset)" class="dataset-item-title fs-13 pl-2">{{dataset.title}}</span>
                             </template>
@@ -88,10 +88,13 @@
                             <v-expansion-panel class="sym-expand-panel dataset-child" v-for="(subId,idx) in dataset.subDatasetIds" :key="idx"  v-show="datasetAndColumn[subId].show" >
                                 <v-expansion-panel-header class="v-expand-header sym-expand-panel-header px-4 py-0">
                                     <v-menu 
+                                        absolute
                                         left
+                                        nudge-left="10"
+                                        nudge-bottom="10"
                                         >
                                         <template v-slot:activator="{ on }">
-                                            <v-icon v-on="on" class="fs-15 icon-table">mdi-table-large</v-icon>
+                                            <v-icon v-on="on"  @click.prevent.stop="showDetailDataset(datasetAndColumn[subId])" class="fs-15 icon-table">mdi-table-large</v-icon>
                                             <v-icon class="selected-dataset-mark" v-show="datasetAndColumn[subId].isSelected">mdi-check-circle</v-icon>
                                             <span v-on="on"  @click.prevent.stop="showDetailDataset(datasetAndColumn[subId])" class="dataset-item-title fs-13 pl-2">{{datasetAndColumn[subId].title}}</span>
                                         </template>
