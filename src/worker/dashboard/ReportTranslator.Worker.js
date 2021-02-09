@@ -21,7 +21,19 @@ var handler = {
     },
     
     getSortData(cell) {
-        return cell.rawConfigs.extra ? cell.rawConfigs.extra.sortConfig : [];
+        let rsl = [];
+        for (let name in cell.rawConfigs.setting) {
+            let cols = cell.rawConfigs.setting[name].selectedColums;
+            for(let col of cols){
+                if(col.sort && col.sort != 'none'){
+                    rsl.push({
+                        mode: col.sort,
+                        column: col
+                    });
+                }
+            }
+        }
+        return rsl;
     },
 
     
@@ -104,7 +116,6 @@ var handler = {
             cellId: cell.sharedConfigs.cellId,
             filter: filter,
             crossFilterCond: cell.sharedConfigs.crossFilterCond,
-            // crossFilterCond: '',
             sort: sortData,
             reportName: reportName,
             needTotal: this.checkNeedTotal(cell)
