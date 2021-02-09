@@ -451,7 +451,6 @@ export default {
 				showMeasureConfig: false,
 				calculation: 'measure', // phục vụ cho hiển thị xem cột này tính toán từ đâu: measure hay caculated field
 			};
-			debugger
 			dataset.columns.unshift(newCol);
 			// this.refsToColumns[dataset.id + newCol.name] = newCol;
 			// SDashboardEditor.trackingMeasureInDataset(dataset, newCol);

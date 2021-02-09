@@ -22,7 +22,6 @@ self.onmessage = async function (event) {
                 let dataPost ={};
                 let dataControl ={};
                 let issueType = data.allIssueTypeInProject.find(ele => ele.id == data.task.tmg_issue_type);
-                debugger
                 if (issueType) {
                     dataPost['documentId'] = issueType.documentId;
                 }

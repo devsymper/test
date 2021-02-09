@@ -1345,7 +1345,6 @@ export default {
 			return this.rowData
 		},
 		customRowHeights(value){
-			debugger
 			if(value == 1){
 				this.gridOptions.rowHeight  = this.rowHeight
 			}else{
