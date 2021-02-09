@@ -1,9 +1,9 @@
 <template>
-    <div style="width: auto;background-color:white" class="pa-2">
+    <div style="width: auto;background-color:white" class="pa-4">
         <div class="fs-14 font-weight-bold" style="text-align:center">
             Dataset infomation
         </div>
-        <div class="w-100 d-flex justify-space-between">
+        <div class="w-100  my-2 d-flex justify-space-between">
             <div class="font-weight-bold">
                 Dataset origin:
             </div>
@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <div v-if="info.type == 'doc'" class="w-100">
+        <div v-if="info.type == 'doc'" class="w-100 ">
             <div class="w-100 d-flex justify-space-between ">
                 <div class=" font-weight-bold">
                     Document id:
@@ -22,7 +22,7 @@
                 </div>
             </div>
 
-            <div class="w-100 d-flex justify-space-between">
+            <div class="w-100 my-2 d-flex justify-space-between">
                 <div class=" font-weight-bold">
                     Document name:
                 </div>
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <div class="w-100 d-flex justify-space-between">
+            <div class="w-100 my-2 d-flex justify-space-between">
                 <div class=" font-weight-bold">
                     Document title:
                 </div>
@@ -42,7 +42,7 @@
         </div>
 
         <div v-else class="w-100">
-            <div class="w-100 d-flex justify-space-between">
+            <div class="w-100 my-2 d-flex justify-space-between">
                 <div class=" font-weight-bold">
                     Dataset id:
                 </div>
@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <div class="w-100 d-flex justify-space-between">
+            <div class="w-100 my-2 d-flex justify-space-between">
                 <div class=" font-weight-bold">
                     Dataset name:
                 </div>
@@ -60,7 +60,7 @@
                 </div>
             </div>
 
-            <div class="w-100 d-flex justify-space-between">
+            <div class="w-100 my-2 d-flex justify-space-between">
                 <div class=" font-weight-bold">
                     Node name:
                 </div>

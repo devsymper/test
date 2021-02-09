@@ -59,7 +59,7 @@
 			</v-card-title>
 			<v-card-text>
 				<div class="w-100 ">
-					<TableConditionalFormatSetting ref="tableConditionalFormatSetting" :config="selectingConditionFormat"/>
+					<TableConditionalFormatSetting v-if="selectingConditionFormat" ref="tableConditionalFormatSetting" :config="selectingConditionFormat"/>
 				</div>
 			</v-card-text>
 			<v-card-actions>
@@ -183,7 +183,7 @@ export default {
 				}
 				this.$set(condItem, 'listColumns', columns);
 				this.selectingConditionFormat = null;
-				this.selectingConditionFormat = util.cloneDeep(condItem);
+				this.$set(this,'selectingConditionFormat',util.cloneDeep(condItem))
 				this.isShowDialog = true;
 				this.condFormatTmpInfo = {
 					condIndex,name:name
@@ -200,7 +200,7 @@ export default {
 			}
 		},
 		applyConditionSetting(){
-			this.styleConfig.conditionalFormat.children[this.condFormatTmpInfo.name].value[this.condFormatTmpInfo.condIndex] = this.selectingConditionFormat;
+			this.$set(this.styleConfig.conditionalFormat.children[this.condFormatTmpInfo.name].value,this.condFormatTmpInfo.condIndex,this.selectingConditionFormat)
 			this.isShowDialog = false;
 		},
 		removeCondFormatItem(data){
