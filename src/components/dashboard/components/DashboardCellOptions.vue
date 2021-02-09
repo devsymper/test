@@ -145,6 +145,7 @@ export default {
     },
     methods:{
 		applySort(){
+			
 			this.closeOnContentClick = true
 			setTimeout((self) => {
 				self.closeOnContentClick = false
