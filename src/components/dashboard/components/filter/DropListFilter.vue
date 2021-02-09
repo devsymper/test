@@ -94,6 +94,9 @@ export default {
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }
+.report-select-filter >>> .v-input__icon {
+	display: none !important;
+}
 
 .v-menu__content >>> .v-icon {
 	font-size: 16px !important;
@@ -114,5 +117,8 @@ export default {
 }
 .v-simple-checkbox .v-icon{
 	font-size: 16px;
+}
+.custom-selected-display{
+	margin-left: -12px ;
 }
 </style>

@@ -1,11 +1,11 @@
 <template>
 	<div class="condition-item fs-13">
 		<v-expansion-panel>
-			<v-expansion-panel-header>
+			<v-expansion-panel-header class="header-panels">
 				<v-tooltip bottom>
 					<template v-slot:activator="{ on, attrs }">
 						<div
-							class="title-condition fs-13"
+							class="title-condition fs-13 ml-2"
 							v-bind="attrs"
 							v-on="on"
 							small 
@@ -169,7 +169,7 @@ export default {
 .condition-item >>> .v-expansion-panel-header{
 	background-color: #EBEEF5 !important;
 	min-height: unset !important;
-	padding: 8px 12px;
+	padding: 8px 16px !important;
 	position: relative;
 }
 
@@ -181,7 +181,7 @@ export default {
 }
 .condition-item >>> .icon-remove-condition{
 	position: absolute;
-	right: 14px;
+	right: 6px;
 	opacity: 0;
 	z-index: 10000;
 }
@@ -212,6 +212,7 @@ export default {
 	border: 1px solid lightgray;
 	border-radius: 4px;
 	min-height: unset;
+	height: 28px !important
 }
 .condition-item >>> .v-select__slot,
 .condition-item >>> .v-input__slot{

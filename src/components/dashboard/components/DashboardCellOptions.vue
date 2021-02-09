@@ -70,12 +70,13 @@
 									<template v-slot:activator="{ on }">
 										<v-btn 
 											x-small
+											text-white
 											@click="changeItemSortType(item)"
 											v-on="on"
 											:color="item.sort != 'none' ? 'orange' : 'gray'"
 										>
-											<span class="text-uppercase text-white">
-												{{item.sort }}
+											<span class="text-uppercase text-white" :style="{color: item.sort != 'none' ?'white' : 'black'}">
+												{{ item.sort }}
 											</span>
 										</v-btn>
 									</template>
@@ -148,7 +149,11 @@ export default {
 			setTimeout((self) => {
 				self.closeOnContentClick = false
 			}, 1000, this);
-			this.$emit('apply-sort', this.selectedColumns)
+			this.$$evtBus.$emit('bi-report-change-display', {
+				id: this.cell.sharedConfigs.cellId,
+				type: 'data',
+				instanceKey: this.instanceKey
+			})
 		},
 		changeItemSortType(item){
 			let value = item.sort == 'none' ? 'asc' : item.sort == 'asc' ? 'desc' : 'none'
