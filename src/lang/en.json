@@ -1511,7 +1511,8 @@
         },
         "settingBoard":"Board setting",
         "createIssue":"Create Issue",
-        "noDocumentConfig":"Create Issue"
+        "noDocumentConfig":"Create Issue",
+        "createPriority":"Create Priority"
 
 
 

@@ -749,6 +749,12 @@ body {
 .color-green {
     color: green!important
 }
+.color-blue{
+    color:blue!important;
+}
+.color-black{
+    color:black!important;
+}
 
 .color-normal {
     color: #707070!important

@@ -1,5 +1,5 @@
 <template>
-<div class='log-time h-100' style="padding-left: 10px">
+<div class='log-time h-100 pl-4' >
     <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px">
         <period-selector  @load-logtime="reloadLog" />
         <div style="width:38%;float:right" 
@@ -11,8 +11,10 @@
         </div>
     </v-row>
     <v-dialog v-model="logtimeDialog" width="357" @click:outside="deleteLog()">
-        <LogTimeForm v-show="showTask==false"
+        <LogTimeForm v-show="!showTask"
+            ref="logtime"
             @showTaskForm="showTaskForm"
+            @loadMonthView="loadMonthView"
             @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
             :updateAPICategory ="updateAPICate"
@@ -29,7 +31,12 @@
             :onCancel="onCancelSave">
         </LogTimeForm>
          <TaskForm @loadTask="loadTask()" v-show="showTask&&showCategory==false" @cancel="cancelTaskForm()"/>
-         <CategoryForm @updateList="updateAPICategory()" v-show="showCategory" @cancel="cancelCateForm()"/>
+         <CategoryForm
+            ref="cate"
+            :isAddView="true"
+            @updateList="updateAPICategory()"
+            v-show="showCategory" 
+            @cancel="cancelCateForm()"/>
     </v-dialog>
      <!-- test -->
       <v-dialog
@@ -62,6 +69,7 @@
     <LogCalendar 
         :userId="userId"
         @showLog="showLog" 
+        :monEvents="monthEvents"
         ref="logCalendar" 
         :time-view="time_view" 
         @create-time="onCreateTime" 
@@ -94,6 +102,7 @@ export default {
     data() {
         return {
             userId:'',
+            monthEvents:{},
             showTask:false,
             showCategory:false,
             time_view: true,
@@ -144,6 +153,12 @@ export default {
               this.$refs.logCalendar.events.pop()
             }
         },
+        loadMonthView(data){
+            // this.$refs.logCalendar.monthEvents[data.date]=[];
+            // this.$refs.logCalendar.monthEvents[data.date].push(data);
+            this.monthEvents = data;
+            this.$refs.logCalendar.load()
+        },
         doneCate(){
             this.updateAPICate = false
         },
@@ -167,6 +182,7 @@ export default {
             this.showTask=false;
             this.showCategory=false;
             this.cancelCate != this.cancelCate;
+            this.$refs.logtime.getCategory()
         },
         showTaskForm(value){
             this.eventLog = value;
@@ -175,9 +191,10 @@ export default {
         },
          showCategoryForm(value){
             this.eventLog = value;
+            this.$refs.cate.forBa = false;
+            this.$refs.cate.typeCate = 'normal';
             this.showCategory=true;
             this.showTask =true;
-          
         },
         getNow: function() {
             let current = this.$moment().format('HH:mm');

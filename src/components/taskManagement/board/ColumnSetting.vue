@@ -36,7 +36,7 @@
                     <transition-group type="transition" name="flip-list" class="wrap-kanban-board">
                         <div
                             v-for="(column,index) in listColumn"
-                            :key="column.id"
+                            :key="column.id+index"
                             :style="getColWidth()"
                             class=" board-column-item mr-4"
                         >
@@ -127,18 +127,6 @@ export default {
         sCurrentProject(){
             return this.$store.state.taskManagement.currentProject;
         },
-        listColumn(){
-            if (!this.currentBoard.id) {
-                return [];
-            }
-            let idBoard = this.currentBoard.id;
-            let columns = this.sTaskManagement.listColumnInBoard[idBoard];
-            let backLogData = this.sTaskManagement.backLogData;
-            if(backLogData.length > 0){
-                columns.push(backLogData[0]);
-            }
-            return columns;
-        },
         
     },
     data(){
@@ -146,7 +134,8 @@ export default {
             isLoading:false,
             columns:[],
             kanbanWorker:null,
-            listStatus:null
+            listStatus:null,
+            listColumn:null
         }
     },
     watch:{
@@ -156,12 +145,26 @@ export default {
             deep:true,
             handler(to,from){
                 if(to.name == 'kanbanBoardSetting'){
-                    this.getListStatus()
+                    this.getListColumn();
+                    this.getListStatus();
                 }
             }
         }
     },
     methods:{
+        getListColumn(){
+            if (!this.currentBoard.id) {
+                return [];
+            }
+            let idBoard = this.currentBoard.id;
+            let columns = this.sTaskManagement.listColumnInBoard[idBoard];
+            let backLogData = this.sTaskManagement.backLogData;
+            if(backLogData.length > 0){
+                columns.push(backLogData[0]);
+                console.log('vao');
+            }
+            this.listColumn = columns;
+        },
         getListStatus(){
             let allStatus = util.cloneDeep(this.sTaskManagement.listStatusInProjects[this.sCurrentProject.id]);
             for (let index = 0; index < this.listColumn.length; index++) {
@@ -215,13 +218,25 @@ export default {
                 action:'saveColumn',
                 data:data
             });
-
+ 
         },
         updateColumn(){
             this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
-            data.data = JSON.stringify(this.listColumn);
+            let newData = util.cloneDeep(this.listColumn);
+            newData = newData.reduce((arr,obj)=>{
+                let newObj = obj;
+                let newStatusInColumn = newObj.statusInColumn.reduce((arr1, obj1) => {
+                    delete obj1.tasks;
+                    arr1.push(obj1)
+                    return arr1
+                },[]);
+                obj.statusInColumn = newStatusInColumn;
+                arr.push(obj)
+                return arr;
+            },[]);
+            data.data = JSON.stringify(newData);
             data.boardId = idBoard;
             
             this.kanbanWorker.postMessage({

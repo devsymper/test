@@ -9,15 +9,15 @@
                         v-model="search"
                         append-icon="mdi-magnify"
                         label="Tìm kiếm"
-                        dense
                         solo
-                        style="max-width:255px;"
+                        dense
+                        style="max-width:200px;"
                         single-line
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
                     <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate" >
-                        <span>Create priority</span>
+                        <span>{{$t("taskManagement.createPriority")}}</span>
                     </v-btn>
                 </v-card-title>
                 <v-data-table
@@ -33,7 +33,7 @@
                             :animation="200"
                             @change="handleChangeLevel"
                             >
-                            <tr v-for="item in listPriority" :key="item.id">
+                            <tr v-show="checkShowItem(item)" v-for="item in listPriority" :key="item.id">
                                 <td>
                                     <span class="name-project" style="color:#0000aa">
                                         {{item.name}}
@@ -103,7 +103,6 @@
 </template>
 
 <script>
-import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import modalAddOrDetailPriority from "./ModalAddOrDetailPriority";
@@ -195,6 +194,16 @@ export default {
         }
     },
     methods:{
+        checkShowItem(item){
+            if(!this.search){
+                return true;
+            }
+            if(item && item.name){
+                let s = this.search.toLowerCase();
+                return item.name.toLowerCase().includes(s) || item.description.toLowerCase().includes(s);
+            }
+            return false;
+        },
         handleChangeLevel(data){
             let dataChange=[];
             let min =0, max =0;
@@ -226,7 +235,7 @@ export default {
                         this.$snotifySuccess("Update level priority success!");
                         this.$store.commit("taskManagement/addToTaskManagementStore",data); 
                     }else{
-                        this.$snotifyError("", "Error! Have error !!!");
+                        this.$snotifyError("", res.message);
                     }
                 })
                 .catch(err => {
@@ -275,7 +284,7 @@ export default {
                         this.$snotifySuccess("Remove priority success!");
                         this.$store.commit("taskManagement/removePriorityToStore",this.prioritySelected.id);
                     }else{
-                        this.$snotifyError("", "Error! Have error !!!");
+                        this.$snotifyError("", res.message);
                     }
                 })
                 .catch(err => {

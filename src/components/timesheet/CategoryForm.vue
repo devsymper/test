@@ -1,159 +1,158 @@
 <template>
-<div>
+<div class="pl-2" style="background:white!important">
     <div class="pb-2 pt-2 headline lighten-2" 
     primary>
-        <div class="w-100 pb-1 fs-16" style="border-bottom: 1px solid lightgrey;">
-            Loại công việc</div>
-    </div>
-    <div v-bind:style="nameError? 'height:80px' :'height:60px'">
-        <span class="label pt-2"> {{$t('timesheet.name')}}<span style="color:red"> *</span></span>
-        <div>
-            <input type="text" v-model= "name" class="w-100 input-logform"
-            v-bind:style="nameError? 'margin-bottom:4px' :''">
-        </div>
-        <div class="w-100 mb-5" style="height:20px">
-            <span class="red--text" v-show="nameError">{{nameError}}</span>
+        <div class="w-100 fs-16 fw-430" >
+            Loại công việc
         </div>
     </div>
-    <div>
-        <span class="label pt-2">Key<span style="color:red"> *</span></span></span>
-      <div>
-        <input type="text" v-model="key" class="w-100 input-logform">
-        </div>
+    <div style="border-bottom: 1px solid lightgrey;margin-top: -10px">
+        <v-btn @click="showNewCate()" x-small text class="fs-13 btn" :style="{background:bgNewCate}">
+            Tạo mới
+        </v-btn>
+         <v-btn v-show="forBa" @click="showDocCate()" x-small text class="fs-13 btn" :style="{background:bgDocCate}">
+            Loại công việc từ doc
+        </v-btn>
     </div>
-    <div>
-        <span class="label pt-2">Mô tả<span style="color:red"> *</span></span></span>
-      <div>
-        <input type="text" v-model="description" class="w-100 input-logform">
-        </div>
-    </div>
+    <Category ref="normal" v-show="typeCate=='normal'" :type="typeCate"/>
+    <Category ref="doc" v-show="typeCate=='doc'" :type="typeCate" :listDoc='listDoc' />
     <div class="pb-5 pt-2">
         <div class= "d-flex justify-end w-100">
              <v-btn small v-if="!isAddView" color="success" class="mr-2" width="50" style="color:white" 
              @click="updateAPI()">Sửa</v-btn>
               <v-btn small v-else color="primary" class="mr-2" width="50" style="color:white" 
-             @click="save()">Thêm</v-btn> 
+             @click="saveCategory()">Thêm</v-btn>
+              <v-btn small  class="mr-2" width="50" 
+             @click="cancel()">Thoát</v-btn> 
         </div>
     </div>
 </div>
 </template>  
 <script>
 import timesheetApi from '../../api/timesheet';
+import Category from '../../components/timesheet/form/CategoryChildren';
+import { documentApi } from '../../api/Document';
 
 export default {
-    props:['isAddView'],
+    components:{
+        Category
+    },
+    props:['isAddView','listDoc','type'],
     name: 'CategoryForm',
     data: () => ({
-        dialog: false,
-        name: '',
-        key: '',
+        typeCate:'normal',
         id:-1,
-        check:false,
-        nameError: '',
-        status:1,
-        description:''
+        forBa:true,
+        bgDocCate:'',
+        bgNewCate:'lightgrey'
     }),
-    watch:{
-        name(){
-            if(this.check){
-                if(this.name==''){
-                }else{
-                    this.nameError = '';
-                    this.check = false;
-                }
-            }
-        },
-    },
     methods: {
+        showDocCate(){
+            this.bgDocCate = 'lightgrey';
+            this.bgNewCate = '';
+           this.typeCate = "doc";
+
+        },
+        showNewCate(){
+            this.bgNewCate = 'lightgrey';
+            this.bgDocCate = '';
+            this.typeCate = "normal";
+        },
+        cancel(){
+            this.$emit('cancel');
+        },
         refreshAll(){
-            this.name="";
-            this.key="";
-            this.nameError ="";
+            this.$refs.normal.name="";
+            this.$refs.normal.description="";
+            this.$refs.normal.key="";
+            this.$refs.normal.nameError ="";
+            this.$refs.doc.name="";
+            this.$refs.doc.key="";
+            this.$refs.doc.description = "";
         },
         updateAPI(){
             let self = this;
-             if(this.name==''){
-                 this.nameError = this.$t('timesheet.required_value'); 
-             }
-            else{
-                let data = {
-                    taskName: this.name,
-                    key: this.key,
-                    id: this.id,
-                    status: this.status,
-                    description: this.description
+            if(this.typeCate=='normal'){
+               let data = this.$refs.normal.save()
+               if(data&&JSON.stringify(data)!= '{}'){
+                   data.id = this.id;
+                   this.updateCategory(data)
+               }
+            }else{
+                 let data = this.$refs.doc.save();
+                if(data&&JSON.stringify(data) != '{}'){
+                     data.id = this.id;
+                    this.updateCategory(data)
+                }else{
+
                 }
-                 timesheetApi.updateCategory(data)
-                .then(res => {
-                    if (res.status === 200) {
-                        self.$emit('cancel');
-                        self.$snotify({
-                            type: "success",
-                            title: this.$t("notification.successTitle"),
-                        });
-                    }else{
-                          self.$snotify({
-                            type: "error",
-                            title: this.$t("notification.errorTitle"),
-                        });
-                    }
-                })
-                .catch(console.log);
             }
+           
         },
-        save(){
-            this.check = true;
+        updateCategory(data){
             const self = this;
-            if(this.name==''){
-                 this.nameError = this.$t('timesheet.required_value'); 
-             }
-            else{
-            timesheetApi.createCategory({
-                    taskName: this.name,
-                    key: this.key,
-                    status: 1,
-                    description: this.description
-                })
-                .then(res => {
-                    if (res.status === 200) {
-                        self.$emit('cancel');
+            timesheetApi.updateCategory(data)
+            .then(res => {
+                if (res.status === 200) {
+                    self.$emit('cancel');
+                    self.$snotify({
+                        type: "success",
+                        title: this.$t("notification.successTitle"),
+                    });
+                }else{
                         self.$snotify({
-                            type: "success",
-                            title: this.$t("notification.successTitle"),
-                        });
-                    }else{
-                        self.$snotify({
-                            type: "error",
-                            title: this.$t("notification.errorTitle"),
-                        });
-                    }
-                })
+                        type: "error",
+                        title: this.$t("notification.errorTitle"),
+                    });
+                }
+            })
+            .catch(console.log);
+
+        },
+        createCatogry(data){
+            const self = this;
+            timesheetApi.createCategory(data)
+            .then(res => {
+                if (res.status === 200) {
+                    self.$emit('cancel');
+                    self.$snotify({
+                        type: "success",
+                        title: this.$t("notification.successTitle"),
+                    });
+                }else{
+                    self.$snotify({
+                        type: "error",
+                        title: this.$t("notification.errorTitle"),
+                    });
+                }
+            })
+        },
+        saveCategory(){
+            const self = this;
+            // let data = this.typeCate =='normal'?this.
+            if(this.typeCate=='normal'){
+               let data = this.$refs.normal.save()
+               if(data&&JSON.stringify(data)!= '{}'){
+                   this.createCatogry(data)
+               }
+            }else{
+                 let data = this.$refs.doc.save();
+                if(data&&JSON.stringify(data) != '{}'){
+                    this.createCatogry(data)
+                }else{
+
+                }
             }
+               
         }
     }
 }
 </script>
 <style lang="scss" scoped>
 
-.v-input__control {
-    font-size: 13px;
-    font-family: Roboto;
-    color: grey;
+.btn{
+   letter-spacing: 0px;
+   font-weight:420
 }
-
-.input-logform {
-    float: flex;
-    background-color: #F7F7F7;
-    width: 97%;
-    font-size:13px!important;
-    height: 32px !important;
-    border-radius: 2px;
-    padding-left: 12px;
-}
-
-.v-menu__content .v-list {
-    padding-top: 10px;
-    top: 120px !important;
-}
-
 </style>
+

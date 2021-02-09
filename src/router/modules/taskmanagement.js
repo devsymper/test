@@ -83,18 +83,18 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/workflow/List.vue')
                 }
             },
-            {
-                path: "projects/:id/timesheets",
-                meta:{group:'home'},
-                name: "timesheet",
-                components:{
-                    TaskManagement: () => import ('../../views/taskManagement/timesheet/Index.vue')
-                }
-            },
+            // {
+            //     path: "projects/:id/timesheets",
+            //     meta:{group:'home'},
+            //     name: "timesheet",
+            //     components:{
+            //         TaskManagement: () => import ('../../views/taskManagement/timesheet/Index.vue')
+            //     }
+            // },
             {
                 path: "projects/:id/issue-link",
                 meta:{group:'projectSetting'},
-                name: "issueLink",
+                name: "projectIssueLink",
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/issueLink/List.vue')
                 }
@@ -179,7 +179,7 @@ export default [
             // priority
             {
                 path: "projects/:id/priorities",
-                name: "priority",
+                name: "projectPriority",
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/priority/List.vue')
                 }

@@ -15,6 +15,9 @@ export const taskManagementApi = {
     countIssueInListProject(projectIds){
         return taskManagement.get("count",{projectIds:JSON.stringify(projectIds)});
     },
+    countIssue(data){
+        return taskManagement.get("count",data);
+    },
     //danh mục category
     getAllCategory(){
         return taskManagement.get("categories");
