@@ -91,7 +91,7 @@ export default {
                 if(totalHour>hour*60){
                     color = "light-red-color"
                 }else if(totalHour==hour*60){
-                    color = "light-green-color"
+                    color = "dark-sea-green"
                 }
                 else{
                     color = "light-yellow-color"

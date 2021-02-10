@@ -622,9 +622,9 @@ export default {
             let self= this;
              timesheetApi.getAllCategory({}).then(res => {
                 if (res.status === 200) {
-                    self.listCategory = res.data.category;
+                    self.listCategory = res.data.listObject;
                     self.category.category_name=[];
-                    let category = res.data.category;
+                    let category = res.data.listObject;
                     for(let i=0; i<category.length; i++){
                         self.category.category_name.push(
                             category[i].key+"-"+category[i].name
