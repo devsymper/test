@@ -312,10 +312,13 @@ export const TranslatorHelper = {
 				return commonAttr;
 			}
 			let viewOptions = TranslatorHelper.getDataGantt(data.data,columns,style,typeChart,stacking, ratio);
-			let rsl = Object.assign(commonAttr, viewOptions) ; // Kết quả trả về
+			viewOptions.chart = {
+				backgroundColor: commonAttr.general.backgroundColor,
+			};
+			viewOptions = Object.assign(commonAttr, viewOptions) ; // Kết quả trả về
 			// translate cho chart
 			let options = JSON.parse(JSON.stringify(staticChartOptions));
-			rsl = Object.assign(options, viewOptions);
+			let rsl = Object.assign(options, viewOptions);
 			rsl.scrollbar = {
 				enabled: true
 			};
@@ -383,10 +386,6 @@ export const TranslatorHelper = {
 			},
             series: series
         };
-        // rsl.xAxis.categories = series.xAxisCategory;
-        rsl.chart = {
-            backgroundColor: commonAttr.general.backgroundColor,
-		};
         return rsl;
 	},
 	/**
