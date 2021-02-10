@@ -29,9 +29,9 @@
         <v-btn icon @click="pre()">
             <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-        <span>{{totalHours*10/10}}/{{hoursRequired}} {{$t('timesheet.of')}} 
-            <span style="color:#008080"> {{startDate.slice(0,5)}} - {{endDate}}</span>
-           </span>
+        <span style="color:#008080">{{totalHours*10/10}}/{{hoursRequired}}</span>
+      
+            <span class="ml-1">{{$t('timesheet.of')}} {{startDate.slice(0,5)}} - {{endDate}}</span>
         <v-btn icon @click="next()">
             <v-icon>mdi-chevron-right </v-icon>
         </v-btn>

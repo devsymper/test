@@ -1,21 +1,25 @@
 <template>
-<div class="pl-2" style="background:white!important">
+<div class="pl-2 pr-2 w-100 h-100" style="background:white!important">
     <div class="pb-2 pt-2 headline lighten-2" 
     primary>
         <div class="w-100 fs-16 fw-430" >
             Loại công việc
         </div>
     </div>
-    <div style="border-bottom: 1px solid lightgrey;margin-top: -10px">
-        <v-btn @click="showNewCate()" x-small text class="fs-13 btn" :style="{background:bgNewCate}">
+    <div v-show="forBa"  style="margin-top: -10px">
+        <v-btn @click="showNewCate()" x-small text class="fs-13 btn" :style="{background:typeCate=='doc'?'':'lightgrey'}">
             Tạo mới
         </v-btn>
-         <v-btn v-show="forBa" @click="showDocCate()" x-small text class="fs-13 btn" :style="{background:bgDocCate}">
+        <v-btn @click="showDocCate()" x-small text class="fs-13 btn" :style="{background:typeCate=='doc'?'lightgrey':''}">
             Loại công việc từ doc
         </v-btn>
     </div>
-    <Category ref="normal" v-show="typeCate=='normal'" :type="typeCate"/>
-    <Category ref="doc" v-show="typeCate=='doc'" :type="typeCate" :listDoc='listDoc' />
+    <FormTpl
+        class="mr-2"
+        :labelWidth="'60px'"
+        :allInputs="allInputs"
+        :single-line="true"
+    />
     <div class="pb-5 pt-2">
         <div class= "d-flex justify-end w-100">
              <v-btn small v-if="!isAddView" color="success" class="mr-2" width="50" style="color:white" 
@@ -30,64 +34,149 @@
 </template>  
 <script>
 import timesheetApi from '../../api/timesheet';
-import Category from '../../components/timesheet/form/CategoryChildren';
 import { documentApi } from '../../api/Document';
-
+import FormTpl from "./../../components/common/FormTpl";
 export default {
-    components:{
-        Category
+    created () {
+        this.allInputs.key.value = this.cate.key;
+        this.allInputs.taskName.value = this.cate.name;
+        this.id = this.cate.id;
+        this.allInputs.description.value = this.cate.description;
+        this.typeCate = this.cate.type
+
     },
-    props:['isAddView','listDoc','type'],
+    watch: {
+        typeCate(){
+            if(this.typeCate=='doc'){
+                this.allInputs.taskName.type="autocomplete";
+                this.allInputs.description.type="script"
+            }else{
+                this.allInputs.taskName.type="text";
+                this.allInputs.description.type="textarea"
+
+            }
+        },
+    },
+    components:{
+         FormTpl
+    },
+    props:['isAddView','listDoc','type','cate'],
     name: 'CategoryForm',
-    data: () => ({
+    data () {
+        return {
+        allInputs:{
+            taskName: {
+                title: "Tên",
+                type: "text",
+                value: "",
+                info: "",
+                options: this.listDoc,
+                validateStatus:{
+                    isValid:true,
+                    message:"Error"
+                },
+                validate(){
+                    if (this.value=="") {
+                        this.validateStatus.isValid=false;
+                        this.validateStatus.message="Không bỏ trống";
+                    }else{
+                        this.validateStatus.isValid=true;
+                        this.validateStatus.message="";
+                    }
+                }
+            },
+            key: {
+                title: "Key",
+                type: "text",
+                value: "",
+                info: "",
+                 validateStatus:{
+                    isValid:true,
+                    message:"Error"
+                },
+                validate(){
+                    if (this.value=="") {
+                        this.validateStatus.isValid=false;
+                        this.validateStatus.message="Không bỏ trống";
+                    }else{
+                        this.validateStatus.isValid=true;
+                        this.validateStatus.message="";
+                    }
+                }
+            },
+            description: {
+                title: "Mô tả",
+                type: "textarea",
+                value: "",
+                info: ""
+            }
+        },
         typeCate:'normal',
+        check:false,
         id:-1,
         forBa:true,
-        bgDocCate:'',
-        bgNewCate:'lightgrey'
-    }),
+     }
+    },
     methods: {
+        checkValidate(){
+            let check = false;
+            if(this.allInputs.taskName.value==''){
+                this.allInputs.key.value = this.allInputs.taskName.value.slice(0, 1);
+            }
+            if(this.allInputs.taskName.value&&this.allInputs.key.value){
+                check = true
+            }
+            return check;
+        },
         showDocCate(){
-            this.bgDocCate = 'lightgrey';
-            this.bgNewCate = '';
-           this.typeCate = "doc";
-
+            this.typeCate = "doc";
+        },
+        saveCategory(){
+            let data = this.save()
+            if(data&&JSON.stringify(data)!= '{}'){
+                this.createCatogry(data)
+            }
+        },
+        save(){
+            let check = this.checkValidate();
+            let data = {};
+            if(check){
+                for(let i in this.allInputs){
+                    data[i] = this.allInputs[i].value;
+                    data.status= 1;
+                    // this.listDoc.map(doc=>{
+                    //     if(doc.id==data[i]){
+                    //         this.allInputs[i].value=doc.title
+                    //     }
+                    // })
+                    data.type = this.typeCate=='doc'?1:0
+                }
+            }
+            return data
         },
         showNewCate(){
-            this.bgNewCate = 'lightgrey';
-            this.bgDocCate = '';
             this.typeCate = "normal";
         },
         cancel(){
+            this.refreshAll();
             this.$emit('cancel');
         },
         refreshAll(){
-            this.$refs.normal.name="";
-            this.$refs.normal.description="";
-            this.$refs.normal.key="";
-            this.$refs.normal.nameError ="";
-            this.$refs.doc.name="";
-            this.$refs.doc.key="";
-            this.$refs.doc.description = "";
+            this.allInputs.taskName.value="";
+            this.allInputs.description.value="";
+            this.allInputs.key.value="";
         },
         updateAPI(){
-            let self = this;
-            if(this.typeCate=='normal'){
-               let data = this.$refs.normal.save()
-               if(data&&JSON.stringify(data)!= '{}'){
-                   data.id = this.id;
-                   this.updateCategory(data)
-               }
+            let data = this.save();
+            if(data&&JSON.stringify(data) != '{}'){
+                data.id = this.id;
+                this.updateCategory(data)
             }else{
-                 let data = this.$refs.doc.save();
-                if(data&&JSON.stringify(data) != '{}'){
-                     data.id = this.id;
-                    this.updateCategory(data)
-                }else{
+                this.notify(false)
 
-                }
             }
-           
+        },
+        setCategory(){
         },
         updateCategory(data){
             const self = this;
@@ -95,56 +184,41 @@ export default {
             .then(res => {
                 if (res.status === 200) {
                     self.$emit('cancel');
-                    self.$snotify({
-                        type: "success",
-                        title: this.$t("notification.successTitle"),
-                    });
+                    self.notify(true)
                 }else{
-                        self.$snotify({
-                        type: "error",
-                        title: this.$t("notification.errorTitle"),
-                    });
+                     self.notify(false)
                 }
             })
             .catch(console.log);
 
         },
-        createCatogry(data){
-            const self = this;
-            timesheetApi.createCategory(data)
-            .then(res => {
-                if (res.status === 200) {
-                    self.$emit('cancel');
-                    self.$snotify({
+        notify(success=false){
+            if(success){
+                this.$snotify({
                         type: "success",
                         title: this.$t("notification.successTitle"),
                     });
-                }else{
-                    self.$snotify({
-                        type: "error",
-                        title: this.$t("notification.errorTitle"),
-                    });
-                }
-            })
-        },
-        saveCategory(){
-            const self = this;
-            // let data = this.typeCate =='normal'?this.
-            if(this.typeCate=='normal'){
-               let data = this.$refs.normal.save()
-               if(data&&JSON.stringify(data)!= '{}'){
-                   this.createCatogry(data)
-               }
             }else{
-                 let data = this.$refs.doc.save();
-                if(data&&JSON.stringify(data) != '{}'){
-                    this.createCatogry(data)
-                }else{
-
-                }
+                 this.$snotify({
+                    type: "error",
+                    title: this.$t("notification.errorTitle"),
+                });
             }
-               
-        }
+        },
+        async createCatogry(data){
+            let res = await timesheetApi.createCategory(data);
+            // let formulas = [data.description];
+            // if(this.typeCate=="doc"){
+            //     let fomulas = await timesheetApi.compileBulk({formulas:JSON.stringify(formulas),variables:{}})
+            // }
+            if (res.status === 200) {
+                this.$emit('cancel');
+                this.notify(true);
+            }else{
+                this.notify(false);
+            }
+        },
+      
     }
 }
 </script>

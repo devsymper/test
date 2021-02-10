@@ -1,8 +1,8 @@
 <template>
-     <div :class="[getColorHeader(monthEvents[date],hoursRequired,date)]">
+     <div :class="[getColorHeader(monthEvents[date],hoursRequired)]">
         <v-tooltip top>
-            <template v-slot:activator="on">
-                <div  v-on="on" class="px-3 pt-2">
+            <template v-slot:activator="{on}">
+                <div v-on="on" class="px-3 pt-2">
                     <div class="d-flex justify-space-between">
                         <!-- Xử lý header -->
                         <span  
@@ -10,8 +10,8 @@
                             :key="i" 
                             :class="[present ? 'color-orange' :'color-grey']" 
                             class="fs-14">
-                            <span >{{$t('timesheet.'+d)}}</span>
-                            <span class="ml-2">{{day}}/{{month}}</span>
+                            {{$t('timesheet.'+d)}}
+                            <span class="ml-1">{{day}}/{{month}}</span>
                         </span>
                         <!--  Xử lý header -->
                         <span v-if="monthEvents[date]">
@@ -58,7 +58,7 @@ export default {
             }
             return hour + minutes
         },
-       getColorHeader(events,hoursRequired,date){
+       getColorHeader(events,hoursRequired){
             let color = 'grey-color';
             let hour = hoursRequired.trim()
             if(events){
@@ -129,6 +129,9 @@ export default {
 }
 </script>
 <style>
+.color-orange{
+    color:orange
+}
 .light-green-color{
     background-color: #e2f9e4
 }

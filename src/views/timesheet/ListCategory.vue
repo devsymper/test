@@ -15,12 +15,12 @@
     </list-items>
         <v-dialog 
             v-model="showPanel"
-            persistent
-            max-width="350"
+            max-width="400"
       >
        <CategoryForm
-            style="background:white!important"
+            style="background:white!important; over-flow:hidden"
             ref="category"
+            :cate="cate"
             :listDoc="listDoc"
             :isAddView="isAddView"
             @cancel="cancel()"/>
@@ -47,6 +47,7 @@ export default {
         return {
             listDoc:[],
             showPanel:false,
+            cate:{},
             isAddView:true,
             listCategory:[],
             categoryTask: [],
@@ -90,11 +91,11 @@ export default {
                             title:'table.date_created',
                             type:"text"
                         },
-                        // {
-                        //     name:'status',
-                        //     title:'table.status',
-                        //     type:"numeric"
-                        // },
+                        {
+                            name:'type',
+                            title:'table.type',
+                            type:"numeric"
+                        },
                         {
                             name:'userUpdate',
                             title:'table.user_updated',
@@ -109,6 +110,11 @@ export default {
                    );
                     let listUser = self.$store.state.app.allUsers;
                     data.listObject.map(d=>{
+                        if(d.type==1){
+                            d.type="DO"
+                        }else{
+                            d.type="TI"
+                        }
                         listUser.map(user=>{
                             if(d.userCreate==user.id){
                                 d.userCreate=user.displayName
@@ -116,7 +122,12 @@ export default {
                               if(d.userUpdate==user.id){
                                 d.userUpdate=user.displayName
                              }
-                        })
+                        });
+                        // self.listDoc.map(doc=>{
+                        //     if(doc.id==d.name){
+                        //         d.name=doc.title
+                        //     }
+                        // })
                     })
                     return  data;
                 }
@@ -162,7 +173,12 @@ export default {
             const self = this;
             documentApi.getSmallListDocument().then(res=>{
                 if(res.status==200){
-                    self.listDoc = res.data.listObject;
+                    // self.listDoc =res.data.listObject;
+                    self.listDoc = [];
+                    res.data.listObject.map(data=>{
+                        self.listDoc.push({id:data.title})
+                    })
+
                 }
             })
         },
@@ -195,19 +211,19 @@ export default {
         update(category){
             this.showPanel = true;
             this.isAddView = false;
-            this.$refs.category.id = category.id;
-            if(category.type==0){
-                this.$refs.category.typeCate="normal";
-                this.$refs.category.$refs.normal.key = category.key;
-                this.$refs.category.$refs.normal.name = category.name;
-                this.$refs.category.$refs.normal.description = category.description;
+            if(this.$refs.category){
+                this.$refs.category.id= category.id;
+                this.$refs.category.allInputs.key.value = category.key;
+                this.$refs.category.allInputs.taskName.value = category.name;
+                this.$refs.category.allInputs.description.value  = category.description;
+                this.$refs.category.typeCate=category.type=='TI'?"normal":"doc";
             }else{
-                this.$refs.category.typeCate="doc";
-                this.$refs.category.$refs.doc.key = category.key;
-                this.$refs.category.$refs.doc.name = category.name;
-                this.$refs.category.$refs.doc.description = category.description;
+                this.cate.id = category.id;
+                this.cate.key = category.key;
+                this.cate.name = category.name;
+                this.cate.description = category.description;
+                this.cate.type=category.type=='TI'?"normal":"doc"
             }
-          
         },
         addCategory(){
             this.showPanel = true;
@@ -220,7 +236,6 @@ export default {
             this.containerHeight = util.getComponentSize(this).h;
         },
         cancel(){
-            this.$refs.category.refreshAll();
             this.$refs.listCategory.refreshList();
             this.showPanel = false
         }
