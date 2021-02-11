@@ -103,7 +103,7 @@ export default {
                 formulaValue : { 
                     title: "Formula",
                     type: "script",
-                    value: self.cellConfigs.rawConfigs.extra.formulaUpdateTask ? self.cellConfigs.rawConfigs.extra.formulaUpdateTask : '' ,
+                    value: (self.cellConfigs.rawConfigs.extra && self.cellConfigs.rawConfigs.extra.formulaUpdateTask) ? self.cellConfigs.rawConfigs.extra.formulaUpdateTask : '' ,
                     validateStatus:{
                         isValid:true,
                         message:"Error"

@@ -256,4 +256,7 @@ export default {
   background: #f5f5f5;
   cursor: pointer;
 }
+.gantt-chart {
+    overflow: scroll!important;
+}
 </style>

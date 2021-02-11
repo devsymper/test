@@ -159,7 +159,7 @@ export default {
             });
         },
         getListDocumentSubmitTask(){
-            if (this.cellConfigs.rawConfigs.extra.ganttDocIdSelected && this.cellConfigs.rawConfigs.extra.ganttDocIdSelected.length > 0) {
+            if (this.cellConfigs.rawConfigs.extra && this.cellConfigs.rawConfigs.extra.ganttDocIdSelected && this.cellConfigs.rawConfigs.extra.ganttDocIdSelected.length > 0) {
                 this.filter.filter[0].conditions[0].value = this.cellConfigs.rawConfigs.extra.ganttDocIdSelected;
                 this.ganttchartWorker.postMessage({
                     action: 'getListDocumentSubmitTaskBefor',
