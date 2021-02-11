@@ -44,7 +44,11 @@ export default class Table extends ReportBase {
             cellStyle: this.getStyleItemsInConfig(style.cellFormat.children, 'px', ratio),
             headerStyle: this.getStyleItemsInConfig(style.headerFormat.children, 'px', ratio),
             totalRowBackup: [],
-            totalRow: []
+            totalRow: [],
+            tableSize: {
+                h: extraData.size.h,
+                w: extraData.size.w,
+            }
         };
         
 

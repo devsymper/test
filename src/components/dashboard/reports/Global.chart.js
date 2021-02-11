@@ -29,6 +29,9 @@ export default class Global extends ReportBase {
             }
         };
         super('global', 'global', columnSettingKeys, styleKeys);
+        this.rawConfigs.style.dashboardSize.width = 1080;
+        this.rawConfigs.style.dashboardSize.height = 720;
+
         this.viewConfigs.displayOptions = {
             dashboardStyle: {
                 size: {

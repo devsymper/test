@@ -307,14 +307,18 @@ export const TranslatorHelper = {
 		ganttChart(rawConfigs,data,displayOptions,extraData,typeChart,stacking, ratio){
 			let columns = rawConfigs.setting;
 			let style = util.cloneDeep(rawConfigs.style);
+			let commonAttr = TranslatorHelper.getCommonCellStyleAttr(style, ratio);
 			if (columns.name.selectedColums.length == 0 || columns.start.selectedColums.length == 0 ) {
-				return;
+				return commonAttr;
 			}
 			let viewOptions = TranslatorHelper.getDataGantt(data.data,columns,style,typeChart,stacking, ratio);
-			let rsl = viewOptions; // Kết quả trả về
+			viewOptions.chart = {
+				backgroundColor: commonAttr.general.backgroundColor,
+			};
+			viewOptions = Object.assign(commonAttr, viewOptions) ; // Kết quả trả về
 			// translate cho chart
 			let options = JSON.parse(JSON.stringify(staticChartOptions));
-			rsl = Object.assign(options, viewOptions);
+			let rsl = Object.assign(options, viewOptions);
 			rsl.scrollbar = {
 				enabled: true
 			};
@@ -382,12 +386,7 @@ export const TranslatorHelper = {
 			},
             series: series
         };
-        // rsl.xAxis.categories = series.xAxisCategory;
-        let commonAttr = this.getCommonCellStyleAttr(style, ratio);
-        rsl.chart = {
-            backgroundColor: commonAttr.general.backgroundColor,
-		};
-        return Object.assign(commonAttr, rsl);
+        return rsl;
 	},
 	/**
      * Chuyển các cấu hình thành options tương ứng với các loại chart: line, column, bar, combo

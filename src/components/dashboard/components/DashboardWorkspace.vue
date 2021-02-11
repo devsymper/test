@@ -41,9 +41,10 @@
                         :i="item.i"
                         :symper-cell-id="item.cellId"
                         :class="{   
-                                'symper-grid-item symper-dashboard-cell-wrapper' : true,
-                                'dashboard-cell-with-icon':dashboardConfig.allCellConfigs[item.cellId].viewConfigs.showIcon,
-                                'selected-report':dashboardConfig.allCellConfigs[item.cellId].viewConfigs.isSelecting}"
+                            'symper-grid-item symper-dashboard-cell-wrapper' : true,
+                            'dashboard-cell-with-icon':dashboardConfig.allCellConfigs[item.cellId].viewConfigs.showIcon,
+                            'selected-report':dashboardConfig.allCellConfigs[item.cellId].viewConfigs.isSelecting
+                        }"
                         @resized="handleResizeItem"
                         @resize="handleResizingItem">
                     <DashboardCell 
@@ -440,8 +441,8 @@ export default {
         setDashboardSize(dashboardSize){
             let sizeMode = dashboardSize.dashboardSizeMode.value;
             if(sizeMode == 'realSize'){
-                this.workspaceStyle.height = dashboardSize.height.value + 'px'; 
-                this.workspaceStyle.width = dashboardSize.width.value + 'px'; 
+                this.workspaceStyle.height = (Number(dashboardSize.height.value) ? dashboardSize.height.value : 720) + 'px'; 
+                this.workspaceStyle.width = (Number(dashboardSize.width.value) ? dashboardSize.width.value : 1080) + 'px'; 
             }else if(sizeMode = "fitWidth"){
                 let containerWidth = util.getComponentSize(this.$el).w;
                 this.workspaceStyle.height = '100%'; 
@@ -481,7 +482,7 @@ export default {
         /**
          * Thêm cell mới vào dashboard
          */ 
-        addCell(type, cellSize = {}, active = false){
+        addCell(type, active = false, cellSize = {}){
             this.$store.commit('dashboard/addCellToLayout', {
                 instanceKey: this.instanceKey,
                 type,
@@ -560,7 +561,7 @@ export default {
         getReportWraperSize(cellId){
             let size = util.getComponentSize(this.$refs[cellId][0]);
             let titleAttr = this.dashboardConfig.allCellConfigs[cellId].rawConfigs.style.title.children;
-            if(titleAttr.show.value && titleAttr.titleText.value){
+            if(titleAttr.show.value){
                 size.h -= calcTitleCellHeight(titleAttr.textSize.value);
             }
             return size;

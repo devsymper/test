@@ -389,11 +389,10 @@ export default {
             return this.cellConfigs.viewConfigs.displayOptions;
         },
         tableStyle(){
-            let titleAttr = this.cellConfigs.rawConfigs.style.title.children;
-            let showTitle = titleAttr.show.value && titleAttr.titleText.value;
+            let displayOptions = this.cellConfigs.viewConfigs.displayOptions;
             return Object.assign({
                 width: '100%', 
-                height: showTitle ? 'calc(100% - 60px)' : 'calc(100% - 30px)'
+                height: (displayOptions.tableSize.h - 30)+'px'
             }, this.options.cellStyle);
         }
     },
