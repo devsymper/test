@@ -1623,7 +1623,9 @@ export default {
             if(formulasId && formulasId != 0){
                 let self = this;
                 formulasApi.detailFormulas(formulasId).then(res=>{
-                    self.titleObjectFormula = new Formulas(self.keyInstance,res.data.lastContent,'titleObject');
+                    if(res.status == 200){
+                        self.titleObjectFormula = new Formulas(self.keyInstance,res.data.lastContent,'titleObject');
+                    }
                 })
             }
             
