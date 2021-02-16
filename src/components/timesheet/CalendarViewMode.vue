@@ -1,7 +1,7 @@
 <template>
 <div class="calendar-viewmode">
     
-    <v-btn style="float:left" v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="timeView()">
+    <v-btn style="float:left" v-if="type !='month'" icon @click="timeView()">
         <v-tooltip top>
                     <!-- màn hình month - header ngày, giờ -->
             <template v-slot:activator="{ on }">
@@ -13,7 +13,7 @@
         </v-tooltip>
     </v-btn>
       
-    <v-btn style="float:left" class="mr-2" v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="listView()">
+    <v-btn style="float:left" class="mr-2" v-if="type !='month'" icon @click="listView()">
          <v-tooltip top>
           <template v-slot:activator="{ on }">
                     <v-icon v-on="on">mdi-apps</v-icon>

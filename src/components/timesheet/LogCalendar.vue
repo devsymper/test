@@ -54,7 +54,7 @@
                                 class="d-flex flex-column h-100">
                                 <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
                                     <div class="d-flex flex-row justify-space-between align-center pl-2">
-                                        <div class="fm text-ellipsis" >
+                                        <div class="fm text-ellipsis" style="width:calc(100% - 55px)" >
                                             <span v-if="findDuration(event.start, event.end)<62">
                                                 <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green']" class="mr-1"></i>
                                             </span>
