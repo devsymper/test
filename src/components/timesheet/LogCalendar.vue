@@ -630,7 +630,6 @@ export default {
         });
     },
 
-
 };
 </script>
 <style lang="scss" scoped>
@@ -675,9 +674,6 @@ export default {
     user-select: none;
     -webkit-user-select: none;
     background-color:white !important;
-    // background: green;
-    // border: 3px solid white !important;
-    // border-radius:1px!important;
 }
 .month-status{
     background-color:#90EE90; 
@@ -756,8 +752,8 @@ export default {
     height: 600px;
 }
 .h-580{
-height: 600px;
-border-bottom: 1px solid rgb(0,0,0,0.05)
+    height: 600px;
+    border-bottom: 1px solid rgb(0,0,0,0.05)
 }
 .mdi-calendar{
     margin-top:5px;
