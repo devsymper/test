@@ -95,8 +95,8 @@
                                                 {{event.category_key}}
                                             </span>
                                         </div>
-                                        <div class="d-flex flex-row-reverse ">
-                                            <span class="fs-11 color-black">
+                                        <div >
+                                            <span class="fs-11 color-black" style="margin-right:-5px">
                                             {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
                                             </span>
                                         </div>
@@ -674,10 +674,9 @@ export default {
     width: 97% !important;
     user-select: none;
     -webkit-user-select: none;
-    background-color: rgb(254, 253, 253) !important;
+    background-color:white !important;
     // background: green;
-
-    // border: 3px solid lightgrey !important;
+    // border: 3px solid white !important;
     // border-radius:1px!important;
 }
 .month-status{
