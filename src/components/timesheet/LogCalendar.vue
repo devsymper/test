@@ -1,132 +1,132 @@
 <template>
-<div class="w-100 pr-5 mt-2 mr-3" style="height: calc(100vh - 120px)">
-    <v-sheet :class="[calendarType=='month'? 'h-50' :'h-580']" 
-     class="h-100 calendar">
-        <v-calendar ref="calendar"  
-            :weekdays="weekday" 
-            :type="internalCalendarType" 
-            v-model="calendar"
-            :end="endDate"
-            :events="events" 
-            :color="color" 
-            @mousedown:event="startDrag" 
-            @mousemove:time="mouseMove" 
-            @mouseup:time="endDrag" 
-            @mousedown:time="startTime" 
-            @mouseleave.native="cancelDrag" 
-            :start="calendarShowDate">
-            <template v-slot:day-body="{ date, week }">
-              <div
-                class="v-current-time"
-                :class="{ first: date === week[0].date }"
-                :style="{ top: nowY }"
-              ></div>
-            </template>
-            <template v-slot:day-label="{day,present,past, month, date}">
-                <MonthViewHeader 
-                    class="pl-3 pt-1"
-                    :monthEvents="monthEvents"
-                    :month="month"
-                    :present="present"
-                    :day="day"
-                    :date="date"
-                    :hoursRequired="hoursRequired"
-                />
-            </template>
-              <!-- màn hình month - task -->
-            <template v-slot:day="{date}">
-                <MonthViewEvent 
-                    :monthEvents="monthEvents"
-                    :date="date"
-                    @showLog="start"
-                    :hoursRequired="hoursRequired"
-                />
-               
-            </template>
-              <!-- màn hình week/day/weekday - event log -->
-            <template v-slot:event="{ event, eventSummary,timed, eventParsed  }">
-                <v-menu offset-x :nudge-right="10">
-                    <template v-slot:activator="{on: detailEvents}">
-                        <div
-                            @dblclick="actionLogEvent(event, 0)"
-                            v-on="detailEvents"
-                            class="d-flex flex-column h-100">
-                            <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
-                                <div class="d-flex flex-row justify-space-between align-center pl-2">
-                                    <div class="fm text-ellipsis" >
-                                        <span v-if="findDuration(event.start, event.end)<62">
-                                            <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green']" class="mr-1"></i>
-                                        </span>
-                                        <b style="color:#303030" class="fs-12 fw-430">{{event.name}}</b>
+    <div class="w-100 pr-5 mt-2 mr-3" style="height: calc(100vh - 120px)">
+        <v-sheet :class="[calendarType=='month'? 'h-50' :'h-580']" 
+        class="h-100 calendar">
+            <v-calendar ref="calendar"  
+                :weekdays="weekday" 
+                :type="internalCalendarType" 
+                v-model="calendar"
+                :events="events" 
+                :color="color" 
+                @mousedown:event="startDrag" 
+                @mousemove:time="mouseMove" 
+                @mouseup:time="endDrag" 
+                @mousedown:time="startTime" 
+                @mouseleave.native="cancelDrag" 
+                :start="calendarShowDate">
+                <template v-slot:day-body="{ date, week }">
+                <div
+                    v-if="timeView"
+                    class="v-current-time"
+                    :class="{ first: date === week[0].date }"
+                    :style="{ top: nowY }"
+                ></div>
+                </template>
+                <template v-slot:day-label="{day,present,past, month, date}">
+                    <MonthViewHeader 
+                        class="pl-3 pt-1"
+                        :monthEvents="monthEvents"
+                        :month="month"
+                        :present="present"
+                        :day="day"
+                        :date="date"
+                        :hoursRequired="hoursRequired"
+                    />
+                </template>
+                <!-- màn hình month - task -->
+                <template v-slot:day="{date}">
+                    <MonthViewEvent 
+                        :monthEvents="monthEvents"
+                        :date="date"
+                        @showLog="start"
+                        :hoursRequired="hoursRequired"
+                    />
+                
+                </template>
+                <!-- màn hình week/day/weekday - event log -->
+                <template v-slot:event="{ event, eventSummary,timed, eventParsed  }">
+                    <v-menu offset-x :nudge-right="10">
+                        <template v-slot:activator="{on: detailEvents}">
+                            <div
+                                @dblclick="actionLogEvent(event, 0)"
+                                v-on="detailEvents"
+                                style="border:1px solid lightgrey"
+                                class="d-flex flex-column h-100">
+                                <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
+                                    <div class="d-flex flex-row justify-space-between align-center pl-2">
+                                        <div class="fm text-ellipsis" >
+                                            <span v-if="findDuration(event.start, event.end)<62">
+                                                <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green']" class="mr-1"></i>
+                                            </span>
+                                            <b style="color:#303030" class="fs-12 fw-430">{{event.name}}</b>
+                                        </div>
+                                        <div >
+                                            <v-menu 
+                                                bottom left
+                                                nudge-left='5' 
+                                                nudge-top='-10'>
+                                                <template v-slot:activator="{on:actionEvents }" >
+                                                    <span class="fs-12 fw-400 color-black"
+                                                        v-if="findDuration(event.start, event.end)<62" >
+                                                        {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
+                                                    </span>
+                                                    <!-- <v-btn class="ml-1" dense dark icon> -->
+                                                        <v-icon v-if="event.type"
+                                                            v-on="actionEvents"
+                                                            small class="color-black"> mdi-dots-vertical</v-icon>
+                                                    <!-- </v-btn> -->
+                                                </template>
+                                                <div class="d-flex flex-column" style="background:white">
+                                                    <v-btn v-for="action in actionLog" text small :key='action.id' @click="actionLogEvent(event,action.id)">{{$t(action.name)}}</v-btn>
+                                                </div>
+                                            </v-menu>
+                                        </div>
                                     </div>
-                                    <div >
-                                        <v-menu 
-                                            open-on-focus 
-                                            bottom left
-                                            nudge-left='5' 
-                                            nudge-top='-10'>
-                                            <template v-slot:activator="{on:actionEvents }" >
-                                                <span class="fs-12 fw-400 color-black"
-                                                    v-if="findDuration(event.start, event.end)<62" >
-                                                    {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
-                                                </span>
-                                                <!-- <v-btn class="ml-1" dense dark icon> -->
-                                                    <v-icon v-if="event.type"
-                                                        v-on="actionEvents"
-                                                        small class="color-black"> mdi-dots-vertical</v-icon>
-                                                <!-- </v-btn> -->
-                                            </template>
-                                            <div class="d-flex flex-column" style="background:white">
-                                                <v-btn v-for="action in actionLog" text small :key='action.id' @click="actionLogEvent(event,action.id)">{{$t(action.name)}}</v-btn>
-                                            </div>
-                                        </v-menu>
+                                    <div v-if="findDuration(event.start, event.end)>105" style="height:30px" class="text-ellipsis fs-12 pl-2 color-grey" >
+                                        {{event.desc ? event.desc: "" }}
+                                    </div>
+                                    <v-spacer />
+                                    <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center" v-if="findDuration(event.start, event.end)>61">
+                                        <div>
+                                            <span >
+                                                <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
+                                            </span>
+                                            <span class= "fs-12 text-ellipsis color-grey" style="margin-left:-50px" v-if="findDuration(event.start, event.end)>70"> 
+                                                {{event.category_key}}
+                                            </span>
+                                        </div>
+                                        <div class="d-flex flex-row-reverse ">
+                                            <span class="fs-11 color-black">
+                                            {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div v-if="findDuration(event.start, event.end)>105" style="height:30px" class="text-ellipsis fs-12 pl-2 color-grey" >
-                                    {{event.desc ? event.desc: "" }}
+                                <div v-if="timed" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
                                 </div>
-                                <v-spacer />
-                                <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center" v-if="findDuration(event.start, event.end)>61">
-                                    <div>
-                                        <span >
-                                            <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
-                                        </span>
-                                        <span class= "fs-12 text-ellipsis color-grey" style="margin-left:-50px" v-if="findDuration(event.start, event.end)>70"> 
-                                            {{event.category_key}}
-                                        </span>
-                                    </div>
-                                    <div class="d-flex flex-row-reverse ">
-                                        <span class="fs-11 color-black">
-                                        {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
-                                        </span>
-                                    </div>
-                                </div>
+                            </template>
+                            <div>
+                                <LogTimeView :event="event" />
                             </div>
-                            <div v-if="timed" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
-                            </div>
-                        </template>
-                        <div>
-                            <LogTimeView :event="event" />
-                        </div>
-                </v-menu>
-            </template>
-             <!-- màn hình week/day/weekday - header -->
-            <template v-slot:day-header="{day, present, month, weekday, date}">
-                <WeekdayHeader  
-                    class="pl-3 pt-1"
-                    :monthEvents="monthEvents"
-                    :month="month"
-                    :present="present"
-                    :weekday="weekday"
-                    :date="date"
-                    :day="day"
-                    :hoursRequired="hoursRequired"
-                />
-            </template>
-        </v-calendar>
-        <!-- </div> -->
-    </v-sheet>
-</div>
+                    </v-menu>
+                </template>
+                <!-- màn hình week/day/weekday - header -->
+                <template v-slot:day-header="{day, present, month, weekday, date}">
+                    <WeekdayHeader  
+                        class="pl-3 pt-1"
+                        :monthEvents="monthEvents"
+                        :month="month"
+                        :present="present"
+                        :weekday="weekday"
+                        :date="date"
+                        :day="day"
+                        :hoursRequired="hoursRequired"
+                    />
+                </template>
+            </v-calendar>
+            <!-- </div> -->
+        </v-sheet>
+    </div>
 </template>
 
 <script>
@@ -154,7 +154,6 @@ export default {
     props: ['timeView','userId','monEvents'],
     data() {
         return {
-            endDate:'',
             menu:false,
             calendar: '',// value calendar
             ready: false,
@@ -210,12 +209,11 @@ export default {
             this.cal.scrollToTime(first)
         },
         updateTime () {
-            setInterval(() => this.cal.updateTimes(), 60 * 1000)
-            },
+            setInterval(() => this.cal.updateTimes(), 60 * 1000)},
         start(date){
             this.$emit('showLog',date);   
         },
-         getLogByUserId(id){
+        getLogByUserId(id){
             const self = this;
             timesheetApi.getLogByUserId({userId:id})
                 .then(res => {
@@ -529,10 +527,12 @@ export default {
         }
     },
     computed: {
-        cal () {
-                return this.ready ? this.$refs.calendar : null},
-        nowY () {
-                return this.cal ? this.cal.timeToY(this.cal.times.now) + 'px' : '-10px'},
+        cal(){
+                return this.ready ? this.$refs.calendar : null
+        },
+        nowY(){
+                return this.cal ? this.cal.timeToY(this.cal.times.now) + 'px' : '-10px'
+        },
         ...mapState('timesheet', {
             calendarShowDate: 'calendarShowDate',
             calendarType: 'calendarType',
@@ -573,20 +573,6 @@ export default {
         },
     },
     watch: {
-        // monEvents:{
-        //     deep: true,
-        //     immediate: true,
-        //     handler(event){
-        //         if(this.monthEvents[event.date]){
-        //             let startTime = this.$moment(event.start,'YYYY-MM-DD HH:mm').format('x');
-        //             event.start=startTime;
-        //             event.end=startTime;
-        //             this.monthEvents[event.date]=[];
-        //             this.monthEvents[event.date].push(event);
-
-        //         }
-        //     }
-        // },
          userId(){
             this.getLogByUserId(this.userId);
         },
@@ -619,8 +605,12 @@ export default {
     mounted() {
         // this.$refs.calendar.scrollToTime('07:40');
         this.onChangeCalendar();
-        this.ready = true
-        this.scrollToTime()
+        this.ready = true;
+        if(this.timeView){
+            this.scrollToTime()
+        }else{
+            this.$refs.calendar.scrollToTime('07:40');
+        }
         this.updateTime()
         const self = this
         this.logFormWorker.addEventListener("message", function (event) {
@@ -685,8 +675,10 @@ export default {
     user-select: none;
     -webkit-user-select: none;
     background-color: rgb(254, 253, 253) !important;
-    border: 1px solid lightgrey !important;
-    border-radius:1px!important;
+    // background: green;
+
+    // border: 3px solid lightgrey !important;
+    // border-radius:1px!important;
 }
 .month-status{
     background-color:#90EE90; 
@@ -725,7 +717,7 @@ export default {
 }
 .v-current-time {
     height: 2px;
-    background-color: #00BFFF;
+    background-color:lightcoral;
     position: absolute;
     left: -1px;
     right: 0;
