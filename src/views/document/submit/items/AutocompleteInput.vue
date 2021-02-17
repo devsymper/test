@@ -10,11 +10,13 @@
         :headers="headers"
         :items="dataTable"
         :search="search"
+        :loading="tableLoadding"
         disable-pagination
         fixed-header
         hide-default-footer
         :hide-default-header="isHideHeader"
         dense
+        loading-text="Đang tải dữ liệu..."
         no-data-text="Không có dữ liệu"
         calculate-widths
         
@@ -53,6 +55,7 @@ export default {
     },
     data () { 
         return {
+            tableLoadding:false,
             key:Date.now(),
             isShowAutoComplete:false,
             positionBox:{'top':0,'left':0},
@@ -89,9 +92,15 @@ export default {
             }
             
         },
+        showLoadding(){
+            this.tableLoadding = true;
+        },
+        hideLoadding(){
+            this.tableLoadding = false;
+        },
         refreshActive(){
             for (let index = 0; index < this.dataTable.length; index++) {
-                delete this.dataTable[index]['checked']
+                delete this.dataTable[index]['checked'];
             }
         },
         setEvent(){
@@ -131,20 +140,21 @@ export default {
             this.resetData();
         },
         resetData(){
-            this.headers = []
-            this.dataTable = []
+            this.headers = [];
+            this.dataTable = [];
         },
         isShow(){
             return this.isShowAutoComplete;
         },
         setControlValueKey(controlValueKey){
-            this.controlValueKey = controlValueKey
+            this.controlValueKey = controlValueKey;
         },
         setData(data){
             this.showHeader();
+            this.hideLoadding();
             if(data.headers == undefined){
-                this.dataTable = []
-                return
+                this.dataTable = [];
+                return;
             }
             if(data.headers.length > 0)
             this.headers = data.headers;
@@ -154,7 +164,7 @@ export default {
                 for (let i = 0; i < Object.values(rowData).length; i++) {
                     const cellValue = Object.values(rowData)[i];
                     if(this.dataSelected[this.alias].includes(cellValue)){
-                        this.$set(this.dataTable[index],'checked',true)
+                        this.$set(this.dataTable[index],'checked',true);
                     }
                 }
                
@@ -268,12 +278,10 @@ export default {
             }
             this.curInput.val(value.inputValue);
             this.$emit('after-select-row',{value:value,controlName:this.controlForcusing});
-
         },
         openSubForm(){
             this.hide();
             this.$emit('open-sub-form');
-
         }
     }
 }
