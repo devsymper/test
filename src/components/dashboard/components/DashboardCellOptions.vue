@@ -145,11 +145,11 @@ export default {
     },
     methods:{
 		applySort(){
-			
 			this.closeOnContentClick = true
 			setTimeout((self) => {
 				self.closeOnContentClick = false
 			}, 1000, this);
+            debugger
 			this.$evtBus.$emit('bi-report-change-display', {
 				id: this.cell.sharedConfigs.cellId,
 				type: 'data',

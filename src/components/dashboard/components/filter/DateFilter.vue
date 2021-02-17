@@ -4,15 +4,31 @@
 			<template v-slot:activator="{ on, attrs }">
 				<v-combobox v-model="dateRangeText" solo  readonly v-bind="attrs" v-on="on"> </v-combobox>
 			</template>
-			<div class="d-flex" style="background-color: #ffffff">
-				<div style="border-right: 1px solid lightgray ">
-					<div v-for="(item, i) in pickerOptions.shortcuts" :key="i">
-						<span class="fs-13 ml-2 mt-2 mr-4 picker-option-title" @click="item.onClick()">
-							{{ item.text }}
-						</span>
+			<div class="d-flex flex-column" style="background-color: #ffffff; z-index: 100000	">
+				<div class="d-flex" >
+					<div style="border-right: 1px solid lightgray" class="mt-2">
+						<div v-for="(item, i) in pickerOptions.shortcuts" :key="i">
+							<span class="fs-13 ml-2 mt-2 mr-4 picker-option-title" @click="item.onClick()">
+								{{ item.text }}
+							</span>
+						</div>
+					</div>
+					<!-- <v-date-picker v-model="dataValue.value" range scrollable> </v-date-picker> -->
+					<div class="d-flex flex-column mt-2 ml-5">
+						<span class="fs-13">Ngày bắt đầu</span>
+						<input type="date" class="ml-4 " style="margin-top: 2px"  />
+						<span class="fs-13 " style="margin-top: 18px">Ngày kết thúc</span>
+						<input type="date"  class="ml-4" style="margin-top: 2px" />
 					</div>
 				</div>
-				<v-date-picker v-model="dataValue.value" range scrollable> </v-date-picker>
+				<div class="d-flex  flex-row-reverse mr-2 mb-2 mt-2">
+					<v-btn small color="primary" class="ml-1" @click="applyFilter">
+						Áp dụng
+					</v-btn>
+					<v-btn small @cancel="cancel">
+						Huỷ
+					</v-btn>
+				</div>
 			</div>
 		</v-menu>
 	</div>
@@ -37,6 +53,12 @@ export default {
 		},
 	},
 	methods: {
+		applyFilter(){
+			this.cancel()
+		},
+		cancel(){
+			this.menu = false
+		},
 		handleChangeValue() {
 			this.$emit('change-filter-value', this.cellId);
 		},
@@ -56,8 +78,7 @@ export default {
 						onClick(picker) {
 							const end = new Date();
 							const start = new Date();
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.cancel()
 						},
 					},
 					{
@@ -66,8 +87,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.cancel()
 						},
 					},
 					{
@@ -76,8 +96,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.cancel()
 						},
 					},
 					{
@@ -86,8 +105,8 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 14);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							// this.$emit('pick', [start, end]);
+							self.cancel()
 						},
 					},
 					{
@@ -96,8 +115,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 28);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.cancel()
 						},
 					},
 					{
@@ -106,8 +124,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.cancel()
 						},
 					},
 				],
@@ -132,6 +149,7 @@ export default {
 }
 .picker-option-title {
 	cursor: pointer;
+	font-size: 13px !important;
 }
 .picker-option-title:hover {
 	color: blue;
