@@ -42,7 +42,8 @@ export default {
         this.allInputs.taskName.value = this.cate.name;
         this.id = this.cate.id;
         this.allInputs.description.value = this.cate.description;
-        this.typeCate = this.cate.type
+        this.typeCate = this.cate.type;
+        this.docObjId = this.cate.docObjId
 
     },
     watch: {
@@ -115,6 +116,7 @@ export default {
         check:false,
         id:-1,
         forBa:true,
+        docObjId:0
      }
     },
     methods: {
@@ -144,6 +146,7 @@ export default {
                 for(let i in this.allInputs){
                     data[i] = this.allInputs[i].value;
                     data.status= 1;
+                    data.docObjId=this.docObjId;
                     // this.listDoc.map(doc=>{
                     //     if(doc.id==data[i]){
                     //         this.allInputs[i].value=doc.title
