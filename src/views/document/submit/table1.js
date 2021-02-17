@@ -279,7 +279,7 @@ export default class SymperTable {
                         control:controlValue,
                         controlColumn:colField
                     },
-                    hide:colField.includes('_____s_table_id_sql_lite') ,
+                    hide:colField.includes('_____s_table_id_sql_lite') || colField.includes("_____childObjectId"),
                     editable:this.checkEditableCell(controlValue),
                     // cellStyle: function(params) {
                     //     if (params.value=='R') {
