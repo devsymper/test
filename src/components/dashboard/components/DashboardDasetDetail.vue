@@ -39,19 +39,20 @@
                 <v-expansion-panel class="sym-expand-panel " v-for="(dataset,idx) in datasetAndColumn" :key="idx" v-show="dataset.show && !dataset.isSubDataset">
                     <v-expansion-panel-header class="v-expand-header sym-expand-panel-header px-4 py-0">
                         <v-menu 
-                            open-on-hover 
-                            :close-on-content-click="false" 
-                            left 
-                            open-delay="400"
+                            absolute
+                            left
+                            nudge-left="10"
+                            nudge-bottom="10"
                             >
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
-                                <v-icon v-on="on" v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
-                                <v-icon  class="selected-dataset-mark" v-if="dataset.isSelected">mdi-check-circle</v-icon>
-                                <span v-on="on" class="dataset-item-title fs-13 pl-2">{{dataset.title}}</span>
+                                <v-icon v-on="on" @click.prevent.stop="showDetailDataset(dataset)" v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
+                                <v-icon v-on="on" @click.prevent.stop="showDetailDataset(dataset)" v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
+                                <v-icon  class="selected-dataset-mark" v-show="dataset.isSelected">mdi-check-circle</v-icon>
+                                <span v-on="on" @click.prevent.stop="showDetailDataset(dataset)" class="dataset-item-title fs-13 pl-2">{{dataset.title}}</span>
                             </template>
                             <dataset-detail-tooltip 
-                                :info="getInfoDatasetTooltip(dataset)"
+                                v-if="dataSetDetail"
+                                :info="dataSetDetail"
                             />
                         </v-menu>
                         <v-icon class="fs-15" style="position: absolute;right: 40px;" @click.prevent.stop="removeDataset(dataset)">mdi-close</v-icon>
@@ -87,17 +88,19 @@
                             <v-expansion-panel class="sym-expand-panel dataset-child" v-for="(subId,idx) in dataset.subDatasetIds" :key="idx"  v-show="datasetAndColumn[subId].show" >
                                 <v-expansion-panel-header class="v-expand-header sym-expand-panel-header px-4 py-0">
                                     <v-menu 
-                                        open-on-hover 
-                                        :close-on-content-click="false" 
-                                        left open-delay="400"
+                                        absolute
+                                        left
+                                        nudge-left="10"
+                                        nudge-bottom="10"
                                         >
                                         <template v-slot:activator="{ on }">
-                                            <v-icon v-on="on" class="fs-15 icon-table">mdi-table-large</v-icon>
-                                            <v-icon class="selected-dataset-mark" v-if="dataset.isSelected">mdi-check-circle</v-icon>
-                                            <span v-on="on" class="dataset-item-title fs-13 pl-2">{{datasetAndColumn[subId].title}}</span>
+                                            <v-icon v-on="on"  @click.prevent.stop="showDetailDataset(datasetAndColumn[subId])" class="fs-15 icon-table">mdi-table-large</v-icon>
+                                            <v-icon class="selected-dataset-mark" v-show="datasetAndColumn[subId].isSelected">mdi-check-circle</v-icon>
+                                            <span v-on="on"  @click.prevent.stop="showDetailDataset(datasetAndColumn[subId])" class="dataset-item-title fs-13 pl-2">{{datasetAndColumn[subId].title}}</span>
                                         </template>
                                         <dataset-detail-tooltip 
-                                            :info="getInfoDatasetTooltip(datasetAndColumn[subId])"
+                                             v-if="dataSetDetail"
+                                            :info="dataSetDetail"
                                         />
 										<v-menu offset-y>
 											<template v-slot:activator="{ on, attrs }">
@@ -267,6 +270,7 @@ export default {
             openedPanelChild:[],
             search:"",
             infoDataflows:[],
+            dataSetDetail:null,
 			showVariables:false,
 			selectingCalculatedColumn: null,
         }
@@ -378,7 +382,7 @@ export default {
                 self.loadding = false;
             }, 100,this);
         },
-        postSelectedDatasetBefor(selectedDataset,setSelect = true){
+        postSelectedDatasetBefor(selectedDataset){
             this.dashboardDatasetWorker.postMessage({
 				action: 'postSelectedDatasetBefor',
 				data:{
@@ -447,13 +451,16 @@ export default {
 				showMeasureConfig: false,
 				calculation: 'measure', // phục vụ cho hiển thị xem cột này tính toán từ đâu: measure hay caculated field
 			};
-			debugger
 			dataset.columns.unshift(newCol);
 			// this.refsToColumns[dataset.id + newCol.name] = newCol;
 			// SDashboardEditor.trackingMeasureInDataset(dataset, newCol);
 		},
         getInfoDataFlowAfter(data){
-            this.infoDataflows = data.infoDataFlow;
+            if (Array.isArray(data.infoDataFlow)) {
+                this.infoDataflows = data.infoDataFlow;
+            }else{
+                this.infoDataflows = [data.infoDataFlow];
+            }
         },
         removeDataset(dataset){
             let idDataset = dataset.id;
@@ -471,14 +478,14 @@ export default {
             this.$store.commit("dashboard/addDatasetAndColumnInDashboard",dataPos);
 
         },
-        getInfoDatasetTooltip(dataset){
+        showDetailDataset(dataset){
             if (dataset.type == 'doc') {
-                return dataset
+                this.dataSetDetail = dataset
             }else{
                 let infoDataFlow = this.infoDataflows.find(ele => ele.id == dataset.id);
                 if (infoDataFlow) {
                     infoDataFlow.type = 'dataset_by_dataflow'
-                    return infoDataFlow;
+                    this.dataSetDetail = infoDataFlow;
                 }
             }
         }
@@ -518,6 +525,9 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.dataset-item-title:hover{
+    text-decoration: underline;
 }
 .sym-expand-panel{
     margin-top: 0px ;

@@ -11,7 +11,7 @@
                         label="Tìm kiếm"
                         dense
                         solo
-                        style="max-width:255px;"
+                        style="max-width:200px;"
                         single-line
                         hide-details
                         class="sym-small-size sym-style-input"
@@ -114,6 +114,16 @@ export default {
             }
         },
        
+    },
+    watch:{
+        listVersion:{
+            deep: true,
+            handler:function(vl){
+                if(vl.length > 0){
+                    this.countIssueWithListVersion();
+                }
+            }
+        }
     },
     data(){
         return{
@@ -250,6 +260,15 @@ export default {
             this.$refs.modalAddOrDetailVersion.show();
 
         },
+        countIssueWithListVersion(){
+            let data = {};
+            data.projectId = this.$route.params.id;
+            data.listVersion = this.listVersion;
+            this.versionWorker.postMessage({
+                action:'countIssueInListVersion',
+                data:data
+            });
+        }
      
     },
     created(){
@@ -268,6 +287,15 @@ export default {
                     self.dialogRemoveVersion = false;  
                     self.loading = false;
                     break;
+                case 'countIssueInListVersion':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.dataProgess.total = res.total ? res.total : 0;
+                        self.dataProgess.item.todo.value = res.todo ? res.todo : 0;
+                        self.dataProgess.item.inprogress.value = res.inprogress ? res.inprogress : 0;
+                        self.dataProgess.item.done.value = res.done ? res.done : 0;
+                    } 
+                    break
                 default:
                     break;
             }

@@ -1,16 +1,12 @@
 <template>
 <div class="w-100 pl-4 symper-submit-timesheet" >
     <v-row class="submit-view">
-        <div style="width:63%;float:left; color: black!important">
+        <div style="width:63%;float:left">
             <div class="float-lg-left float-md-left .d-lg-flex .d-lg-none d-none d-lg-block sub-submit-view pt-3">
-                <v-menu offset-y>
-                    <v-list>
-                    </v-list>
-                </v-menu>
                 <v-btn @click="adjust(-1)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('timesheet.last_week')}}</v-btn>
                 <v-btn @click="adjust(0)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('timesheet.last_week1')}}</v-btn>
             </div>
-            <v-col style="padding-left:0px" class=".d-lg-flex .d-lg-none d-none d-lg-block">
+            <v-col class="pl-0 .d-lg-flex .d-lg-none d-none d-lg-block">
                 <v-btn @click="adjust(-1, true)" icon>
                     <v-icon>mdi-chevron-left</v-icon>
                 </v-btn>
@@ -22,16 +18,17 @@
         </div>
         <div style="width:37%;float:right" class=" .d-lg-flex .d-lg-none d-none d-lg-block">
             <div class="icon-calendar">
-                <v-btn icon class="mdi-calendar-button" 
-                @click="$router.push('/timesheet')">
+                <v-btn icon class="mdi-calendar-button" @click="$router.push('/timesheet')">
                     <v-icon>mdi-calendar</v-icon>
                 </v-btn>
-                <v-select class="submit-groupby" :items='groupBy'
-                 :menu-props="{'nudge-top':-40}" 
-                 style="" item-color="white" 
-                 label="Group by" background-color="#F7F7F7">
+                <v-select class="submit-groupby" 
+                    :items='groupBy'
+                    :menu-props="{'nudge-top':-40}" 
+                    style="" item-color="white" 
+                    label="Group by"
+                    background-color="#F7F7F7">
                     <template v-slot:selection>
-                        <span style="color:black!important; padding-left:5px">{{$t('timesheet.task_form')}}</span>
+                        <span class="pl-1">{{$t('timesheet.task_form')}}</span>
                     </template>
                     <template v-slot:label>
                         {{$t('timesheet.group_by')}}
@@ -43,8 +40,8 @@
                     </template>
                 </v-select>
             </div>
-            <v-col class="float-lg-right mr-4" style="float:left; 
-                padding-right: 0px; padding-left: 0px; width: 160px">
+            <v-col class="float-lg-right mr-4 px-0"
+                style="float:left; width: 160px">
                 <div class="div-action-button">
                     <v-dialog v-model="dialog" width="350">
                         <template v-slot:activator="{ on, attrs }">
@@ -52,8 +49,7 @@
                                 <span>{{$t('timesheet.submit_timesheet')}}</span>
                             </v-btn>
                         </template>
-                        <SubmitTimesheetForm :hours="hoursRequired" @cancel="cancel()">
-                        </SubmitTimesheetForm>
+                        <SubmitTimesheetForm :hours="hoursRequired" @cancel="cancel()" />
                     </v-dialog>
                 </div>
             </v-col>
@@ -64,10 +60,12 @@
     <template>
         <AgDataTable  
             :customGridOptions="customGridOptions"
-            style="width: 98%; max-height: 80%; 
-         margin-left: 3px; margin-top: 10px; font-size: 13px!important; 
-         font-family: Roboto" ref="agTable" :allColumns="allColumns" :rowData="dataTable" :editable="false" 
-         :customComponents="customAgComponents">
+            class="ag-table" 
+            ref="agTable" 
+            :allColumns="allColumns" 
+            :rowData="dataTable" 
+            :editable="false" 
+            >
         </AgDataTable>
     </template>
 </div>
@@ -75,19 +73,27 @@
 
 <script>
 import AgDataTable from "./../../components/common/agDataTable/AgDataTable";
-import CheckBoxRenderer from "./../../components/common/agDataTable/CheckBoxRenderer";
-import PeriodSelector from "./../../components/timesheet/PeriodSelector";
-import ActionButtons from "./../../components/timesheet/ActionButtons";
 import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetForm";
-import timesheetApi from '../../api/timesheet';
-
+import TimesheetWorker from 'worker-loader!@/worker/timesheet/SubmitTimesheet.Worker.js';
 import _groupBy from 'lodash/groupBy';
 
 export default {
     components: {
         AgDataTable,
-        CheckBoxRenderer,
         SubmitTimesheetForm,
+    },
+    mounted(){
+        const self = this
+        this.timesheetWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'showTotalHourInSubmitView':
+                    self.setDataTable(data.dataAfter)
+                    break;
+                default:
+                    break;
+            }
+        });
     },
     methods: {
         color(){
@@ -103,101 +109,48 @@ export default {
                 this.$store.commit('timesheet/adjustSubmit', value);
             }
         },
-        load() {
+        load(){
             const self = this;
-            timesheetApi.sendStartEnd({
-                    startEnd: this.startEndDate
-                })
-                .then(res => {
-                    if (res.status === 200) {
-                        const ranges = self.allColumns.slice(2, self.allColumns.length).map(c => c.colId);
-                        const logTimeList = _groupBy(res.data.listLogTime, 'task_id');
-                        const dateList = _groupBy(res.data.listLogTime, 'date');
-                        const userName = _groupBy(res.data.listLogTime, 'account_id');
-                        //console.log(dateList);
-                        const rows = Object.keys(logTimeList).map(k => {
-                            const returnObj = {
-                                // name: [logTimeList[k][0].account_id],
-                                category: logTimeList[k][0].category_task,
-                                name: [k],
-
-                            };
-                            let logged = 0;
-                            logTimeList[k].forEach(log => {
-                                const loggedByDay = (log.duration / 60);
-                                returnObj[log.date] = loggedByDay.toFixed(1);
-                                if (ranges.includes(log.date))
-                                    logged += loggedByDay;
-                            })
-                            returnObj['logged'] = logged.toFixed(1);
-                            return returnObj;
-                             }).filter(logTime => logTime.logged > 0);
-
-                        Object.keys(dateList).forEach(key => {
-                        dateList[key] = dateList[key].reduce((acc, date) => acc + date.duration/60, 0).toFixed(1);
-                    //    console.log( dateList[key]);
-                        });
-                     
-                        dateList.name = ["Tổng"];
-                        dateList.category ='';
-            
-                       
-                       // dateList.cellStyle = {color: 'red', 'background-color': 'green'};
-                        dateList.logged = "0";
-                        dateList.logged = (rows.reduce((acc,r) => +r.logged + acc, 0));
-                        //console.log(typeof dateList.logged);
-                        this.sum = dateList.logged.toFixed(1);
-                       
-                        rows.push(dateList);
-                        // this.dataTable = ;
-                        this.dataTable=rows;
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
-
-                });
-
+            let data = {
+                startEnd:this.startEndDate,
+                allColumns: this.allColumns
+            }
+            this.timesheetWorker.postMessage({
+                action:'showTotalHourInSubmitView',
+                data:{data:data}
+            })
+        },
+        setDataTable(data){
+            this.sum = data.sum;
+            this.dataTable = data.dataTable
         }
     },
     data() {
         return {
+            timesheetWorker:null,
             customGridOptions: {
                 getRowStyle : function(params) {
-                    console.log(params, 'paramsparamsparamsparams');
                     if (params.node.key === 'Tổng') {
                         return { background: '#E0FFFF' };
                     }
                 }
             },
-            customAgComponents: {
-                customCheckBox: CheckBoxRenderer
-            },
             sum:0,
             dialog: false,
             groupBy: ['task'],
-            reviewer: {
-                name: ["Thắng Nguyễn", "Dinh Nguyễn"],
-                icon: ['1', '2'],
-            },
-            dataTable: [
-                {
-                }
-            ],
+            dataTable: [ {}],
             baseColumns: [
                 {
                     "headerName":this.$t("timesheet.category_submit"),
                     "field": "category",
                     "width": 200,
                     "colId": "category",
-                   
                 },
                 {
                     "headerName":this.$t("timesheet.logged_time"),
                     "field": "logged",
                     "width": 100,
                     "colId": "logged", 
-                   
                 },
             ],
         }
@@ -208,11 +161,6 @@ export default {
         },
         startEndDate() {
             return this.$store.getters['timesheet/submitStartEndDate'];
-        },
-        startDate() {
-            let start = this.$store.getters['timesheet/submitStartEndDate'];
-            startDate = start.slice(0, 8);
-            return startDate;
         },
         hoursRequired() {
             return this.$store.getters['timesheet/getTotalHoursBy']('submit');
@@ -225,18 +173,12 @@ export default {
         }
     },
     created() {
-        this.load();
-        end: this.$store.getters['timesheet/submitStartEndDate'];
+        this.timesheetWorker = new TimesheetWorker();
+        this.load()
     },
 }
 </script>
-
-<style>
-.symper-submit-timesheet .ag-theme-balham .ag-cell{
-    border:none!important;
-    line-height:22px!important
-}
-</style><style lang="scss" scoped>
+<style lang="scss" scoped>
 .v-btn:not(.v-btn--round).v-size--small {
     padding: 0 4px !important;
 }
@@ -270,11 +212,6 @@ button {
     padding-left: 0px;
 }
 
-.submit-groupby ::v-deep .v-input__control .v-input__slot {
-    font-size: 13px !important;
-    font-family: Roboto !important;
-}
-
 .submit-groupby ::v-deep .v-input__control .v-select__selection {
     margin-left: 5px;
 
@@ -292,22 +229,12 @@ button {
     display: none;
 }
 
-.submit-groupby ::v-deep .v-list-item__title {
-    font-size: 13px !important;
-    font-family: Roboto !important;
-}
-
 .submit-groupby ::v-deep .v-input__slot:before {
     border-color: transparent !important;
 }
 
 .submit-groupby ::v-deep .v-input__slot:after {
     border-color: transparent !important;
-}
-
-.submit-groupby-item {
-    color: rgba(0, 0, 0, 0.87) !important;
-    caret-color: rgba(0, 0, 0, 0.87) !important;
 }
 
 .icon-calendar {
@@ -352,8 +279,18 @@ button {
 .submit-groupby ::v-deep .v-input__control {
     margin-right: 4px !important
 }
+.ag-table{
+    width: 98%; 
+    max-height: 80%; 
+    margin-left: 3px; 
+    margin-top: 10px; 
+}
 </style>
 <style>
+.ag-theme-balham .ag-cell{
+    border:none!important;
+    line-height:22px!important
+}
 .v-list-item__title {
     font-size: 13px !important;
     font-family: Roboto !important;
@@ -364,8 +301,4 @@ button {
     padding-left: 0px;
     font-size: 13px !important;
 }
-.my-class{
-    background-color:green;
-}
-
 </style>

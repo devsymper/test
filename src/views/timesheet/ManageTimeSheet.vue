@@ -51,6 +51,8 @@ import CheckBoxRenderer from "./../../components/common/agDataTable/CheckBoxRend
 import Config from "../../components/timesheet/Config";
 import timesheetApi from '../../api/timesheet';
 import _groupBy from 'lodash/groupBy';
+import ManageTimesheetWorker from 'worker-loader!@/worker/timesheet/ManageTimesheet.Worker.js';
+
 
 export default {
     components: {
@@ -58,8 +60,22 @@ export default {
         CheckBoxRenderer,
         Config, 
     },
+     mounted(){
+        const self = this
+        this.manageTimesheetWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'showTotalHourManageView':
+                    self.setDataTable(data.dataAfter)
+                    break;
+                default:
+                    break;
+            }
+        });
+    },
     data() {
         return {
+            manageTimesheetWorker:null,
             tab: null,
             customAgComponents: {
                 customCheckBox: CheckBoxRenderer
@@ -113,9 +129,13 @@ export default {
         }
     },
     created() {
+        this.manageTimesheetWorker = new ManageTimesheetWorker();
         this.load();
     },
     methods: {
+        setDataTable(data){
+            this.dataTable = data
+        },
         changeRange(range) {
             this.$store.commit('timesheet/changeManageTimesheetRange', range);
         },
@@ -130,52 +150,14 @@ export default {
         },
         load() {
             const self = this;
-            timesheetApi.getLogTimeList()
-                .then(res => {
-                    if (res.status === 200) {
-                        const ranges = self.allColumns.slice(2, self.allColumns.length).map(c => c.colId);
-                        const logTimeListByAccount = _groupBy(res.data.listLogTime, 'account_id');
-                        let userName = res.data.userName;
-                         console.log(userName);
-                        // console.log('ádádjádaksdjkádj');
-                        this.dataTable = Object.keys(logTimeListByAccount).map(k => {
-                            const returnObj = {
-                                name:[userName],
-                                department: 'department',
-                            };
-                            
-                            let logged = 0;
-                            ranges.forEach(r => {
-                                const start = r.split(" ")[0];
-                                const end = r.split(" ")[1];
-                                logTimeListByAccount[k] = logTimeListByAccount[k].map(log => {
-                                    if (log.checked) {
-                                        return {
-                                            ...log,
-                                            checked: true,
-                                        }
-                                    }
-                                    let checked = false;
-                                    if (this.$moment(log.date).isBetween(start, end, 'day', '[]')) {
-                                        const duration = (log.duration / 60);                        
-                                        returnObj[r] = (returnObj[r] || 0) + duration;
-                                        logged += duration;
-                                        checked = true;
-                                    }
-                                    return {
-                                        ...log,
-                                        checked,
-                                    }
-                                })
-                            });
-                            returnObj['logged'] = logged.toFixed(2);
-                            return returnObj;
-                        })
-                    }
-                })
-                .catch(e => {
-                    console.log('error manage timesheet', e);
-                })
+            let data = {
+                startEnd:this.startEndDate,
+                allColumns: this.allColumns
+            }
+            this.manageTimesheetWorker.postMessage({
+                action:'showTotalHourManageView',
+                data:data
+            })
         }
     }
 }
@@ -334,7 +316,8 @@ button {
     display: flex;
     flex-direction: column;
 }
-</style><style>
+</style>
+<style>
 .v-time-picker-title .v-picker__title__btn,
 .v-time-picker-title span {
     font-size: 24px !important;
@@ -360,5 +343,9 @@ button {
 
  a{
     color:black;
+}
+.ag-theme-balham .ag-cell{
+    border:none!important;
+    line-height:22px!important
 }
 </style>

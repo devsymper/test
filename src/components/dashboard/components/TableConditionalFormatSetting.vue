@@ -4,9 +4,11 @@
             <div class="item-title">
                 Apply for column: 
             </div>
-            <div>
+            <div style="padding-top:1px">
                 <select-column 
+                    class="sym-select-cond"
                     :itemText="'as'"
+                    :configPadding=1
                     :allColumns="listColumnForSelect"
                     :model="config.applyColumnUid"
                     @change-value="changeSelectedCol"
@@ -40,7 +42,7 @@
             <SingleColorConditionalFormat 
                 ref="singleColorConditionalFormat"
                 v-if="config.mode == 'singleColor'" 
-                v-model="config.singleColorConfig"
+                :value="config.singleColorConfig"
                 :columns="config.listColumns"/>        
         </VuePerfectScrollbar>
         <!-- <ColorScaleConditionFormat v-else v-model="config.colorScaleConfig" />         -->
@@ -60,7 +62,7 @@ var entireRowFormatConfig = {
     "uid": "Format entire row",
     "name": "Format entire row",
     "customItem": {
-        "icon": "ms-Icon ms-Icon--TableBrandedRow",
+        "icon": "mdi-dots-horizontal",
         "hideNameOnDisplay": true
     },
     "columnName": "",

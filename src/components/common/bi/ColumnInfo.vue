@@ -1,6 +1,7 @@
 <template>
     <div >
-		<div class="single-row px-4 item-column-dataset justify-space-between" @click="handlerColumnClick(infoColumn, $event)">
+		<div class="single-row px-4 item-column-dataset justify-space-between" @click="handlerColumnClick(infoColumn, $event)"
+        :class="{'px-4':configPadding == 4,'px-3':configPadding == 3,'px-2':configPadding == 2,'px-1':configPadding == 1}">
 			<v-icon v-if="infoColumn.calculation == 'measure'" style="margin-left:-16px;margin-right:-12px; color: blue" small> mdi-calculator</v-icon>
 			<div class="text-ellipsis flex-grow-1" :style="{'max-width': infoColumn.calculation == 'measure' ? '43%' : '100%'  }" >
 				<v-icon color="#000" class="fs-14 pr-2">{{icon[infoColumn.type]}}</v-icon>
@@ -38,6 +39,10 @@ export default {
         showIconRemove:{
             type: Boolean,
             default: false
+        },
+        configPadding:{
+            type:Number,
+            default:4
         }
 
     },

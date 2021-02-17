@@ -12,14 +12,19 @@
         :customAPIResult="customAPIResult"
         :tableContextMenu="tableContextMenu"
         :getDataUrl="getListUrl">
-        <div slot="right-panel-content" class="h-100">
-           <CategoryForm 
+    </list-items>
+        <v-dialog 
+            v-model="showPanel"
+            max-width="400"
+      >
+       <CategoryForm
+            style="background:white!important; over-flow:hidden"
             ref="category"
+            :cate="cate"
+            :listDoc="listDoc"
             :isAddView="isAddView"
             @cancel="cancel()"/>
-        </div>
-    </list-items>
-    
+      </v-dialog>
      
 </div>
 </template>
@@ -30,7 +35,7 @@ import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
 import timesheetApi from '../../api/timesheet';
 import CategoryForm from "./../../components/timesheet/CategoryForm";
-
+import {documentApi} from "../../api/Document"
 export default {
     components: {
         "list-items": ListItems,
@@ -40,18 +45,21 @@ export default {
     data(){
         const self = this
         return {
+            listDoc:[],
+            showPanel:false,
+            cate:{},
             isAddView:true,
             listCategory:[],
             categoryTask: [],
             updateCategory:{},
             showAddCategory:false,
             customAPIResult: {
-                  reformatData(res){
+                reformatData(res){
                     let data={
                         listObject:[],
                         columns:[]
                     };
-                    data.listObject = res.data.category;
+                    data.listObject = res.data.listObject;
                     data.columns.push(
                         {
                             name:'id',
@@ -73,26 +81,26 @@ export default {
                             title:'table.description',
                             type:"text"
                         },
-                        // {
-                        //     name:'user_created',
-                        //     title:'table.user_created',
-                        //     type:"text"
-                        // },
+                        {
+                            name:'userCreate',
+                            title:'table.user_created',
+                            type:"text"
+                        },
                         {
                             name:'createAt',
                             title:'table.date_created',
                             type:"text"
                         },
-                        // {
-                        //     name:'status',
-                        //     title:'table.status',
-                        //     type:"numeric"
-                        // },
-                        // {
-                        //     name:'user_updated',
-                        //     title:'table.user_updated',
-                        //     type:"text"
-                        // },
+                        {
+                            name:'type',
+                            title:'table.type',
+                            type:"numeric"
+                        },
+                        {
+                            name:'userUpdate',
+                            title:'table.user_updated',
+                            type:"text"
+                        },
                         {
                             name:'updateAt',
                             title:'table.date_updated',
@@ -100,20 +108,41 @@ export default {
                         },
                       
                    );
+                    let listUser = self.$store.state.app.allUsers;
+                    data.listObject.map(d=>{
+                        if(d.type==1){
+                            d.type="DO"
+                        }else{
+                            d.type="TI"
+                        }
+                        listUser.map(user=>{
+                            if(d.userCreate==user.id){
+                                d.userCreate=user.displayName
+                             }
+                              if(d.userUpdate==user.id){
+                                d.userUpdate=user.displayName
+                             }
+                        });
+                        // self.listDoc.map(doc=>{
+                        //     if(doc.id==d.name){
+                        //         d.name=doc.title
+                        //     }
+                        // })
+                    })
                     return  data;
-                } 
+                }
             },
              tableContextMenu:{
-                view: {
-                    name:"view",
-                    text:this.$t('timesheet.table.view'),
-                    callback: (cate, callback) => {
-                        this.showDetail(cate);
-                    }
-                },
+                // view: {
+                //     name:"view",
+                //     text:this.$t('timesheet.table.view'),
+                //     callback: (cate, callback) => {
+                //         this.showDetail(cate);
+                //     }
+                // },
                  update: {
                     name:"update",
-                    text:this.$t('timesheet.table.update'),
+                    text:this.$t('common.update'),
                     callback: (cate, callback) => {
                         this.update(cate);
                     }
@@ -136,16 +165,42 @@ export default {
         this.calcContainerHeight();
     },
     created(){
+        this.getDocument();
         this.getListUrl = appConfigs.apiDomain.timesheet+'category';
     },
     methods:{
+        getDocument(){
+            const self = this;
+            documentApi.getSmallListDocument().then(res=>{
+                if(res.status==200){
+                    // self.listDoc =res.data.listObject;
+                    self.listDoc = [];
+                    res.data.listObject.map(data=>{
+                        self.listDoc.push({id:data.title})
+                    })
+
+                }
+            })
+        },
         deleteOne(cate){
-            this.$refs.category.id = cate.id;
-            this.$refs.category.key= cate.key;
-            this.$refs.category.name= cate.name;
-            this.$refs.category.description= cate.description;
-            this.$refs.category.status= 0;
-            this.$refs.category.updateAPI();
+            let data = {id: cate.id};
+            const self = this;
+            timesheetApi.deleteCategory(data).then(res=>{
+                if(res.status==200){
+                    self.$snotify({
+                        type: "success",
+                        title:" Xóa thành công",
+                    });
+                    self.$refs.listCategory.refreshList();
+                }else{
+                     self.$snotify({
+                        type: "error",
+                        title: "Xóa thất bại",
+                    });
+                }
+            }
+        )
+            
         },
         delete(category){
             category.map(cate=>{
@@ -154,14 +209,25 @@ export default {
             )
         },
         update(category){
+            this.showPanel = true;
             this.isAddView = false;
-            this.$refs.listCategory.openactionPanel();
-            this.$refs.category.key = category.key;
-            this.$refs.category.name = category.name;
-            this.$refs.category.description = category.description;
-            this.$refs.category.id = category.id;
+            if(this.$refs.category){
+                this.$refs.category.id= category.id;
+                this.$refs.category.allInputs.key.value = category.key;
+                this.$refs.category.allInputs.taskName.value = category.name;
+                this.$refs.category.allInputs.description.value  = category.description;
+                this.$refs.category.typeCate=category.type=='TI'?"normal":"doc";
+            }else{
+                this.cate.id = category.id;
+                this.cate.key = category.key;
+                this.cate.name = category.name;
+                this.cate.description = category.description;
+                this.cate.type=category.type=='TI'?"normal":"doc"
+            }
         },
         addCategory(){
+            this.showPanel = true;
+            this.$refs.listCategory.closeactionPanel();
             this.$refs.category.refreshAll();
             this.isAddView = true;
             this.showAddCategory = true;
@@ -170,9 +236,8 @@ export default {
             this.containerHeight = util.getComponentSize(this).h;
         },
         cancel(){
-            this.$refs.listCategory.refreshList()
-            this.$refs.category.refreshAll();
-            this.$refs.listCategory.closeactionPanel();
+            this.$refs.listCategory.refreshList();
+            this.showPanel = false
         }
     }
 }

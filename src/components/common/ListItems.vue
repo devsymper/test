@@ -1345,7 +1345,6 @@ export default {
 			return this.rowData
 		},
 		customRowHeights(value){
-			debugger
 			if(value == 1){
 				this.gridOptions.rowHeight  = this.rowHeight
 			}else{
@@ -1741,6 +1740,7 @@ export default {
 			this.$emit("refresh-list", {});
         },
 		showTableDropdownMenu(x, y, colName){
+
 			this.searchKey = ""
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){

@@ -1,5 +1,21 @@
 <template>
-     <VuePerfectScrollbar style="height:100%" v-if="listItem.length > 0">
+    <div class="h-100">
+        <div  :class="{'single-row': true }"
+            class="d-flex w-100 py-1" style="font-weight:500;">
+                <div class="ml-4">
+                    Mô tả 
+                </div>
+                <div class="mt-2 mr-2" style="margin-left:auto;width:160px">
+                    Mức độ ưu tiên
+                </div>  
+                <div class="mt-2" style="width:130px">
+                    Trạng thái
+                </div> 
+                <div class="mt-2 mx-1" style="width:180px" >
+                    Người thực hiện
+                </div>   
+            </div>
+            <VuePerfectScrollbar style="height:calc(100% - 50px)" v-if="listItem.length > 0">
         <div
             v-for="(obj, idex) in listItem"
             :key="idex"
@@ -13,6 +29,7 @@
                     class="issue-item"
                     v-for="(item, i) in obj.issues"
                     :key="i"
+                    @click.prevent.stop="handleShowDetailIssue(item)"
                     >
                         <div  :class="{'single-row': true }"
                          class="d-flex w-100 py-1">
@@ -25,7 +42,7 @@
                             </div>
                             <div class="d-flex justify-space-between ml-2">
                                 <div>
-                                    <div  @click.prevent.stop="handleShowDetailIssue(item)" class="task-hover-poiter">{{item.tmg_name}}</div>
+                                    <div>{{item.tmg_name}}</div>
                                     <div class="grey--text">
                                             {{item.tmg_project_key}}-{{item.document_object_id}}
                                     </div>
@@ -55,6 +72,8 @@
             ref="issue"
         />
     </VuePerfectScrollbar>
+    </div>
+     
 </template>
 
 <script>
@@ -115,5 +134,8 @@ export default {
 }
 .issue-item:hover{
     background: var(--symper-background-hover);
+}
+.issue-item{
+    cursor: pointer;
 }
 </style>

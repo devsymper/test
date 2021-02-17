@@ -6,7 +6,7 @@ export default [{
     },
 
     {
-        path: "/timesheet",
+        path: "/timesheet/report",
         name: "Report timesheet",
         component: () =>
             import ('../../views/timesheet/ReportTimesheet.vue'),

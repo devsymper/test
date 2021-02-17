@@ -11,6 +11,9 @@ export const documentApi = {
     getListDocument() {
         return coreApi.get("documents?pageSize=3000");
     },
+    getSmallListDocument(){
+        return coreApi.get("documents?pageSize=50");
+    },
     getListDocumentObject(docId) {
         return coreApi.get("documents/"+docId+"/objects");
     },

@@ -137,7 +137,7 @@
 			:taskId="originData.id"
 			:varsForBackend="varsForBackend"
 			:taskInfo="taskInfo"
-			@success="refreshMyItem('complete')"
+			@success="handleSuccessActionOnTask"
 		/>
 		<DelegateDialog
 			:showDialog="modelDialog.delegateShowDialog"
@@ -432,6 +432,14 @@ export default {
 	},
 	created() {},
 	methods: {
+		handleSuccessActionOnTask(taskData){
+			let vars = taskData.variables.reduce((map, el) => {
+				map[el.name] = el.value;
+				return map;
+			}, {});
+			this.updateProcessInstanceName(vars);
+			this.refreshMyItem('complete');
+		},
 		repeatSubmit(){
 			this.saveTaskOutcome("submit",0)
 			this.$emit('repeated-submit');
@@ -439,13 +447,14 @@ export default {
 		needComplyFormula(str) {
 			return /ref\s*\(|select |\$\{/i.test(str);
 		},
-		async updateProcessInstanceName() {
+		async updateProcessInstanceName(variables = {}) {
 			if (this.taskAction != '' && this.taskAction != undefined && this.taskAction != 'submitAdhocTask') {
-				let dataInput = this.$refs.task.getVarsMap();
+				let dataInput = this.$refs.task.getVarsMap(); 
 				let processName = '';
 				let processKey = this.originData.processDefinitionId.split(':')[0];
 				let processInstanceNameKey = processKey + '_instanceDisplayText';
 				let formulaName = dataInput[processInstanceNameKey];
+				dataInput = Object.assign(dataInput, variables);
 				if (this.needComplyFormula(formulaName)) {
 					let newName = await formulasApi.getDataByAllScriptType(formulaName, dataInput);
 					BPMNEngine.updateProcessInstance(this.originData.processInstanceId, {

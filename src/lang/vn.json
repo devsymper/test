@@ -562,11 +562,12 @@
             "date_created": "Ngày tạo",
             "user_updated": "Người cập nhật",
             "date_updated": "Ngày cập nhật",
+            "type":"Kiểu",
             "create": "Thêm",
-            "update": "Cập nhật",
             "delete": "Xóa",
             "view": "Chi tiết"
         },
+        "view_des":"Chưa có mô tả",
         "assignee": "Người được giao",
         "fre_submit": "Tần suất submit",
         "fow": "Ngày đầu tháng",
@@ -642,8 +643,6 @@
         "description": "Mô tả",
         "view_log_time": "Xem công việc",
         "save": "Lưu",
-        "update": "Cập nhật",
-        "delete": "Xoá",
         "category": "Loại công việc",
         "logged_time": "Số giờ",
         "view_plan_time": "Kế hoạch",
@@ -1676,7 +1675,8 @@
         "settingBoard":"Cài đặt Board",
         "createIssue":"Tạo tác vụ",
         "createIssueType":"Tạo loại tác vụ",
-        "noDocumentConfig":"You haven't configured Document yet for this type of task"
+        "noDocumentConfig":"You haven't configured Document yet for this type of task",
+        "createPriority":"Tạo priority"
 
     }
 }

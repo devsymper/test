@@ -159,7 +159,7 @@ function  getSortConfigs(filterData) {
  * @param {String} method Method phục vụ cho gọi API: GET, POST 
  * @param {Object} header header phục vụ cho request 
  */
-export const getDataFromConfig = function(url, configs, columns, filterData, success, method = 'GET',header = {}, dataConfig){
+export const getDataFromConfig = function(url, configs, columns, filterData, success, method = 'GET',header = {}, dataConfig = {}){
 	let options = {};
 	let customContentType = {}
     if(!configs.emptyOption){
