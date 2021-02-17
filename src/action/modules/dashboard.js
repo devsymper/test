@@ -36,8 +36,9 @@ export default [{
         ...commonProps,
         "action": "list",
         "handler": function(param) {
-            window.open(util.addEnvToUrl('https://bi.symper.vn'), '_blank');
-        } 
+            let url = '/dashboards/102/edit';
+            this.$goToPage(url, 'test dashboard');
+        }
     },
     {
         ...commonProps,

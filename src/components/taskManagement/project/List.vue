@@ -11,7 +11,7 @@
                         label="Tìm kiếm"
                         dense
                         solo
-                        style="max-width:255px;"
+                        style="max-width:200px;"
                         single-line
                         hide-details
                         class="sym-small-size sym-style-input"
@@ -25,6 +25,7 @@
                     :items="listProject"
                     :search="search"
                     hide-default-footer
+                    @click:row="onProjectItemClick"
                     class="table-list-project"
                 >
                     <template v-slot:[`item.isFavorite`]="{ item }">
@@ -38,7 +39,7 @@
                                 <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
                             </div>
-                            <span  @click.stop="onProjectItemClick(item)" class="name-project pt-1 pl-2" style="color:#0000aa">
+                            <span class="name-project pt-1 pl-2">
                                 {{item.name}}
                             </span>
                         </div>
@@ -48,7 +49,7 @@
                     </template>
 
                     <template v-slot:[`item.categoryName`]="{ item }">
-                        <span  @click.stop="onClickCategory(item)" class="name-project" style="color:#0000aa">
+                        <span  @click.stop.prevent="onClickCategory(item)" class="name-project" style="color:#0000aa">
                             {{item.categoryName}}
                         </span>
                     </template>

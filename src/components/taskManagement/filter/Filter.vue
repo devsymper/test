@@ -17,20 +17,19 @@
                 <span>Lọc</span>
             </v-tooltip>
         </template>
-        <v-list class="mt-2" :style="{'height':height+'px', 'padding': '0px'}" >
+        <v-list class="mt-2" :style="{'min-height':height+'px', 'padding': '0px','width':'250px'}" >
             <div class="body-filter h-100">
                 <form-tpl 
                     :allInputs="filters"
                 />
-                <div class="mt-2 action">
+                <div class="m-2 mt-3">
                     <v-btn
                         depressed
                         small
                         color="primary"
-                        class="float-right"
                         @click="applyFilter()"
                     >Áp dụng</v-btn>
-                    <v-btn depressed small text class="mr-2 float-right" @click="isShow=false">Thoát</v-btn>
+                    <v-btn depressed small text class="mr-2" @click="isShow=false">Thoát</v-btn>
                 </div>
             </div>
         </v-list>

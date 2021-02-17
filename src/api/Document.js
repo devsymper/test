@@ -5,8 +5,14 @@ var coreApi = new Api(appConfigs.apiDomain.sdocumentManagement);
 var formulasApi = new Api(appConfigs.apiDomain.formulasService);
 var trashApi = new Api(appConfigs.apiDomain.trashService);
 export const documentApi = {
+    getListDocumentFilter(filter) {
+        return coreApi.get("documents",filter);
+    },
     getListDocument() {
         return coreApi.get("documents?pageSize=3000");
+    },
+    getSmallListDocument(){
+        return coreApi.get("documents?pageSize=50");
     },
     getListDocumentObject(docId) {
         return coreApi.get("documents/"+docId+"/objects");

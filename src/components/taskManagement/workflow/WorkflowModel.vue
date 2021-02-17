@@ -30,7 +30,7 @@
                     <v-icon @click="deleteElementOrLink" style="font-size:20px; height:22px;margin-left:4px;margin-top:8px">
                         mdi-delete-forever
                     </v-icon>
-                    <add-status-view ref="popupAddStatusView" :allStatus="allStatus"  @after-add-status-click="afterAddStatusClick"/>
+                    <add-status-view v-if="allStatus.length > 0" ref="popupAddStatusView" :allStatus="allStatus"  @after-add-status-click="afterAddStatusClick"/>
                     <add-link-view :listNode="listNode" ref="popupAddLinkView" @after-add-link-click="afterAddLinkClick"/>
                 </div>
                 <div id='paperView' style="width: 100%; height: calc(100% - 50px)">
@@ -295,10 +295,26 @@ export default {
                     }
 
                     let obj2 = this.listNode.find(data => data.id.value == this.selected.id)
+                    let idNode = obj2.id.value;
                     var index2 = this.listNode.indexOf(obj2);
                     if (index2 > -1) {
                         this.listNode.splice(index2, 1);
                     }
+                    // check nếu có link tới node thì xóa link
+                    let link = this.listLink.find(data => data.to.value == idNode);
+                    if (link) {
+                        let index3 = this.listLink.indexOf(link);
+                        if (index3 > -1) {
+                            this.listLink.splice(index3, 1);
+                        }
+                        // xóa link trong dataWorkflow
+                        let objLink = this.dataWorkflow.links.find(data => data.id == link.id.value)
+                        let indexLink = this.dataWorkflow.links.indexOf(objLink);
+                        if (indexLink > -1) {
+                            this.dataWorkflow.links.splice(indexLink, 1);
+                        }
+                    }
+                
 
                 }
                 
@@ -690,13 +706,20 @@ export default {
             rectBacklog.addTo(this.graph);
 
             let nodeDefaultInfo = getStatusDefault(); // cấu hình mặc định node
-            nodeDefaultInfo.name.value.name = "To Do";
-            nodeDefaultInfo.name.value.id = "5fe44f1c-10aa-35e6-7f89-93300ea2ab8b";
-            nodeDefaultInfo.common.value = 1;
-            nodeDefaultInfo.colorStatus.value = "#dfe1e6";
-            this.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
-            this.$set(nodeDefaultInfo.statusCategory,"value",'5fe314fb-47f0-99a5-d682-7ae20ea2ab8b');
-            this.listNode.push(nodeDefaultInfo);
+            let listStatus = self.allStatus;
+            if (listStatus.length == 0) {
+                listStatus = self.$store.state.taskManagement.allStatus;
+            }
+            let todoNode = self.allStatus.find(ele => ele.name === 'To Do');
+            if (todoNode) {
+                nodeDefaultInfo.name.value.name = "To Do";
+                nodeDefaultInfo.name.value.id = todoNode.id;
+                nodeDefaultInfo.common.value = 1;
+                nodeDefaultInfo.colorStatus.value = todoNode.color;
+                self.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
+                self.$set(nodeDefaultInfo.statusCategory,"value",todoNode.statusCategoryId);
+                self.listNode.push(nodeDefaultInfo);
+            }
 
             let link1 = new joint.shapes.standard.Link({
                 source: { id: rectStart.id },

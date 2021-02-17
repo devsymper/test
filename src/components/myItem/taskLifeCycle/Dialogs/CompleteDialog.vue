@@ -162,7 +162,7 @@ export default {
 						type: "success",
 						title: self.$t("myItem.taskLifeCycle.notify.complete")
 					})
-					self.$emit('success')
+					self.$emit('success', taskData)
 					resolve(result);
 				} catch (error) {
 					let detail = '';

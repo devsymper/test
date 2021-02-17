@@ -35,18 +35,21 @@
                     class="sym-small-size sym-style-input d-inline-block mr-3"
                     append-icon="mdi-magnify"
                     solo
+                    dense
+                    single-line
                     :placeholder="$t('common.search')"
                     hide-details
+                    style="max-width:200px;"
                 ></v-text-field>
                 <filterKanban 
                 class="mr-2"
                     :filters="filterProps"
                     @apply-filter="applyFilter"
                 />
-                <div class="list-user d-inline-block" v-for="(obj) in listUserShow" :key="obj.id">
+                <!-- <div class="list-user d-inline-block" v-for="(obj) in listUserShow" :key="obj.id">
                     <span class="count-user" v-if="obj.count">{{obj.count}}+</span>
                     <symperAvatar v-else :size="22" class="user-avatar" :userId="obj.userId" />
-                </div>
+                </div> -->
                 <div class="ml-3 d-inline-block">
                     <v-menu offset-y>
                         <template v-slot:activator="{ on, attrs }">
@@ -78,7 +81,7 @@
                 >
                     <p class="title-column">{{column.name}}</p>
                     <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-                    <VuePerfectScrollbar style="max-height: calc(100vh - 232px);" class="wrap-scroll-column">
+                    <VuePerfectScrollbar style="max-height: calc(100vh - 240px);" class="wrap-scroll-column">
                         <div v-for="(status, index) in column.statusInColumn"
                             :key="index"
                             class="mt-2 list-control-autocomplete"
@@ -186,9 +189,6 @@ export default {
         allIssueTypeInProject(){
             return this.sTaskManagement.listIssueTypeInProjects[this.projectId];
         },
-        dataSprintAfterMapIssue(){
-            return this.sTaskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
-        },
         currentBoard(){
             return this.$store.state.taskManagement.currentBoard;
         },
@@ -197,15 +197,6 @@ export default {
         },
     },
     watch:{
-        dataSprintAfterMapIssue:{
-            deep:true,
-            immediate:true,
-            handler(val){
-                if (val) {
-                    this.getListTasks(true);
-                }
-            }
-        },
         currentBoard(after, before){
             if(after.id == before.id){
                 return;
@@ -273,7 +264,7 @@ export default {
                     }
                 ],
                 page : 1,
-                pageSize: 200,
+                pageSize: 500,
                 distinct: true
             },
             filterScrum:{
@@ -291,61 +282,45 @@ export default {
                     },
                 ],
                 page : 1,
-                pageSize: 200,
+                pageSize: 500,
                 distinct: true
             },
             filterProps:{ // bộ lọc
                 tmg_assignee : { 
                     title: "Thành viên",
-                    type: "autocomplete",
+                    type: "combobox",
                     value:"",
+                    multipleSelection:true,
+                    isSelectionChip:true,
+                    showAvatarUser:true,
                     options: [],
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                      
-                    }
                 },
                 tmg_status_id : {
                     title: "Trạng thái",
-                    type: "autocomplete",
+                    type: "combobox",
                     showId:false,
                     value:"",
                     options: [],
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
+                    multipleSelection:true,
+                    isSelectionChip:true,
                 },
                 tmg_priority_id : {
                     title: "Mức độ ưu tiên",
-                    type: "autocomplete",
+                    type: "combobox",
                     value:"",
                     showId:false,
                     options: [],
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
+                    multipleSelection:true,
+                    isSelectionChip:true,
                 },
                 tmg_issue_type : {
                     title: "Loại task vụ",
-                    type: "autocomplete",
+                    type: "combobox",
                     value:"",
                     showId:false,
                     options: [],
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
+                    multipleSelection:true,
+                    isSelectionChip:true,
                 }
             },
         };
@@ -370,13 +345,17 @@ export default {
             }
             for (let name in this.filterProps) {
                 if (this.filterProps[name].value) {
+                    let listIds = this.filterProps[name].value.reduce((arr,obj)=>{
+                        arr.push(obj.id);
+                        return arr;
+                    },[])
                     let item =   {
                         column : name,
                         operation : "and",
                         conditions : [
                             {
                                 name : "in",
-                                value : [this.filterProps[name].value],
+                                value : listIds,
                             }
                         ],
                     };
@@ -397,6 +376,7 @@ export default {
             data.optionStatus = this.filterProps.tmg_status_id.options;
             data.optionPriority = this.filterProps.tmg_priority_id.options;
             data.optionIssueType = this.filterProps.tmg_issue_type.options;
+            console.log(this.sTaskManagement,'datadatadatadata');
             this.kanbanWorker.postMessage({
                 action:'setDataForFilter',
                 data: data
@@ -560,7 +540,9 @@ export default {
                         ],
                     };
                     data.filter = util.cloneDeep(this.filter);
-                    data.filter.filter.push(item);
+                    if(this.sCurrentProject.userLeader != this.$store.state.app.endUserInfo.id){
+                        data.filter.filter.push(item);
+                    }
                 }else{
                     data.filter = filter;
                 }
@@ -636,6 +618,17 @@ export default {
        
     },
     created(){
+        this.projectId = this.$route.params.id;
+        if(this.sTaskManagement.listUserInProject[this.projectId]){
+            this.listUserShow = this.sTaskManagement.listUserInProject[this.projectId]
+        }
+        let breadcrumbs = [
+                {
+                    text: 'Kanban',
+                    disabled: true
+                },
+            ]
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
         let self = this;
         this.$evtBus.$on('task-manager-submit-issue-success', (issue) =>{
             self.checkUpdateTask(issue);
@@ -679,9 +672,6 @@ export default {
                 case 'getListRoleUserInProject':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
-                        if (res.data.length == 0) {
-                            self.$emit('loaded-content');
-                        }
                         self.$store.commit("taskManagement/setListRoleUserInProject", res);
                     } 
                     break;
@@ -742,19 +732,6 @@ export default {
         this.loadData();
     },
     
-    activated(){
-        this.projectId = this.$route.params.id;
-        if(this.sTaskManagement.listUserInProject[this.$route.params.id]){
-            this.listUserShow = this.sTaskManagement.listUserInProject[this.$route.params.id]
-        }
-        let breadcrumbs = [
-                {
-                    text: 'Kanban',
-                    disabled: true
-                },
-            ]
-        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
-    }
 };
 </script>
 
@@ -821,5 +798,11 @@ export default {
     height: 24px;
     /* padding: 4px 0px; */
     text-align: center;
+}
+::v-deep .ps > .ps__rail-x{
+    opacity: 1;
+}
+::v-deep .ps__thumb-x{
+    height: 10px !important;
 }
 </style>

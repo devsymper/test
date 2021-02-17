@@ -2,31 +2,19 @@ import Api from "./api";
 import { appConfigs } from "./../configs.js";
 
 let api = new Api(appConfigs.apiDomain.timesheet);
-var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models);
 var userApi = new Api(appConfigs.apiDomain.user);
 let taskApi = new Api(appConfigs.apiDomain.workflowExtend);
-
-// Phục vụ cho việc test API task
-let fullCookieTest = "abc=xyz;FLOWABLE_REMEMBER_ME=YWNLNEUwTHlxbGNoQThEcUV4RTlpQSUzRCUzRDpsZUJRVTlTOSUyQnF5YzBCblNFZzdLQ3clM0QlM0Q";
-fullCookieTest.split(';').forEach((el) => {
-    document.cookie = el.trim();
-});
-
-let testHeader = {
-    Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
-    "Content-Type": "application/json",
-};
-
-let testOptions = {}
-
 export default {
     //lấy user
     getListUser({ page, pageSize }) {
         return userApi.get("users?page=" + page + "&pageSize=" + pageSize, { page, pageSize });
     },
+    getPreLog(data){
+        return userApi.get('pre-log',data)
+    },
     // lấy danh sách Log time
-    getLogTimeList() {
-        return api.get('log-time');
+    getLogTimeList(dateStartEnd) {
+        return api.get('log-time',dateStartEnd);
     },
     getAllUserLogTimeList() {
         return api.get('manage-timesheet');
@@ -70,6 +58,9 @@ export default {
             desc,
             categoryTask,
         })
+    },
+    createListLog(data){
+        return api.post('list-log-time', data);
     },
     deleteLogTime({ id }) {
         return api.put('log-time-delete' + '/' + id, { id })
@@ -126,9 +117,6 @@ export default {
             weekRemind
         })
     },
-    // getTask(filter) {
-    //     return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
-    // },
     getTask(filter) {
         return taskApi.get('tasks?sort[0][column]=createTime&sort[0][type]=desc&search=%' + filter + '%');
     },

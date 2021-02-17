@@ -1,22 +1,22 @@
 <template>
-	<div class="task-item rounded px-2 pt-2 pb-1" :style="{
-		'border-left':(status) ? '4px solid '+status.color : ''
+	<div class="task-item rounded px-2 pt-2 pb-1 task-hover-poiter" :style="{
+		'border-left':(status) ? '4px solid '+ borderColor : ''
 	}"
-	>
+	@click.prevent.stop="handleShowDetailIssue">
 		<div class="task-item__header">
-			<p @click.prevent.stop="handleShowDetailIssue" class="task-hover-poiter task-content">{{task.tmg_name}}</p>
+			<p class="task-content">{{task.tmg_name}}</p>
 		</div>
 		<div class="mt-4 card-item__body">
 			<div class="left-content">
+				<v-icon v-if="issueType">{{issueType.icon}}</v-icon>
 				<v-icon v-if="priority" :style="{color:(priority.color) ? priority.color : ''}">{{priority.icon}}</v-icon>
 				<span>{{task.tmg_project_key+"-"+task.document_object_id}}</span>
 			</div>
 			<div class="right-content">
-				<v-icon>mdi-clock-time-four-outline</v-icon>
-				<span>{{task.document_object_create_time}}</span>
+				<v-icon>mdi-calendar-month</v-icon>
+				<span>{{getDate(task.document_object_create_time)}}</span>
 				<symper-avatar :size="16" :userId="task.tmg_assignee"/>
 			</div>
-			
 		</div>
 		<detail-issue
             :documentObjectId="documentObjectId"
@@ -57,7 +57,9 @@ export default {
 			priority:null,
 			projectId:null,
 			documentObjectId:null,
-			issue:null
+			issue:null,
+			issueType:null,
+			borderColor:null
 		}
 	},
 	computed: {
@@ -66,6 +68,9 @@ export default {
 		},
 		allStatus(){
 			return this.$store.state.taskManagement.listStatusInProjects[this.projectId];
+		},
+		issueTypes(){
+			return this.$store.state.taskManagement.currentProject.issueTypes;
 		}
 	},
 	created(){
@@ -73,8 +78,16 @@ export default {
 	},
 	mounted(){
 		this.getPriority();
+		this.getIssueType();
+		this.borderColor = (this.priority) ? this.priority.color :status.color
 	},
 	methods:{
+		getDate(dateTime){
+			dateTime = dateTime.split(' ')[0];
+			dateTime = dateTime.split('-');
+			let date = dateTime[1]+"-"+dateTime[2];
+			return date
+		},
 		handleShowDetailIssue(){
 			this.documentObjectId = this.task.document_object_id;
 			this.issue = this.task;
@@ -84,6 +97,12 @@ export default {
 			let priority = this.allPriority.find(ele => ele.id == this.task.tmg_priority_id);
 			if(priority){
 				this.priority = {icon:priority.icon, color:priority.color}
+			}
+		},
+		getIssueType(){
+			let issueType = this.issueTypes.find(ele => ele.id == this.task.tmg_issue_type);
+			if(issueType){
+				this.issueType = {icon:issueType.icon, name:issueType.name}
 			}
 		},
 	
@@ -132,10 +151,12 @@ export default {
 		height: 14px;
 		border-radius: 50%;
 	}
-	.task-hover-poiter:hover{
+	.task-hover-poiter{
 		cursor: pointer;
-		text-decoration: underline;
-		color: blue;
+		transition: all ease-in-out 250ms;
+	}
+	.task-hover-poiter:hover{
+		box-shadow: var(--symper-box-shadow-bottom);
 	}
 	.task-content{
 		display: -webkit-box;

@@ -88,10 +88,65 @@ self.onmessage = async function (event) {
             let res = getMoreInfoListIssue(data);
             postMessage({action:'getMoreInfoListIssue', dataAfter : res})
             break;
+        case 'countIssueInListVersion':
+            let dataCountIssue = getDataFilterCountIssue(data);
+            taskManagementApi.countIssue(dataCountIssue).then(res=>{
+                if(res['status'] == 200 && res['data']){
+                    if (res.data[data.projectId] && res.data[data.projectId].length > 0) {
+                        let infoRes =  res.data[data.projectId];
+                        let dataProcess = {};
+                        let infoTodo = infoRes.find(ele => ele.status == "TO DO");
+                        if (infoTodo) {
+                            dataProcess.todo = infoTodo.count;
+                        }
+                        let infoInpro = infoRes.find(ele => ele.status == "IN PROGRESS");
+                        if (infoInpro) {
+                            dataProcess.inprogress = infoInpro.count;
+                        }
+                        let infoDone = infoRes.find(ele => ele.status == "DONE");
+                        if (infoDone) {
+                            dataProcess.done = infoDone.count;
+                        }
+                        dataProcess.total = 0
+                        for (let key in dataProcess) {
+                            if(dataProcess[key] && key != 'total'){
+                                dataProcess.total += Number(dataProcess[key])
+                            }
+                        }
+                        postMessage({action:'countIssueInListVersion', dataAfter : dataProcess})
+
+                    }
+
+                }
+            })
+            break;
         default:
             break;
     }
 };
+
+function getDataFilterCountIssue(data){
+    let projectId = data.projectId;
+    let listVersion = data.listVersion;
+    let itemCondition = {};
+    itemCondition.name = "tmg_version_id";
+    let vl = ""
+    if (listVersion.length > 0) {
+        for (let i = 0; i < listVersion.length; i++) {
+            vl += "'"+listVersion[i].id+"',"
+        }
+        if (vl.length > 1) {
+           vl = vl.substring(0, vl.length-1);
+        }
+        itemCondition.value = vl;
+    }
+
+    let dataPost = {};
+    dataPost.projectIds = JSON.stringify([projectId]);
+    dataPost.moreCondition = JSON.stringify([itemCondition])
+
+    return dataPost;    
+}
 
 function getMoreInfoListIssue(data){
     let issues = data.issues;

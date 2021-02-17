@@ -11,10 +11,10 @@
                         label="Tìm kiếm"
                         dense
                         solo
-                        style="max-width:255px;"
+                        style="max-width:200px;"
                         single-line
                         hide-details
-                        class="sym-small-size sym-style-input"
+                        class="sym-small-size sym-style-input d-inline-block"
                     ></v-text-field>
                     <v-btn v-if="checkRole('task_manager_task_life_cycle','add')" small class="px-1 ml-1" solo depressed @click="handleCreate" >
                         <span >Create workflow</span>
@@ -148,6 +148,9 @@ export default {
 }
 .table-list-category >>> td{
     font-size: 13px!important;
+}
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
 }
 
 </style>

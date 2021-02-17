@@ -1,5 +1,16 @@
 <template>
     <div class="w-100 h-100">
+        <v-text-field
+            v-on:input="onSearch($event)"
+            class="sym-small-size sym-style-input d-inline-block mr-3"
+            append-icon="mdi-magnify"
+            solo
+            dense
+            single-line
+            :placeholder="$t('common.search')"
+            hide-details
+            style="float:right"
+        ></v-text-field>
         <common-list-issue
             v-if="!loadding"
             :listItem="listItem"
@@ -35,6 +46,26 @@ export default {
     watch:{
     },
     methods:{
+        onSearch(vl){
+            if (this.delayLoadView) {
+                clearTimeout(this.delayLoadView);
+            }
+            this.delayLoadView = setTimeout((self) => {
+                self.loadding = true;
+                let data = {};
+                data.documentIds = self.documentIds;
+                data.userId = self.$store.state.app.endUserInfo.id;
+                data.keySearch = vl;
+                if (self.homeWorker) {
+                    self.homeWorker.postMessage({
+                        action:'getDataAssigneeIssue',
+                        data:data
+                    });
+                }
+
+            }, 300,this);
+          
+        },
         getListAssigneeIssueGroupDateTime(){
             let data = {};
             data.listIssue = this.$store.state.taskManagement.listIssueAssignRecent;
@@ -100,6 +131,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
+}
 </style>

@@ -1,9 +1,14 @@
 {
     "common": {
+		"ok": "OK",
         "id": "Id",
         "format_table":"Formatting",
         "number_instance": "Number of process instance",
         "select_lang": "Select language",
+		"dblclick": "Double click to rename",
+		"inputPlaceholder": "Text here",
+		"inputAddPlaceholder": "Add value",
+		"placeholder-search": "Search",
         "required": "required",
         "KH": "Knowledge Management",
         "taskManagement": "Task Management",
@@ -17,7 +22,8 @@
         "service": "Service",
         "menu": "Menu",
         "users": "Users",
-        "add": "Add",
+		"add": "Add",
+		"view":"View",
         "edit": "Edit",
         "cancel": "Cancel",
 		"update": "Update",
@@ -154,7 +160,15 @@
             "viewOrgchart": "View orgchart default",
             "list_workflow": "List Workflow",
             "list_work": "List Jobs",
-            "environment": "Environment management"
+			"environment": "Environment management",
+			"list-dashboard":"List dashboard",
+			"list-trash-dashboard":"List trash dashboard",
+			"list-dataflow":"List dataflow",
+			"list-trash-dataflow":"List trash dataflow ",
+			"list-relation":"List relation",
+			"list-trash-relation":"List trash relation",
+			"list-dataset":"List dataset",
+			"list-trash-dataset":"List trash dataset"
         },
         "system": "System",
         "copy": "Copy"
@@ -215,6 +229,7 @@
 		"userCreateName": "User create",
 		"isDefault":"Default",
 		"lastUpdateAt": "Last update at",
+		"userLastUpdate": "Last update at",
 		"baUpdate": "BA Update",
         "wrap_tex_mode": {
             "wrap": "Wrap",
@@ -1155,7 +1170,64 @@
         "successTitle": "Success",
         "older": "Older",
         "today": "Today"
-    },
+	},
+	"bi":{
+		"dashboard":{
+			"title-show-list": "List dashboard",
+			"title-show-list-trash": "List trash dashboard",
+			"title-visualization":"Visualization",
+			"column-config":"Column config",
+			"style-config":"Style config",
+			"condition-config":"Condition config",
+			"condition-value":"Condition value",
+			"config":{
+				"add-field":"Add field here"
+			},
+			"relation-selector": "Select relation"
+		},
+		"dataflow":{
+			"title-show-list": "List dataflow",
+			"title-show-list-trash": "List trash dataflow"
+		},
+		"dataset":{
+			"title-add":"Name of Dataset",
+			"title-show-list": "Danh sách dataset",
+			"title-show-list-trash": "Danh sách dataset đã xóa"
+		},
+		"relation":{
+			"title-show-list": "Danh sách relation",
+			"title-show-list-trash": "Danh sách relation đã xóa"
+		},
+		"chart":{
+			"area": "Area",
+			"card": "Card",
+			"clusteredBar": "Clustered Bar",
+			"clusteredColumn": "Clustered Column",
+			"donut": "Donut",
+			"editor": "Editor",
+			"filter": "Filter",
+			"gantt": "Gantt",
+			"global": "Global",
+			"line": "Line",
+			"lineAndClusteredColumn": "Line And Clustered Column",
+			"lineAndStackedColumn": "Line And Stacked Column",
+			"pie": "Pie",
+			"pivot": "Pivot",
+			"stackedArea": "Stacked Area",
+			"stackedBar": "Stacked Bar",
+			"stackedBar100": "Stacked Bar 100",
+			"stackedColumn": "Stacked Column",
+			"stackedColumn100": "Stacked Column 100",
+			"table": "Bảng",
+			"treeMap": "TreeMap"
+
+		},
+		"runningInfo":{
+			"run-success": "Run successfully in",
+			"with": "with ",
+			"rows":"rows"
+		}
+	},
     "virtualdoc": {
         "header": {
             "id": "ID",
@@ -1437,7 +1509,10 @@
             "removeVersion": "You will remove version from this list."
 
         },
-        "settingBoard":"Board setting"
+        "settingBoard":"Board setting",
+        "createIssue":"Create Issue",
+        "noDocumentConfig":"Create Issue",
+        "createPriority":"Create Priority"
 
 
 

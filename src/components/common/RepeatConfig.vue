@@ -9,23 +9,24 @@
                 <span>Cấu hình lặp lại</span>
             </div>
             <v-select
-            class="symper-custom-select"
-            :items="listType"
-            v-model="selectedType"
-            return-object
-            hide-details
-            item-value="type"
-            item-text="name"
-            dense
-            :style="{'width':'150px',
-                    'display': 'inline-block',
-                    'font-weight':'500',
-                    'font-size':'13px',
-                    'padding':'4px 8px',
-                    'border-radius':'3px',
-                    'background-color':'#F7F7F7',
-                    'vertical-align': 'top',
-            }"
+				class="symper-custom-select"
+				:items="listType"
+				v-model="selectedType"
+				return-object
+				hide-details
+				item-value="type"
+				item-text="name"
+				dense
+				:style="{
+					'width':'150px',
+					'display': 'inline-block',
+					'font-weight':'500',
+					'font-size':'13px',
+					'padding':'4px 8px',
+					'border-radius':'3px',
+					'background-color':'#F7F7F7',
+					'vertical-align': 'top',
+				}"
             ></v-select>
             <!-- <div class="form__no-loop">
                 <v-checkbox
@@ -43,7 +44,6 @@
             <div class="btn-review-repeat">
                 <button v-on:click="previewRepeatTime">
                     <v-icon>mdi-calendar-check</v-icon>
-
                 </button>
                 <div class="calendar-review-repeat" 
                 :style="{

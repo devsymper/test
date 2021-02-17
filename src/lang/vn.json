@@ -1,14 +1,21 @@
 {
     "common": {
+		"ok": "OK",
         "number_instance": "Tổng số instance",
         "id": "Id",
+		"deleteAll": "Xóa tất cả",
+		"title": "Tiêu đề",
+		"inputPlaceholder": "Nhập giá trị",
+		"inputAddPlaceholder": "Kéo field vào để thêm dữ liệu",
+		"placeholder-search": "Tìm kiếm",
+		"dblclick": "Click đúp để đổi tên",
         "format_table":"Định dạng",
-        "deleteAll": "Xóa tất cả",
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
         "taskManagement": "Quản lí công việc",
-        "structureManagement": "Quản lí cơ cấu ",
+		"structureManagement": "Quản lí cơ cấu ",
+		"searchPlaceholder": "Tìm kiếm",
         "reports": "Báo cáo",
         "workflows": "Quy trình",
         "documents": "Văn bản",
@@ -20,8 +27,9 @@
         "users": "Tài khoản người dùng",
         "add": "Thêm",
         "import_excel_history": "Lịch sử Import",
-        "edit": "Sửa",
-        "cancel": "Hủy",
+		"edit": "Sửa",
+		"view":"Chi tiết",
+		"cancel": "Hủy",
         "update": "Cập nhật",
         "create": "Thêm mới",
         "delete": "Xóa",
@@ -130,7 +138,7 @@
             "App": "Ứng dụng",
             "Administrator": "Quản trị viên",
             "Account management": "Quản lý tài khoản",
-            "Task Management": "Quản lý công việc",
+            "Task Management": "Quản lý tác vụ",
             "Access Management": "Quản lý truy cập",
             "accessControl": "Quản lý truy cập",
             "accessControlBeta": "Quản lý truy cập beta",
@@ -162,8 +170,19 @@
             "list_workflow": "Danh sách quy trình",
             "list_work": "Danh sách công việc",
             "syqlFunction": "SYQL Function",
-            "environment": "Quản lí môi trường"
-            
+			"environment": "Quản lí môi trường",
+			"list-dashboard":"Danh sách báo cáo",
+			"list-trash-dashboard":"Danh sách báo cáo đã xóa",
+			"list-dataflow":"Danh sách dataflow",
+			"list-trash-dataflow":"Danh sách dataflow đã xóa",
+			"list-relation":"Danh sách relation",
+			"list-trash-relation":"Danh sách relation đã xóa",
+			"list-dataset":"Danh sách dataset",
+			"list-trash-dataset":"Danh sách dataset đã xóa",
+			"dashboard": "Dashboard",
+			"dataflow":"Data flow",
+			"relation":"Relation",
+			"dataset":"Data set"
         },
         "system": "Vai trò người dùng",
         "copy": "Sao chép"
@@ -184,7 +203,7 @@
     },
     "table": {
         "id": "ID",
-        "name": "Tên Service",
+        "name": "Tên",
         "description": "Mô tả",
         "lastVersion": "Version mới nhất",
         "language": "Ngôn ngữ",
@@ -231,6 +250,7 @@
 		"code": "Mã",
 		"isDefault":"SĐTC mặc định",
 		"lastUpdateAt": "Thời gian cập nhật",
+		"userLastUpdate": "Thời gian cập nhật",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"
@@ -542,11 +562,12 @@
             "date_created": "Ngày tạo",
             "user_updated": "Người cập nhật",
             "date_updated": "Ngày cập nhật",
+            "type":"Kiểu",
             "create": "Thêm",
-            "update": "Cập nhật",
             "delete": "Xóa",
             "view": "Chi tiết"
         },
+        "view_des":"Chưa có mô tả",
         "assignee": "Người được giao",
         "fre_submit": "Tần suất submit",
         "fow": "Ngày đầu tháng",
@@ -622,8 +643,6 @@
         "description": "Mô tả",
         "view_log_time": "Xem công việc",
         "save": "Lưu",
-        "update": "Cập nhật",
-        "delete": "Xoá",
         "category": "Loại công việc",
         "logged_time": "Số giờ",
         "view_plan_time": "Kế hoạch",
@@ -1306,7 +1325,65 @@
             "updateAt": "Ngày cập nhật",
             "userFilterAt": "Ngày theo dõi"
         }
-    },
+	},
+	"bi":{
+		"dashboard":{
+			"title-show-list": "Danh sách dashboard",
+			"title-show-list-trash": "Danh sách dashboard đã xóa",
+			"title-visualization":"Các loại chart",
+			"column-config":"Cấu hình cột",
+			"style-config":"Cấu hình style",
+			"condition-config":"Cấu hình điều kiện",
+			"condition-value":"Giá trị điều kiện",
+			"config":{
+				"add-field":"Thêm trường mới"
+			},
+			"relation-selector": "Lựa chọn relation"
+		},
+		"dataflow":{
+			"title-show-list": "Danh sách dataflow",
+			"title-show-list-trash": "Danh sách dataflow đã xóa"
+		},
+		"dataset":{
+			"title-add":"Tên Dataset",
+			"title-show-list": "Danh sách dataset",
+			"title-show-list-trash": "Danh sách dataset đã xóa"
+		},
+		"relation":{
+			"title-show-list": "Danh sách relation",
+			"title-show-list-trash": "Danh sách relation đã xóa",
+			"selector": "Lựa chọn relation"
+		},
+		"chart":{
+			"area": "Area",
+			"card": "Card",
+			"clusteredBar": "Clustered Bar",
+			"clusteredColumn": "Clustered Column",
+			"donut": "Donut",
+			"editor": "Editor",
+			"filter": "Filter",
+			"gantt": "Gantt",
+			"global": "Global",
+			"line": "Line",
+			"lineAndClusteredColumn": "Line And Clustered Column",
+			"lineAndStackedColumn": "Line And Stacked Column",
+			"pie": "Pie",
+			"pivot": "Pivot",
+			"stackedArea": "Stacked Area",
+			"stackedBar": "Stacked Bar",
+			"stackedBar100": "Stacked Bar 100",
+			"stackedColumn": "Stacked Column",
+			"stackedColumn100": "Stacked Column 100",
+			"table": "Bảng",
+			"treeMap": "TreeMap"
+		},
+		"runningInfo":{
+			"run-success": "Chạy thành công trong",
+			"with": "với",
+			"rows":"kết quả"
+		}
+
+	},
     "virtualdoc": {
         "header": {
             "id": "ID",
@@ -1595,7 +1672,11 @@
             "removePriority": "Bạn sẽ xóa priority này khỏi danh sách.",
             "removeVersion": "Bạn sẽ xóa version này khỏi danh sách"
         },
-        "settingBoard":"Cài đặt Board"
+        "settingBoard":"Cài đặt Board",
+        "createIssue":"Tạo tác vụ",
+        "createIssueType":"Tạo loại tác vụ",
+        "noDocumentConfig":"You haven't configured Document yet for this type of task",
+        "createPriority":"Tạo priority"
 
     }
 }

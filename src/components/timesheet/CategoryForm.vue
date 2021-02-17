@@ -1,159 +1,232 @@
 <template>
-<div>
+<div class="pl-2 pr-2 w-100 h-100" style="background:white!important">
     <div class="pb-2 pt-2 headline lighten-2" 
     primary>
-        <div class="w-100 pb-1 fs-16" style="border-bottom: 1px solid lightgrey;">
-            Loại công việc</div>
-    </div>
-    <div v-bind:style="nameError? 'height:80px' :'height:60px'">
-        <span class="label pt-2"> {{$t('timesheet.name')}}<span style="color:red"> *</span></span>
-        <div>
-            <input type="text" v-model= "name" class="w-100 input-logform"
-            v-bind:style="nameError? 'margin-bottom:4px' :''">
-        </div>
-        <div class="w-100 mb-5" style="height:20px">
-            <span class="red--text" v-show="nameError">{{nameError}}</span>
+        <div class="w-100 fs-16 fw-430" >
+            Loại công việc
         </div>
     </div>
-    <div>
-        <span class="label pt-2">Key<span style="color:red"> *</span></span></span>
-      <div>
-        <input type="text" v-model="key" class="w-100 input-logform">
-        </div>
+    <div v-show="forBa"  style="margin-top: -10px">
+        <v-btn @click="showNewCate()" x-small text class="fs-13 btn" :style="{background:typeCate=='doc'?'':'lightgrey'}">
+            Tạo mới
+        </v-btn>
+        <v-btn @click="showDocCate()" x-small text class="fs-13 btn" :style="{background:typeCate=='doc'?'lightgrey':''}">
+            Loại công việc từ doc
+        </v-btn>
     </div>
-    <div>
-        <span class="label pt-2">Mô tả<span style="color:red"> *</span></span></span>
-      <div>
-        <input type="text" v-model="description" class="w-100 input-logform">
-        </div>
-    </div>
+    <FormTpl
+        class="mr-2"
+        :labelWidth="'60px'"
+        :allInputs="allInputs"
+        :single-line="true"
+    />
     <div class="pb-5 pt-2">
         <div class= "d-flex justify-end w-100">
              <v-btn small v-if="!isAddView" color="success" class="mr-2" width="50" style="color:white" 
              @click="updateAPI()">Sửa</v-btn>
               <v-btn small v-else color="primary" class="mr-2" width="50" style="color:white" 
-             @click="save()">Thêm</v-btn> 
+             @click="saveCategory()">Thêm</v-btn>
+              <v-btn small  class="mr-2" width="50" 
+             @click="cancel()">Thoát</v-btn> 
         </div>
     </div>
 </div>
 </template>  
 <script>
 import timesheetApi from '../../api/timesheet';
-
+import { documentApi } from '../../api/Document';
+import FormTpl from "./../../components/common/FormTpl";
 export default {
-    props:['isAddView'],
-    name: 'CategoryForm',
-    data: () => ({
-        dialog: false,
-        name: '',
-        key: '',
-        id:-1,
-        check:false,
-        nameError: '',
-        status:1,
-        description:''
-    }),
-    watch:{
-        name(){
-            if(this.check){
-                if(this.name==''){
-                }else{
-                    this.nameError = '';
-                    this.check = false;
-                }
+    created () {
+        this.allInputs.key.value = this.cate.key;
+        this.allInputs.taskName.value = this.cate.name;
+        this.id = this.cate.id;
+        this.allInputs.description.value = this.cate.description;
+        this.typeCate = this.cate.type
+
+    },
+    watch: {
+        typeCate(){
+            if(this.typeCate=='doc'){
+                this.allInputs.taskName.type="autocomplete";
+                this.allInputs.description.type="script"
+            }else{
+                this.allInputs.taskName.type="text";
+                this.allInputs.description.type="textarea"
+
             }
         },
     },
-    methods: {
-        refreshAll(){
-            this.name="";
-            this.key="";
-            this.nameError ="";
-        },
-        updateAPI(){
-            let self = this;
-             if(this.name==''){
-                 this.nameError = this.$t('timesheet.required_value'); 
-             }
-            else{
-                let data = {
-                    taskName: this.name,
-                    key: this.key,
-                    id: this.id,
-                    status: this.status,
-                    description: this.description
-                }
-                 timesheetApi.updateCategory(data)
-                .then(res => {
-                    if (res.status === 200) {
-                        self.$emit('cancel');
-                        self.$snotify({
-                            type: "success",
-                            title: this.$t("notification.successTitle"),
-                        });
+    components:{
+         FormTpl
+    },
+    props:['isAddView','listDoc','type','cate'],
+    name: 'CategoryForm',
+    data () {
+        return {
+        allInputs:{
+            taskName: {
+                title: "Tên",
+                type: "text",
+                value: "",
+                info: "",
+                options: this.listDoc,
+                validateStatus:{
+                    isValid:true,
+                    message:"Error"
+                },
+                validate(){
+                    if (this.value=="") {
+                        this.validateStatus.isValid=false;
+                        this.validateStatus.message="Không bỏ trống";
                     }else{
-                          self.$snotify({
-                            type: "error",
-                            title: this.$t("notification.errorTitle"),
-                        });
+                        this.validateStatus.isValid=true;
+                        this.validateStatus.message="";
                     }
-                })
-                .catch(console.log);
+                }
+            },
+            key: {
+                title: "Key",
+                type: "text",
+                value: "",
+                info: "",
+                 validateStatus:{
+                    isValid:true,
+                    message:"Error"
+                },
+                validate(){
+                    if (this.value=="") {
+                        this.validateStatus.isValid=false;
+                        this.validateStatus.message="Không bỏ trống";
+                    }else{
+                        this.validateStatus.isValid=true;
+                        this.validateStatus.message="";
+                    }
+                }
+            },
+            description: {
+                title: "Mô tả",
+                type: "textarea",
+                value: "",
+                info: ""
+            }
+        },
+        typeCate:'normal',
+        check:false,
+        id:-1,
+        forBa:true,
+     }
+    },
+    methods: {
+        checkValidate(){
+            let check = false;
+            if(this.allInputs.taskName.value==''){
+                this.allInputs.key.value = this.allInputs.taskName.value.slice(0, 1);
+            }
+            if(this.allInputs.taskName.value&&this.allInputs.key.value){
+                check = true
+            }
+            return check;
+        },
+        showDocCate(){
+            this.typeCate = "doc";
+        },
+        saveCategory(){
+            let data = this.save()
+            if(data&&JSON.stringify(data)!= '{}'){
+                this.createCatogry(data)
             }
         },
         save(){
-            this.check = true;
-            const self = this;
-            if(this.name==''){
-                 this.nameError = this.$t('timesheet.required_value'); 
-             }
-            else{
-            timesheetApi.createCategory({
-                    taskName: this.name,
-                    key: this.key,
-                    status: 1,
-                    description: this.description
-                })
-                .then(res => {
-                    if (res.status === 200) {
-                        self.$emit('cancel');
-                        self.$snotify({
-                            type: "success",
-                            title: this.$t("notification.successTitle"),
-                        });
-                    }else{
-                        self.$snotify({
-                            type: "error",
-                            title: this.$t("notification.errorTitle"),
-                        });
-                    }
-                })
+            let check = this.checkValidate();
+            let data = {};
+            if(check){
+                for(let i in this.allInputs){
+                    data[i] = this.allInputs[i].value;
+                    data.status= 1;
+                    // this.listDoc.map(doc=>{
+                    //     if(doc.id==data[i]){
+                    //         this.allInputs[i].value=doc.title
+                    //     }
+                    // })
+                    data.type = this.typeCate=='doc'?1:0
+                }
             }
-        }
+            return data
+        },
+        showNewCate(){
+            this.typeCate = "normal";
+        },
+        cancel(){
+            this.refreshAll();
+            this.$emit('cancel');
+        },
+        refreshAll(){
+            this.allInputs.taskName.value="";
+            this.allInputs.description.value="";
+            this.allInputs.key.value="";
+        },
+        updateAPI(){
+            let data = this.save();
+            if(data&&JSON.stringify(data) != '{}'){
+                data.id = this.id;
+                this.updateCategory(data)
+            }else{
+                this.notify(false)
+
+            }
+        },
+        setCategory(){
+        },
+        updateCategory(data){
+            const self = this;
+            timesheetApi.updateCategory(data)
+            .then(res => {
+                if (res.status === 200) {
+                    self.$emit('cancel');
+                    self.notify(true)
+                }else{
+                     self.notify(false)
+                }
+            })
+            .catch(console.log);
+
+        },
+        notify(success=false){
+            if(success){
+                this.$snotify({
+                        type: "success",
+                        title: this.$t("notification.successTitle"),
+                    });
+            }else{
+                 this.$snotify({
+                    type: "error",
+                    title: this.$t("notification.errorTitle"),
+                });
+            }
+        },
+        async createCatogry(data){
+            let res = await timesheetApi.createCategory(data);
+            // let formulas = [data.description];
+            // if(this.typeCate=="doc"){
+            //     let fomulas = await timesheetApi.compileBulk({formulas:JSON.stringify(formulas),variables:{}})
+            // }
+            if (res.status === 200) {
+                this.$emit('cancel');
+                this.notify(true);
+            }else{
+                this.notify(false);
+            }
+        },
+      
     }
 }
 </script>
 <style lang="scss" scoped>
 
-.v-input__control {
-    font-size: 13px;
-    font-family: Roboto;
-    color: grey;
+.btn{
+   letter-spacing: 0px;
+   font-weight:420
 }
-
-.input-logform {
-    float: flex;
-    background-color: #F7F7F7;
-    width: 97%;
-    font-size:13px!important;
-    height: 32px !important;
-    border-radius: 2px;
-    padding-left: 12px;
-}
-
-.v-menu__content .v-list {
-    padding-top: 10px;
-    top: 120px !important;
-}
-
 </style>
+

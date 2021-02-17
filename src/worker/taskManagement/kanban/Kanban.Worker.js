@@ -311,10 +311,10 @@ self.onmessage = async function (event) {
         case 'getListSprintInBoard':
             if (data) {
                 taskManagementApi.getListSprint(data).then(res => {
-                    if(res['status'] == 200 && res['data'] ){
+                    if(res['status'] == 200){
                         let dataRec8 = {};
                         dataRec8.key = data;
-                        dataRec8.data = res.data.listObject;
+                        dataRec8.data = (res.data && res.data.listObject) ? res.data.listObject : [];
                         postMessage({action:'getListSprintInBoard',dataAfter : dataRec8})
                     }
                 });
@@ -598,6 +598,7 @@ async function setLiskTask(data){
         }
         return arr
     },[])
+    console.log(data,'datadata');
     data.filter.ids = JSON.stringify(documentIds);
     let allTask = await documentApi.getListObjectByMultipleDocument(data.filter)
     allTask = allTask['data']['listObject'];

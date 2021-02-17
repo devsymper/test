@@ -12,11 +12,11 @@
                     'min-width': labelMinwidth,
                     'width': compLabelWidth,
                     'line-height': '13px',
-                    'vertical-align': (singleLine && (inputInfo.type == 'text' || inputInfo.type == 'select')) ? 'middle' : 'top' ,
+                    'vertical-align': 'middle',
                     'margin-right': space,
                     'margin-top' : (singleLine && inputInfo.type == 'textarea') ? '8px' : '0' ,
                     'position' : 'relative',
-                    'font-size':'11px',
+                    'font-size': titleFontSize,
                 }"
                 v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' ) && !inputInfo.isShowTitle">
                 {{inputInfo.title}}
@@ -178,6 +178,9 @@ import FormAutoComplete from "./../../views/document/sideright/items/FormAutoCom
 import FormulaEditor from "./../formula/editor/FormulaEditor";
 import DateFormat from "./../common/DateFormat";
 import Editor from "./../common/editor/Editor";
+import ButtonSelect from "./../common/bi/ButtonSelect";
+import ColorPalette from "./../common/bi/ColorPalette";
+import PickColorSingle from "./../common/bi/PickColorSingle";
 import NumberFormat from "./../common/NumberFormat";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
@@ -189,9 +192,23 @@ import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocompl
 import SymperListCombobox from "./../common/symperInputs/SymperListCombobox";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 import SymperDefaultControlDocument from "@/components/common/symperInputs/SymperDefaultControlDocument.vue";
-
+import ConditionalFormat from "./../common/bi/ConditionalFormat";
+var titleSizeMap = {
+    small: '11px',
+    normal: '12px',
+    large: '14px'
+};
 const inputTypeConfigs = {
     numeric: {
+        tag: "v-text-field",
+        props(config) {
+            return {
+                placeholder: config.title,
+                type: "number"
+            };
+        }
+    },
+    number: {
         tag: "v-text-field",
         props(config) {
             return {
@@ -240,17 +257,17 @@ const inputTypeConfigs = {
             };
         }
     },
-    color: {
-        tag: "v-color-picker",
-        props(config) {
-            return {
-                label: config.title,
-                'dot-size':"17",
-                'mode':"hexa",
-                'swatches-max-height':"116"
-            };
-        }
-    },
+    // color: {
+    //     tag: "v-color-picker",
+    //     props(config) {
+    //         return {
+    //             label: config.title,
+    //             'dot-size':"17",
+    //             'mode':"hexa",
+    //             'swatches-max-height':"116"
+    //         };
+    //     }
+    // },
     textarea: {
         tag: "v-textarea",
         props(config) {
@@ -309,8 +326,9 @@ const inputTypeConfigs = {
                 data: config.value,
                 multipleSelection: config.multipleSelection,
                 showId: config.hasOwnProperty('showId') ? config.showId : true,
+                showAvatarUser: config.hasOwnProperty('showAvatarUser') ? config.showAvatarUser : false,
                 isSelectionChip:(config.isSelectionChip == false) ? false : true,
-                value: config.value
+                value: config.value,
                 
             };
             if(config.onSearch){
@@ -412,6 +430,38 @@ const inputTypeConfigs = {
             return {
                 label: config.title,
             };
+        }
+    },
+    btnSelect:{
+        tag:"button-select",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
+    colorArray:{
+        tag:"color-palette",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
+    color:{
+        tag:"pick-color-single",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
+    conditionalFormatItems:{
+        tag:"conditional-format-items",
+        props(config){
+            return{
+                value:config.value
+            }
         }
     }
 
@@ -697,9 +747,16 @@ export default {
         },
         instance:{
             type:Number
-        }
+        },
+        titleSize:{
+            type: String,
+            default: 'small' // nhận một trong các giá trị: small, normal, large
+        },
     },
     computed: {
+        titleFontSize(){
+            return titleSizeMap[this.titleSize];
+        },
         labelMinwidth() {
             return this.singleLine ? this.labelWidth : "100%";
         },
@@ -741,7 +798,11 @@ export default {
         SymperColorPicker: SymperColorPicker,
         "default-control-document":SymperDefaultControlDocument,
         'symper-editor':Editor,
-        SymperListCombobox
+        SymperListCombobox,
+        'button-select':ButtonSelect,
+        'color-palette':ColorPalette,
+        'pick-color-single':PickColorSingle,
+        'conditional-format-items':ConditionalFormat
 
 
     }
