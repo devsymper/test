@@ -13,16 +13,33 @@
 							</span>
 						</div>
 					</div>
-					<!-- <v-date-picker v-model="dataValue.value" range scrollable> </v-date-picker> -->
-					<div class="d-flex flex-column mt-2 ml-5">
-						<span class="fs-13">Ngày bắt đầu</span>
-						<input type="date" class="ml-4 " style="margin-top: 2px"  />
-						<span class="fs-13 " style="margin-top: 18px">Ngày kết thúc</span>
-						<input type="date"  class="ml-4" style="margin-top: 2px" />
+					<div class="d-flex mt-2">
+						<div class="d-flex flex-column">
+							<div class="d-flex align-center mx-1 justify-content-center" style="background-color: #E0E0E0">
+								<span class="fs-13 py-1" style="margin-left: auto; margin-right: auto" >Ngày bắt đầu</span>
+							</div>
+							<v-date-picker 
+								no-title 
+								scrollable 
+								v-model="startDate"
+							>
+							</v-date-picker>
+						</div>
+						<div class="d-flex flex-column" style="border-left: 1px solid lightgray">
+							<div class="d-flex mx-1 justify-content-center" style="background-color: #E0E0E0">
+								<span class="fs-13 py-1" style="margin-left: auto; margin-right: auto">Ngày kết thúc</span>
+							</div>
+							<v-date-picker 
+								no-title 
+								scrollable 
+								v-model="endDate"
+							>
+							</v-date-picker>
+						</div>
 					</div>
 				</div>
 				<div class="d-flex  flex-row-reverse mr-2 mb-2 mt-2">
-					<v-btn small color="primary" class="ml-1" @click="applyFilter">
+					<v-btn small color="primary" class="ml-2" @click="applyFilter">
 						Áp dụng
 					</v-btn>
 					<v-btn small @cancel="cancel">
@@ -54,15 +71,28 @@ export default {
 	},
 	methods: {
 		applyFilter(){
-			this.cancel()
+			if(this.endDate >= this.startDate){
+				this.handleChangeValue()
+			}else{
+				this.$snotifyError("Ngày kết thúc phải lớn hơn ngày bắt đầu", "Ngày kết thúc phải lớn hơn ngày bắt đầu")
+			}
 		},
 		cancel(){
 			this.menu = false
 		},
 		handleChangeValue() {
-			this.$emit('change-filter-value', this.cellId);
+			this.dates = [this.startDate, this.endDate];
+			this.$emit('change-filter-value', this.dates, this.cellId);
+			this.cancel()
 		},
+		pickDateRange(start, end){
+			this.endDate = this.$moment(end).format("YYYY-MM-DD")
+			this.startDate = this.$moment(start).format("YYYY-MM-DD")
+			this.handleChangeValue()
+		},
+		
 	},
+
 	props: ['data', 'selectionType', 'selectedCol', 'cellId', 'cellView'],
 	data() {
 		let self = this
@@ -70,24 +100,26 @@ export default {
 			selectAll: false,
 			selectingRadioBox: -1,
 			menu: false,
-			dates: ['2019-09-10', '2019-09-20'],
+			startDate: "",
+			endDate: "",
+			dates: [],
 			pickerOptions: {
 				shortcuts: [
 					{
 						text: 'Today',
 						onClick(picker) {
-							const end = new Date();
 							const start = new Date();
-							self.cancel()
+							const end = new Date();
+							self.pickDateRange(start, end)
 						},
 					},
 					{
 						text: 'Yesterday',
 						onClick(picker) {
-							const end = new Date();
 							const start = new Date();
+							const end = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24);
-							self.cancel()
+							self.pickDateRange(start, end)
 						},
 					},
 					{
@@ -96,7 +128,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-							self.cancel()
+							self.pickDateRange(start, end)
 						},
 					},
 					{
@@ -105,8 +137,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 14);
-							// this.$emit('pick', [start, end]);
-							self.cancel()
+							self.pickDateRange(start, end)
 						},
 					},
 					{
@@ -115,7 +146,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 28);
-							self.cancel()
+							self.pickDateRange(start, end)
 						},
 					},
 					{
@@ -124,7 +155,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-							self.cancel()
+							self.pickDateRange(start, end)
 						},
 					},
 				],
