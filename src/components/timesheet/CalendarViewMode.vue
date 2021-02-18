@@ -60,6 +60,7 @@ export default {
     data: () => ({
         types: ['day', 'weekday', 'week', 'month'],
         timebtn:true,
+        events:[],
     }),
     computed: {
         type() {

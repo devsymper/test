@@ -22,7 +22,7 @@
                     :style="{ top: nowY }"
                 ></div>
                 </template>
-                <template v-slot:day-label="{day,present,past, month, date}">
+                <template v-slot:day-label="{day,present,past̥, month, date}">
                     <MonthViewHeader 
                         class="pl-3 pt-1"
                         :monthEvents="monthEvents"
@@ -102,7 +102,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div v-if="timed" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
+                                <div v-show="timed&&timeView" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
                                 </div>
                             </template>
                             <div>
@@ -154,6 +154,7 @@ export default {
     props: ['timeView','userId','monEvents'],
     data() {
         return {
+            listLogInTime:[],
             menu:false,
             calendar: '',// value calendar
             ready: false,
@@ -182,7 +183,6 @@ export default {
         this.load();
     },
     methods: { 
-      
         setResizeLogtime(event){
             this.events = event
         },
@@ -315,7 +315,6 @@ export default {
             }
         },
         openLogTimeDialog(event, update = false) {
-            debugger
             this.$emit('create-time', {
                 update: update,
                 logtimeEvent: event,
@@ -410,7 +409,7 @@ export default {
                 docObjId:event.docObjId
             })
             if (res.status === 200) {
-                // alert ('Hello')
+   // alert ('Hello')
                
                     // this.load();;
             } else {
@@ -423,12 +422,14 @@ export default {
         },
         // xử lý các sự kiện create, extend, drag log time
         handleLogTimeAction() {
+            debugger // để nguyên duration và thời gian bắt đầu kết thúc
             if (this.createEvent) {// 1. createEvent khac null, kéo xuống/di chuyển
                 if (this.extend) {//1.1: kéo xuống
                     try {
-                        let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
+                        let duration = this.findDuration(this.cr̥eateEvent.start, this.createEvent.end);
                         this.createEvent.duration = duration; 
                         this.updateEvent(this.createEvent, duration);
+                     
                     } catch(e) {console.log(e); }
                 } else {//1.2: tao moi event
                     this.openLogTimeDialog(this.createEvent,false);
@@ -436,8 +437,27 @@ export default {
             } else if(this.dragEvent) {//2.sự kiện di chuyển logtime
                 try {
                     let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
-                    this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD')
-                    this.updateEvent(this.dragEvent, duration);
+                    this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD');
+                    if(this.timeView){
+                        this.updateEvent(this.dragEvent, duration);
+                    }else{
+                        let id = this.dragEvent.id;
+                        let oldLog = [...this.listLogInTime];
+                        oldLog = oldLog.filter(log=>log.id==id)[0]
+                        // lấy ngày giờ => chuyển sang dạng 
+                        let hour = this.$moment(oldLog.start).get('hour');
+                        let minutes = this.$moment(oldLog.start).get('minutes');
+                        let newStart = Number(this.$moment(this.dragEvent.start).hour(hour).minute(minutes).format('x'));
+                        let newEnd = Number(newStart)+Number(oldLog.duration*60*1000);
+                        // oldLog.date = this.dragEvent.date;
+                        oldLog.start = newStart;
+                        oldLog.date= this.$moment(newStart).format('YYYY-MM-DD');
+                        oldLog.end = newEnd;
+                        // this.resizeLogtime();
+                         this.updateEvent(oldLog, oldLog.duration);
+
+                        
+                    }
                 } catch(e) { console.log(e);}
             }
             this.freshDrag();
@@ -491,7 +511,6 @@ export default {
                     div.setAttribute('style', div.getAttribute('style').replace('border-top: none; border-bottom: none', ''));
                      this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: block');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: block');
-
                 } else {
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: none');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: none');
@@ -505,11 +524,15 @@ export default {
                     div.setAttribute('data-init', 'true');
                 }
             })
+            // let test = {...this.events};
+            // listEvent.push(test);
             if(!self.timeView){
+                this.listLogInTime = [...this.events];
                 this.resizeLogtime();
             }else{
-                 this.getLogByUserId(this.userId);
-                 this.load()
+                this.events = this.listLogInTime;
+                this.getLogByUserId(this.userId);
+                //  this.load()
             }
             
         },

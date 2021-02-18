@@ -155,15 +155,15 @@ export default {
             }
         },
         createLog(data){
-            debugger
             data.name=data.task;
             data.category=data.categoryTask;
             data.category_key=data.categoryTask.split('-')[0];
             this.$refs.logCalendar.events.push(data);
+            if(!this.$refs.logCalendar.timeView){
+                this.$refs.logCalendar.resizeLogtime()
+            }
         },
         loadMonthView(data){
-            // this.$refs.logCalendar.monthEvents[data.date]=[];
-            // this.$refs.logCalendar.monthEvents[data.date].push(data);
             this.monthEvents = data;
             this.$refs.logCalendar.load()
         },
