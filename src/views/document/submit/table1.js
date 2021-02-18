@@ -611,14 +611,14 @@ export default class SymperTable {
             },
             // debounceVerticalScrollbar:true,
             autoGroupColumnDef: { 
-                minWidth: 100,
+                // minWidth: 100,
                 cellRendererParams: {
                     suppressCount: true
                 }
             },
             defaultColDef: {
                 filter: true,
-                minWidth: 50,
+                // minWidth: 50,
                 flex: 1,
                 sortable: true,
                 resizable: true,
