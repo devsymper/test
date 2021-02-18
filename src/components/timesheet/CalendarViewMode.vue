@@ -1,7 +1,7 @@
 <template>
 <div class="calendar-viewmode">
     
-    <v-btn style="float:left" v-if="type !='month'&&timebtn" icon @click="timeView()">
+    <v-btn style="float:left" v-if="type !='month'&&timebtn" class="mr-2" icon @click="timeView()">
         <v-tooltip top>
                     <!-- màn hình month - header ngày, giờ -->
             <template v-slot:activator="{ on }">

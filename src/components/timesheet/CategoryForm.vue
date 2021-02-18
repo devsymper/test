@@ -147,6 +147,7 @@ export default {
                     data[i] = this.allInputs[i].value;
                     data.status= 1;
                     data.docObjId=this.docObjId;
+                    data.description = this.allInputs[i].value?this.allInputs[i].value:' ';
                     // this.listDoc.map(doc=>{
                     //     if(doc.id==data[i]){
                     //         this.allInputs[i].value=doc.title

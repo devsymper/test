@@ -12,8 +12,11 @@
     </v-card-title>
     <v-card-text class="mt-1 h-65" >
         <span class="label ">{{$t('timesheet.category_task')}}</span>
+         <v-btn style="height:20px!important" text @click="showCategoryForm()" depressed x-small class="mr-2 ml-1 fs-13">
+            <v-icon style="font-size:15px!important; margin-top:-3px">mdi-plus</v-icon>
+        </v-btn>
         <v-row>
-            <div style="width: 275px!important" 
+            <div style="width: 320px!important" 
                 class="ml-3 mr-1">
                 <v-autocomplete 
                     style="margin-top:-10px!important; " 
@@ -34,15 +37,16 @@
                         </span>
                     </template>
                 </v-autocomplete>
+                 
             </div>
-            <div style="width:10%">
+            <!-- <div style="width:10%">
                 <button 
                     style="border-radius:2px;font-weight: normal; float:right;margin-left:2px"
                     @click="showCategoryForm()" 
                     depressed small class="mr-2 ml-1 fs-13">
                         <v-icon>mdi-plus</v-icon>
                 </button>
-            </div>
+            </div> -->
         </v-row>
     </v-card-text>
      <v-card-text>
@@ -85,12 +89,15 @@
        <!-- <v-checkbox v-model="checkbox" :label="'Chưa log'"></v-checkbox> -->
       <!-- </v-card-text> -->
     <!-- lọc user -->
-    <v-card-text  class='task-form h-65' style="margin-top:-4px">
+    <v-card-text  class='task-form h-65' style="margin-top:-4px" >
         <span class="label">{{$t('timesheet.task_logform')}}
             <span style="color:red"> *</span>
         </span>
+         <v-btn style="height:20px!important" text @click="showTaskForm()" depressed x-small class="mr-2 ml-1 fs-13">
+            <v-icon style="font-size:15px!important; margin-top:-3px">mdi-plus</v-icon>
+        </v-btn>
         <v-row style="margin-top:-10px">
-            <div style="width: 275px!important" class="ml-3 mr-1">
+            <div style="width: 320px!important" class="ml-3 mr-1">
                 <v-autocomplete 
                     class="task w-100 mt-2 fs-13" 
                     v-model="task"
@@ -116,12 +123,6 @@
                         </template>
                 </v-autocomplete>
            </div>
-            <div>
-                <button style="border-radius:2px;font-weight: normal; float:right" @click="showTaskForm()" 
-                depressed small class="mr-2  mt-3 fs-13">
-                <v-icon>mdi-plus</v-icon>
-                </button>
-            </div>
         </v-row>
     </v-card-text>
     <v-card-text>
@@ -398,7 +399,7 @@ export default {
             }
         },
         search(){
-            if(!this.categoryTask){
+            if(!this.categoryTask){// chưa chọn cate
                 this.getAllTask(this.search);
             }else{
                 this.filterTaskByCategory();
@@ -520,7 +521,9 @@ export default {
             }
         },
          async getAllTask(nameTask){
-             debugger
+            if(nameTask==undefined){
+                nameTask='t'
+            }
             let self = this;
             this.items = [];
            await timesheetApi.getTaskDB()
@@ -528,7 +531,8 @@ export default {
              self.items.push(...res.data.task);
                 })
                 .catch(console.log);
-            await timesheetApi.getTask(nameTask)
+                debugger
+            await timesheetApi.getTask('t')
             .then(res => {
                 let name = res.data.listObject;
                 name.map(x=>{
