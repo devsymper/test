@@ -459,7 +459,7 @@ export default {
                         oldLog.start = newStart;
                         oldLog.date= this.$moment(newStart).format('YYYY-MM-DD');
                         oldLog.end = newEnd;
-                        // this.resizeLogtime();
+                        this.resizeLogtime();
                          this.updateEvent(oldLog, oldLog.duration);
 
                         
