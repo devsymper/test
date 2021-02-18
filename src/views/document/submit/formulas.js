@@ -206,7 +206,7 @@ export default class Formulas extends FormulasEvent{
             }
             return {
                 server:false,
-                data: dataRes
+                data: {data:dataRes}
             }
         }
 

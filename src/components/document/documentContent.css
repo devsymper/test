@@ -727,8 +727,8 @@ button:hover {
     outline: none;
 }
 
-.sym-form-submit div:not(.ag-cell):empty,
-.sym-form-Detail div:not(.ag-cell):empty {
+.sym-form-submit div:not(.ag-cell):not(.ps__thumb-x):empty,
+.sym-form-Detail div:not(.ag-cell):not(.ps__thumb-x):empty {
     height: 12px;
 }
 
