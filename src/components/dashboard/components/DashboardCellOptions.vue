@@ -1,127 +1,152 @@
 <template>
-    <v-menu
-        top
-        offset-y>
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                v-bind="attrs"
-                v-on="on"
-                x-small
-                icon
-                class="float-right d-inline-block cell-options-select"
-            >
-                <i class="fs-16 mdi mdi-dots-horizontal"></i>
-            </v-btn>
-        </template>
+    <div class="d-flex">
+        <v-menu bottom offset-y :close-on-content-click="false">
+             <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    v-bind="attrs"
+                    v-on="on"
+                    x-small
+                    icon
+                    class="float-right d-inline-block cell-options-comment"
+                >
+                    <i class="fs-16 mdi mdi-comment-outline"></i>
+                </v-btn>
+            </template>
+            <div class="cell-comment-area px-1  pr-2">
+                <Comment 
+                    :showComment="true" 
+                    :objectType="'dashboard-cell'"  
+                    :objectIdentifier="cell.sharedConfigs.cellId"
+                    :listCommentHeight="370"
+                />
+            </div>
+        </v-menu>
+        <v-menu
+            top
+            offset-y>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    v-bind="attrs"
+                    v-on="on"
+                    x-small
+                    icon
+                    class="float-right d-inline-block cell-options-select"
+                >
+                    <i class="fs-15 mdi mdi-dots-horizontal"></i>
+                </v-btn>
+            </template>
 
-        <v-list class="dashboard-options">
-            <v-list-item 
-                class="py-1 "
-                v-if="!isView"  
-                @click="handleCellAction({action:'clone'})">
-                <i class="fs-14 mdi mdi-content-duplicate"></i> <span class="ml-2 fs-13">Nhân bản</span> 
-            </v-list-item>
-            <v-list-item 
-                class="py-1 " 
-                v-if="!isView"  
-                @click="handleCellAction({action:'copy'})">
-                <i class="mdi fs-14 mdi-content-copy "></i> <span class="ml-2 fs-13">Copy</span>
-                <span style="position: absolute; right: 8px; font-size: 13px; color: grey; margin-left: 8px">Ctrl+C</span>
-            </v-list-item>
-            <v-list-item 
-                class="py-1 " 
-                v-if="!isView"  
-                @click="handleCellAction({action:'cut'})">
-                <i class="mdi fs-14 mdi-content-cut"></i> <span class="ml-2 fs-13">Cut</span>
-                <span style="position: absolute; right: 8px; font-size: 13px; color: grey; margin-left: 8px">Ctrl+X</span>
-            </v-list-item>
+            <v-list class="dashboard-options">
+                <v-list-item 
+                    class="py-1 "
+                    v-if="!isView"  
+                    @click="handleCellAction({action:'clone'})">
+                    <i class="fs-14 mdi mdi-content-duplicate"></i> <span class="ml-2 fs-13">Nhân bản</span> 
+                </v-list-item>
+                <v-list-item 
+                    class="py-1 " 
+                    v-if="!isView"  
+                    @click="handleCellAction({action:'copy'})">
+                    <i class="mdi fs-14 mdi-content-copy "></i> <span class="ml-2 fs-13">Copy</span>
+                    <span style="position: absolute; right: 8px; font-size: 13px; color: grey; margin-left: 8px">Ctrl+C</span>
+                </v-list-item>
+                <v-list-item 
+                    class="py-1 " 
+                    v-if="!isView"  
+                    @click="handleCellAction({action:'cut'})">
+                    <i class="mdi fs-14 mdi-content-cut"></i> <span class="ml-2 fs-13">Cut</span>
+                    <span style="position: absolute; right: 8px; font-size: 13px; color: grey; margin-left: 8px">Ctrl+X</span>
+                </v-list-item>
 
-            <v-list-item 
-                class="item-sort" 
-                divided
-			>
-				<v-menu
-					bottom
-					offset-x
-					:close-on-content-click="closeOnContentClick"
-				>
-					<template v-slot:activator="{ on, attrs }">
-						<div 
-							v-bind="attrs"
-							v-on="on"
-							class="menu-item-sort h-100 w-100"
-						>
-						<i 	class="mdi fs-14 mdi-sort" ></i> <span class="ml-1 fs-13">Sắp xếp</span>
-						</div>
-						
-					</template>
-					<div class="sort-content p-2">
-						<VuePerfectScrollbar style="max-height: 200px" >
-							<div v-for="(item, i) in selectedColumns" :key="i" class="d-flex mt-1 mb-1 mr-2 ml-2">
-								<v-tooltip bottom>
-									<template v-slot:activator="{ on }">
-										<span class="text-ellipsis flex-grow-1" v-on="on" style="max-width: 100px">
-											{{item.name}}
-										</span>
-									</template>
-									<span>{{item.name}}</span>
-								</v-tooltip>
-								<v-tooltip bottom>
-									<template v-slot:activator="{ on }">
-										<v-btn 
-											x-small
-											text-white
-											@click="changeItemSortType(item)"
-											v-on="on"
-											:color="item.sort != 'none' ? 'orange' : 'gray'"
-										>
-											<span class="text-uppercase text-white" :style="{color: item.sort != 'none' ?'white' : 'black'}">
-												{{ item.sort }}
-											</span>
-										</v-btn>
-									</template>
-									<span>Click để thay đổi kiểu sort</span>
-								</v-tooltip>
-							</div>
-						</VuePerfectScrollbar>
-					
-						<div class="d-flex flex-row-reverse mt-2">
-							<v-btn color="primary" small @click="applySort"> 
-								{{$t('common.apply')}}
-							</v-btn>
-						</div>
-					</div>
-				</v-menu>
-            </v-list-item>
-            <v-list-item 
-                class="py-1 " 
-                @click="handleCellAction({action:'download-excel'})"
-                :class="{
-                    'selected-for-sort': sortMode == 'desc'
-                }"  >
-                <i class="mdi fs-14 mdi-microsoft-excel"></i> <span class="ml-2 fs-13">Xuất excel</span>
-            </v-list-item>
+                <v-list-item 
+                    class="item-sort" 
+                    divided
+                >
+                    <v-menu
+                        bottom
+                        offset-x
+                        :close-on-content-click="closeOnContentClick"
+                    >
+                        <template v-slot:activator="{ on, attrs }">
+                            <div 
+                                v-bind="attrs"
+                                v-on="on"
+                                class="menu-item-sort h-100 w-100"
+                            >
+                            <i 	class="mdi fs-14 mdi-sort" ></i> <span class="ml-1 fs-13">Sắp xếp</span>
+                            </div>
+                            
+                        </template>
+                        <div class="sort-content p-2">
+                            <VuePerfectScrollbar style="max-height: 200px" >
+                                <div v-for="(item, i) in selectedColumns" :key="i" class="d-flex mt-1 mb-1 mr-2 ml-2">
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <span class="text-ellipsis flex-grow-1" v-on="on" style="max-width: 100px">
+                                                {{item.name}}
+                                            </span>
+                                        </template>
+                                        <span>{{item.name}}</span>
+                                    </v-tooltip>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn 
+                                                x-small
+                                                text-white
+                                                @click="changeItemSortType(item)"
+                                                v-on="on"
+                                                :color="item.sort != 'none' ? 'orange' : 'gray'"
+                                            >
+                                                <span class="text-uppercase text-white" :style="{color: item.sort != 'none' ?'white' : 'black'}">
+                                                    {{ item.sort }}
+                                                </span>
+                                            </v-btn>
+                                        </template>
+                                        <span>Click để thay đổi kiểu sort</span>
+                                    </v-tooltip>
+                                </div>
+                            </VuePerfectScrollbar>
+                        
+                            <div class="d-flex flex-row-reverse mt-2">
+                                <v-btn color="primary" small @click="applySort"> 
+                                    {{$t('common.apply')}}
+                                </v-btn>
+                            </div>
+                        </div>
+                    </v-menu>
+                </v-list-item>
+                <v-list-item 
+                    class="py-1 " 
+                    @click="handleCellAction({action:'download-excel'})"
+                    :class="{
+                        'selected-for-sort': sortMode == 'desc'
+                    }"  >
+                    <i class="mdi fs-14 mdi-microsoft-excel"></i> <span class="ml-2 fs-13">Xuất excel</span>
+                </v-list-item>
 
-            <v-list-item 
-                class="py-1 " 
-                @click="handleCellAction({action:'print-report'})">
-                <i class="mdi fs-14 mdi-printer"></i> <span class="ml-2 fs-13">In báo cáo này</span>
-            </v-list-item>
-            <v-list-item  
-                v-if="!isView"  
-                @click="handleCellAction({action:'remove'})" 
-                class="py-1 red-item">
-                <i class="mdi fs-14 mdi-trash-can-outline"></i> <span class="ml-2 fs-13">Xóa</span>
-            </v-list-item>
-        </v-list>
-    </v-menu>
+                <v-list-item 
+                    class="py-1 " 
+                    @click="handleCellAction({action:'print-report'})">
+                    <i class="mdi fs-14 mdi-printer"></i> <span class="ml-2 fs-13">In báo cáo này</span>
+                </v-list-item>
+                <v-list-item  
+                    v-if="!isView"  
+                    @click="handleCellAction({action:'remove'})" 
+                    class="py-1 red-item">
+                    <i class="mdi fs-14 mdi-trash-can-outline"></i> <span class="ml-2 fs-13">Xóa</span>
+                </v-list-item>
+            </v-list>
+        </v-menu>
+    </div>
 </template>
 
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import Comment from "@/components/common/comment/Comment"
 export default {
 	components:{
-		VuePerfectScrollbar
+		VuePerfectScrollbar,
+        Comment
 	},
     computed: {
         dashboardConfigs(){
@@ -149,7 +174,8 @@ export default {
 			setTimeout((self) => {
 				self.closeOnContentClick = false
 			}, 1000, this);
-			this.$$evtBus.$emit('bi-report-change-display', {
+            debugger
+			this.$evtBus.$emit('bi-report-change-display', {
 				id: this.cell.sharedConfigs.cellId,
 				type: 'data',
 				instanceKey: this.instanceKey
@@ -270,6 +296,13 @@ export default {
     top: 2px;
     right: 2px;
 }
+.symper-dashboard-cell .cell-options-comment{
+    visibility: hidden;
+    z-index: 999;
+    position: absolute;
+    top: 2px;
+    right: 22px;
+}
 .menu-item-sort:hover{
 	background-color: #f5f5f5;
 }
@@ -286,15 +319,23 @@ export default {
 .item-sort {
 	padding: unset !important;
 }
-.symper-dashboard-cell .cell-options-select .icon-as-btn{
+.symper-dashboard-cell .cell-options-select .icon-as-btn,
+.symper-dashboard-cell .cell-options-comment .icon-as-btn{
     background-color: #ececec;
     border-radius: 0px!important;
 }
 
-.symper-dashboard-cell:hover .cell-options-select{
+.symper-dashboard-cell:hover .cell-options-select,
+.symper-dashboard-cell:hover .cell-options-comment{
     visibility: visible!important;
 }
 .btn-swap-sort{
 	cursor: pointer;
+}
+.cell-comment-area{
+    background-color: #ffffff;
+    z-index: 100000;
+    width: 350px;
+    height: 500px;
 }
 </style>

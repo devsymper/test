@@ -6,7 +6,7 @@ export default class Pivot extends ReportBase {
         let styleKeys ={
 			"headerFormat":{
 				"title":"Header Style",
-				"items":["alignment","bgColor","borderColor","borderWidth","fontColor","tableColumnWidthMode","textSize","verticalLine","verticalAlign","wrapText"]
+				"items":["alignment","bgColor","borderColor","borderWidth","borderStyle","fontColor","tableColumnWidthMode","textSize","verticalLine","verticalAlign","wrapText"]
 			},
 			"cellFormat":{
 				"title":"Row data Style",
@@ -14,7 +14,7 @@ export default class Pivot extends ReportBase {
 			},
 			"total":{
 				"title":"Total",
-				"items":["bgColor","fontColor","show","textSize"]
+				"items":["bgColor","fontColor","show","textSize","borderColor","borderWidth","borderStyle"]
 			},
 			"conditionalFormat":{
 				"title":"Conditional Format",

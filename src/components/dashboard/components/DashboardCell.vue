@@ -3,6 +3,7 @@
         class="w-100 h-100 border-all symper-dashboard-cell"
         :style="viewAttrs.general"
         @click="selectThisCell">
+      
         <DashboardCellOptions 
             :cell="cellConfigs"
             :instanceKey="instanceKey" 
@@ -135,5 +136,8 @@ export default {
 .cell-placeholder {
     background-color: #fdfdfd;
 }
-
+.cell-comment{
+    float: right;
+    margin-right: 18px;
+}
 </style>

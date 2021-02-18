@@ -295,6 +295,30 @@ var attrItems = {
             },
         ]
     },
+    borderStyle: {
+        title: 'Border style',
+        type: 'btnSelect',
+        default: 'solid',
+        options: [{
+                name: 'solid',
+                icon: 'mdi-border-all-variant',
+                value: 'solid',
+                text: ''
+            },
+            {
+                name: 'dashed',
+                icon: 'mdi-border-none',
+                value: 'dashed',
+                text: ''
+            },
+            {
+                name: 'double',
+                icon: 'mdi-equal',
+                value: 'double',
+                text: ''
+            },
+        ]
+    },
     verticalAlign: {
         title: 'vertical alignment',
         type: 'btnSelect',
