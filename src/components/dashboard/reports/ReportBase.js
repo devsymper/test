@@ -202,6 +202,7 @@ export default class ReportBase {
             textAlign: st.alignment ? st.alignment.value : '',
             borderBottomWidth: st.borderBottomWidth ? (st.borderBottomWidth.value + sizeUnit) : '',
             borderWidth: st.borderWidth ? (st.borderWidth.value + sizeUnit) : '',
+            borderStyle: st.borderStyle ? st.borderStyle.value : 'none',
         }
 
         if (st.borderBottomColor && st.borderBottomColor.value) {

@@ -18,7 +18,7 @@
 			style="height:100px!important;width:185px"
 			class="mx-auto"
 		/>
-		<VuePerfectScrollbar v-else style="height:calc(100% - 44px)">
+		<VuePerfectScrollbar v-else :style="{height: configHeight - 50 + 'px'}">
 			<template>
 				<v-expansion-panels
 					:multiple="true"
@@ -103,6 +103,10 @@ export default {
 	props:{
 		instanceKey:{
 			default: null
+		},
+		configHeight:{
+			type: Number,
+			default: 0
 		}
 	},
 	computed:{

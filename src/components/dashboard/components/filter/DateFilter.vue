@@ -4,15 +4,48 @@
 			<template v-slot:activator="{ on, attrs }">
 				<v-combobox v-model="dateRangeText" solo  readonly v-bind="attrs" v-on="on"> </v-combobox>
 			</template>
-			<div class="d-flex" style="background-color: #ffffff">
-				<div style="border-right: 1px solid lightgray ">
-					<div v-for="(item, i) in pickerOptions.shortcuts" :key="i">
-						<span class="fs-13 ml-2 mt-2 mr-4 picker-option-title" @click="item.onClick()">
-							{{ item.text }}
-						</span>
+			<div class="d-flex flex-column" style="background-color: #ffffff; z-index: 100000	">
+				<div class="d-flex" >
+					<div style="border-right: 1px solid lightgray" class="mt-2">
+						<div v-for="(item, i) in pickerOptions.shortcuts" :key="i">
+							<span class="fs-13 ml-2 mt-2 mr-4 picker-option-title" @click="item.onClick()">
+								{{ item.text }}
+							</span>
+						</div>
+					</div>
+					<div class="d-flex mt-2">
+						<div class="d-flex flex-column">
+							<div class="d-flex align-center mx-1 justify-content-center" style="background-color: #E0E0E0">
+								<span class="fs-13 py-1" style="margin-left: auto; margin-right: auto" >Ngày bắt đầu</span>
+							</div>
+							<v-date-picker 
+								no-title 
+								scrollable 
+								v-model="startDate"
+							>
+							</v-date-picker>
+						</div>
+						<div class="d-flex flex-column" style="border-left: 1px solid lightgray">
+							<div class="d-flex mx-1 justify-content-center" style="background-color: #E0E0E0">
+								<span class="fs-13 py-1" style="margin-left: auto; margin-right: auto">Ngày kết thúc</span>
+							</div>
+							<v-date-picker 
+								no-title 
+								scrollable 
+								v-model="endDate"
+							>
+							</v-date-picker>
+						</div>
 					</div>
 				</div>
-				<v-date-picker v-model="dataValue.value" range scrollable> </v-date-picker>
+				<div class="d-flex  flex-row-reverse mr-2 mb-2 mt-2">
+					<v-btn small color="primary" class="ml-2" @click="applyFilter">
+						Áp dụng
+					</v-btn>
+					<v-btn small @cancel="cancel">
+						Huỷ
+					</v-btn>
+				</div>
 			</div>
 		</v-menu>
 	</div>
@@ -37,10 +70,29 @@ export default {
 		},
 	},
 	methods: {
-		handleChangeValue() {
-			this.$emit('change-filter-value', this.cellId);
+		applyFilter(){
+			if(this.endDate >= this.startDate){
+				this.handleChangeValue()
+			}else{
+				this.$snotifyError("Ngày kết thúc phải lớn hơn ngày bắt đầu", "Ngày kết thúc phải lớn hơn ngày bắt đầu")
+			}
 		},
+		cancel(){
+			this.menu = false
+		},
+		handleChangeValue() {
+			this.dates = [this.startDate, this.endDate];
+			this.$emit('change-filter-value', this.dates, this.cellId);
+			this.cancel()
+		},
+		pickDateRange(start, end){
+			this.endDate = this.$moment(end).format("YYYY-MM-DD")
+			this.startDate = this.$moment(start).format("YYYY-MM-DD")
+			this.handleChangeValue()
+		},
+		
 	},
+
 	props: ['data', 'selectionType', 'selectedCol', 'cellId', 'cellView'],
 	data() {
 		let self = this
@@ -48,26 +100,26 @@ export default {
 			selectAll: false,
 			selectingRadioBox: -1,
 			menu: false,
-			dates: ['2019-09-10', '2019-09-20'],
+			startDate: "",
+			endDate: "",
+			dates: [],
 			pickerOptions: {
 				shortcuts: [
 					{
 						text: 'Today',
 						onClick(picker) {
-							const end = new Date();
 							const start = new Date();
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							const end = new Date();
+							self.pickDateRange(start, end)
 						},
 					},
 					{
 						text: 'Yesterday',
 						onClick(picker) {
-							const end = new Date();
 							const start = new Date();
+							const end = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.pickDateRange(start, end)
 						},
 					},
 					{
@@ -76,8 +128,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.pickDateRange(start, end)
 						},
 					},
 					{
@@ -86,8 +137,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 14);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.pickDateRange(start, end)
 						},
 					},
 					{
@@ -96,8 +146,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 28);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.pickDateRange(start, end)
 						},
 					},
 					{
@@ -106,8 +155,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-							this.$emit('pick', [start, end]);
-							self.menu = false
+							self.pickDateRange(start, end)
 						},
 					},
 				],
@@ -132,6 +180,7 @@ export default {
 }
 .picker-option-title {
 	cursor: pointer;
+	font-size: 13px !important;
 }
 .picker-option-title:hover {
 	color: blue;

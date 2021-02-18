@@ -1,7 +1,7 @@
 <template>
     <div class="pl-2 pr-2" v-if="displayOptions.selectionMode == 'default'">
         <date-filter 
-            @change-filter-value="handleChangeFilterValue"
+            @change-filter-value="handleChangeDateFilter"
             :data="displayOptions.data"
             :selectionType="displayOptions.selectionType"
             :selectedCol="selectedCol"
@@ -44,14 +44,6 @@
                     v-model="sliderDataValue.value[1]">
                 </v-text-field>
             </div>
-            <!-- <el-slider
-                v-model="sliderDataValue.value"
-                range
-                class="mini-slider"
-                @change="handleChangeFilterValue(cellConfigs.sharedConfigs.cellId)"
-                :max="sliderDataValue.max"
-                :min="sliderDataValue.min">
-            </el-slider> -->
         </div>
     </div>
     <div v-else-if="displayOptions.selectionMode == 'dropList'">
@@ -88,6 +80,11 @@ export default {
     methods:{
         useDatePicker(){
            return this.selectedCol.type == 'date'
+        },
+        handleChangeDateFilter(dates, cellId){
+            this.cellConfigs.viewConfigs.displayOptions.data.value = dates
+            // debugger
+            this.handleChangeFilterValue(cellId)
         },
         handleChangeFilterValue(cellId){
             this.$evtBus.$emit('bi-report-change-display', {
