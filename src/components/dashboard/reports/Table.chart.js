@@ -5,15 +5,15 @@ export default class Table extends ReportBase {
         let styleKeys = {
             headerFormat: {
                 title: 'Header Style',
-                items: ['fontColor', 'textSize', 'bgColor', 'tableColumnWidthMode', 'borderWidth', 'borderColor', 'alignment', 'verticalLine', 'wrapText']
+                items: ['fontColor', 'textSize', 'bgColor', 'tableColumnWidthMode', 'borderWidth', 'borderColor', 'borderStyle', 'alignment', 'verticalLine', 'wrapText']
             },
             cellFormat: {
                 title: 'Row data Style',
-                items: ['fontColor', 'textSize', 'borderBottomWidth', 'borderBottomColor', 'verticalLine', 'zeroValueDisplay', 'tooltipDecimalNumber']
+                items: ['fontColor', 'textSize', 'borderBottomWidth', 'borderBottomColor','borderStyle', 'verticalLine', 'zeroValueDisplay', 'tooltipDecimalNumber']
             },
             total: {
                 title: 'Total',
-                items: ['show', 'fontColor', 'textSize', 'bgColor']
+                items: ['show', 'fontColor', 'textSize','borderWidth', 'borderColor', 'borderStyle', 'bgColor']
             },
             conditionalFormat: {
                 title: 'Conditional format',

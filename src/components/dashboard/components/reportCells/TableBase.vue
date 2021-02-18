@@ -97,7 +97,6 @@ export default {
                 this.cellConfigs.rawConfigs.extra = {};
             }
             this.cellConfigs.rawConfigs.extra.hiddenCols = hiddenCols;
-            // this.applyHiddenToDisplayConfig(hiddenCols);
         },
         applyHiddenToDisplayConfig(hiddenCols){
             let leafCols = [];
@@ -186,7 +185,7 @@ export default {
         },
         convertCssObjToStr(styleObj){
             let rsl = '';
-            for(let styleName in this.options.headerStyle){
+            for(let styleName in styleObj){
                 let name = styleName.replace(/([A-Z])/g,'-$1').toLowerCase();
                 rsl += `${name} : ${styleObj[styleName]}; \n`;
             }
@@ -205,38 +204,27 @@ export default {
             let headerStyle = this.options.headerStyle;
             if(headerStyle){
                 style += `
-                    #${idCell} .ag-floating-bottom {
-                        font-weight: bold;
-                    }
                     #${idCell} .ag-header-cell {
                         border-top-width: ${headerStyle.borderWidth};
                         border-top-color: ${headerStyle.borderColor};
                         border-bottom-width: ${headerStyle.borderWidth};
                         text-align: ${headerStyle.textAlign};
                         border-bottom-color: ${headerStyle.borderColor};
-                        border-bottom-style: solid;
-                        border-top-style: solid;
+                        border-bottom-style: ${headerStyle.borderStyle};
+                        border-top-style: ${headerStyle.borderStyle};
                     }
                     #${idCell} .ag-header-group-cell {
                         border-top-width: ${headerStyle.borderWidth};
                         border-top-color: ${headerStyle.borderColor};
                         border-bottom-color: ${headerStyle.borderColor};
-                        border-bottom-style: solid;
-                        border-top-style: solid;
+                        border-bottom-style: ${headerStyle.borderStyle};
+                        border-top-style: ${headerStyle.borderStyle};
                     }
                     #${idCell} .ag-header-group-cell .ag-header-group-cell-label,
                     #${idCell} .ag-header-cell .ag-header-cell-label {
                         justify-content: ${headerStyle.textAlign == 'right' ? 'flex-end' : headerStyle.textAlign};
                     }
 
-                    #${idCell} .ag-floating-bottom{
-                        border-bottom-width: ${headerStyle.borderWidth}!important;
-                        border-bottom-color: ${headerStyle.borderColor}!important;
-                        border-top-width: ${headerStyle.borderWidth}!important;
-                        border-top-color: ${headerStyle.borderColor}!important;
-                        border-bottom-style: inset;
-                        border-top-style: solid;
-                    }
                     `;
                 
                 
@@ -246,13 +234,6 @@ export default {
                         #${idCell} .ag-header-cell {
                             border-right-width: ${headerStyle.borderWidth};
                             border-right-color: ${headerStyle.borderColor};
-                            border-right-style: solid;
-                        }
-                        
-                        #${idCell} .ag-floating-bottom .ag-cell{
-                            border-right-width: ${headerStyle.borderWidth};
-                            border-right-color: ${headerStyle.borderColor};
-                            border-bottom-right: inset;
                             border-right-style: solid;
                         }
                     `;
@@ -267,6 +248,42 @@ export default {
                     `;
                 }
             }
+            return style;
+        },
+        reStyleTotal(){
+            let cellId = this.cellConfigs.sharedConfigs.cellId;
+            let idCell = 'symper-table-wrapper-' + cellId;
+            debugger
+            let style = this.convertCssObjToStr(this.options.totalRowStyle);
+            let totalRowStyle = this.options.totalRowStyle;
+            if(totalRowStyle){
+                style += `
+                    #${idCell} .ag-floating-bottom {
+                        font-weight: bold;
+                    }
+                    #${idCell} .ag-floating-bottom{
+                        border-bottom-width: ${totalRowStyle.borderWidth}!important;
+                        border-bottom-color: ${totalRowStyle.borderColor}!important;
+                        border-top-width: ${totalRowStyle.borderWidth}!important;
+                        border-top-color: ${totalRowStyle.borderColor}!important;
+                        border-bottom-style: ${totalRowStyle.borderStyle}!important;
+                        border-top-style:  ${totalRowStyle.borderStyle}!important;
+                    }
+                    `;
+                
+                
+                if(totalRowStyle.verticalLine){
+                    style += `
+                        #${idCell} .ag-floating-bottom .ag-cell{
+                            border-right-width: ${totalRowStyle.borderWidth};
+                            border-right-color: ${totalRowStyle.borderColor};
+                            border-bottom-right:  ${totalRowStyle.borderStyle}!important;
+                            border-right-style:  ${totalRowStyle.borderStyle}!important;
+                        }
+                    `;
+                }
+            }
+            debugger
             return style;
         },
         reStyleDataCell(){
@@ -302,6 +319,7 @@ export default {
         onTableRender(){
             let customStyle = this.reStyleHeader();
             customStyle += this.reStyleDataCell();
+            customStyle += this.reStyleTotal();
             let styleTag = this.$refs.styleTag;
             styleTag.innerHTML = `<style>${customStyle}</style>`;
 
