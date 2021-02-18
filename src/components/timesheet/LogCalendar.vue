@@ -95,9 +95,14 @@
                                                 {{event.category_key}}
                                             </span>
                                         </div>
-                                        <div >
+                                        <div v-if="timeView">
                                             <span class="fs-11 color-black" style="margin-right:-5px">
                                             {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
+                                            </span>
+                                        </div>
+                                         <div v-else>
+                                            <span class="fs-11 color-black" style="margin-right:-5px">
+                                           {{changeDuration(event.duration)}}
                                             </span>
                                         </div>
                                     </div>
@@ -426,7 +431,8 @@ export default {
             if (this.createEvent) {// 1. createEvent khac null, kéo xuống/di chuyển
                 if (this.extend) {//1.1: kéo xuống
                     try {
-                        let duration = this.findDuration(this.cr̥eateEvent.start, this.createEvent.end);
+                        debugger
+                        let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
                         this.createEvent.duration = duration; 
                         this.updateEvent(this.createEvent, duration);
                      
@@ -524,8 +530,6 @@ export default {
                     div.setAttribute('data-init', 'true');
                 }
             })
-            // let test = {...this.events};
-            // listEvent.push(test);
             if(!self.timeView){
                 this.listLogInTime = [...this.events];
                 this.resizeLogtime();

@@ -46,7 +46,7 @@ export const copyLogTime = async function(event) {
       return check
 }
 export const resizeLogtime = async function(events) {
-    let taskLength = 60*60*1000;
+    let taskLength = 85*60*1000;
     let padding = 60*60*300;
     let lastDate, lastEnd;
     let newTasks = events.map(task=>{
