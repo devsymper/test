@@ -120,11 +120,12 @@ var handler = {
             reportName: reportName,
             needTotal: this.checkNeedTotal(cell)
         };
-
+        let pageSize = 1000;
         if(cellType == 'table' || cellType == 'pivot'){
-            rsl.pageSize = cell.sharedConfigs.pageSize ? cell.sharedConfigs.pageSize : 200;
-            rsl.currentPage = cell.sharedConfigs.currentPage ? cell.sharedConfigs.currentPage : 1;
+            pageSize = 50;
         }
+        rsl.pageSize = cell.sharedConfigs.pageSize ? cell.sharedConfigs.pageSize : pageSize;
+        rsl.currentPage = cell.sharedConfigs.currentPage ? cell.sharedConfigs.currentPage : 1;
         return rsl;
     },
 

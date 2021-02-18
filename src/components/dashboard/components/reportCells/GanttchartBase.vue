@@ -1,19 +1,19 @@
 <template>
     <div class="w-100 h-100">
-        <div class="action-gantt">
+        <div class="action-gantt py-2">
             <v-icon v-if="taskSeleted.id" @click="handleDelete" style="font-size:20px;margin-right:4px">mdi-delete-forever-outline</v-icon>
             <v-text-field
-            v-on:input="onSearch($event)"
-            class="d-inline-block sym-small-size"
-            single-line
-            append-icon="mdi-magnify"
-            outlined
-            hide-details
-            dense
-            flat
-            label="Search"
-            :placeholder="$t('common.search')"
-            style="width: inherit"
+                v-on:input="onSearch($event)"
+                class="d-inline-block sym-small-size mr-2"
+                single-line
+                append-icon="mdi-magnify"
+                outlined
+                hide-details
+                dense
+                flat
+                label="Search"
+                :placeholder="$t('common.search')"
+                style="width: inherit"
             ></v-text-field>
             <v-menu
                 content-class="action-create"
@@ -22,8 +22,8 @@
                 offset-y
             >
                 <template v-slot:activator="{ on: on }">
-                    <v-btn v-on="on"  depressed  small>
-                        <span class="ml-2">Create task</span>
+                    <v-btn v-on="on"  depressed  small class="mr-2">
+                        <span>Tạo task</span>
                     </v-btn>
                 </template>
                 <v-list class="fs-13">
@@ -38,27 +38,32 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
-            <v-btn class="mx-1" @click="changeStatusEdit" v-if="!isEdit" small depressed >
-                Edit
+            <v-btn class="mr-1" @click="changeStatusEdit" v-if="!isEdit" small depressed >
+                {{$t("common.edit")}}
             </v-btn>
             <v-btn
-                class="mx-1"
+                class="mr-2"
                 v-else 
                 small
                 @click="saveUpdate" 
                 :loading="loading"
                 color="blue darken-1"
-                text
             >
                 {{$t("common.save")}}
             </v-btn>
-            <v-icon @click.stop.prevent="showPopupConfig" class="fs-16">mdi-cog-outline</v-icon>
+            
+            <v-btn class="mx-1" tile icon @click="showPopupConfig" small depressed>
+                <i class=" mdi fs-18 mdi-cog-outline"></i>
+            </v-btn>
+            
         </div>
 
         <Highcharts
             ref="chartGantt"
-            style="height:calc(100% - 30px)"
-            class="w-100 py-1 gantt-chart" 
+            :style="{
+                height: cellConfigs.viewConfigs.displayOptions.chart.height + 'px'
+            }"
+            class="w-100 py-1 gantt-chart mt-5" 
             :constructorType="'ganttChart'"
             :options="options">
         </Highcharts>
@@ -97,6 +102,8 @@ import PopupSubmitTask from '../PopupSubmitTask.vue';
 
 Gantt(Highcharts);
 DragDrop(Highcharts);
+var day = 1000 * 60 * 60 * 24;
+
 export default {
     components: {
         Highcharts: Chart,
@@ -104,41 +111,47 @@ export default {
         PopupSubmitTask,
     },
     computed:{
-        options(){
-            let self = this;
-			var  day = 1000 * 60 * 60 * 24;
-            let optionData = {};
-            if (this.isEdit) {
-                optionData = util.cloneDeep(this.cellConfigs.viewConfigs.displayOptions);
-                optionData.plotOptions = {
-                    series: {
-                        animation: false, // Do not animate dependency connectors
-                        dragDrop: {
-                            draggableX: true,
-                            draggableY: true,
-                            dragMinY: 0,
-                            dragMaxY: 2,
-                            dragPrecisionX: day / 48 // Snap to eight hours
-                        },
-                        allowPointSelect: true,
-                        point: {
-                            events: {
-                                select: self.selected,
-                                unselect: self.unselected,
-                                // remove: self.removedObject,
-                                drop: self.drop
-                                // click: self.change,
+    },
+    watch: {
+        'cellConfigs.viewConfigs.displayOptions': {
+            deep: true,
+            immediate: true,
+            handler(){
+                let self = this;
+                let optionData = {};
+                if (this.isEdit) {
+                    optionData = util.cloneDeep(this.cellConfigs.viewConfigs.displayOptions);
+                    optionData.plotOptions = {
+                        series: {
+                            animation: false, // Do not animate dependency connectors
+                            dragDrop: {
+                                draggableX: true,
+                                draggableY: true,
+                                dragMinY: 0,
+                                dragMaxY: 2,
+                                dragPrecisionX: day / 48 // Snap to eight hours
+                            },
+                            allowPointSelect: true,
+                            point: {
+                                events: {
+                                    select: self.selected,
+                                    unselect: self.unselected,
+                                    // remove: self.removedObject,
+                                    drop: self.drop
+                                    // click: self.change,
+                                }
                             }
                         }
-                    }
-                };
-            }else{
-                optionData = util.cloneDeep(this.cellConfigs.viewConfigs.displayOptions);
+                    };
+                }else{
+                    optionData = util.cloneDeep(this.cellConfigs.viewConfigs.displayOptions);
+                }
+                setTimeout(() => {
+                    self.options = optionData;                
+                }, 0);
             }
-            return optionData;
         }
     },
-   
     props: {
         cellConfigs: {
             default(){
@@ -170,6 +183,7 @@ export default {
             loading:false,
             closeOnClick:true,
             dialogRemove: false,
+            options: {}
         }
     },
     methods:{

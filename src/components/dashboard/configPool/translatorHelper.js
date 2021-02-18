@@ -341,7 +341,7 @@ export const TranslatorHelper = {
 				enabled: false
 			};
 	
-			rsl.chart.height = extraData.size.h;
+			rsl.chart.height = extraData.size.h - 20;
 			rsl.chart.width = extraData.size.w;
 			return rsl;
 		},
