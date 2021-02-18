@@ -15,6 +15,7 @@
             ref="logtime"
             @showTaskForm="showTaskForm"
             @loadMonthView="loadMonthView"
+            @create-log="createLog"
             @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
             :updateAPICategory ="updateAPICate"
@@ -152,6 +153,13 @@ export default {
             if(!this.update){
               this.$refs.logCalendar.events.pop()
             }
+        },
+        createLog(data){
+            debugger
+            data.name=data.task;
+            data.category=data.categoryTask;
+            data.category_key=data.categoryTask.split('-')[0];
+            this.$refs.logCalendar.events.push(data);
         },
         loadMonthView(data){
             // this.$refs.logCalendar.monthEvents[data.date]=[];

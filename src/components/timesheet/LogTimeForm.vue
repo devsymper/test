@@ -416,9 +416,7 @@ export default {
                 }
              }
              else{
-                
-                    let taskId = this.task;
-                 
+                let taskId = this.task;
                 this.findNameTask(this.task);
                 this.getCategoryId(taskId);
              }
@@ -453,7 +451,6 @@ export default {
             // this.task = val.task?val.task:getIdTask(val.task);
             this.task = val.task?val.task:"";
             if(val.task){
-                debugger
                 this.items.push({name:val.task});
             }
             // hiển thị nút plan và log theo từng giờ
@@ -681,9 +678,11 @@ export default {
                 desc: this.inputs.description || ""
             }
             if(!this.repeat){
-                this.onSave();
+                // this.onSave(data);
+                this.$emit('create-log',data);
                 timesheetApi.createLogTime(data).then(res => {
                     if (res.status === 200) {
+                        this.onSave();
                          this.$snotify({
                             type: "success",
                             title:" Thêm thành công",
@@ -693,6 +692,7 @@ export default {
                             this.$emit('loadMonthView',data)
                         }
                     }else{
+                        // xử lý
                         this.onSave();
                         self.$snotify({
                             type: "error",

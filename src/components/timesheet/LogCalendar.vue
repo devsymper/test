@@ -219,7 +219,6 @@ export default {
             timesheetApi.getLogByUserId({userId:id})
                 .then(res => {
                     if (res.status === 200) {
-                       
                     }
                 })
                 .catch(err => {
@@ -227,7 +226,12 @@ export default {
                 })
         },
         copyLogTime(event){
-            // this.events.push(event);
+            let data = {...event};
+            data.start = this.$moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm");
+            data.end = this.$moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm");
+            data.categoryTask = event.category;
+            data.desc = event.desc || "";
+            this.events.push(data);
             this.logFormWorker.postMessage({
                 action:'copyLogTime',
                 data:event
@@ -235,14 +239,12 @@ export default {
         },
         setEventCopy(data){
             if(data){
-                debugger
-                // this.load()
+                this.load()
             }else{
                 this.$snotify({
                     type: "error",
                     title: "Lỗi"
                 })
-
             }
         },
         // tính tổng thời gian của cả tháng
@@ -312,7 +314,12 @@ export default {
                 break;
             }
         },
+        createLogTime(event){
+            debugger
+            this.events.push(event);
+        },
         openLogTimeDialog(event, update = false) {
+            debugger
             this.$emit('create-time', {
                 update: update,
                 logtimeEvent: event,
@@ -424,6 +431,7 @@ export default {
                 if (this.extend) {//1.1: kéo xuống
                     try {
                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
+                        this.createEvent.duration = duration; 
                         this.updateEvent(this.createEvent, duration);
                     } catch(e) {console.log(e); }
                 } else {//1.2: tao moi event
