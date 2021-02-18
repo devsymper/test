@@ -67,6 +67,18 @@
             :constructorType="'ganttChart'"
             :options="options">
         </Highcharts>
+        
+        <div class="symper-table-pagination pl-1" style="height: 25px; margin-top: 5px" >
+            <Pagination
+                :contentSize="'mini'"
+                :totalVisible="5"
+                :pageSizeOptions="[50, 100, 200, 400]"
+                @on-change-page-size="handleSizeChange"
+                @on-change-page="handleCurrentPageChange"
+                :total="cellConfigs.viewConfigs.displayOptions.totalRowCount"
+                :shortMode="true">
+            </Pagination>
+        </div>
         <popup-config-ganttchart 
             ref="configGantt"
             :cellConfigs="cellConfigs"
@@ -99,6 +111,7 @@ import DragDrop from "highcharts/modules/draggable-points"
 import { util } from '@/plugins/util';
 import PopupConfigGanttchart from '../PopupConfigGanttchart.vue';
 import PopupSubmitTask from '../PopupSubmitTask.vue';
+import Pagination from '@/components/common/Pagination.vue';
 
 Gantt(Highcharts);
 DragDrop(Highcharts);
@@ -109,6 +122,7 @@ export default {
         Highcharts: Chart,
         PopupConfigGanttchart,
         PopupSubmitTask,
+        Pagination
     },
     computed:{
     },
@@ -187,6 +201,22 @@ export default {
         }
     },
     methods:{
+        handleCurrentPageChange(data){
+            this.cellConfigs.sharedConfigs.currentPage = data.page; 
+            this.$evtBus.$emit('bi-report-change-display', {
+                type: 'data',
+                id: this.cellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
+            });
+        },
+        handleSizeChange(data){
+            this.cellConfigs.sharedConfigs.pageSize = data.pageSize;
+            this.$evtBus.$emit('bi-report-change-display', {
+                type: 'data',
+                id: this.cellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
+            });
+        },
         onSearch(vl){
             if(this.delayTimer){
                 clearTimeout(this.delayTimer);

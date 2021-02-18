@@ -23,7 +23,7 @@ export default class Gantt extends ReportBase {
             }
             this.rawConfigs.setting.documentObjectId.selectedColums.push(item);
         }
-       
+        this.sharedConfigs.pageSize = 50;
     }
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
         let displayOptions = {};
