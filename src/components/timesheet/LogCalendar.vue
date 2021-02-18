@@ -438,7 +438,16 @@ export default {
                      
                     } catch(e) {console.log(e); }
                 } else {//1.2: tao moi event
-                    this.openLogTimeDialog(this.createEvent,false);
+                    if(this.timeView){
+                         this.openLogTimeDialog(this.createEvent,false);
+
+                    }else{
+                        this.events.splice(this.events.indexOf(event), 1);
+                        this.$snotify({
+                            title:'error',
+                            text:"Quay lại time view để tạo log"
+                        })
+                    }
                 }
             } else if(this.dragEvent) {//2.sự kiện di chuyển logtime
                 try {
