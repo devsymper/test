@@ -104,8 +104,8 @@ export default {
     },
     data:()=>{
         return {
-            page:null,
-            size:50,
+            page: null,
+            size: 50,
         }
     },
     beforeMount(){

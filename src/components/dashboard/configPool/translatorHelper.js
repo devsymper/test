@@ -341,8 +341,10 @@ export const TranslatorHelper = {
 				enabled: false
 			};
 	
-			rsl.chart.height = extraData.size.h;
+			rsl.chart.height = extraData.size.h - 60;
 			rsl.chart.width = extraData.size.w;
+            rsl.totalRowCount = Number(data.total);
+
 			return rsl;
 		},
 		editor(rawConfigs,displayOptions,extraData,oldOutput,ratio) {
