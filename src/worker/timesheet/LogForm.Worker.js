@@ -89,9 +89,11 @@ export const getLogTimeList = async function(dateStartEnd){
             task: logTime.task_id,
             desc: logTime.description,
             type: logTime.type,
-            id: logTime.id
+            id: logTime.id,
+            docObjId:logTime.doc_obj_id
         }))];
     }
+    debugger
     return data
 }
 export const changeDuration = async function(duration){

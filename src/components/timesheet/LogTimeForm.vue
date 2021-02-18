@@ -453,6 +453,7 @@ export default {
             // this.task = val.task?val.task:getIdTask(val.task);
             this.task = val.task?val.task:"";
             if(val.task){
+                debugger
                 this.items.push({name:val.task});
             }
             // hiển thị nút plan và log theo từng giờ
@@ -522,6 +523,7 @@ export default {
             }
         },
          async getAllTask(nameTask){
+             debugger
             let self = this;
             this.items = [];
            await timesheetApi.getTaskDB()
@@ -679,9 +681,9 @@ export default {
                 desc: this.inputs.description || ""
             }
             if(!this.repeat){
+                this.onSave();
                 timesheetApi.createLogTime(data).then(res => {
                     if (res.status === 200) {
-                        this.onSave();
                          this.$snotify({
                             type: "success",
                             title:" Thêm thành công",
@@ -691,6 +693,7 @@ export default {
                             this.$emit('loadMonthView',data)
                         }
                     }else{
+                        this.onSave();
                         self.$snotify({
                             type: "error",
                             title:"Thêm thất bại",
@@ -804,6 +807,7 @@ export default {
                 //  let taskId = this.task;
                 let taskId = Number(this.task)?this.task:this.items.filter(x=>x.name==this.task)[1].id;
                // let test = this.items.filter(x=>x.name==this.task)[0].id;
+                this.onSave()
                 timesheetApi.updateLogTime({
                         start: this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
@@ -817,7 +821,7 @@ export default {
                     })
                     .then(res => {
                         if (res.status === 200) {
-                            this.onSave()
+                         
                         }
                     })
                     .catch(console.log);

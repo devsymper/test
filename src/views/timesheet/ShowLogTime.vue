@@ -73,7 +73,7 @@
         ref="logCalendar" 
         :time-view="time_view" 
         @create-time="onCreateTime" 
-        @delete-event="onDeleteEvent" />
+        @delete-logtime="deleteLogTime" />
 </div>
 </template>
 
@@ -223,7 +223,7 @@ export default {
                 this.onCancelSave = onCancel;
             });
         },
-        onDeleteEvent({deleteEvent, onDelete}) {
+        deleteLogTime({deleteEvent, onDelete}) {
             this.deleteDialog = true;
             this.$nextTick(() => {
                 this.deleteEvent = deleteEvent;

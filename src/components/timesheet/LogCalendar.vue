@@ -10,7 +10,7 @@
                 :color="color" 
                 @mousedown:event="startDrag" 
                 @mousemove:time="mouseMove" 
-                @mouseup:time="endDrag" 
+                @mouseup:time="handleLogTimeAction" 
                 @mousedown:time="startTime" 
                 @mouseleave.native="cancelDrag" 
                 :start="calendarShowDate">
@@ -87,11 +87,11 @@
                                     </div>
                                     <v-spacer />
                                     <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center" v-if="findDuration(event.start, event.end)>61">
-                                        <div>
+                                        <div style="margin-top:17px">
                                             <span >
                                                 <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
                                             </span>
-                                            <span class= "fs-12 text-ellipsis color-grey" style="margin-left:-50px" v-if="findDuration(event.start, event.end)>70"> 
+                                            <span class= "fs-11 text-ellipsis color-grey" style="margin-left:-50px" v-if="findDuration(event.start, event.end)>70"> 
                                                 {{event.category_key}}
                                             </span>
                                         </div>
@@ -181,7 +181,8 @@ export default {
         this.logFormWorker = new LogFormWorker();
         this.load();
     },
-    methods: {
+    methods: { 
+      
         setResizeLogtime(event){
             this.events = event
         },
@@ -226,6 +227,7 @@ export default {
                 })
         },
         copyLogTime(event){
+            // this.events.push(event);
             this.logFormWorker.postMessage({
                 action:'copyLogTime',
                 data:event
@@ -233,7 +235,14 @@ export default {
         },
         setEventCopy(data){
             if(data){
-                this.load()
+                debugger
+                // this.load()
+            }else{
+                this.$snotify({
+                    type: "error",
+                    title: "Lỗi"
+                })
+
             }
         },
         // tính tổng thời gian của cả tháng
@@ -296,13 +305,12 @@ export default {
                     this.openLogTimeDialog(event, true);
                 break;
                  case 1:
-                    this.openDeleteDialog(event);
+                    this.openDeleteLogtime(event);
                 break;
                  case 2:
                     this.copyLogTime(event);
                 break;
             }
-
         },
         openLogTimeDialog(event, update = false) {
             this.$emit('create-time', {
@@ -312,9 +320,9 @@ export default {
                 onCancel: update ? () => null : () => this.events.splice(this.events.indexOf(event), 1)
             });
         },
-        openDeleteDialog(event) {
+        openDeleteLogtime(event) {
             event.durationFormatted = this.getDuration(event.start,event.end);
-            this.$emit('delete-event', {
+            this.$emit('delete-logtime', {
                 deleteEvent: event,
                 onDelete: () => this.events.splice(this.events.indexOf(event), 1)
             });
@@ -382,53 +390,51 @@ export default {
             let check = this.$moment(time).isAfter(now)==true?0:1;
             return check
         },
-        async endDrag() {
-            let self = this;
-            async function updateEvent(event, duration) {
-                let start = self.$moment(event.start);
-                let end = self.$moment(event.end);
-                let res = await timesheetApi.updateLogTime({
-                    start: start.format("YYYY-MM-DD HH:mm"),
-                    end: end.format("YYYY-MM-DD HH:mm"),
-                    duration: duration,
-                    task: event.task,
-                    type: self.checkPlanOrLog(event.start),
-                    id: event.id,
-                    date: start.format('YYYY-MM-DD'),
-                    categoryTask: event.category,
-                    desc: event.desc || ""
-                });
-                if (res.status === 200) {
-                    return true;
-                } else {
-                    return false;
-                }
+        async updateEvent(event,duration){
+            let start = this.$moment(event.start);
+            let end = this.$moment(event.end);
+            const self = this;
+            let res = await timesheetApi.updateLogTime({
+                start: start.format("YYYY-MM-DD HH:mm"),
+                end: end.format("YYYY-MM-DD HH:mm"),
+                duration: duration,
+                task: event.task,
+                type: self.checkPlanOrLog(event.start),
+                id: event.id,
+                date: start.format('YYYY-MM-DD'),
+                categoryTask: event.category,
+                desc: event.desc || "",
+                docObjId:event.docObjId
+            })
+            if (res.status === 200) {
+                // alert ('Hello')
+               
+                    // this.load();;
+            } else {
+                self.$snotify({
+                    type: "error",
+                    title: "Lỗi"
+                })
+                self.load();;
             }
-            // 3 loai su kien: create, extend, drag
-            // 1. neu createEvent khac null, co 2 truong hop nho
-            if (this.createEvent) {
-                if (this.extend) {
-                    // truong hop 1.1: neu extend => update event
+        },
+        // xử lý các sự kiện create, extend, drag log time
+        handleLogTimeAction() {
+            if (this.createEvent) {// 1. createEvent khac null, kéo xuống/di chuyển
+                if (this.extend) {//1.1: kéo xuống
                     try {
                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
-                        let result = await updateEvent(this.createEvent, duration);
-                        if (result) this.load();
-                    } catch(e) {
-                        console.log(e);
-                    }
-                } else {
-                    // truong hop 1.2: tao moi event
-                    this.openLogTimeDialog(this.createEvent);
+                        this.updateEvent(this.createEvent, duration);
+                    } catch(e) {console.log(e); }
+                } else {//1.2: tao moi event
+                    this.openLogTimeDialog(this.createEvent,false);
                 }
-            } else if(this.dragEvent) {
-                // 2. drag event => update event
+            } else if(this.dragEvent) {//2.sự kiện di chuyển logtime
                 try {
                     let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
-                    let result = await updateEvent(this.dragEvent, duration);
-                    if (result) this.load();
-                } catch(e) {
-                    console.log(e);
-                }
+                    this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD')
+                    this.updateEvent(this.dragEvent, duration);
+                } catch(e) { console.log(e);}
             }
             this.freshDrag();
             this.extend = false
