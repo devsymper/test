@@ -147,6 +147,7 @@ export default class SymperTable {
                 field:'index_increment',
                 headerName:"",
                 minWidth:90,
+                width:90,
                 valueGetter: function(params) {
                     if(params.node.rowPinned){
                         return ""
@@ -685,11 +686,13 @@ export default class SymperTable {
     autoSizeAll() {
         var allColumnIds = [];
         this.gridOptions.columnApi.getAllColumns().forEach(function (column) {
-          allColumnIds.push(column.colId);
+            if(!["index_increment","s_table_id_sql_lite","child_object_id"].includes(column.colDef.field)){
+                allColumnIds.push(column.colId);
+            }
         });
       
         this.gridOptions.api.sizeColumnsToFit();
-        if(allColumnIds.length > 7){
+        if(allColumnIds.length > 5){
             this.gridOptions.columnApi.autoSizeColumns(allColumnIds, false);
         }
       }
@@ -855,7 +858,6 @@ export default class SymperTable {
         for(let controlName in this.tableControl.controlInTable){
             dataSubmit[controlName] = this.getColData(controlName);
         }
-        
         dataSubmit['child_object_id'] = this.getColData('child_object_id');
         return dataSubmit
     }

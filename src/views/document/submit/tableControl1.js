@@ -42,10 +42,17 @@ export default class TableControl1 extends Control {
          * tên các control nằm trong control này, mặc định là null, nếu control là table thì mới có giá trị là {'tên control':true}
          */
         this.controlInTable = {};
-        this.tableMode = this.controlProperties.tableView.value;
+        this.tableMode = this.getTableMode();
         this.formulasWorker = null
         this.init();
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
+    }
+    getTableMode(){
+        let tableMode = this.controlProperties.tableView.value;
+        if(typeof tableMode == 'object'){
+            tableMode = 'Flat';
+        }
+        return tableMode;
     }
     renderTable() {
         this.tableInstance = new SymperTable(this, this.keyInstance, this.groupConfig, this.pivotConfig, this.formulasWorker);
