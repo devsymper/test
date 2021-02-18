@@ -12,8 +12,11 @@
     </v-card-title>
     <v-card-text class="mt-1 h-65" >
         <span class="label ">{{$t('timesheet.category_task')}}</span>
+         <v-btn style="height:20px!important" text @click="showCategoryForm()" depressed x-small class="mr-2 ml-1 fs-13">
+            <v-icon style="font-size:15px!important; margin-top:-3px">mdi-plus</v-icon>
+        </v-btn>
         <v-row>
-            <div style="width: 275px!important" 
+            <div style="width: 320px!important" 
                 class="ml-3 mr-1">
                 <v-autocomplete 
                     style="margin-top:-10px!important; " 
@@ -34,15 +37,16 @@
                         </span>
                     </template>
                 </v-autocomplete>
+                 
             </div>
-            <div style="width:10%">
+            <!-- <div style="width:10%">
                 <button 
                     style="border-radius:2px;font-weight: normal; float:right;margin-left:2px"
                     @click="showCategoryForm()" 
                     depressed small class="mr-2 ml-1 fs-13">
                         <v-icon>mdi-plus</v-icon>
                 </button>
-            </div>
+            </div> -->
         </v-row>
     </v-card-text>
      <v-card-text>
@@ -85,12 +89,15 @@
        <!-- <v-checkbox v-model="checkbox" :label="'Chưa log'"></v-checkbox> -->
       <!-- </v-card-text> -->
     <!-- lọc user -->
-    <v-card-text  class='task-form h-65' style="margin-top:-4px">
+    <v-card-text  class='task-form h-65' style="margin-top:-4px" >
         <span class="label">{{$t('timesheet.task_logform')}}
             <span style="color:red"> *</span>
         </span>
+         <v-btn style="height:20px!important" text @click="showTaskForm()" depressed x-small class="mr-2 ml-1 fs-13">
+            <v-icon style="font-size:15px!important; margin-top:-3px">mdi-plus</v-icon>
+        </v-btn>
         <v-row style="margin-top:-10px">
-            <div style="width: 275px!important" class="ml-3 mr-1">
+            <div style="width: 320px!important" class="ml-3 mr-1">
                 <v-autocomplete 
                     class="task w-100 mt-2 fs-13" 
                     v-model="task"
@@ -116,12 +123,6 @@
                         </template>
                 </v-autocomplete>
            </div>
-            <div>
-                <button style="border-radius:2px;font-weight: normal; float:right" @click="showTaskForm()" 
-                depressed small class="mr-2  mt-3 fs-13">
-                <v-icon>mdi-plus</v-icon>
-                </button>
-            </div>
         </v-row>
     </v-card-text>
     <v-card-text>
@@ -391,14 +392,14 @@ export default {
         },
        
         duration(){
-            if(this.duration<=0||Number.isNaN(this.duration)){
+            if(this.duration<=0||Number.isNaN(this.duration)||this.duration.match(/[^a-zA-Z0-9]/)||this.duration=='0h'||this.duration=='0m'){
                 this.timeError = this.$t('timesheet.time_invalid');}
             else{
                 this.timeError = ''
             }
         },
         search(){
-            if(!this.categoryTask){
+            if(!this.categoryTask){// chưa chọn cate
                 this.getAllTask(this.search);
             }else{
                 this.filterTaskByCategory();
@@ -416,9 +417,7 @@ export default {
                 }
              }
              else{
-                
-                    let taskId = this.task;
-                 
+                let taskId = this.task;
                 this.findNameTask(this.task);
                 this.getCategoryId(taskId);
              }
@@ -522,6 +521,9 @@ export default {
             }
         },
          async getAllTask(nameTask){
+            if(nameTask==undefined){
+                nameTask='t'
+            }
             let self = this;
             this.items = [];
            await timesheetApi.getTaskDB()
@@ -529,7 +531,8 @@ export default {
              self.items.push(...res.data.task);
                 })
                 .catch(console.log);
-            await timesheetApi.getTask(nameTask)
+                debugger
+            await timesheetApi.getTask('t')
             .then(res => {
                 let name = res.data.listObject;
                 name.map(x=>{
@@ -679,6 +682,8 @@ export default {
                 desc: this.inputs.description || ""
             }
             if(!this.repeat){
+                // this.onSave(data);
+                this.$emit('create-log',data);
                 timesheetApi.createLogTime(data).then(res => {
                     if (res.status === 200) {
                         this.onSave();
@@ -691,6 +696,8 @@ export default {
                             this.$emit('loadMonthView',data)
                         }
                     }else{
+                        // xử lý
+                        this.onSave();
                         self.$snotify({
                             type: "error",
                             title:"Thêm thất bại",
@@ -804,6 +811,7 @@ export default {
                 //  let taskId = this.task;
                 let taskId = Number(this.task)?this.task:this.items.filter(x=>x.name==this.task)[1].id;
                // let test = this.items.filter(x=>x.name==this.task)[0].id;
+                this.onSave()
                 timesheetApi.updateLogTime({
                         start: this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
@@ -817,7 +825,7 @@ export default {
                     })
                     .then(res => {
                         if (res.status === 200) {
-                            this.onSave()
+                         
                         }
                     })
                     .catch(console.log);

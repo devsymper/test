@@ -1,7 +1,7 @@
 <template>
 <div class="calendar-viewmode">
     
-    <v-btn style="float:left" v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="timeView()">
+    <v-btn style="float:left" v-if="type !='month'&&timebtn" class="mr-2" icon @click="timeView()">
         <v-tooltip top>
                     <!-- màn hình month - header ngày, giờ -->
             <template v-slot:activator="{ on }">
@@ -11,9 +11,8 @@
                 Time view
             </span>
         </v-tooltip>
-    </v-btn>
-      
-    <v-btn style="float:left" class="mr-2" v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="listView()">
+    </v-btn>       
+    <v-btn style="float:left" class="mr-2" v-if="type !='month'&&!timebtn" icon @click="listView()">
          <v-tooltip top>
           <template v-slot:activator="{ on }">
                     <v-icon v-on="on">mdi-apps</v-icon>
@@ -60,6 +59,7 @@
 export default {
     data: () => ({
         types: ['day', 'weekday', 'week', 'month'],
+        timebtn:true,
     }),
     computed: {
         type() {
@@ -71,10 +71,13 @@ export default {
             this.$store.commit("timesheet/changeCalendarType", _type);
         },
         timeView() {
-            this.$emit('time_view');
+            this.timebtn = false;
+            this.$emit('list_view');
+           
         },
         listView() {
-            this.$emit('list_view');
+            this.timebtn = true;
+             this.$emit('time_view');
         },
         format(date) {
             switch (date) {

@@ -62,8 +62,8 @@ export default {
     createListLog(data){
         return api.post('list-log-time', data);
     },
-    deleteLogTime({ id }) {
-        return api.put('log-time-delete' + '/' + id, { id })
+    deleteLogTime({ id, docObjId }) {
+        return api.put('log-time-delete' + '/' + id, { id, docObjId })
     },
     getConfigInfo() {
         return api.get('config');
@@ -120,7 +120,7 @@ export default {
     getTask(filter) {
         return taskApi.get('tasks?sort[0][column]=createTime&sort[0][type]=desc&search=%' + filter + '%');
     },
-    updateLogTime({ start, end, task, date, duration, type, categoryTask, accountId, desc, id }) {
+    updateLogTime({ start, end, task, date, duration, type, categoryTask, accountId, desc, id,docObjId }) {
         return api.put('log-time-update' + '/' + id, {
             start,
             end,
@@ -132,6 +132,7 @@ export default {
             desc,
             categoryTask,
             id,
+            docObjId
         })
     },
 }

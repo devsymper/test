@@ -556,6 +556,7 @@
             "name": "Tên nhóm ",
             "key": "Key",
             "id": "id",
+            "stt":"Stt",
             "description": "Mô tả",
             "status": "Trạng thái",
             "user_created": "Người tạo",

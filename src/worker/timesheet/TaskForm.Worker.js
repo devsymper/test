@@ -23,7 +23,7 @@ export const getCategory = async function() {
     let listCategory =[];
     let res = await timesheetApi.getAllCategory({});
     if (res.status === 200) {
-        let category = res.data.category;
+        let category = res.data.listObject;
             for(let i=0; i<category.length; i++){
                 listCategory.push(
                     category[i].key+"-"+category[i].name

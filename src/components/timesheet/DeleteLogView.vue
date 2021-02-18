@@ -46,7 +46,6 @@
 
 <script>
 import timesheetApi from '../../api/timesheet';
-
 export default {
     props: ['deleteEvent', 'onDelete', 'onCancel'],
     data() {
@@ -56,13 +55,19 @@ export default {
     },
     methods: {
         doDelete() {
+            this.onDelete();
             timesheetApi.deleteLogTime({
-                ...this.deleteEvent, 
-                id: this.deleteEvent.id,     
+                id: this.deleteEvent.id,
+                docObjId:this.deleteEvent.docObjId  
             }).then(res => {
                 if (res.status === 200) {
-                    this.onDelete();
-                }}).catch(console.log)
+                }else{
+                    this.$snotify({
+                        type: "error",
+                        title: "Lỗi",
+                    })
+                }
+                }).catch(console.log)
             this.$emit('cancel');
         }
     },
