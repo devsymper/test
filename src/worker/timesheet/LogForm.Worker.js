@@ -31,7 +31,6 @@ export const copyLogTime = async function(event) {
     let check = false;
     let res = await timesheetApi.createLogTime({
           start:moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
-          start:moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
           end: moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
           duration:event.duration,
           task: event.task,
@@ -89,7 +88,8 @@ export const getLogTimeList = async function(dateStartEnd){
             task: logTime.task_id,
             desc: logTime.description,
             type: logTime.type,
-            id: logTime.id
+            id: logTime.id,
+            docObjId:logTime.doc_obj_id
         }))];
     }
     return data

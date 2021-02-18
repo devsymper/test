@@ -15,6 +15,7 @@
             ref="logtime"
             @showTaskForm="showTaskForm"
             @loadMonthView="loadMonthView"
+            @create-log="createLog"
             @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
             :updateAPICategory ="updateAPICate"
@@ -73,7 +74,7 @@
         ref="logCalendar" 
         :time-view="time_view" 
         @create-time="onCreateTime" 
-        @delete-event="onDeleteEvent" />
+        @delete-logtime="deleteLogTime" />
 </div>
 </template>
 
@@ -153,6 +154,13 @@ export default {
               this.$refs.logCalendar.events.pop()
             }
         },
+        createLog(data){
+            debugger
+            data.name=data.task;
+            data.category=data.categoryTask;
+            data.category_key=data.categoryTask.split('-')[0];
+            this.$refs.logCalendar.events.push(data);
+        },
         loadMonthView(data){
             // this.$refs.logCalendar.monthEvents[data.date]=[];
             // this.$refs.logCalendar.monthEvents[data.date].push(data);
@@ -223,7 +231,7 @@ export default {
                 this.onCancelSave = onCancel;
             });
         },
-        onDeleteEvent({deleteEvent, onDelete}) {
+        deleteLogTime({deleteEvent, onDelete}) {
             this.deleteDialog = true;
             this.$nextTick(() => {
                 this.deleteEvent = deleteEvent;

@@ -164,9 +164,15 @@ export default {
              if (check) {
                 this.$emit('loadTask');
                 this.cancel();
-                alert('thêm thành công');
+                this.$snotify({
+                    title:"success",
+                    text: "Thêm thành công"
+                })
              }else{
-                  alert('thêm thất bại');
+                 this.$snotify({
+                    title:"error",
+                    text: "Lỗi"
+                })
              }
         },
         setCategory(data){
