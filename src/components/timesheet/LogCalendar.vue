@@ -71,7 +71,7 @@
                                                         {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
                                                     </span>
                                                     <!-- <v-btn class="ml-1" dense dark icon> -->
-                                                        <v-icon v-if="event.type"
+                                                        <v-icon v-if="event.name"
                                                             v-on="actionEvents"
                                                             small class="color-black"> mdi-dots-vertical</v-icon>
                                                     <!-- </v-btn> -->
@@ -414,8 +414,6 @@ export default {
                 docObjId:event.docObjId
             })
             if (res.status === 200) {
-   // alert ('Hello')
-               
                     // this.load();;
             } else {
                 self.$snotify({
@@ -427,15 +425,12 @@ export default {
         },
         // xử lý các sự kiện create, extend, drag log time
         handleLogTimeAction() {
-            debugger // để nguyên duration và thời gian bắt đầu kết thúc
             if (this.createEvent) {// 1. createEvent khac null, kéo xuống/di chuyển
                 if (this.extend) {//1.1: kéo xuống
                     try {
-                        debugger
                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
                         this.createEvent.duration = duration; 
                         this.updateEvent(this.createEvent, duration);
-                     
                     } catch(e) {console.log(e); }
                 } else {//1.2: tao moi event
                     if(this.timeView){
@@ -453,9 +448,12 @@ export default {
                 try {
                     let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
                     this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD');
+                    
                     if(this.timeView){
+                        this.dragEvent.type = this.checkPlanOrLog(this.dragEvent.start)?1:0;
                         this.updateEvent(this.dragEvent, duration);
                     }else{
+                        this.dragEvent.type = this.checkPlanOrLog(this.dragEvent.date)?1:0;
                         let id = this.dragEvent.id;
                         let oldLog = [...this.listLogInTime];
                         oldLog = oldLog.filter(log=>log.id==id)[0]
@@ -468,6 +466,7 @@ export default {
                         oldLog.start = newStart;
                         oldLog.date= this.$moment(newStart).format('YYYY-MM-DD');
                         oldLog.end = newEnd;
+                        // oldLog.type=0;
                         this.resizeLogtime();
                          this.updateEvent(oldLog, oldLog.duration);
 

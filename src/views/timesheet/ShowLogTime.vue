@@ -18,6 +18,7 @@
             @create-log="createLog"
             @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
+            @update-log="updateLog"
             :updateAPICategory ="updateAPICate"
             @cancel="cancelSave()"
             :dateMonth ="dateMonth"
@@ -153,6 +154,17 @@ export default {
             if(!this.update){
               this.$refs.logCalendar.events.pop()
             }
+        },
+        //update lại log được update
+        updateLog(data){
+            let events = [...this.$refs.logCalendar.events];
+            let oldLog = events.filter(e=>e.id==data.id)[0];
+            for(let i = 0; i<events.length;i++){
+                if(events[i].id==oldLog.id){
+                    events[i]=data
+                }
+            }
+           this.$refs.logCalendar.events=events;
         },
         createLog(data){
             data.name=data.task;

@@ -801,6 +801,18 @@ export default {
             let check = this.$moment(time).isAfter(now)==true?0:1;
             return check
         },
+        setOriginLog(data){
+            let updateLog = {
+                ...data,
+                start:Number(this.$moment(data.start).format('x')),
+                end:Number(this.$moment(data.end).format('x')),
+                category_key:data.categoryTask.split('-')[0],
+                name:data.task,
+                timed:true
+            };
+            return updateLog
+
+        },
         updatelog(type) {
             this.checkNullTask = true;
             this.checkNullCate = true;
@@ -810,21 +822,23 @@ export default {
                 //  let taskId = this.task;
                 let taskId = Number(this.task)?this.task:this.items.filter(x=>x.name==this.task)[1].id;
                // let test = this.items.filter(x=>x.name==this.task)[0].id;
-                this.onSave()
-                timesheetApi.updateLogTime({
-                        start: this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
-                        end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
-                        duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
-                        task: this.findNameTask(taskId),
-                        type: this.checkPlanOrLog(this.newEvent.start),
-                        id: this.newEvent.id,
-                        date: this.inputs.date,
-                        categoryTask: this.categoryTask,
-                        desc: this.inputs.description || ""
-                    })
-                    .then(res => {
+                let data = {
+                    start: this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
+                    end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
+                    duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
+                    task: this.findNameTask(taskId),
+                    type: this.checkPlanOrLog(this.newEvent.start),
+                    id: this.newEvent.id,
+                    date: this.inputs.date,
+                    categoryTask: this.categoryTask,
+                    desc: this.inputs.description || "",
+                    docObjId: this.newEvent.docObjId
+
+                }
+                let originLog=this.setOriginLog(data);
+                this.$emit('update-log',originLog);
+                timesheetApi.updateLogTime(data).then(res => {
                         if (res.status === 200) {
-                         
                         }
                     })
                     .catch(console.log);
