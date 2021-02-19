@@ -118,7 +118,7 @@ export default {
         })
     },
     getTask(filter) {
-        return taskApi.get('tasks?sort[0][column]=createTime&sort[0][type]=desc&search=%' + filter + '%');
+             return taskApi.get('tasks?sort[0][column]=createTime&sort[0][type]=desc&search=%' + filter + '%&page=1&pageSize=50&variables=symper_last_executor_id%2Csymper_user_id_start_workflow%2Csymper_last_executor_name');
     },
     updateLogTime({ start, end, task, date, duration, type, categoryTask, accountId, desc, id,docObjId }) {
         return api.put('log-time-update' + '/' + id, {
