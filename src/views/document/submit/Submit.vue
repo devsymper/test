@@ -1,6 +1,6 @@
 <template>
     <div :class="globalClass">
-    <VuePerfectScrollbar class="scroll-content h-100">
+    <VuePerfectScrollbar class="scroll-content h-100 wrapview-contextmenu">
          
         <Preloader ref="preLoaderView"/>
         <div

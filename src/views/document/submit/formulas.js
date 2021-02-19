@@ -368,7 +368,7 @@ export default class Formulas extends FormulasEvent{
          */
     replaceParamsToData(dataInput, formulas) {
         // thay thế các tham số của workflow 
-        formulas = this.replaceWorkflowParams(formulas);
+        // formulas = this.replaceWorkflowParams(formulas);
         if (Object.keys(dataInput).length == 0 || dataInput == false) {
             return formulas;
         }
