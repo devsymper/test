@@ -100,43 +100,62 @@ export default class SymperTable {
         gridOptions.api.setColumnDefs(columnDefs);
     }
     getContextMenuItems(params){
-        return [
-            {
-                name: 'Thêm dòng phía trên ',
-                action: function() {
-                    let rowIndex = (params.node) ? params.node.rowIndex : 0;
-                    params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex });
+        let self = params.context.thisComponent;
+        if(self.viewType == 'detail'){
+            return [
+                'autoSizeAll',
+                'expandAll',
+                'contractAll',
+                'resetColumns',
+                'excelExport',
+            ]
+        }
+        else{
+            let submitContextItem = [
+                {
+                    name: 'Xóa dòng ' + params.value,
+                    action: function() {
+                        params.api.applyTransaction({ remove: [params.node.data]});
+                    },
+                    cssClasses: ['redFont']
                 },
-                cssClasses: ['blueFont'],
-                // icon:'mdi mdi-table-row-plus-before'
-
-            },
-            {
-                name: 'Thêm dòng phía dưới ' ,
-                action: function() {
-                    let rowIndex = (params.node) ? params.node.rowIndex : 0;
-                    params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
-                },
-                cssClasses: ['blueFont'],
-                // icon:'mdi-table-row-plus-after'
-            },
-            
-            {
-                name: 'Xóa dòng ' + params.value,
-                action: function() {
-                    params.api.applyTransaction({ remove: [params.node.data]});
-                },
-                cssClasses: ['redFont']
-            },
-            'autoSizeAll',
-            'expandAll',
-            'contractAll',
-            'copy',
-            'paste',
-            'resetColumns',
-            'excelExport',
-        ]
+                'autoSizeAll',
+                'expandAll',
+                'contractAll',
+                'copy',
+                'paste',
+                'resetColumns',
+                'excelExport',
+            ];
+            if(self.tableControl.isInsertRow()){
+                submitContextItem.unshift(
+                    {
+                        name: 'Thêm dòng phía trên ',
+                        action: function() {
+                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex });
+                        },
+                        cssClasses: ['blueFont'],
+                        // icon:'mdi mdi-table-row-plus-before'
+        
+                    }
+                )
+                submitContextItem.unshift(
+                    {
+                        name: 'Thêm dòng phía dưới ' ,
+                        action: function() {
+                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
+                        },
+                        cssClasses: ['blueFont'],
+                        // icon:'mdi-table-row-plus-after'
+                    }
+                )
+            }
+            return submitContextItem;
+        }
     }
+        
     /**
      * Hàm lấy các định nghĩa của cột
      */
@@ -601,7 +620,7 @@ export default class SymperTable {
                 BottomPinnedRowRenderer: BottomPinnedRowRenderer,
                 ValidateCellRenderer: ValidateCellRenderer,
             },
-            popupParent: document.querySelector('body'),
+            popupParent: document.querySelector('.wrapview-contextmenu'),
             getContextMenuItems: this.getContextMenuItems,
             rowDragManaged: true,
             pinnedBottomRowData: (this.tableHasRowSum) ? this.createBottomTotalRow() : false,
@@ -630,6 +649,9 @@ export default class SymperTable {
             tableInstance:this,
 
             
+        };
+        this.gridOptions.context = {
+            thisComponent : this
         };
         if(this.tableControl.isWrapText()){
             // Object.assign(this.gridOptions,{rowHeight:25});
