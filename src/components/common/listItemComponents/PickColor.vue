@@ -1,5 +1,9 @@
 <template>
     <div style="background:white!important">
+        <div class="ml-2 fs-13 pt-2 fw-430">
+             <v-icon size="16" class=" mr-1">mdi-format-color-fill</v-icon>
+            {{name}}
+        </div>
         <!-- <div>
             <v-btn x-small text><i class="mdi mdi-close"></i></v-btn>
         </div> -->
@@ -14,16 +18,33 @@
             mode="rgba"
             v-model="color"
             show-swatches
-            :swatches="swatches"
+            :swatches="swatchesColor"
             swatches-max-height="200"
         ></v-color-picker>
-         <div class="ml-2 d-flex fs-13 justify-center mb-2" >
+         <div v-if="reset" class="ml-2 d-flex fs-13 justify-center mb-2" >
             <v-icon size="16" class=" mr-2">mdi-delete-sweep</v-icon>Đặt lại
+        </div>
+         <div v-if="random" style="margin-top:-10px" class="ml-2 d-flex fs-13 justify-center" >
+             <v-switch
+                v-model="randomColor"
+                label="Màu ngẫu nhiên"
+            ></v-switch>
+        </div>
+         <div v-if="showSaveBtn" style="margin-top:-10px" class="pr-2 d-flex justify-end pb-2">
+            <v-btn class="fs-13 fw-400" x-small color="primary" @click="save()">OK</v-btn>
         </div>
     </div>
 </template>
 <script>
 export default {
+  created () {
+
+  },
+  methods: {
+      save(){
+          this.$emit('save',this.randomColor)
+      }
+  },
   props: {
        value: {
             type: String,
@@ -31,6 +52,32 @@ export default {
                 return ''
             }
         },
+         reset: {
+            type: Boolean,
+           default:false
+        },
+         randomColor: {
+            type: Boolean,
+           default:false
+        },
+        showSaveBtn: {
+            type: Boolean,
+           default:false
+        },
+        random: {
+            type: Boolean,
+           default:false
+        },
+        name: {
+            type: String,
+           default:"Chọn màu"
+        },
+        swatchesColor:{
+            type: Array,
+            default(){
+                return this.swatches;
+            }
+        }
   },
   watch: {
         color(){
@@ -39,8 +86,9 @@ export default {
     },
   data () {
     return {
-        color:'',
-         swatches: [
+        color:this.value,
+        // randomColor:false,
+        swatches: [
             ['#FF0000', '#AA0000', '#550000','#000000'],
             ['#FFFF00', '#AAAA00', '#555500','#00A0AA'],
             ['#00FF00', '#00AA00', '#005500','#000555'],

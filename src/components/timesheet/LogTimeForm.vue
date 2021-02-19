@@ -1,7 +1,6 @@
 <template>
 <div>
 <ConfigRepeat @cancel="showConfigRepeat=false" v-if="showConfigRepeat" style="background:white!important"/>
-
 <v-card v-else class="w-100 log-form" >
     <!-- text-sm-center -->
     <!-- test -->
@@ -25,7 +24,7 @@
                     class="category-task" 
                     :search-input.sync="searchCategory" 
                     :items="category.category_name" 
-                    placeholder="Tìm việc ..." 
+                    placeholder="Tìm loại việc ..." 
                     item-color="white" 
                     background-color="#F7F7F7">
                     <template v-slot:item="data" class="category-task">
@@ -37,7 +36,6 @@
                         </span>
                     </template>
                 </v-autocomplete>
-                 
             </div>
             <!-- <div style="width:10%">
                 <button 
@@ -107,7 +105,7 @@
                     item-text="name"    
                     item-value="id"
                     :menu-props="{'nudge-top':-10, 'max-width': 300}" 
-                    label="Tìm loại công việc ...">
+                    label="Tìm công việc ...">
                         <template v-slot:item="data">
                             <v-list-item-content>
                                <v-list-item-title class="st-icon-pandora">
@@ -115,7 +113,7 @@
                                 </v-list-item-title>
                             <v-list-item-subtitle class="fs-11 color-grey" >
                                 <span v-if="data.item.categoryId" style="color:black" class="color-grey">
-                                     {{getNameCategory(data.item.categoryId)}}-{{data.item.description?data.item.description:'Chưa có mô tả'}} </span>
+                                     {{getNameCategory(data.item.categoryId)}}-{{data.item.description!=''?data.item.description:"Chưa có mô tả"}} </span>
                                 <span v-else style="color:black" class="color-grey">
                                     </span>
                                     </v-list-item-subtitle>
@@ -200,7 +198,7 @@
         <span class="label">Mô tả</span>
         <textarea v-model="inputs.description" class='description'></textarea>
     </v-card-text>
-    <!-- <v-row class="w-100" >
+    <v-row class="w-100" >
         <v-col class="col-md-4" @click="repeatConfig()">
              <i class="ri-vip-crown-2-fill"></i>
             <input class="ml-6 mr-1 mt-1" type="checkbox" v-model="repeat">
@@ -214,10 +212,9 @@
                 :items="selectRepeat">
             </v-select>
         </v-col>
-    </v-row> -->
+    </v-row>
     <!-- <div class="w-100 pb-5" style="margin-top: -15px!important;background:white"> -->
     <div class="w-100 pb-5" >
-
         <input class="ml-6 mr-1 mt-1" type="checkbox" id="checkbox" v-model="keepLog">
         <span class="fs-13" >
             Thêm liên tục
@@ -244,7 +241,7 @@ export default {
     name: 'LogTimeForm',
     props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
     data: () => ({
-        selectRepeat:['Hằng ngày',"Hằng tuần vào thứ 2","Từ thứ 2 đến thứ 7","Tùy chỉnh..."],
+        selectRepeat:['Hằng ngày',"Hằng tuần vào thứ 2","Từ thứ 2 đến thứ 7"],
         selectedRepeat:'Hằng ngày',
         repeat:false,
         logTimeList:[],
@@ -296,7 +293,6 @@ export default {
         ConfigRepeat 
     },
     computed: {
-        
         startDate() {
             return this.$store.state.timesheet.calendarStartDate;
         },
@@ -522,7 +518,7 @@ export default {
         },
          async getAllTask(nameTask){
             if(nameTask==undefined){
-                nameTask='t'
+                nameTask=' '
             }
             let self = this;
             this.items = [];
@@ -531,11 +527,13 @@ export default {
              self.items.push(...res.data.task);
                 })
                 .catch(console.log);
-            await timesheetApi.getTask('t')
+            await timesheetApi.getTask(nameTask)
             .then(res => {
                 let name = res.data.listObject;
                 name.map(x=>{
-                    x.name = JSON.parse(x.description).content
+                    x.categoryId = "602e321e-0689-b438-887b-7dce711740c4";
+                    x.name = JSON.parse(x.description).content;
+                    x.description = 'Ngày tạo: '+ x.createTime;
                 })
                 self.items.push(...res.data.listObject);
                 })
@@ -819,8 +817,7 @@ export default {
             let check = this.checkValidateLogForm();
             if (!check){
             } else {
-                //  let taskId = this.task;
-                let taskId = Number(this.task)?this.task:this.items.filter(x=>x.name==this.task)[1].id;
+                let taskId = this.task;
                // let test = this.items.filter(x=>x.name==this.task)[0].id;
                 let data = {
                     start: this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),

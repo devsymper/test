@@ -6,8 +6,8 @@
                 :weekdays="weekday" 
                 :type="internalCalendarType" 
                 v-model="calendar"
-                :events="events" 
-                :color="color" 
+                :events="events"
+                :color="color"
                 @mousedown:event="startDrag" 
                 @mousemove:time="mouseMove" 
                 @mouseup:time="handleLogTimeAction" 
@@ -22,7 +22,7 @@
                     :style="{ top: nowY }"
                 ></div>
                 </template>
-                <template v-slot:day-label="{day,present,past̥, month, date}">
+                <template v-slot:day-label="{day,present,past, month, date}">
                     <MonthViewHeader 
                         class="pl-3 pt-1"
                         :monthEvents="monthEvents"
@@ -44,10 +44,11 @@
                 
                 </template>
                 <!-- màn hình week/day/weekday - event log -->
-                <template v-slot:event="{ event, eventSummary,timed, eventParsed  }">
+                <template v-slot:event="{ event, eventSummary,timed, eventParsed  }" >
                     <v-menu offset-x :nudge-right="10">
                         <template v-slot:activator="{on: detailEvents}">
-                            <div
+                            <div 
+                                :style="{background:event.color}"
                                 @dblclick="actionLogEvent(event, 0)"
                                 v-on="detailEvents"
                                 style="border:1px solid lightgrey"
@@ -135,6 +136,7 @@
 </template>
 
 <script>
+import {uiConfigApi} from "../../api/uiConfig";
 import LogTimeView from "./../../components/timesheet/LogTimeView";
 import ViewDetailMonth from "./../../components/timesheet/ViewDetailMonth";
 import DeleteLogView from "./../../components/timesheet/DeleteLogView";
@@ -161,6 +163,7 @@ export default {
         return {
             listLogInTime:[],
             menu:false,
+            isRandom:false,
             calendar: '',// value calendar
             ready: false,
             color:'orange',
@@ -177,6 +180,7 @@ export default {
             internalCalendarType: 'week',
             extend : false,
             sum: [],
+            colorLog:'#F0F8FF',
             events: [],// chứa event của calendar
             hoursRequired: '',
             logFormWorker:null
@@ -184,15 +188,54 @@ export default {
     },
 
     created() {
+        this.getColor();
         this.logFormWorker = new LogFormWorker();
         this.load();
+        
     },
-    methods: { 
+    methods: {
+        getWidgetIdentifier(){
+            let widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
+            widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            return widgetIdentifier;
+		},
+        getColor(){
+            const self = this;
+            let widgetIdentifier = this.getWidgetIdentifier();
+            uiConfigApi.getUiConfig(widgetIdentifier).then(res=>{
+                if(res.status==200){
+                    debugger
+                    self.colorLog = JSON.parse(res.data.detail).color;
+                    self.isRandom = JSON.parse(res.data.detail).isRandom;
+                    self.$emit('set-color',{color:self.colorLog,isRandom:self.isRandom})
+                }
+            })
+
+        },
         setResizeLogtime(event){
             this.events = event
         },
+         randomColor(){
+            var color = "";
+            for(var i = 0; i < 3; i++) {
+                var sub = Math.floor(Math.random() * 256).toString(16);
+                color += (sub.length == 1 ? "0" + sub : sub);
+            }
+        // debugger
+             return "#" + color;
+        },
+        
         setLogTimeList(data){
             this.events =  data.events;
+            if(this.isRandom){
+                this.events.map(e=>{
+                e.color = this.randomColor()
+                })
+            }else{
+                this.events.map(e=>{
+                    e.color = this.colorLog
+                })
+            }
             this.sum = data.sumLogTime;
             this.hoursRequired = data.hoursRequired;
             if(!this.timeView){
@@ -448,7 +491,6 @@ export default {
                 try {
                     let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
                     this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD');
-                    
                     if(this.timeView){
                         this.dragEvent.type = this.checkPlanOrLog(this.dragEvent.start)?1:0;
                         this.updateEvent(this.dragEvent, duration);
@@ -555,6 +597,7 @@ export default {
                 end: this.$moment(this.$refs.calendar.lastEnd.date).format('DD/MM/YY'),
             });
             this.createCalendarHoverEvent();
+            this.load()
         },
         updateTotalHours() {
             let start = this.$moment(this.$refs['calendar'].lastStart.date);
@@ -618,10 +661,15 @@ export default {
         },
     },
     watch: {
+        period(){
+            debugger
+            this.load()
+        },
          userId(){
             this.getLogByUserId(this.userId);
         },
         calendarType(newType) {
+             this.load();
             this.getLogByUserId(this.userId);
             if (newType === 'weekday') {
                 this.internalCalendarType = 'week';
@@ -678,6 +726,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.v-application .primary{
+    
+}
 .calendar ::v-deep .v-btn {
     background-color: transparent !important;
 }
@@ -713,12 +764,11 @@ export default {
     height: 0px;
 }
 .calendar ::v-deep .v-event-timed {
-    left: 3% !important;
     white-space:pre-wrap!important;
-    width: 97% !important;
     user-select: none;
     -webkit-user-select: none;
-    background-color:white !important;
+    background-color:white!important;
+    // background-color:#F0F8FF !important;
 }
 .month-status{
     background-color:#90EE90; 

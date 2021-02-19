@@ -87,6 +87,7 @@ export const getLogTimeList = async function(dateStartEnd){
             category_key: logTime.key,
             task: logTime.task_id,
             desc: logTime.description,
+            color:'#F0F8FF',
             type: logTime.type,
             id: logTime.id,
             docObjId:logTime.doc_obj_id
@@ -94,6 +95,7 @@ export const getLogTimeList = async function(dateStartEnd){
     }
     return data
 }
+
 export const changeDuration = async function(duration){
     let hour = duration / 60;
     let minutes = duration % 60;

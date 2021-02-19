@@ -1,5 +1,5 @@
 <template>
-<div style="width:62%;float:left"  class="period-selector">
+<div style="width:62%;float:left" class="period-selector">
     <div class="float-lg-left float-md-left  select-time" 
         v-bind:class="[type=='month'?'width-55':'width-58']">
         <!-- <v-menu offset-y>
@@ -55,6 +55,7 @@ export default {
         getPreLog(){
 
         },
+      
         getSubDepartmentUser(){
             const self = this;
             orgchartApi.getSubDepartMent().then(res=>{

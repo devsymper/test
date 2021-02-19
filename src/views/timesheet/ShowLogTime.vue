@@ -5,6 +5,8 @@
         <div style="width:38%;float:right" 
              class="">
             <CalendarViewMode
+                ref="viewmode"
+                @change-color="changeColor"
                 @time_view="time_view = true"
                 @list_view="time_view = false" />
             <ActionButtons refs="action" />
@@ -68,7 +70,8 @@
             :onDelete="onDeleteLogTimeEvent">
         </DeleteLogView>
     </v-dialog>
-    <LogCalendar 
+    <LogCalendar
+        @set-color="setColor"
         :userId="userId"
         @showLog="showLog" 
         :monEvents="monthEvents"
@@ -103,6 +106,7 @@ export default {
     },
     data() {
         return {
+            
             userId:'',
             monthEvents:{},
             showTask:false,
@@ -149,6 +153,19 @@ export default {
         })
     },
     methods: {
+        setColor(data){
+            this.$refs.viewmode.logColor = data.color;
+            this.$refs.viewmode.randomColor = data.isRandom;
+        },
+        changeColor(data){
+            if(data.isRandom){
+                this.$refs.logCalendar.events.map(e=>{
+                    e.color = this.$refs.logCalendar.randomColor()})
+            }else{
+                this.$refs.logCalendar.events.map(e=>{
+                    e.color = data.color})
+            }
+        },
         // khi click ra ngoài log form
         deleteLog(){
             if(!this.update){
