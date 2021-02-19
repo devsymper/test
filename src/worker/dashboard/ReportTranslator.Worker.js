@@ -121,7 +121,7 @@ var handler = {
             needTotal: this.checkNeedTotal(cell)
         };
         let pageSize = 1000;
-        if(cellType == 'table' || cellType == 'pivot'){
+        if(cellType == 'table' || cellType == 'pivot' || cellType == 'gantt'){
             pageSize = 50;
         }
         rsl.pageSize = cell.sharedConfigs.pageSize ? cell.sharedConfigs.pageSize : pageSize;

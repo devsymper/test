@@ -183,6 +183,9 @@ export default {
             this.setDashboardStyle(data.allCellConfigs.global.rawConfigs.style);
             this.changeSelectedDatasets(data.relateDatasetIds);
             this.$refs.dashboardWorkspace.initCrossFilterMng(data.dashboardInfo.relations);
+            if(this.action == 'view'){
+                data.dashboardInfo.lockWorkspace = true;
+            }
             this.$set(
                 this.myData.dashboardConfigs,
                 'allCellConfigs',
