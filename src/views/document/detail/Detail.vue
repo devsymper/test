@@ -475,7 +475,6 @@ export default {
                     ".s-control:not(.bkerp-input-table .s-control)"
                 );
             }
-            // let listTableIns = [];
             let thisCpn = this;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
