@@ -27,7 +27,7 @@
                 </v-tooltip>
             </div>
         </div>
-        <VuePerfectScrollbar style="height: calc(100% - 30px);" class="content-scroll">
+        <VuePerfectScrollbar style="height: calc(100% - 30px);" class="content-scroll wrapview-contextmenu">
             <div
                 class="sym-form-Detail"
                 :id="'sym-Detail-'+keyInstance"

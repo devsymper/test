@@ -266,7 +266,6 @@ export default {
             }
             let formulas = new Formulas(this.instance,selectionText,"");
             let dataInput = {};
-            let self = this;
             for(let input in this.allInput){
                 dataInput[input] = this.allInput[input].value;
                 this.cacheDataInput[input] = this.allInput[input].value;
