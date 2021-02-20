@@ -100,43 +100,62 @@ export default class SymperTable {
         gridOptions.api.setColumnDefs(columnDefs);
     }
     getContextMenuItems(params){
-        return [
-            {
-                name: 'Thêm dòng phía trên ',
-                action: function() {
-                    let rowIndex = (params.node) ? params.node.rowIndex : 0;
-                    params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex });
+        let self = params.context.thisComponent;
+        if(self.viewType == 'detail'){
+            return [
+                'autoSizeAll',
+                'expandAll',
+                'contractAll',
+                'resetColumns',
+                'excelExport',
+            ]
+        }
+        else{
+            let submitContextItem = [
+                {
+                    name: 'Xóa dòng ' + params.value,
+                    action: function() {
+                        params.api.applyTransaction({ remove: [params.node.data]});
+                    },
+                    cssClasses: ['redFont']
                 },
-                cssClasses: ['blueFont'],
-                // icon:'mdi mdi-table-row-plus-before'
-
-            },
-            {
-                name: 'Thêm dòng phía dưới ' ,
-                action: function() {
-                    let rowIndex = (params.node) ? params.node.rowIndex : 0;
-                    params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
-                },
-                cssClasses: ['blueFont'],
-                // icon:'mdi-table-row-plus-after'
-            },
-            
-            {
-                name: 'Xóa dòng ' + params.value,
-                action: function() {
-                    params.api.applyTransaction({ remove: [params.node.data]});
-                },
-                cssClasses: ['redFont']
-            },
-            'autoSizeAll',
-            'expandAll',
-            'contractAll',
-            'copy',
-            'paste',
-            'resetColumns',
-            'excelExport',
-        ]
+                'autoSizeAll',
+                'expandAll',
+                'contractAll',
+                'copy',
+                'paste',
+                'resetColumns',
+                'excelExport',
+            ];
+            if(self.tableControl.isInsertRow()){
+                submitContextItem.unshift(
+                    {
+                        name: 'Thêm dòng phía trên ',
+                        action: function() {
+                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex });
+                        },
+                        cssClasses: ['blueFont'],
+                        // icon:'mdi mdi-table-row-plus-before'
+        
+                    }
+                )
+                submitContextItem.unshift(
+                    {
+                        name: 'Thêm dòng phía dưới ' ,
+                        action: function() {
+                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
+                        },
+                        cssClasses: ['blueFont'],
+                        // icon:'mdi-table-row-plus-after'
+                    }
+                )
+            }
+            return submitContextItem;
+        }
     }
+        
     /**
      * Hàm lấy các định nghĩa của cột
      */
@@ -147,6 +166,7 @@ export default class SymperTable {
                 field:'index_increment',
                 headerName:"",
                 minWidth:90,
+                width:90,
                 valueGetter: function(params) {
                     if(params.node.rowPinned){
                         return ""
@@ -263,6 +283,7 @@ export default class SymperTable {
                 if(obj[col.name] && !arr.includes(obj[col.name])){
                     arr.push(obj[col.name]);
                     arr.push(obj[col.name]+"_____s_table_id_sql_lite");
+                    arr.push(obj[col.name]+"_____childObjectId");
                 }
                 return arr
             },[]);
@@ -278,23 +299,23 @@ export default class SymperTable {
                         control:controlValue,
                         controlColumn:colField
                     },
-                    hide:colField.includes('_____s_table_id_sql_lite'),
+                    hide:colField.includes('_____s_table_id_sql_lite') || colField.includes("_____childObjectId"),
                     editable:this.checkEditableCell(controlValue),
-                    cellStyle: function(params) {
-                        if (params.value=='R') {
-                            return {color: 'white', backgroundColor: 'green'};
-                        }
-                        if (params.value=='A') {
-                            return {color: 'white', backgroundColor: 'red'};
-                        }
-                        if (params.value=='C') {
-                            return {color: 'white', backgroundColor: 'orange'};
-                        }
-                        if (params.value=='I') {
-                            return {color: 'white', backgroundColor: 'gray'};
-                        }
-                        return null;
-                    }
+                    // cellStyle: function(params) {
+                    //     if (params.value=='R') {
+                    //         return {color: 'white', backgroundColor: 'green'};
+                    //     }
+                    //     if (params.value=='A') {
+                    //         return {color: 'white', backgroundColor: 'red'};
+                    //     }
+                    //     if (params.value=='C') {
+                    //         return {color: 'white', backgroundColor: 'orange'};
+                    //     }
+                    //     if (params.value=='I') {
+                    //         return {color: 'white', backgroundColor: 'gray'};
+                    //     }
+                    //     return null;
+                    // }
                 };
                 this.columnDefs.push(colBinding);
             }
@@ -336,6 +357,9 @@ export default class SymperTable {
                         if(column == newRow[this.cols[0]['name']]+"_____s_table_id_sql_lite"){
                             newRow[newColumn] = newRow['s_table_id_sql_lite'];
                         }
+                        if(column == newRow[this.cols[0]['name']]+"_____childObjectId"){
+                            newRow[newColumn] = newRow['childObjectId'];
+                        }
 
                     }
                     newData.push(newRow);
@@ -344,6 +368,7 @@ export default class SymperTable {
                     let columnCache = newRow[this.cols[0]['name']];
                     columnCache = columnCache.replace('\.','____');
                     newData[mapRowWithData.indexOf(rowKey)][columnCache+'_____s_table_id_sql_lite'] = newRow['s_table_id_sql_lite']
+                    newData[mapRowWithData.indexOf(rowKey)][columnCache+'_____childObjectId'] = newRow['childObjectId']
                     newData[mapRowWithData.indexOf(rowKey)][columnCache] = newRow[controlValue]
                 }
             }
@@ -486,6 +511,7 @@ export default class SymperTable {
             data = this.convertDataToGroup(data);
         }
         this.gridOptions.api.setRowData(data);
+        this.autoSizeAll();
         let controlBinding = Object.keys(data[0]);
         for (let index = 0; index < controlBinding.length; index++) {
             if(controlBinding[index] != 's_table_id_sql_lite'){
@@ -500,53 +526,47 @@ export default class SymperTable {
         }
         this.caculatorHeight();
     }
-    /**
-     * chuyển data dạng pivot sang data dạng flat thì cần xóa các dữ liệu của các cột được thêm vào
-     * @param {*} data 
-     */
-    minimizeData(data){
-        for (let index = 0; index < this.allColumnAppend.length; index++) {
-            delete data[this.allColumnAppend[index]];
-        }
-    }
+   
 
     /**
      * ham trả về data của table
      */
-    getGroupData(){
-        let rowData = [];
-        this.gridOptions.api.forEachNode(node => {
-                if(!node.group){
-                    if(this.allColumnAppend.length > 0){
-                        for (let index = 0; index < this.allColumnAppend.length; index++) {
-                            const column = this.allColumnAppend[index];
-                            let newRow = util.cloneDeep(node.data);
-                            newRow[this.cols[0].name] = column;
-                            newRow[this.values[0].name] = newRow[column];
-                            this.minimizeData(newRow);
-                            rowData.push(newRow);
-                        }
-                    }
-                    else{
-                        rowData.push(node.data)
-                    }
-                }
-            }
-        );
-        let dataForSubmit = {};
-        if(rowData.length > 0){
-            for (let index = 0; index < rowData.length; index++) {
-                let row = rowData[index];
-                for (let control in row){
-                    if(!dataForSubmit[control]){
-                        dataForSubmit[control] = []
-                    }
-                    dataForSubmit[control].push(row[control]);
-                }
-            }
-        }
-        return dataForSubmit;
-    }
+    // getGroupData(){
+    //     let rowData = [];
+    //     this.gridOptions.api.forEachNode(node => {
+    //             if(!node.group){
+    //                 if(this.allColumnAppend.length > 0){
+    //                     for (let index = 0; index < this.allColumnAppend.length; index++) {
+    //                         const column = this.allColumnAppend[index];
+    //                         if(column.indexOf('_____s_table_id_sql_lite') != -1){
+    //                             let newRow = util.cloneDeep(node.data);
+    //                             newRow[this.cols[0].name] = column;
+    //                             newRow[this.values[0].name] = newRow[column];
+    //                             this.minimizeData(newRow);
+    //                             rowData.push(newRow);
+    //                         }
+    //                     }
+    //                 }
+    //                 else{
+    //                     rowData.push(node.data)
+    //                 }
+    //             }
+    //         }
+    //     );
+    //     let dataForSubmit = {};
+    //     if(rowData.length > 0){
+    //         for (let index = 0; index < rowData.length; index++) {
+    //             let row = rowData[index];
+    //             for (let control in row){
+    //                 if(!dataForSubmit[control]){
+    //                     dataForSubmit[control] = []
+    //                 }
+    //                 dataForSubmit[control].push(row[control]);
+    //             }
+    //         }
+    //     }
+    //     return dataForSubmit;
+    // }
     /**
      * Hoangnd:
      * Hàm tính toán chiều cao cho table
@@ -600,7 +620,7 @@ export default class SymperTable {
                 BottomPinnedRowRenderer: BottomPinnedRowRenderer,
                 ValidateCellRenderer: ValidateCellRenderer,
             },
-            popupParent: document.querySelector('body'),
+            popupParent: document.querySelector('.wrapview-contextmenu'),
             getContextMenuItems: this.getContextMenuItems,
             rowDragManaged: true,
             pinnedBottomRowData: (this.tableHasRowSum) ? this.createBottomTotalRow() : false,
@@ -611,14 +631,14 @@ export default class SymperTable {
             },
             // debounceVerticalScrollbar:true,
             autoGroupColumnDef: { 
-                minWidth: (this.rows && this.rows.length > 1) ? 250 : 150,
+                // minWidth: 100,
                 cellRendererParams: {
                     suppressCount: true
                 }
             },
             defaultColDef: {
                 filter: true,
-                minWidth: 150,
+                // minWidth: 50,
                 flex: 1,
                 sortable: true,
                 resizable: true,
@@ -629,6 +649,9 @@ export default class SymperTable {
             tableInstance:this,
 
             
+        };
+        this.gridOptions.context = {
+            thisComponent : this
         };
         if(this.tableControl.isWrapText()){
             // Object.assign(this.gridOptions,{rowHeight:25});
@@ -682,6 +705,19 @@ export default class SymperTable {
         this.caculatorHeight();
         
     }
+    autoSizeAll() {
+        var allColumnIds = [];
+        this.gridOptions.columnApi.getAllColumns().forEach(function (column) {
+            if(!["index_increment","s_table_id_sql_lite","child_object_id"].includes(column.colDef.field)){
+                allColumnIds.push(column.colId);
+            }
+        });
+      
+        this.gridOptions.api.sizeColumnsToFit();
+        if(allColumnIds.length > 5){
+            this.gridOptions.columnApi.autoSizeColumns(allColumnIds, false);
+        }
+      }
     /**
      * tinh lại chiều cao table sau khi paste
      */
@@ -806,11 +842,14 @@ export default class SymperTable {
                             let column = util.cloneDeep(this.allColumnAppend[index]);
                             let columnOld = util.cloneDeep(this.allColumnAppend[index]);
                             column = column.replace('\.','____')
-                            let newRow = util.cloneDeep(node.data);
-                            newRow[this.cols[0].name] = columnOld;
-                            newRow[this.values[0].name] = (newRow[column]) ? newRow[column] : "";
-                            this.minimizeData(newRow);
-                            rowData.push(newRow);
+                            if(column.indexOf('_____s_table_id_sql_lite') == -1 && column.indexOf('_____childObjectId') == -1){
+                                let newRow = util.cloneDeep(node.data);
+                                newRow['child_object_id'] = newRow[column+'_____childObjectId'];
+                                newRow[this.cols[0].name] = columnOld;
+                                newRow[this.values[0].name] = (newRow[column]) ? newRow[column] : "";
+                                this.minimizeData(newRow);
+                                rowData.push(newRow);   
+                            }
                         }
                     }
                     else{
@@ -824,6 +863,7 @@ export default class SymperTable {
             for (let index = 0; index < rowData.length; index++) {
                 let row = rowData[index];
                 delete row['s_table_id_sql_lite'];
+                delete row['childObjectId'];
                 for (let control in row){
                     if(!dataForSubmit[control]){
                         dataForSubmit[control] = []
@@ -840,7 +880,6 @@ export default class SymperTable {
         for(let controlName in this.tableControl.controlInTable){
             dataSubmit[controlName] = this.getColData(controlName);
         }
-        
         dataSubmit['child_object_id'] = this.getColData('child_object_id');
         return dataSubmit
     }
@@ -874,6 +913,7 @@ export default class SymperTable {
         const ps = new PerfectScrollbar(agBodyHorizontalViewport);
             ps.update();
         }
+        this.tableInstance.autoSizeAll();
     }
 
     /**
@@ -1482,14 +1522,14 @@ export default class SymperTable {
      * @param {*} columnGroupName 
      */
     getDataInputFromGroupTable(listInput, formulaInstance){
-        let columnGroupName = this.dataChange['columnName']
-        let currentRowData = this.dataChange['currentRowData']
+        let columnGroupName = this.dataChange['columnName'];
+        let currentRowData = this.dataChange['currentRowData'];
         let extraData = {}
         let inputControl = formulaInstance.getInputControl();
         for (let inputControlName in inputControl) {
             if(listInput.hasOwnProperty(inputControlName)){
                 let controlIns = listInput[inputControlName];
-                if(controlIns.inTable == this.tableName){
+                if(controlIns.inTable == this.tableName && currentRowData){
                     if(currentRowData[inputControlName]){
                         extraData[inputControlName] = currentRowData[inputControlName];
                     }

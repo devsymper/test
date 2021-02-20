@@ -27,7 +27,7 @@
                 </v-tooltip>
             </div>
         </div>
-        <VuePerfectScrollbar style="height: calc(100% - 30px);" class="content-scroll">
+        <VuePerfectScrollbar style="height: calc(100% - 30px);" class="content-scroll wrapview-contextmenu">
             <div
                 class="sym-form-Detail"
                 :id="'sym-Detail-'+keyInstance"
@@ -57,8 +57,8 @@
         <HistoryControl ref="historyView" />
         <Comment style="margin-left:-12px;margin-right:8px" 
 				:showComment="true" 
-				:objectIdentifier="String(docObjId)" 
-				:objectType="'document'" 
+				:objectIdentifier="taskId ? taskId : String(docObjId)" 
+				:objectType="taskId ? 'task' : 'document'" 
 				:height="'480px'"
                 :listCommentHeight="425"
                 ref="commentView"
@@ -475,7 +475,6 @@ export default {
                     ".s-control:not(.bkerp-input-table .s-control)"
                 );
             }
-            // let listTableIns = [];
             let thisCpn = this;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');

@@ -288,7 +288,7 @@ export default {
             currentDocObjectActiveIndex:'',
             panelDocTitle:"",
             docObjInfo:{},
-            actionPanelWidth:800,
+            actionPanelWidth:850,
             containerHeight: 200,
             dataTable:[],
             countRecordSelected:0,
@@ -519,7 +519,7 @@ export default {
             this.formulasInput.formula.value = "";
             this.isDeleteMultiple = false;
             this.$refs.listObject.removeCheckBoxColumn();
-            this.actionPanelWidth = 800;
+            this.actionPanelWidth = 850;
             this.$refs.listObject.closeactionPanel();
             setTimeout((self) => {
                 self.$refs.listObject.refreshList(); 
@@ -572,7 +572,7 @@ export default {
         },
         showDetailInfoDocument(){
             if(this.$refs.viewDetail.isShow()){
-                this.actionPanelWidth = 800;
+                this.actionPanelWidth = 850;
                 this.$refs.viewDetail.setLayoutFromQuickView('21cm','auto')
             }
             else{
@@ -583,7 +583,7 @@ export default {
             this.$refs.viewDetail.toggleSideBar()
         },
         afterHideSidebarDetail(){
-            this.actionPanelWidth = 800;
+            this.actionPanelWidth = 850;
             this.$refs.viewDetail.setLayoutFromQuickView('21cm','auto')
         },
         

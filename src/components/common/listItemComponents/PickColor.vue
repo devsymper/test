@@ -10,12 +10,12 @@
         <div class="mt-2 ml-2 d-flex fs-13 justify-center" style="margin-bottom:-10px">
         </div>
         <v-color-picker 
-            class="ma-2"
+            class="pa-2"
             :hide-canvas="false"
             hide-inputs
             hide-mode-switch
             :hide-sliders="false"
-            mode="rgba"
+            mode="hexa"
             v-model="color"
             show-swatches
             :swatches="swatchesColor"
@@ -48,9 +48,7 @@ export default {
   props: {
        value: {
             type: String,
-            default(){
-                return ''
-            }
+            default:"",
         },
          reset: {
             type: Boolean,
@@ -81,7 +79,12 @@ export default {
   },
   watch: {
         color(){
-            this.$emit('input',this.color);
+            if (!this.showButton) {
+                this.$emit('input',this.color);
+            }
+        },
+        value(vl){
+            this.color = vl;
         }
     },
   data () {
@@ -96,8 +99,8 @@ export default {
             ['#00FFFF', '#00AAA0', '#005545','#000055']],
            
     }
-  },
     
+}
 }
 </script>
 <style >

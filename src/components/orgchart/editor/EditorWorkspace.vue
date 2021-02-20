@@ -5,9 +5,10 @@
         :draw-grid="drawGrid" 
         @init="setupGraph"
         :readonly="readonly"
-        ref="jointPaper" />
+        ref="jointPaper" 
+	/>
 </template>
-<script>
+<script> 
 import JointPaper from "@/components/common/rappid/JointPaper";
 import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOUCUS_DEPARTMENT_DISPLAY } from "./../nodeDefinition/departmentDefinition";
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
@@ -17,7 +18,6 @@ import { util } from '../../../plugins/util';
 import {
     appConfigs
 } from "@/configs";
-require('@/plugins/rappid/rappid.css');
 export default {
     components: {
         JointPaper
@@ -377,7 +377,6 @@ export default {
             let nodeName = this.context == 'department' ? this.$t('orgchart.editor.department') : this.$t('orgchart.editor.position');
             nodeName += ' 1';
             let firstNode = this.context == 'department' ?  createDepartmentNode(nodeName) : createPositionNode(nodeName);
-            
             var treeLayout = new joint.layout.TreeLayout({
                 graph: graph,
                 direction: 'B',

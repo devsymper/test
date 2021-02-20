@@ -43,7 +43,6 @@ SelectCellRenderer.prototype.init = function(params) {
                 isSingleSelect:(control.type == 'select') ? true : false
             })
         } );
-        console.log(control,'controlcontrolcontrol');
     }
     
 };

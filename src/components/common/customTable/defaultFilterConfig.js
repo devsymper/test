@@ -159,8 +159,9 @@ function  getSortConfigs(filterData) {
  * @param {String} method Method phục vụ cho gọi API: GET, POST 
  * @param {Object} header header phục vụ cho request 
  */
-export const getDataFromConfig = function(url, configs, columns, filterData, success, method = 'GET',header = {}){
+export const getDataFromConfig = function(url, configs, columns, filterData, success, method = 'GET',header = {}, dataConfig = {}){
 	let options = {};
+	let customContentType = {}
     if(!configs.emptyOption){
         options = getOptionForGetList(configs, columns, filterData);
 	}
@@ -172,7 +173,10 @@ export const getDataFromConfig = function(url, configs, columns, filterData, suc
     if(configs.customDataForApi){
 		options = configs.customDataForApi
 	}
-    apiObj.callApi(method, url, options, header, {})
+	if(dataConfig.customContentType){
+		customContentType.contentType = 'application/json'
+	}
+    apiObj.callApi(method, url, options, header, customContentType)
     .then(data => {
         success(data);
     })

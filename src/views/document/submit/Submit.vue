@@ -1,6 +1,6 @@
 <template>
     <div :class="globalClass">
-    <VuePerfectScrollbar class="scroll-content h-100">
+    <VuePerfectScrollbar class="scroll-content h-100 wrapview-contextmenu">
          
         <Preloader ref="preLoaderView"/>
         <div
@@ -994,6 +994,7 @@ export default {
             let cell = table.tableInstance.getFocusedCell();
             let forcusCellIndex = cell.rowIndex;
             let count = gridOptions.api.getDisplayedRowCount();
+            
             if(count - forcusCellIndex < dataArray.length){
                 for (var i = forcusCellIndex; i < dataArray.length + count - 1; i++) {
                     let rowData = table.tableInstance.getRowDefaultData(false);
@@ -1015,7 +1016,7 @@ export default {
                 "([^\"\\" + delimiter + "\\r\\n]*))"), "gi");
             // Create an array to hold our data. Give the array
             // a default empty first row.
-            var arrData = [[]];
+            var arrData = [];
             // Create an array to hold our individual pattern
             // matching groups.
             var arrMatches = null;
@@ -1316,6 +1317,7 @@ export default {
                     let dataInput = getDataInputFormula(formulaIns,listInput,this.optionalDataBinding, e.rowIndex);
                     let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
                     if(dataFromCache == false){
+                        this.$refs.autocompleteInput.showLoadding();
                         this.formulasWorker.postMessage({action:'runFormula',data:{
                             formulaInstance:formulaIns, 
                             dataInput:dataInput,
@@ -1338,6 +1340,7 @@ export default {
                 let aliasControl = formulaIns.autocompleteDetectAliasControl();
                 let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
                 if(dataFromCache == false){
+                    this.$refs.autocompleteInput.showLoadding();
                     this.formulasWorker.postMessage({action:'runFormula',data:
                         {
                             formulaInstance:formulaIns,
@@ -1623,7 +1626,9 @@ export default {
             if(formulasId && formulasId != 0){
                 let self = this;
                 formulasApi.detailFormulas(formulasId).then(res=>{
-                    self.titleObjectFormula = new Formulas(self.keyInstance,res.data.lastContent,'titleObject');
+                    if(res.status == 200){
+                        self.titleObjectFormula = new Formulas(self.keyInstance,res.data.lastContent,'titleObject');
+                    }
                 })
             }
             

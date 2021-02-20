@@ -362,6 +362,9 @@ export default {
 				data.forEach(function(e){
 					if(!isNaN(e.userId)){
 						let itemInfor = mapIdToUser[e.userId];
+						if(!itemInfor){
+							itemInfor = {}
+						}
 						let infor = {}
 						if(itemInfor.hasOwnProperty('avatar')){
 							infor.avatar = itemInfor.avatar
