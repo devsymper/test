@@ -531,7 +531,7 @@ export default {
              self.items.push(...res.data.task);
                 })
                 .catch(console.log);
-                debugger
+                
             await timesheetApi.getTask('t')
             .then(res => {
                 let name = res.data.listObject;

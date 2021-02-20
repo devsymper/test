@@ -45,9 +45,9 @@ export default class LoadDataset extends NodeBase {
         return fullConfigs;
     }
 
-    process(source){
-        if (source != 'change-selected-columns') {
-            this.convertInputToConfigs();
+    process(source, meta){
+        if (!meta.type || meta.type == 'change-dataset' ) {
+            this.convertInputToConfigs(meta.data);
             this.selectedCols = {};
         } else {}
         this.configsForFirstLoad = false;
@@ -55,19 +55,27 @@ export default class LoadDataset extends NodeBase {
         this.configs.allColumns.forEach((ele) => {
             if (ele.selected) {
                 rsl.push(ele);
+                this.selectedCols[ele.uid] = true;
             }
         });
         return rsl;
     }
 
-    convertInputToConfigs(){
+    convertInputToConfigs(data){
         let rsl = [];
         let mapSubDts = {};
-        this.configs.subDatasets.forEach(item => {
-            mapSubDts[item.id] = item;
-        });
+        if(this.configs.subDatasets){
+            this.configs.subDatasets.forEach(item => {
+                mapSubDts[item.id] = item;
+            });
+        }
+        let columnGroup = {};
+        if(data){
+            columnGroup = data.columns ? data.columns : this.configs.columns;
+        }
+
         let newTBName = this.configs.newIdDataset = this.getNewDatasetId();
-        rsl = this.getAllFlatColumns(newTBName, this.configs.columns, this.selectedCols);
+        rsl = this.getAllFlatColumns(newTBName, columnGroup, this.selectedCols);
         this.configs.allColumns = rsl;
     }
 

@@ -83,7 +83,7 @@ export default {
         },
         handleChangeDateFilter(dates, cellId){
             this.cellConfigs.viewConfigs.displayOptions.data.value = dates
-            // debugger
+            // 
             this.handleChangeFilterValue(cellId)
         },
         handleChangeFilterValue(cellId){

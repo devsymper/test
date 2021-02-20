@@ -33,11 +33,10 @@ export default {
 		this.listenFromWorker()
 	},
     methods: {
-		handleChangeConfigs(){
-			this.$emit('change-configs', {})
+		handleChangeConfigs(data){
+			this.$emit('change-configs', data)
 		},
 		handleDatasetSelected(params){
-			this.$emit('change-configs', {})
 			setTimeout(self=>{
 				self.changeNodeInfor(params)
 			},200, this)
@@ -50,7 +49,11 @@ export default {
 					}
 				})
 			}else{
-				this.$set(this.nodeData.configs, 'allColumns', this.allDatasetColumn[params.id])
+				this.$set(this.nodeData.configs, 'allColumns', this.allDatasetColumn[params.id]);
+				this.$emit('change-configs', {
+					type: 'change-dataset',
+					data: this.allDatasetColumn[params.id]
+				})
 			}
 		},
 		changeNodeInfor(params){
@@ -60,8 +63,12 @@ export default {
 		},
 		handleGetDatasetColumns(data){
 			if(data.status == 200){
-				this.$set(this.allDatasetColumn, this.currentId, data.data.columns[this.currentId])
-				this.$set(this.nodeData.configs, 'allColumns', data.data.columns[this.currentId])
+				this.$set(this.allDatasetColumn, this.currentId, data.data)
+				this.$set(this.nodeData.configs, 'allColumns', data.data)
+				this.$emit('change-configs', {
+					type: 'change-dataset',
+					data: data.data
+				})
 			}else{
 				this.$snotifyError("Không thể lấy danh sách column")
 			}

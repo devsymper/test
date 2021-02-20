@@ -994,7 +994,7 @@ export default {
             let cell = table.tableInstance.getFocusedCell();
             let forcusCellIndex = cell.rowIndex;
             let count = gridOptions.api.getDisplayedRowCount();
-            debugger
+            
             if(count - forcusCellIndex < dataArray.length){
                 for (var i = forcusCellIndex; i < dataArray.length + count - 1; i++) {
                     let rowData = table.tableInstance.getRowDefaultData(false);

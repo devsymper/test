@@ -315,11 +315,11 @@ export default {
             }
         },
         createLogTime(event){
-            debugger
+            
             this.events.push(event);
         },
         openLogTimeDialog(event, update = false) {
-            debugger
+            
             this.$emit('create-time', {
                 update: update,
                 logtimeEvent: event,
