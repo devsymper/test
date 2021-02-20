@@ -57,8 +57,8 @@
         <HistoryControl ref="historyView" />
         <Comment style="margin-left:-12px;margin-right:8px" 
 				:showComment="true" 
-				:objectIdentifier="String(docObjId)" 
-				:objectType="'document'" 
+				:objectIdentifier="taskId ? taskId : String(docObjId)" 
+				:objectType="taskId ? 'task' : 'document'" 
 				:height="'480px'"
                 :listCommentHeight="425"
                 ref="commentView"
@@ -475,7 +475,6 @@ export default {
                     ".s-control:not(.bkerp-input-table .s-control)"
                 );
             }
-            // let listTableIns = [];
             let thisCpn = this;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
