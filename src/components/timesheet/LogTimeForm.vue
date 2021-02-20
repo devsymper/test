@@ -241,7 +241,7 @@ export default {
     name: 'LogTimeForm',
     props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
     data: () => ({
-        selectRepeat:['Hằng ngày',"Hằng tuần vào thứ 2","Từ thứ 2 đến thứ 7"],
+        selectRepeat:['Hằng ngày',"Hằng tuần vào thứ 2","Từ thứ 2 đến thứ 7","Tùy chỉnh..."],
         selectedRepeat:'Hằng ngày',
         repeat:false,
         logTimeList:[],
