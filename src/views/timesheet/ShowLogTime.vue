@@ -153,6 +153,9 @@ export default {
         })
     },
     methods: {
+        setListCategory(listCategory){
+
+        },
         setColor(data){
             this.$refs.viewmode.logColor = data.color;
             this.$refs.viewmode.randomColor = data.isRandom;
@@ -186,6 +189,8 @@ export default {
         createLog(data){
             data.name=data.task;
             data.category=data.categoryTask;
+            data.color= this.$refs.logCalendar.colorLog;
+            data.type=data.type;
             data.category_key=data.categoryTask.split('-')[0];
             this.$refs.logCalendar.events.push(data);
             if(!this.$refs.logCalendar.timeView){

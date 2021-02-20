@@ -55,8 +55,8 @@
                                 class="d-flex flex-column h-100">
                                 <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
                                     <div class="d-flex flex-row justify-space-between align-center pl-2">
-                                        <div class="fm text-ellipsis" style="width:calc(100% - 55px)" >
-                                            <span v-if="findDuration(event.start, event.end)<62">
+                                        <div class="fm text-ellipsis" :class="{'name-log':findDuration(event.start, event.end)<62}" >
+                                            <span v-show="findDuration(event.start, event.end)<62">
                                                 <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green']" class="mr-1"></i>
                                             </span>
                                             <b style="color:#303030" class="fs-12 fw-430">{{event.name}}</b>
@@ -68,11 +68,11 @@
                                                 nudge-top='-10'>
                                                 <template v-slot:activator="{on:actionEvents }" >
                                                     <span class="fs-12 fw-400 color-black"
-                                                        v-if="findDuration(event.start, event.end)<62" >
+                                                        v-show="findDuration(event.start, event.end)<62" >
                                                         {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
                                                     </span>
                                                     <!-- <v-btn class="ml-1" dense dark icon> -->
-                                                        <v-icon v-if="event.name"
+                                                        <v-icon v-show="event.type"
                                                             v-on="actionEvents"
                                                             small class="color-black"> mdi-dots-vertical</v-icon>
                                                     <!-- </v-btn> -->
@@ -86,23 +86,22 @@
                                     <div v-if="findDuration(event.start, event.end)>105" style="height:30px" class="text-ellipsis fs-12 pl-2 color-grey" >
                                         {{event.desc ? event.desc: "" }}
                                     </div>
-                                    <v-spacer />
-                                    <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center" v-if="findDuration(event.start, event.end)>61">
-                                        <div style="margin-top:17px">
-                                            <span >
+                                    <v-spacer v-show="findDuration(event.start, event.end)>60"/>
+                                    <div class="w-100 d-flex flex-row justify-space-between align-center" :class="{'pa-2 ':findDuration(event.start, event.end)>61,'px-2':findDuration(event.start, event.end)<=61}" v-if="findDuration(event.start, event.end)>61">
+                                        <div class="d-flex justify-start" :class="{'mt-4 ':findDuration(event.start, event.end)>80}">
+                                            <span class="color-black" >
+                                                <!-- {{findDuration(event.start, event.end)}} -->
                                                 <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
                                             </span>
-                                            <span class= "fs-11 text-ellipsis color-grey" style="margin-left:-50px" v-if="findDuration(event.start, event.end)>70"> 
+                                            <span class= "fs-11 color-grey mt-1" style="margin-left:-45px" v-if="findDuration(event.start, event.end)>61"> 
                                                 {{event.category_key}}
                                             </span>
                                         </div>
-                                        <div v-if="timeView">
-                                            <span class="fs-11 color-black" style="margin-right:-5px">
+                                        <div style="margin-right:-5px" :class="{'mt-4 ':findDuration(event.start, event.end)>80}">
+                                            <span v-if="timeView" class="fs-11 color-black">
                                             {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
                                             </span>
-                                        </div>
-                                         <div v-else>
-                                            <span class="fs-11 color-black" style="margin-right:-5px">
+                                             <span v-else class="fs-11 color-black" >
                                            {{changeDuration(event.duration)}}
                                             </span>
                                         </div>
@@ -163,6 +162,7 @@ export default {
         return {
             listLogInTime:[],
             menu:false,
+            listCategory:[],
             isRandom:false,
             calendar: '',// value calendar
             ready: false,
@@ -238,6 +238,8 @@ export default {
             }
             this.sum = data.sumLogTime;
             this.hoursRequired = data.hoursRequired;
+            this.listCategory = data.category;
+            // this.$emit('set-list-category', data.category);
             if(!this.timeView){
                 this.resizeLogtime()
             }
@@ -407,6 +409,7 @@ export default {
                 this.createEvent = {
                     name: ``,
                     timed: true,
+                    color:this.colorLog,
                     date: this.createStart,
                     start: this.createStart,
                     end: this.createStart,
@@ -415,6 +418,7 @@ export default {
             }
         },
         mouseMove(tms) {
+            
             const mouse = this.toTime(tms);
             if (this.dragEvent && this.dragTime !== null) {
                 const start = this.dragEvent.start
@@ -477,8 +481,8 @@ export default {
                     } catch(e) {console.log(e); }
                 } else {//1.2: tao moi event
                     if(this.timeView){
+                        //
                          this.openLogTimeDialog(this.createEvent,false);
-
                     }else{
                         this.events.splice(this.events.indexOf(event), 1);
                         this.$snotify({
@@ -817,6 +821,9 @@ export default {
     display: flex;
     align-items: stretch;
     justify-content: center;
+}
+.name-log{
+    width:calc(100% - 55px)
 }
 .create-timesheet {
     line-height: 20px;

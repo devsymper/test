@@ -11,7 +11,7 @@
     </v-card-title>
     <v-card-text class="mt-1 h-65" >
         <span class="label ">{{$t('timesheet.category_task')}}</span>
-         <v-btn style="height:20px!important" text @click="showCategoryForm()" depressed x-small class="mr-2 ml-1 fs-13">
+         <v-btn text @click="showCategoryForm()" depressed x-small class="add-btn mr-2 ml-1 fs-13">
             <v-icon style="font-size:15px!important; margin-top:-3px">mdi-plus</v-icon>
         </v-btn>
         <v-row>
@@ -91,7 +91,7 @@
         <span class="label">{{$t('timesheet.task_logform')}}
             <span style="color:red"> *</span>
         </span>
-         <v-btn style="height:20px!important" text @click="showTaskForm()" depressed x-small class="mr-2 ml-1 fs-13">
+         <v-btn  text @click="showTaskForm()" depressed x-small class="add-btn mr-2 ml-1 fs-13">
             <v-icon style="font-size:15px!important; margin-top:-3px">mdi-plus</v-icon>
         </v-btn>
         <v-row style="margin-top:-10px">
@@ -360,7 +360,6 @@ export default {
             let date = this.datePicker.slice(8,10);
             this.newEvent.start = this.$moment(this.newEvent.start).date(date).month(month).year(year).valueOf();
             this.newEvent.end = this.$moment(this.newEvent.end).date(date).month(month).year(year).valueOf();
-
             this.inputs.date = this.datePicker;
             this.displayDate= this.datePicker
         },
@@ -371,7 +370,6 @@ export default {
         updateAPICategory(){
              this.getCategory();
              this.$emit("doneCate")
-
         },
         cancelTask(){
             if(this.cancelTask){
@@ -381,15 +379,16 @@ export default {
         },
         eventLog(){
             this.getEventLog();
-            
         },
         dateMonth(){
             this.getDateMonth()
         },
-       
         duration(){
-            if(this.duration<=0||Number.isNaN(this.duration)||this.duration.match(/[^a-zA-Z0-9]/)||this.duration=='0h'||this.duration=='0m'){
-                this.timeError = this.$t('timesheet.time_invalid');}
+            if(this.duration<=0||Number.isNaN(this.duration)||this.duration=='0h'||this.duration=='0m'){
+                if(this.duration.match(/[^a-zA-Z0-9]/)){
+                     this.timeError = this.$t('timesheet.time_invalid');
+                }
+               }
             else{
                 this.timeError = ''
             }
@@ -856,7 +855,11 @@ export default {
     font-size:13px!important
    
 }
-
+.add-btn{
+    height:20px!important;
+    min-width:26px!important;
+    padding:0!important
+}
 .div-description {
     clear: left;
     clear: right;
