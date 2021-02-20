@@ -927,9 +927,8 @@ export default class SymperTable {
                 this.tableInstance.addNewRow(rowData, params.rowIndex + 1);
             }
             else{
-                return
                 let groupRowData = this.tableInstance.getGroupRowData(rowData);
-                this.tableInstance.addNewRow(groupRowData, params.rowIndex + 1);
+                this.tableInstance.addNewRow([groupRowData], params.rowIndex);
             }
             
         }
@@ -960,17 +959,22 @@ export default class SymperTable {
         params.api.setFocusedCell(newCellIndex, params.colDef.field)
     }
     getGroupRowData(rowData){
+        let newRow = util.cloneDeep(rowData);
         let i = 0;
-        for(let controlName in rowData){
+        for(let controlName in newRow){
             if(controlName.indexOf('s_table_id_sql_lite') != -1){
-                rowData[controlName] = Date.now() + i;
+                newRow[controlName] = Date.now() + i;
             }
             if(controlName.indexOf('childObjectId') != -1){
-                rowData[controlName] = "";
+                newRow[controlName] = "";
+            }
+            let rowGroup = this.rows.find(ele => ele.name == controlName);
+            if(!rowGroup){
+                newRow[controlName] = "";
             }
             i++;
         }
-        return rowData;
+        return newRow;
     }
     /**
      * Kiểm tra xem đang ở view detail hay submit
