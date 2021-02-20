@@ -70,6 +70,10 @@ export default class Pivot extends ReportBase {
             columns: [],
             cellStyle: this.getStyleItemsInConfig(style.cellFormat.children, 'px', ratio),
             headerStyle: this.getStyleItemsInConfig(style.headerFormat.children, 'px', ratio),
+            tableSize: {
+                h: extraData.size.h,
+                w: extraData.size.w,
+            }
         };
         
 

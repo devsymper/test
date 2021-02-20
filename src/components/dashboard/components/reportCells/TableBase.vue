@@ -410,7 +410,7 @@ export default {
             let displayOptions = this.cellConfigs.viewConfigs.displayOptions;
             return Object.assign({
                 width: '100%', 
-                height: (displayOptions.tableSize.h - 30)+'px'
+                height: (displayOptions.tableSize.h - 35)+'px'
             }, this.options.cellStyle);
         }
     },
