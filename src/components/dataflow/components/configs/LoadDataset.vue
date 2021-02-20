@@ -33,11 +33,13 @@ export default {
 		this.listenFromWorker()
 	},
     methods: {
-		handleChangeConfigs(){
-			this.$emit('change-configs', {})
+		handleChangeConfigs(data){
+			this.$emit('change-configs', data)
 		},
 		handleDatasetSelected(params){
-			this.$emit('change-configs', {})
+			this.$emit('change-configs', {
+				type: 'change-dataset'
+			})
 			setTimeout(self=>{
 				self.changeNodeInfor(params)
 			},200, this)

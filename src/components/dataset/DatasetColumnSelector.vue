@@ -134,12 +134,19 @@ export default {
 	},
 	methods:{
 		onCellValueChanged(event){
-            this.$emit('change-configs',{type:'change-cell-value'});
+            this.$emit('change-configs',{type: 'change-cell-value', data: event});
         },
 		onSelectionChanged(event) {
-			this.$emit('change-configs',{type:'select-row-change', data: event});
 			let rowIndex = event.node.id;
             this.rowData[rowIndex].selected = event.node.selected;
+			
+			if(this.debounceChangeConfigEmit){
+				clearTimeout(this.debounceChangeConfigEmit);
+			}
+			
+			this.debounceChangeConfigEmit = setTimeout((self) => {
+				self.$emit('change-configs',{type:'select-row-change', data: event});			
+			}, 200, this);
         },
 		cellContextMenu(params) {},
 		onGridReady(params){

@@ -82,9 +82,9 @@ export default class NodeBase {
         return true;
     }
 
-    run(needPropagate = true, source = 'change-config'){
+    run(needPropagate = true, source = 'change-config', meta = {}){
         if(this.isValidConfig()){
-            this.output = this.process(source);
+            this.output = this.process(source, meta);
             if (needPropagate) {
                 this.propagate();
             }

@@ -45,8 +45,8 @@ export default class LoadDataset extends NodeBase {
         return fullConfigs;
     }
 
-    process(source){
-        if (source != 'change-selected-columns') {
+    process(source, meta){
+        if (!meta.type || meta.type == 'change-dataset' ) {
             this.convertInputToConfigs();
             this.selectedCols = {};
         } else {}
@@ -63,9 +63,11 @@ export default class LoadDataset extends NodeBase {
     convertInputToConfigs(){
         let rsl = [];
         let mapSubDts = {};
-        this.configs.subDatasets.forEach(item => {
-            mapSubDts[item.id] = item;
-        });
+        if(this.configs.subDatasets){
+            this.configs.subDatasets.forEach(item => {
+                mapSubDts[item.id] = item;
+            });
+        }
         let newTBName = this.configs.newIdDataset = this.getNewDatasetId();
         rsl = this.getAllFlatColumns(newTBName, this.configs.columns, this.selectedCols);
         this.configs.allColumns = rsl;
