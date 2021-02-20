@@ -155,7 +155,7 @@ export default {
             }
         },
         createLog(data){
-            debugger
+            
             data.name=data.task;
             data.category=data.categoryTask;
             data.category_key=data.categoryTask.split('-')[0];

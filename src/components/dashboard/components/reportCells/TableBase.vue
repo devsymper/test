@@ -253,7 +253,7 @@ export default {
         reStyleTotal(){
             let cellId = this.cellConfigs.sharedConfigs.cellId;
             let idCell = 'symper-table-wrapper-' + cellId;
-            debugger
+            
             let style = this.convertCssObjToStr(this.options.totalRowStyle);
             let totalRowStyle = this.options.totalRowStyle;
             if(totalRowStyle){
@@ -283,7 +283,7 @@ export default {
                     `;
                 }
             }
-            debugger
+            
             return style;
         },
         reStyleDataCell(){

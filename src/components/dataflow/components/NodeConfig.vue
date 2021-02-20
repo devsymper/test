@@ -37,9 +37,9 @@ export default {
 			this.$emit('dataset-selected' , params)
 		}
 	},
-	data(){
-		return {
-			datasetInfor:{
+	computed: {
+		datasetInfor(){
+			return {
 				id:{
 					title:"ID",
 					content: this.configs.idDataset
@@ -55,8 +55,13 @@ export default {
 				docId:{
 					title:"Doc id",
 					content: this.configs.symperDocId
-				},
+				}
 			}
+		}
+	},
+	data(){
+		return {
+			
 		}
 	}
 }
