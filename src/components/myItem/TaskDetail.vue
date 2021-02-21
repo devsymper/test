@@ -248,11 +248,6 @@ export default {
 				this.setCustomDocControls();
 			},
 		},
-		delegationState(val) {
-			// if(val == 'pending'){
-			// 	this.taskStatus = this.getTaskStatus('#8E2D8C', 'Ủy quyền', 'delegate')
-			// }
-		},
 		originData: {
 			deep: true,
 			immediate: true,
@@ -321,7 +316,7 @@ export default {
 			showSnackbar: false,
 			rightAction: 120,
 			showDialogAlert: false,
-			isRole: false, //value =falses khi assignee = userId, =true khi assignee = userId:role
+			isRole: false, //value = falses khi assignee = userId, =true khi assignee = userId:role
 			widthInfoTask: 330,
 			isShowSidebar: false,
 			breadcrumb: {
