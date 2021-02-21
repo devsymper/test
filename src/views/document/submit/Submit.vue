@@ -2685,15 +2685,14 @@ export default {
                         case "formulas":
                             this.handleInputChangeBySystem(controlName,value);
                             break;
-                        
                         case "validate":
                             controlInstance.handlerDataAfterRunFormulasValidate(value);
                             break;
                         case "require":
-                            this.handlerDataAfterRunFormulasRequire(value,controlName);
+                            controlInstance.handlerDataAfterRunFormulasRequire(value);
                             break;
                         case "hidden":
-                            this.handlerDataAfterRunFormulasHidden(controlInstance,value,controlId);
+                            controlInstance.handlerDataAfterRunFormulasHidden(value);
                             break;
                         case "readOnly":
                             controlInstance.handlerDataAfterRunFormulasReadonly(value);
@@ -2708,7 +2707,6 @@ export default {
                     }
                 }
             }
-            
         },
         /**
          * Hàm cập nhật dữ liệu cho bảng pivot
@@ -2783,48 +2781,6 @@ export default {
                 "document/updateDataForLinkControl",
                 {formulaType:formulaType,link:link, title:title, source:source,instance: this.keyInstance, controlName: controlName}
             );
-        },
-
-        /**
-         * Xử lí hiển thị sau khi chạy công thức require
-         */
-        handlerDataAfterRunFormulasRequire(isRequire,controlName){
-            if(Array.isArray(isRequire)){
-                isRequire=isRequire[0]
-            }
-            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-            if(controlInstance.isEmpty()&&(isRequire==1||isRequire==true)){
-                controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+controlInstance.title,'Require')
-            }
-            else{
-                controlInstance.removeValidateIcon('Require');
-            }
-        },
-      
-        handlerDataAfterRunFormulasHidden(controlInstance,isHidden,controlId){
-            if(Array.isArray(isHidden)){
-                isHidden=isHidden[0];
-            }
-            let display = (isHidden == 1 || isHidden==true ) ? 'none' : 'inline-block'
-            if(controlInstance.type == 'page'){
-                controlInstance.setHiddenPage()
-            }
-            else if(controlInstance.type == 'tab'){
-                controlInstance.setHiddenTab()
-            }
-            else{
-                $('#'+controlId).parent().css({'display':display})
-            }
-        },
-        handlerDataAfterRunFormulasReadonly(isReadonly,controlId){
-            if(Array.isArray(isReadonly)){
-                isReadonly=isReadonly[0]
-            }
-            if(isReadonly == 1 || isReadonly==true ){
-                $('#'+controlId).attr('disabled','disabled');
-            }else{
-                $('#'+controlId).removeAttr('disabled');
-            }
         },
         /**
          * Hàm xử lí việc tìm kiếm các root control và chạy công thức cho control đó (lúc khởi tạo doc)

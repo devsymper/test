@@ -176,6 +176,15 @@ export default class BasicControl extends Control {
         }
     }
 
+    getWidth(){
+        if(this.controlProperties['width'] && this.controlProperties['width'].value){
+            return this.controlProperties['width'].value;
+        }
+        else{
+            return 100;
+        }
+    }
+
 
     /**
      * sử dụng cho trường hợp control nằm trong bảng

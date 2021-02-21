@@ -194,8 +194,9 @@
 									@mouseover="showByIndex = idex"
 									@mouseout="showByIndex = null"
 								>
+										<!-- @click="showContentFile(item.serverPath,item.name,item.type,item.id)"  -->
 									<v-col 
-										@click="showContentFile(item.serverPath,item.name,item.type,item.id)" 
+										@click="previewFile(item)"
 										cols="5" 
 										style="font-size:13px;padding:0px;padding-top:3px!important">
 										<v-tooltip bottom>
@@ -327,6 +328,10 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
+		<PreviewFile 
+			ref="previewFile"
+			:fileInfor="fileInfor"
+		/>
 	</v-navigation-drawer>
 </template>
 <script>
@@ -341,6 +346,7 @@ import UploadFile from "@/components/common/UploadFile.vue";
 import RelatedItems from "./RelatedItems.vue";
 import infoUser from "./InfoUser";
 import HistoryTask from './taskLifeCycle/HistoryTask'
+import PreviewFile from '@/components/common/PreviewFile'
 
 export default {
 	components:{
@@ -350,7 +356,8 @@ export default {
 		UploadFile,
 		RelatedItems,
 		infoUser,
-		HistoryTask
+		HistoryTask,
+		PreviewFile
 	},
 	data () {
 		return {
@@ -360,6 +367,7 @@ export default {
 			showMoreFile:false,
 			headerDialog:'',
       		titleDialog:'',
+			fileInfor:{},
 			dialogAlert: false,
 			context_attachment:false,
 			showByIndex: null,
@@ -669,6 +677,10 @@ export default {
 			data.type=type;
 			data.id=id;
 			this.$emit("showContentFile", data);
+		},
+		previewFile(item){
+			this.$refs.previewFile.show()
+			this.fileInfor = item 
 		},
 		downloadOrBackupFile(data) {
 			this.downLoadFile(data.fileId);
