@@ -871,9 +871,10 @@ export default {
                     type: this.checkPlanOrLog(this.newEvent.start),
                     id: this.newEvent.id,
                     date: this.inputs.date,
+                    color:this.newEvent.color,
                     categoryTask: this.categoryTask,
                     desc: this.inputs.description || "",
-                    docObjId: this.newEvent.docObjId
+                    docObjId: this.newEvent.docObjId,
 
                 }
                 let originLog=this.setOriginLog(data);

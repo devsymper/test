@@ -181,9 +181,11 @@ export default {
         updateLog(data){
             let events = [...this.$refs.logCalendar.events];
             let oldLog = events.filter(e=>e.id==data.id)[0];
+            let name = this.$refs.logCalendar.listTask.filter(task=>task.id==data.task)[0].name;
             for(let i = 0; i<events.length;i++){
                 if(events[i].id==oldLog.id){
-                    events[i]=data
+                    events[i]=data,
+                    events[i].name = name;
                 }
             }
            this.$refs.logCalendar.events=events;
