@@ -8,7 +8,7 @@
                 Lặp lại mỗi:
             </v-col>
             <v-col class="col-md-2" style=" margin-top: -0px;">
-                <input style="width:30px; border:1px solid lightgrey" class="pl-1 fs-13" v-model="input" >
+                <input style="width:30px; border:1px solid lightgrey" class="pl-1 fs-13" v-model="numberRepeat" >
             </v-col>
              <v-col class="col-md-6" style="margin-top:-24px;">
                 <v-select
@@ -70,7 +70,7 @@
             <v-btn @click="cancel()" text style="float:right">
                 Thoát
             </v-btn>
-             <v-btn text color="success" style="float:right">
+             <v-btn text color="success" style="float:right" @click="save()">
                Lưu
             </v-btn>
         </div>
@@ -78,27 +78,53 @@
 </template>
 <script>
 export default {
+  props: {
+     type:{
+        type:String,
+        default:''
+     }
+  },
   data () {
     return {
-          isRepeat:false,
-            endDate:'',
-            input:'1',
-            datePicker:this.$moment().format('YYYY-MM-DD'),
-            list:['Ngày','Tuần',"Tháng","Năm"],
-            selected:"Tuần",
-            day:[
-                {name:'T2',show:false},
-                {name:'T3',show:false},
-                {name:'T4',show:false},
-                {name:'T5',show:false},
-                {name:'T6',show:false},
-                {name:'T7',show:false},
-                {name:'CN',show:false},
+        isRepeat:true,
+        endDate:'',
+        numberRepeat:'1',
+        datePicker:this.$moment().format('YYYY-MM-DD'),
+        list:['Ngày','Tuần',"Tháng","Năm"],
+        selected:"Tuần",
+        day:[
+            {name:'T2',show:false,id:1},
+            {name:'T3',show:false,id:2},
+            {name:'T4',show:false,id:3},
+            {name:'T5',show:false,id:4},
+            {name:'T6',show:false,id:5},
+            {name:'T7',show:false,id:6},
+            {name:'CN',show:false,id:0},
 
       ]
     }
   },
   methods: {
+      save(){
+        let applyDay = [];
+        this.day.map(d=>{
+            if(d.show){
+                applyDay.push(d.id)
+            }
+        })
+        let data={
+            isNeverEnd:this.isRepeat,// không lặp lại
+            toDate: this.datePicker,// ngày kết thúc
+            type:this.type,
+            repeatAfter:{
+                number:Number(this.numberRepeat),
+                type:this.selected
+            },
+            applyDay:applyDay
+        }
+        this.$emit('repeat',data)
+
+      },
       cancel(){
           this.$emit('cancel')
       },

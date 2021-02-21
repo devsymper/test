@@ -18,6 +18,7 @@
             @showTaskForm="showTaskForm"
             @loadMonthView="loadMonthView"
             @create-log="createLog"
+            @create-list-log="creatListLog"
             @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
             @update-log="updateLog"
@@ -156,6 +157,7 @@ export default {
         setListCategory(listCategory){
 
         },
+      
         setColor(data){
             this.$refs.viewmode.logColor = data.color;
             this.$refs.viewmode.randomColor = data.isRandom;
@@ -186,8 +188,15 @@ export default {
             }
            this.$refs.logCalendar.events=events;
         },
+        creatListLog(data){
+            debugger
+            this.data.map(d=>{
+                this.createLog(d)
+            })
+
+        },
         createLog(data){
-            data.name=data.task;
+            data.name=this.$refs.logCalendar.listTask.filter(task=>task.id==data.task).length>0? this.$refs.logCalendar.listTask.filter(task=>task.id==data.task)[0].name:'';
             data.category=data.categoryTask;
             data.color= this.$refs.logCalendar.colorLog;
             data.type=data.type;
@@ -258,7 +267,6 @@ export default {
         onCreateTime({logtimeEvent, onSave, onCancel, update}) {
             this.logtimeDialog = true;
             this.$nextTick(() => {
-                console.log(this.onSave);
                 this.update = update;
                 this.logtimeEvent = logtimeEvent;
                 this.onSaveLogTimeEvent = onSave;

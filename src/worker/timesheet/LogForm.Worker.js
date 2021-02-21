@@ -67,16 +67,16 @@ export const resizeLogtime = async function(events) {
 export const getLogTimeList = async function(dateStartEnd){
     let res = await timesheetApi.getLogTimeList(dateStartEnd);
     let data = {
-        sumLogTime: 0,
-        hoursRequired: 0,
-        category:[],
+        // sumLogTime: 0,
+        // hoursRequired: 0,
+        // category:[],
         events:[]
     }
     if(res.status == 200){
         const logTimeList = res.data.listLogTime;
-        data.sum = res.data.sumLogTime;
-        data.category = res.data.category;
-        data.hoursRequired = res.data.hourRequired[0].hoursRequired;
+        // data.sum = res.data.sumLogTime;
+        // data.category = res.data.category;
+        // data.hoursRequired = res.data.hourRequired[0].hoursRequired;
         data.events = [...logTimeList.map((logTime, idx) => ({
             name: `${logTime.task_id}`,
             timed: true,

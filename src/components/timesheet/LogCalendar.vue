@@ -177,23 +177,58 @@ export default {
             createStart: null,
             extendOriginal: null,
             focus: '',
+            listTask:[],
             internalCalendarType: 'week',
             extend : false,
             sum: [],
             colorLog:'#F0F8FF',
             events: [],// chứa event của calendar
-            hoursRequired: '',
+            hoursRequired: '8',
             logFormWorker:null
         };
     },
 
     created() {
         this.getColor();
+        this.getConfigInfo()
         this.logFormWorker = new LogFormWorker();
+        this.getAllTask();
         this.load();
-        
     },
     methods: {
+        async getAllTask(){
+            let self = this;
+            this.items = [];
+            await timesheetApi.getTaskDB().then(res => {
+                self.listTask.push(...res.data.task);
+            })
+            .catch(console.log);
+            await timesheetApi.getTask('').then(res => {
+                let name = res.data.listObject;
+                name.map(x=>{
+                    x.categoryId = "602e321e-0689-b438-887b-7dce711740c4";
+                    x.name = JSON.parse(x.description).content;
+                    x.description = 'Ngày tạo: '+ x.createTime;
+                })
+                self.listTask.push(...res.data.listObject);
+
+                })
+                .catch(console.log);
+                // debugger
+
+        },
+        getConfigInfo(){
+            const self = this;
+             timesheetApi.getConfigInfo().then(res => {
+                if (res.status === 200) {
+                    self.hoursRequired = res.data.listConfig[0].hoursRequired;
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+        },
         getWidgetIdentifier(){
             let widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
@@ -204,7 +239,6 @@ export default {
             let widgetIdentifier = this.getWidgetIdentifier();
             uiConfigApi.getUiConfig(widgetIdentifier).then(res=>{
                 if(res.status==200){
-                    debugger
                     self.colorLog = JSON.parse(res.data.detail).color;
                     self.isRandom = JSON.parse(res.data.detail).isRandom;
                     self.$emit('set-color',{color:self.colorLog,isRandom:self.isRandom})
@@ -226,7 +260,17 @@ export default {
         },
         
         setLogTimeList(data){
-            this.events =  data.events;
+            debugger
+            data.events.map((evt,i)=>{
+                // let test = task.id;
+                 let taskName = this.listTask.filter(task=>task.id==evt.task).length>0? this.listTask.filter(task=>task.id==evt.task)[0].name:'';
+                // evt.task = taskName;
+                evt.name = taskName;
+
+            })
+            debugger
+
+            this.events = data.events;
             if(this.isRandom){
                 this.events.map(e=>{
                 e.color = this.randomColor()
@@ -236,9 +280,9 @@ export default {
                     e.color = this.colorLog
                 })
             }
-            this.sum = data.sumLogTime;
-            this.hoursRequired = data.hoursRequired;
-            this.listCategory = data.category;
+            // this.sum = data.sumLogTime;
+            // this.hoursRequired = data.hoursRequired;
+            // this.listCategory = data.category;
             // this.$emit('set-list-category', data.category);
             if(!this.timeView){
                 this.resizeLogtime()
@@ -277,8 +321,6 @@ export default {
         },
         copyLogTime(event){
             let data = {...event};
-            data.start = this.$moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm");
-            data.end = this.$moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm");
             data.categoryTask = event.category;
             data.desc = event.desc || "";
             this.events.push(data);
@@ -289,7 +331,7 @@ export default {
         },
         setEventCopy(data){
             if(data){
-                this.load()
+               // this.load()
             }else{
                 this.$snotify({
                     type: "error",
@@ -385,7 +427,7 @@ export default {
             let defaultEnd = this.$moment().add(7,'days').format('YYYY-MM-DD')
             let data = {
                 start:this.$refs.calendar?this.$refs.calendar.lastStart.date:defaultStart,
-                end:this.$refs.calendar?this.$refs.calendar.lastEnd.date:defaultEnd
+                end:this.$refs.calendar?this.$refs.calendar.lastEnd.date:defaultEnd,
             }
              this.logFormWorker.postMessage({
                 action:'getLogTimeList',
@@ -418,7 +460,7 @@ export default {
             }
         },
         mouseMove(tms) {
-            
+            // debugger
             const mouse = this.toTime(tms);
             if (this.dragEvent && this.dragTime !== null) {
                 const start = this.dragEvent.start
@@ -496,6 +538,7 @@ export default {
                     let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
                     this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD');
                     if(this.timeView){
+
                         this.dragEvent.type = this.checkPlanOrLog(this.dragEvent.start)?1:0;
                         this.updateEvent(this.dragEvent, duration);
                     }else{
@@ -666,7 +709,6 @@ export default {
     },
     watch: {
         period(){
-            debugger
             this.load()
         },
          userId(){
