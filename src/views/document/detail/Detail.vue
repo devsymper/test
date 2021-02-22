@@ -263,13 +263,14 @@ export default {
                     }
                     if(!$(evt.target).hasClass("s-floatting-popup") &&
                         $(evt.target).closest(".s-floatting-popup").length == 0){
-                            this.focusingControlName = "";
+                        this.focusingControlName = "";
                         this.$refs.floattingPopup.hide() 
                     }
                 }
             }
             
         })
+        
         /**
          * Nhận xử lí sự kiện click chuyển đổi dạng table <=> pivot mode
          */

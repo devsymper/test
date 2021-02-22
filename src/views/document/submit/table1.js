@@ -13,6 +13,7 @@ import sDocument from '@/store/document'
 import store from './../../../store'
 
 import {NumberCellRenderer} from './table/NumberCellRenderer'
+import BaseCellRenderer from './table/BaseCellRenderer'
 import {BottomPinnedRowRenderer} from './table/BottomPinnedRowRenderer'
 import {SelectCellRenderer} from './table/SelectCellRenderer'
 import {DateCellRenderer} from './table/DateCellRenderer'
@@ -68,6 +69,7 @@ export default class SymperTable {
          */
         this.supportCellsType = {
             currency: 'NumberCellRenderer',
+            richText: 'BaseCellRenderer',
             number: 'NumberCellRenderer',
             date: 'DateCellRenderer',
             dateTime: 'DateCellRenderer',
@@ -554,6 +556,7 @@ export default class SymperTable {
             groupDefaultExpanded: -1,
             components: {
                 NumberCellRenderer: NumberCellRenderer,
+                BaseCellRenderer: BaseCellRenderer,
                 FileCellRenderer: FileCellRenderer,
                 PercentCellRenderer: PercentCellRenderer,
                 UserCellRenderer: UserCellRenderer,
@@ -661,7 +664,10 @@ export default class SymperTable {
                 this.gridOptions.columnApi.autoSizeColumns(['ag-Grid-AutoColumn'], false);
             }
         }   
-      }
+    }
+    redrawRows(){
+        this.gridOptions.api.redrawRows()
+    }
     /**
      * tinh lại chiều cao table sau khi paste
      */

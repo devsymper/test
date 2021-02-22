@@ -132,13 +132,10 @@ export default {
          * context: ngữ cảnh sử dụng (detail, submit)
          * rowId : nếu là trong table thì có biến này
          */
-        show(e, context, rowId = undefined) {
-            if(rowId != undefined)
-            this.rowIndex = rowId;
+        show(e, context) {
             this.isShow = true;
             if(this.viewType == 'detail'){
-                this.$refs.comp_trackChange[0].computeDataTable();
-                this.showTrackChangeComp()
+                this.showTrackChangeComp();
             }
             this.calculatorPositionBox(e, context);
         },
@@ -148,9 +145,9 @@ export default {
             let input = $(e.target)
                 .parent()
                 .find(".s-control");
-            if ($(e.target).closest(".handsontable").length > 0) {
-                inputOffset = $(e.delegateTarget).offset();
-                input = $(e.delegateTarget)
+            if ($(e.target).closest(".ag-cell").length > 0) {
+                inputOffset = $(e.target).offset();
+                input = $(e.target);
             }
             //nêu là ngoài bảng
             else {
