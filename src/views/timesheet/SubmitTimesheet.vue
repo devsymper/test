@@ -174,6 +174,7 @@ export default {
     },
     created() {
         this.timesheetWorker = new TimesheetWorker();
+        // this.getAllTask();
         this.load()
     },
 }

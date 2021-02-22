@@ -46,7 +46,7 @@ export default {
     getTaskDB() {
         return api.get('task');
     },
-    createLogTime({ start, end, task, date, duration, type, categoryTask, accountId, desc }) {
+    createLogTime({ start, end, task, date, duration, type, categoryTask, accountId, desc,taskName }) {
         return api.post('log-time', {
             start,
             end,
@@ -57,6 +57,7 @@ export default {
             accountId,
             desc,
             categoryTask,
+            taskName
         })
     },
     createListLog(data){
@@ -120,7 +121,7 @@ export default {
     getTask(filter) {
              return taskApi.get('tasks?sort[0][column]=createTime&sort[0][type]=desc&search=%' + filter + '%&page=1&pageSize=50&variables=symper_last_executor_id%2Csymper_user_id_start_workflow%2Csymper_last_executor_name');
     },
-    updateLogTime({ start, end, task, date, duration, type, categoryTask, accountId, desc, id,docObjId }) {
+    updateLogTime({ start, end, task, date, duration, type, categoryTask, accountId,taskName, desc, id,docObjId }) {
         return api.put('log-time-update' + '/' + id, {
             start,
             end,
@@ -129,6 +130,7 @@ export default {
             duration,
             type,
             accountId,
+            taskName,
             desc,
             categoryTask,
             id,

@@ -456,6 +456,7 @@ export default {
              // this.loadTaskList();
         },
         newEvent(val) {
+            debugger
             this.getAllTask(val.task);
             this.inputs.startTime = val ? this.$moment(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? this.$moment(val.end).format('HH:mm') : "08:40";
@@ -701,6 +702,7 @@ export default {
             }       
         },
         saveLog(start,end,type){
+            debugger
             let data={
                 start: start,
                 end: end,
@@ -710,7 +712,8 @@ export default {
                 type: type,
                 date: this.inputs.date,
                 categoryTask: this.categoryTask,
-                desc: this.inputs.description || ""
+                desc: this.inputs.description || "",
+                taskName: this.findNameTask(this.task)
             }
             if(!this.repeat){
                 // this.onSave(data);
@@ -873,6 +876,7 @@ export default {
                     date: this.inputs.date,
                     color:this.newEvent.color,
                     categoryTask: this.categoryTask,
+                    taskName: this.findNameTask(this.task),
                     desc: this.inputs.description || "",
                     docObjId: this.newEvent.docObjId,
 

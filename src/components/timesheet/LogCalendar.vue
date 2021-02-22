@@ -64,15 +64,15 @@
                                         <div >
                                             <v-menu 
                                                 bottom left
-                                                nudge-left='5' 
-                                                nudge-top='-10'>
+                                                :nudge-left='5' 
+                                                :nudge-top='-10'>
                                                 <template v-slot:activator="{on:actionEvents }" >
                                                     <span class="fs-12 fw-400 color-black"
                                                         v-show="findDuration(event.start, event.end)<62" >
                                                         {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
                                                     </span>
                                                     <!-- <v-btn class="ml-1" dense dark icon> -->
-                                                        <v-icon v-show="event.type"
+                                                        <v-icon v-show="event.id"
                                                             v-on="actionEvents"
                                                             small class="color-black"> mdi-dots-vertical</v-icon>
                                                     <!-- </v-btn> -->
@@ -497,6 +497,7 @@ export default {
                 task: event.task,
                 type: self.checkPlanOrLog(event.start),
                 id: event.id,
+                taskName:event.name,
                 date: start.format('YYYY-MM-DD'),
                 categoryTask: event.category,
                 desc: event.desc || "",
