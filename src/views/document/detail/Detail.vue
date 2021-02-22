@@ -253,8 +253,8 @@ export default {
                     this.$refs.historyView.show($(evt.target))    
                 }
                 else if($(evt.target).is('.info-control-btn')){
-                    this.$refs.floattingPopup.show(evt, $('#sym-Detail-'+this.keyInstance));
                     this.focusingControlName = $(evt.target).attr('data-control');
+                    this.$refs.floattingPopup.show(evt, $('#sym-Detail-'+this.keyInstance));
                 }
                 else{
                     if(!$(evt.target).hasClass("v-data-table") &&
@@ -270,15 +270,6 @@ export default {
             }
             
         })
-        this.$evtBus.$on("on-info-btn-in-table-click", locate => {
-            if(thisCpn._inactive == true) return;
-            let e = locate.e;
-            let row = locate.row;
-            let controlName = locate.controlName;
-            this.focusingControlName = controlName;
-            this.$refs.floattingPopup.show(e, $('#sym-Detail-'+this.keyInstance), row);
-            
-        });
         /**
          * Nhận xử lí sự kiện click chuyển đổi dạng table <=> pivot mode
          */

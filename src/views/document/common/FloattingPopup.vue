@@ -93,11 +93,12 @@ export default {
                     text: "Lịch sử chỉnh sửa",
                     name: 'trackChange',
                     component: HistoryControl
-                },{
-                    text: "Bình luận",
-                    name: 'comment',
-                    component: HistoryControl
                 },
+                // {
+                //     text: "Bình luận",
+                //     name: 'comment',
+                //     component: HistoryControl
+                // },
             ]
             this.style.width = '600px';
             this.style.height = '300px';
@@ -137,6 +138,7 @@ export default {
             this.isShow = true;
             if(this.viewType == 'detail'){
                 this.$refs.comp_trackChange[0].computeDataTable();
+                this.showTrackChangeComp()
             }
             this.calculatorPositionBox(e, context);
         },

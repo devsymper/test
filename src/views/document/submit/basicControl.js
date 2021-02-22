@@ -51,121 +51,122 @@ export default class BasicControl extends Control {
         this.minValue = (this.controlProperties.hasOwnProperty('minValue')) ? this.controlProperties.minValue.value : false;
         this.maxValue = (this.controlProperties.hasOwnProperty('maxValue')) ? this.controlProperties.maxValue.value : false;
         this.colIndex = -1;
+        this.tableCellHistoryData = {};
     }
 
 
     render() {
-            this.ele.wrap('<span style="position:relative;display:inline-block">');
-            this.ele.attr('key-instance', this.keyInstance);
-            if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
-                this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title, 'Require');
-            }
-            if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
-                this.ele.attr('disabled', 'disabled');
-                this.ele.css({ background: 'rgba(0,0,0,0.05)' })
-            }
-            if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
-                this.ele.css({ 'display': 'none' })
-            }
-
-            if (this.ele.hasClass('s-control-number')) {
-                this.formulaValue = "";
-                this.renderNumberControl();
-
-            } else if (this.ele.hasClass('s-control-table')) {
-
-            } else if (this.ele.hasClass('s-control-hidden') || this.ele.hasClass('s-control-tracking-value')) {
-                this.ele.css('display', 'none');
-
-            } else if (this.ele.hasClass('s-control-filter')) {
-                this.renderFilterControl();
-
-            } else if (this.ele.hasClass('s-control-panel')) {
-                // presetPanel(this.ele);
-
-            } else if (this.ele.hasClass('s-control-report')) {
-                this.ele.removeClass('on-property');
-                // getReportTemplate(this.ele, {}, thisObj.name);
-
-            } else if (this.ele.hasClass('s-control-time')) {
-                this.ele.attr('type', 'text');
-                this.renderTimeControl();
-
-            } else if (this.ele.hasClass('s-control-percent')) {
-                this.renderPercentControl()
-
-            } else if (this.ele.hasClass('s-control-date')) {
-                this.renderDateControl();
-
-            } else if (this.ele.hasClass('s-control-datetime')) {
-                this.renderDateTimeControl();
-            } else if (this.ele.hasClass('s-control-file-upload')) {
-                this.renderFileControl();
-            } else if (this.ele.hasClass('s-control-user')) {
-                this.renderUserControl();
-            } else if (this.ele.hasClass('s-control-checkbox')) {
-                this.renderCheckboxControl();
-
-            } else if (this.ele.hasClass('s-control-select')) {
-                this.renderSelectControl();
-            } else if (this.ele.hasClass('s-control-combobox')) {
-                this.renderSelectControl(false);
-            } else if (this.ele.hasClass('s-control-label')) {
-                this.renderLabelControl();
-            } else if (this.ele.hasClass('s-control-rich-text')) {
-                this.renderRichTextControl();
-            }
-
-
-            if(this.checkEmptyFormulas('autocomplete')){
-                this.inputValue = null;
-            }
-            if (this.checkDetailView()) {
-                // this.ele.addClass('detail-view');
-                this.ele.attr('disabled', 'disabled');
-            }
-            if (this.checkViewType('submit')) {
-                this.setDefaultValue()
-            }
-            else if(this.checkViewType('print')){
-                this.setPrintValueControl();
-            }
-            else{
-                this.setValueControl();
-            }
-            this.setEvent();
-            if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete') && this.controlFormulas.autocomplete.instance) {
-                let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
-                let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
-                this.columnBindingSubForm = columnBinding;
-                if (allTable !== false) {
-                    let table = allTable[0];
-                    documentApi.getDetailDocumentByName({ name: table }).then(res => {
-                            if (res.status == 200) {
-                                let documentId = res.data.id;
-                                this.renderSubformButton(documentId);
-                            }
-
-                        }).catch(err => {
-
-                        })
-                        .finally(() => {});
-                }
-            }
-
+        this.ele.wrap('<span style="position:relative;display:inline-block">');
+        this.ele.attr('key-instance', this.keyInstance);
+        if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
+            this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title, 'Require');
         }
-        /**
-         * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
-         * nếu có thì thêm icon info
-         */
+        if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
+            this.ele.attr('disabled', 'disabled');
+            this.ele.css({ background: 'rgba(0,0,0,0.05)' })
+        }
+        if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
+            this.ele.css({ 'display': 'none' })
+        }
+
+        if (this.ele.hasClass('s-control-number')) {
+            this.formulaValue = "";
+            this.renderNumberControl();
+
+        } else if (this.ele.hasClass('s-control-table')) {
+
+        } else if (this.ele.hasClass('s-control-hidden') || this.ele.hasClass('s-control-tracking-value')) {
+            this.ele.css('display', 'none');
+
+        } else if (this.ele.hasClass('s-control-filter')) {
+            this.renderFilterControl();
+
+        } else if (this.ele.hasClass('s-control-panel')) {
+            // presetPanel(this.ele);
+
+        } else if (this.ele.hasClass('s-control-report')) {
+            this.ele.removeClass('on-property');
+            // getReportTemplate(this.ele, {}, thisObj.name);
+
+        } else if (this.ele.hasClass('s-control-time')) {
+            this.ele.attr('type', 'text');
+            this.renderTimeControl();
+
+        } else if (this.ele.hasClass('s-control-percent')) {
+            this.renderPercentControl()
+
+        } else if (this.ele.hasClass('s-control-date')) {
+            this.renderDateControl();
+
+        } else if (this.ele.hasClass('s-control-datetime')) {
+            this.renderDateTimeControl();
+        } else if (this.ele.hasClass('s-control-file-upload')) {
+            this.renderFileControl();
+        } else if (this.ele.hasClass('s-control-user')) {
+            this.renderUserControl();
+        } else if (this.ele.hasClass('s-control-checkbox')) {
+            this.renderCheckboxControl();
+
+        } else if (this.ele.hasClass('s-control-select')) {
+            this.renderSelectControl();
+        } else if (this.ele.hasClass('s-control-combobox')) {
+            this.renderSelectControl(false);
+        } else if (this.ele.hasClass('s-control-label')) {
+            this.renderLabelControl();
+        } else if (this.ele.hasClass('s-control-rich-text')) {
+            this.renderRichTextControl();
+        }
+
+
+        if(this.checkEmptyFormulas('autocomplete')){
+            this.inputValue = null;
+        }
+        if (this.checkDetailView()) {
+            // this.ele.addClass('detail-view');
+            this.ele.attr('disabled', 'disabled');
+        }
+        if (this.checkViewType('submit')) {
+            this.setDefaultValue()
+        }
+        else if(this.checkViewType('print')){
+            this.setPrintValueControl();
+        }
+        else{
+            this.setValueControl();
+        }
+        this.setEvent();
+        if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete') && this.controlFormulas.autocomplete.instance) {
+            let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
+            let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
+            this.columnBindingSubForm = columnBinding;
+            if (allTable !== false) {
+                let table = allTable[0];
+                documentApi.getDetailDocumentByName({ name: table }).then(res => {
+                        if (res.status == 200) {
+                            let documentId = res.data.id;
+                            this.renderSubformButton(documentId);
+                        }
+
+                    }).catch(err => {
+
+                    })
+                    .finally(() => {});
+            }
+        }
+
+    }
+    /**
+     * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
+     * nếu có thì thêm icon info
+     */
     checkHasInfoControl(dataLink) {
-            if (dataLink && Object.keys(dataLink).includes(this.name)) {
-                this.renderInfoIconToControl(this.name);
-            }
+        if (dataLink && Object.keys(dataLink).includes(this.name)) {
+            this.renderMoreInfoControlIcon();
         }
-        /**
-         * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
-         */
+    }
+    /**
+     * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
+     */
     setDefaultValue() {
         if (this.controlProperties['defaultValue'] != undefined) {
             if (typeof this.controlProperties['defaultValue'].value == 'object') {
@@ -716,18 +717,13 @@ export default class BasicControl extends Control {
             if (/^[-0-9,.]+$/.test($(this).val())) {
                 $(this).val(numbro($(this).val()).format())
             }
-        })
+        });
     }
 
 
     renderFilterControl() {
         if (this.checkDetailView()) return;
-        let thisObj = this;
         this.ele.attr('type', 'text');
-        this.ele.on('click', function(e) {
-
-        })
-
     }
     renderUserControl() {
         this.ele.attr('type', 'text');
@@ -838,18 +834,19 @@ export default class BasicControl extends Control {
         }
         return false;
     }
-    renderInfoIconToControl(controlName) {
+    renderMoreInfoControlIcon() {
+        if(this.checkViewType('detail')){
             if (this.ele.parent().find('.info-control-btn').length == 0) {
-
                 // let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
                 this.ele.addClass("info-control-btn");
-                this.ele.attr('data-control', controlName)
+                this.ele.attr('data-control', this.name)
                     //  this.ele.parent().append(icon);
             }
         }
-        /**
-         * Hàm chuyển định dạng date sang dạng sql hiểu được
-         */
+    }
+    /**
+     * Hàm chuyển định dạng date sang dạng sql hiểu được
+     */
     convertDateToStandard(data) {
         let dateFormat = this.controlProperties.formatDate.value;
         if (!dateFormat) {

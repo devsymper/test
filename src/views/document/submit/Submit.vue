@@ -521,11 +521,6 @@ export default {
             let dataParams = thisCpn.getParamsForRunDataFlow(control.properties);
             let element = thisCpn.$refs['dataFlow'+control.properties.dataFlowId.value][0].runDataflow(dataParams);
         });
-        $(document).find('#sym-submit-'+this.keyInstance).off('click','.info-control-btn')
-        $(document).find('#sym-submit-'+this.keyInstance).on('click','.info-control-btn',function(e){
-            thisCpn.focusingControlName = $(e.target).attr('data-control');
-            thisCpn.$refs.floattingPopup.show(e, $('#sym-submit-'+thisCpn.keyInstance));
-        });
     },
 
     async created() {
@@ -622,15 +617,6 @@ export default {
             }
             
             this.$refs.popupPivotTableView.show(type, tableName);
-        });
-
-        this.$evtBus.$on("on-info-btn-in-table-click", locate => {
-            if(thisCpn._inactive == true) return;
-            let e = locate.e;
-            let row = locate.row;
-            let controlName = locate.controlName;
-            this.focusingControlName = controlName;
-            this.$refs.floattingPopup.show(e, $('#sym-submit-'+this.keyInstance), row);
         });
         /**
          * Su kiện phát ra khi có sự thay đổi trong table, để convert sang pivot table
@@ -831,12 +817,6 @@ export default {
                     $(evt.target).closest(".card-autocomplete").length == 0
                 ) {
                     thisCpn.$refs.autocompleteInput.hide();
-                }
-                
-                if( !$(evt.target).hasClass("info-control-btn") &&
-                    !$(evt.target).hasClass("s-floatting-popup") &&
-                    $(evt.target).closest(".s-floatting-popup").length == 0){
-                    this.$refs.floattingPopup.hide();
                 }
                 if (
                     !$(evt.target).hasClass("s-control-date") &&
@@ -1786,7 +1766,6 @@ export default {
                                 control.setEffectedData(prepareData);
                                 this.addToListInputInDocument(controlName,control);
                                 control.render();
-                                control.checkHasInfoControl(this.linkControl);
                             }
                             
                         }
@@ -2774,7 +2753,7 @@ export default {
                     }
                 }
             }
-            controlInstance.renderInfoIconToControl(controlName);
+            // controlInstance.renderMoreInfoControlIcon();
         },
         setDataForLinkControl(formulaType, link, title, source, controlName){
             this.$store.commit(

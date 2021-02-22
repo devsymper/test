@@ -249,7 +249,7 @@ export default class SymperTable {
         }
         let colObjectId = {
             headerName:'child_object_id',
-            field: 'child_object_id',
+            field: 'childObjectId',
             hide:true
         };
         let colSqlId = {
@@ -824,7 +824,7 @@ export default class SymperTable {
         for(let controlName in this.tableControl.controlInTable){
             dataSubmit[controlName] = this.getColData(controlName);
         }
-        dataSubmit['child_object_id'] = this.getColData('child_object_id');
+        dataSubmit['child_object_id'] = this.getColData('childObjectId');
         return dataSubmit
     }
     /**

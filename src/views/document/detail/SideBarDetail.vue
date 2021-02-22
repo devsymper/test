@@ -373,19 +373,19 @@ export default {
 
 			let mapTableAndControls = {};
 			for(let name in newObj){
-				if($.isArray(newObj[name])){
+				if(Array.isArray(newObj[name])){
 					mapTableAndControls[name] = {
 						new: {},
 						old: {}
 					};
 
-					if($.isArray(newObj[name])){
+					if(Array.isArray(newObj[name])){
 						for(let row of newObj[name]){
 							mapTableAndControls[name].new[row.document_object_id] = row;
 						}
 					}
 
-					if($.isArray(oldObj[name])){
+					if(Array.isArray(oldObj[name])){
 						for(let row of oldObj[name]){
 							mapTableAndControls[name].old[row.document_object_id] = row;
 						}
@@ -402,11 +402,9 @@ export default {
 						tbChange[idRow] = this.compareTwoRows(oldObj, newObj);
 					}
 				}
-
 				if(!$.isEmptyObject(tbChange)){
 					let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
 					let table = mapDocControl[tbName];
-					let mapControlToIndex = table.mapControlToIndex;
 					let allColumnId = table.tableInstance.getColData('childObjectId');
 					
 					for(let rowId in tbChange){
@@ -415,10 +413,8 @@ export default {
 						for (let index = 0; index < dataChange.length; index++) {
 							let cellChange = dataChange[index];
 							if(cellChange.data.new != cellChange.data.old){
-								let cellPos = curRowIndex + "_" + mapControlToIndex[cellChange.name];
-								table.tableInstance.addToValueMap(cellPos, {
-									type: 'linkControl',
-								})
+								let controlIns = getControlInstanceFromStore(this.keyInstance, cellChange.name);
+								controlIns.tableCellHistoryData[curRowIndex] = true;
 							}
 						}
 						
@@ -435,7 +431,6 @@ export default {
 					});
 				}
 			}
-
 			let rsl = changedControls.doc.concat(changedControls.tables);
 			return rsl;
 		},
@@ -447,8 +442,8 @@ export default {
 				let ctrl = mapDocControl[name];
 				// [{id:'s-control-id-1596780602772',data:[]}]
 				if(	ctrl
-					&& oldObj.hasOwnProperty(name) && !$.isArray(oldObj[name])
-					&& newObj.hasOwnProperty(name) && !$.isArray(newObj[name]) // nếu khác giá trị
+					&& oldObj.hasOwnProperty(name) && !Array.isArray(oldObj[name])
+					&& newObj.hasOwnProperty(name) && !Array.isArray(newObj[name]) // nếu khác giá trị
 				){
 					if( ['number','percent'].includes(ctrl.type)){
 						if(Number(oldObj[name]) === Number(newObj[name])){
@@ -471,7 +466,7 @@ export default {
 					let ctrlObj = getControlInstanceFromStore(this.keyInstance, name);
 					if(!ctrlObj.valueChanged){
 						ctrlObj.valueChanged = true;
-						ctrlObj.renderInfoIconToControl(name);
+						ctrlObj.renderMoreInfoControlIcon();
 					}
 				}
 			}
