@@ -267,6 +267,7 @@
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
+                @cell-clicked="onCellClicked"
 			>
 			</ag-grid-vue>
 			 <display-config
@@ -2169,13 +2170,13 @@ export default {
 </script>
 <style scoped>
 
-.symper-list-items >>> .ag-row{
-	border-top-style:unset !important;
+.symper-list-items .ag-list-items-table >>>  .ag-row{
+	border-top-style: unset !important;
 }
-.symper-list-items >>> .ag-theme-balham .ag-root-wrapper{
+.symper-list-items .ag-list-items-table >>> .ag-theme-balham .ag-root-wrapper{
 	border: unset !important;
 }
-.symper-list-items >>> .ag-cell{
+.symper-list-items .ag-list-items-table >>> .ag-cell{
 	-webkit-touch-callout: none;
 	-webkit-user-select: none; 
 	-khtml-user-select: none; 
@@ -2199,7 +2200,7 @@ export default {
 	height: 28px !important;
 	min-height: unset !important;
 	background-color: #ffffff !important;
-	border-top: 1px solid lightgray !important;
+	/* border-top: 1px solid lightgray !important; */
 	border-bottom: 1px solid lightgray !important;
 }
 .symper-list-items .ag-list-items-table >>> .ag-header-row {
