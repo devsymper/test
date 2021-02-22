@@ -46,7 +46,7 @@ export const copyLogTime = async function(event) {
       return check
 }
 export const resizeLogtime = async function(events) {
-    let taskLength = 60*60*1000;
+    let taskLength = 85*60*1000;
     let padding = 60*60*300;
     let lastDate, lastEnd;
     let newTasks = events.map(task=>{
@@ -67,16 +67,18 @@ export const resizeLogtime = async function(events) {
 export const getLogTimeList = async function(dateStartEnd){
     let res = await timesheetApi.getLogTimeList(dateStartEnd);
     let data = {
-        sumLogTime: 0,
-        hoursRequired: 0,
+        // sumLogTime: 0,
+        // hoursRequired: 0,
+        // category:[],
         events:[]
     }
     if(res.status == 200){
         const logTimeList = res.data.listLogTime;
-        data.sum = res.data.sumLogTime;
-        data.hoursRequired = res.data.hourRequired[0].hoursRequired;
+        // data.sum = res.data.sumLogTime;
+        // data.category = res.data.category;
+        // data.hoursRequired = res.data.hourRequired[0].hoursRequired;
         data.events = [...logTimeList.map((logTime, idx) => ({
-            name: `${logTime.task_id}`,
+            name: `${logTime.task_name}`,
             timed: true,
             // log form data
             date: logTime.date,
@@ -87,6 +89,7 @@ export const getLogTimeList = async function(dateStartEnd){
             category_key: logTime.key,
             task: logTime.task_id,
             desc: logTime.description,
+            color:'#F0F8FF',
             type: logTime.type,
             id: logTime.id,
             docObjId:logTime.doc_obj_id
@@ -94,6 +97,7 @@ export const getLogTimeList = async function(dateStartEnd){
     }
     return data
 }
+
 export const changeDuration = async function(duration){
     let hour = duration / 60;
     let minutes = duration % 60;

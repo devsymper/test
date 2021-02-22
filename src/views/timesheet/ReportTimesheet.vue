@@ -1,6 +1,9 @@
 <template>
-<div class="w-100 pl-4" >
+<div style=' width: 100%; padding-left: 10px; position: relative;' class="overflow-hidden">
     <v-row class="submit-view">
+      <v-navigation-drawer  v-model="drawer" absolute temporary right style="width: 450px" class="h-100 manage-timesheet">
+             <Config @cancel="drawer=null"/>
+        </v-navigation-drawer>
         <div style="width:63%;float:left">
             <div class="float-lg-left float-md-left .d-lg-flex .d-lg-none d-none d-lg-block sub-submit-view pt-3">
                 <v-btn @click="adjust(-1)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('timesheet.last_week')}}</v-btn>
@@ -17,9 +20,17 @@
             </v-col>
         </div>
         <div style="width:37%;float:right" class=" .d-lg-flex .d-lg-none d-none d-lg-block">
-            <v-col class="float-lg-right mr-4" style="float:left; 
-                padding-right: 0px; padding-left: 0px; width: 160px">
-            </v-col>
+             <div class="icon-calendar">
+                <v-btn icon class="mdi-calendar-button" @click="$router.push('/timesheet')">
+                    <v-icon>mdi-calendar</v-icon>
+                </v-btn>
+                <v-btn icon class="mdi-calendar-button" style="padding-right: 3px" @click.stop="drawer = !drawer">
+                    <v-icon>mdi-account-settings</v-icon>
+                </v-btn>
+                <!-- <v-select class="groupBy" style="font-size:13px" item-color="white" :items='view' v-model="manageTimesheetType"
+                    :menu-props="{'nudge-top':-40}" label="View" background-color="#F7F7F7">
+                </v-select> -->
+            </div>
         </div>
     </v-row>
     <v-row>
@@ -39,6 +50,7 @@
 </template>
 
 <script>
+import Config from "./../../components/timesheet/Config";
 import AgDataTable from "./../../components/common/agDataTable/AgDataTable";
 import ActionButtons from "./../../components/timesheet/ActionButtons";
 import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetForm";
@@ -49,6 +61,8 @@ export default {
     components: {
         AgDataTable,
         SubmitTimesheetForm,
+        Config
+
     },
     mounted(){
         const self = this
@@ -93,6 +107,7 @@ export default {
     },
     data() {
         return {
+            drawer: null,
             reportTimesheetWorker:null,
             listUser: [],
               customGridOptions: {
@@ -280,6 +295,59 @@ button {
 .v-select__selection {
     padding-left: 0px;
     font-size: 13px !important;
+}
+.ag-theme-balham .ag-cell{
+    border:none!important;
+    line-height:22px!important
+}
+
+.manage-timesheet ::v-deep .v-card {
+    box-shadow: none !important;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.manage-timesheet ::v-deep .v-window {
+    display: flex;
+    flex-direction: column;
+}
+
+.manage-timesheet ::v-deep .v-window__container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+
+</style>
+
+<style>
+.v-time-picker-title .v-picker__title__btn,
+.v-time-picker-title span {
+    font-size: 24px !important;
+    height: 35px;
+    margin-top: 5px;
+    align-items: center !important;
+    display: inline-flex;
+}
+
+.v-picker--time>.v-picker__title {
+    padding: 0;
+    padding-right: 16px;
+}
+
+.v-select__selections {
+    padding-left: 10px;
+}
+
+.v-list-item__title {
+    font-size: 13px !important;
+    color: black;
+}
+
+ a{
+    color:black;
 }
 .ag-theme-balham .ag-cell{
     border:none!important;
