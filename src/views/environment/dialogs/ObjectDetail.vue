@@ -151,7 +151,6 @@ export default {
 			this.$emit('back')
 		},
 		addCheckBoxColumn(){
-			debugger
 			delete this.customHeaderBtn.showCheckBox
 			this.$refs.listObject.addCheckBoxColumn()
 		},
