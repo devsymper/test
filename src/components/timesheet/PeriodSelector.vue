@@ -131,7 +131,6 @@ export default {
                         action: (idx) => {
                             this.$store.commit('timesheet/updateCalendarShowDate', this.$moment().subtract(month, 'month').format('YYYY-MM-DD'));
                             this.$store.commit('timesheet/adjustCalendar', month);
-                            debugger
                             self.actions = self.actions.map(act=>{
                                     act.hover=false
                                     return act;

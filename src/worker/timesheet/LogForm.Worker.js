@@ -78,7 +78,7 @@ export const getLogTimeList = async function(dateStartEnd){
         // data.category = res.data.category;
         // data.hoursRequired = res.data.hourRequired[0].hoursRequired;
         data.events = [...logTimeList.map((logTime, idx) => ({
-            name: `${logTime.task_id}`,
+            name: `${logTime.task_name}`,
             timed: true,
             // log form data
             date: logTime.date,

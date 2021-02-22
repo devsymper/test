@@ -135,6 +135,7 @@
 </template>
 
 <script>
+import { formulasApi } from '../../api/Formulas';
 import {uiConfigApi} from "../../api/uiConfig";
 import LogTimeView from "./../../components/timesheet/LogTimeView";
 import ViewDetailMonth from "./../../components/timesheet/ViewDetailMonth";
@@ -193,9 +194,25 @@ export default {
         this.getConfigInfo()
         this.logFormWorker = new LogFormWorker();
         this.getAllTask();
+        this.getCategory();
         this.load();
     },
     methods: {
+        getCategory(){
+            const self = this;
+             timesheetApi.getAllCategory({}).then(res => {
+                if (res.status === 200) {debugger
+                    self.listCategory = res.data.listObject;
+                    // self.category.category_name=[];
+                    // let category = res.data.listObject;
+                    // for(let i=0; i<category.length; i++){
+                    //     self.category.category_name.push(
+                    //         category[i].key+"-"+category[i].name
+                    //     )
+                    // }
+                }
+                }).catch(console.log);
+            },
         async getAllTask(){
             let self = this;
             this.items = [];
@@ -260,16 +277,13 @@ export default {
         },
         
         setLogTimeList(data){
-            debugger
-            data.events.map((evt,i)=>{
-                // let test = task.id;
-                 let taskName = this.listTask.filter(task=>task.id==evt.task).length>0? this.listTask.filter(task=>task.id==evt.task)[0].name:'';
-                // evt.task = taskName;
-                evt.name = taskName;
+            // data.events.map((evt,i)=>{
+            //     // let test = task.id;
+            //      let taskName = this.listTask.filter(task=>task.id==evt.task).length>0? this.listTask.filter(task=>task.id==evt.task)[0].name:'';
+            //     // evt.task = taskName;
+            //     evt.name = taskName;
 
-            })
-            debugger
-
+            // })
             this.events = data.events;
             if(this.isRandom){
                 this.events.map(e=>{
@@ -486,6 +500,21 @@ export default {
             let check = this.$moment(time).isAfter(now)==true?0:1;
             return check
         },
+        sendFormular(formular){
+            formulasApi.getDataByAllScriptType(formular,"{}").then(res=>{
+                if(res.status==200){
+                }
+            })
+
+        },
+        findFormular(keyCateId){
+            let description = this.listCategory.filter(cate=>cate.key==keyCateId&&cate.type==1);
+            let formular = description.length>0?description[0].description:null;
+            if(formular){
+                this.sendFormular(formular)
+            }
+        
+        },
         async updateEvent(event,duration){
             let start = this.$moment(event.start);
             let end = this.$moment(event.end);
@@ -521,6 +550,8 @@ export default {
                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
                         this.createEvent.duration = duration; 
                         this.updateEvent(this.createEvent, duration);
+                        this.findFormular(this.createEvent.category_key)
+                        // cập nhật vào doc
                     } catch(e) {console.log(e); }
                 } else {//1.2: tao moi event
                     if(this.timeView){
@@ -539,9 +570,10 @@ export default {
                     let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
                     this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD');
                     if(this.timeView){
-
                         this.dragEvent.type = this.checkPlanOrLog(this.dragEvent.start)?1:0;
                         this.updateEvent(this.dragEvent, duration);
+                        this.findFormular(this.createEvent.category_key)
+
                     }else{
                         this.dragEvent.type = this.checkPlanOrLog(this.dragEvent.date)?1:0;
                         let id = this.dragEvent.id;
@@ -559,6 +591,8 @@ export default {
                         // oldLog.type=0;
                         this.resizeLogtime();
                          this.updateEvent(oldLog, oldLog.duration);
+                        this.findFormular(this.createEvent.category_key)
+
 
                         
                     }

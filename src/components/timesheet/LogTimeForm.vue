@@ -428,7 +428,6 @@ export default {
                 }
              }
              else{
-                 debugger
                 let taskId = this.task;
                 // debugger
                 // this.findNameTask(this.task);
@@ -456,7 +455,6 @@ export default {
              // this.loadTaskList();
         },
         newEvent(val) {
-            debugger
             this.getAllTask(val.task);
             this.inputs.startTime = val ? this.$moment(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? this.$moment(val.end).format('HH:mm') : "08:40";
@@ -520,7 +518,6 @@ export default {
         },
         // lấy ra tên của task từ id task
         findNameTask(id){
-            debugger
             if(this.listTask.length>0){
                  this.nameTask=this.listTask.filter(x=>x.id==id)[0].name;
                 return this.nameTask
@@ -702,7 +699,6 @@ export default {
             }       
         },
         saveLog(start,end,type){
-            debugger
             let data={
                 start: start,
                 end: end,
@@ -753,8 +749,7 @@ export default {
             if(this.typeRepeat=='general'){
                 switch(this.selectedRepeat){
                     case "Hằng ngày":
-                        //   let conditionDaily = 
-                       ;
+                        let conditionDaily = true;
                         this.repeatData.applyDay = [1,2,3,4,5,6,0]
                         this.repreatConditional(data,conditionDaily);
                         break;
@@ -792,9 +787,10 @@ export default {
             let endMinutes = this.$moment(data.end).format('mm');
             let totalDay = this.$moment.duration(endCalendar.diff(startCalendar)).asDays();
             let logtime = data;
-            for(let i=0;i<=totalDay;i++){
-                if(condition){
-                    logtime.date = this.$moment(startCalendar).add(i, 'days').format('YYYY-MM-DD');//date.logtime=2 = >date.date=2; date = 3
+            for(let i=0;i<=totalDay*2+1;i++){
+                logtime.date = this.$moment(startCalendar).add(i, 'days').format('YYYY-MM-DD');//date.logtime=2 = >date.date=2; date = 3
+                if(eval(condition)){
+                    logtime.type=this.checkPlanOrLog(logtime.start);
                     logtime.start = this.$moment(logtime.date,"YYYY-MM-DD").add(startHour,'hours').add(startMinutes,'minutes').format('YYYY-MM-DD HH:mm');
                     logtime.end = this.$moment(logtime.date,"YYYY-MM-DD").add(endHour,'hours').add(endMinutes,'minutes').format('YYYY-MM-DD HH:mm');
                     logtime.configRepeat = JSON.stringify(this.repeatData);
@@ -803,12 +799,12 @@ export default {
             }
             this.$emit('create-list-log',listLog);
             // this.$emit('')
-            //  timesheetApi.createListLog(JSON.stringify(listLog)).then(res => {
-            //         if (res.status === 200) {
-            //             self.onSave();
-            //             self.$emit('loadMonthView')
-            //         }
-            //         }).catch();
+            timesheetApi.createListLog(JSON.stringify(listLog)).then(res => {
+                    if (res.status === 200) {
+                        self.onSave();
+                        self.$emit('loadMonthView')
+                    }
+            }).catch();
         },
         showError() {
             if (this.duration < 0) {
