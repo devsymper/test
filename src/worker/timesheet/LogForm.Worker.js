@@ -35,6 +35,7 @@ export const copyLogTime = async function(event) {
           duration:event.duration,
           task: event.task,
           type: event.type,
+          taskName:event.name,
           id: event.id,
           date: event.date,
           categoryTask: event.category,

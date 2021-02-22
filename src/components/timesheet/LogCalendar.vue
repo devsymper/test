@@ -335,6 +335,8 @@ export default {
         },
         copyLogTime(event){
             let data = {...event};
+            // data.nameTask = this.listTask.filter(task=>task.id==event.task)[0].name;
+            event.nameTask=data.name;
             data.categoryTask = event.category;
             data.desc = event.desc || "";
             this.events.push(data);

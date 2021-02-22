@@ -479,6 +479,18 @@ export default {
         this.getCategory();
     },
     methods: {
+    create_UUID() {
+        var dt = new Date().getTime();
+        var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        function(c) {
+          var r = (dt + Math.random() * 16) % 16 | 0;
+          dt = Math.floor(dt / 16);
+          return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
+        }
+      );
+      return uuid;
+    },
         repeatConfig(){
             this.repeat = !this.repeat;
         },
@@ -702,6 +714,7 @@ export default {
             let data={
                 start: start,
                 end: end,
+                id:this.create_UUID(),
                 duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
                 // task: this.findNameTask(this.task),
                 task:this.task,
@@ -712,12 +725,12 @@ export default {
                 taskName: this.findNameTask(this.task)
             }
             if(!this.repeat){
-                // this.onSave(data);
-                this.$emit('create-log',data);
+                //this.onSave(data);
+                this.$emit('create-log',{...data});
                 timesheetApi.createLogTime(data).then(res => {
                     if (res.status === 200) {
                         this.onSave();
-                         this.$snotify({
+                        this.$snotify({
                             type: "success",
                             title:" Thêm thành công",
                         });
@@ -728,7 +741,7 @@ export default {
                     }else{
                         // xử lý
                         this.onSave();
-                        self.$snotify({
+                        this.$snotify({
                             type: "error",
                             title:"Thêm thất bại",
                     });

@@ -46,9 +46,10 @@ export default {
     getTaskDB() {
         return api.get('task');
     },
-    createLogTime({ start, end, task, date, duration, type, categoryTask, accountId, desc,taskName }) {
+    createLogTime({id, start, end, task, date, duration, type, categoryTask, accountId, desc,taskName }) {
         return api.post('log-time', {
             start,
+            id,
             end,
             task,
             date,

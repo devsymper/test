@@ -197,10 +197,14 @@ export default {
 
         },
         createLog(data){
+            data.start = Date.parse(data.start);
+            data.date = this.$moment(data.end).format('YYYY-MM-DD');
+            data.end = Date.parse(data.end);
             data.name=this.$refs.logCalendar.listTask.filter(task=>task.id==data.task).length>0? this.$refs.logCalendar.listTask.filter(task=>task.id==data.task)[0].name:'';
             data.category=data.categoryTask;
             data.color= this.$refs.logCalendar.colorLog;
             data.type=data.type;
+            data.timed= true;
             data.category_key=data.categoryTask.split('-')[0];
             this.$refs.logCalendar.events.push(data);
             if(!this.$refs.logCalendar.timeView){
