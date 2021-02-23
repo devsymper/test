@@ -42,6 +42,7 @@ const defaultState = {
     checkBoardChange:[],
     backLogData:{},
     listUserInProject:{},
+    countIssueWithStatusInListProject:{},// có dạng {key : []} , key là projectId,
 };
 
 export default defaultState;

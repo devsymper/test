@@ -40,12 +40,12 @@
                     <template v-slot:[`item.user`]="{ item }">
                         <infoUser class="userInfo fs-13" :userId="item.userCreate" :roleInfo="{}" />
                     </template>
-                    <template v-slot:[`item.progess`]="{}">
-                        <div class="w-100 d-flex progress"  >
-                            <div class="progress-item" v-for="(item, key) in dataProgess.item " :key="key" 
+                    <template v-slot:[`item.progess`]="{ item }">
+                        <div class="w-100 d-flex progress" v-if="infoDataProgress && infoDataProgress[item.id]" >
+                            <div class="progress-item" v-for="(item2, key) in infoDataProgress[item.id].item " :key="key" 
                                         :style="{
-                                            width: (item.value/dataProgess.total)*100 +'%',
-                                            background:item.color
+                                            width: (item2.value/infoDataProgress[item.id].total)*100 +'%',
+                                            background:item2.color
                                         }">
                             </div>
                         </div>
@@ -129,23 +129,7 @@ export default {
         return{
             versionWorker:null,
             loading:false,
-            dataProgess:{
-                total:6,
-                item:{
-                    todo:{
-                        value:2,
-                        color:'grey'
-                    },
-                    inprogress:{
-                        value:3,
-                        color:'blue'
-                    },
-                    done:{
-                        value:1,
-                        color:'green'
-                    }
-                }
-            },
+            infoDataProgress:null,
             versionSelected:{},
             statusDetail:false,
             dialogRemoveVersion:false,
@@ -290,10 +274,11 @@ export default {
                 case 'countIssueInListVersion':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
-                        self.dataProgess.total = res.total ? res.total : 0;
-                        self.dataProgess.item.todo.value = res.todo ? res.todo : 0;
-                        self.dataProgess.item.inprogress.value = res.inprogress ? res.inprogress : 0;
-                        self.dataProgess.item.done.value = res.done ? res.done : 0;
+                        self.infoDataProgress = res;
+                        let dataSet = {};
+                        dataSet.key = self.$route.params.id;
+                        dataSet.data = res
+                        self.$store.commit('taskManagement/setCountIssueWithStatusInListProject',dataSet);
                     } 
                     break
                 default:
