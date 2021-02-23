@@ -5,17 +5,15 @@
 				<span class="mb-2 fs-13">
 					{{ $t('bi.relation.selector') }}
 				</span>
-
 				<DatasetAutocomplete @dataset-selector="handleDatasetSelected" :listDatasets="listDatasets" />
-
 				<VuePerfectScrollbar class="mt-2 " :style="{ height: listHeight + 'px' }" v-if="listDatasetSelected.length > 0">
 					<dataset-selected-item  v-for="(item, i) in listDatasetSelected" :key="i" class="dataset-selected-item" :item="item" :showRemove="true" @remove-item="removeItem" />
 				</VuePerfectScrollbar>
 			</div>
 		</div>
 		<div class="relation-workspace flex-grow-1 d-flex flex-column">
-			<div class="relation-workspace-toolbar d-flex">
-				<div class="dflex" :class="{'flex-grow-1': dialogMode}">
+			<div class="d-flex  justify-content-center">
+				<div class="d-flex " style="width: 150px" :class="{'flex-grow-1': dialogMode}">
 					<v-icon small>
 						mdi-pencil-box-outline
 					</v-icon>
@@ -23,31 +21,26 @@
 						{{relationName}}
 					</span>
 				</div>
-			
-				<!-- <v-text-field
-					solo
-				>
-
-				</v-text-field> -->
-				<div>
+				<div class="flex-grow-1" style="margin-right: auto; margin-left: auto">
 					<v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
 						<template v-slot:activator="{ on }">
-							<v-btn @click="handleHeaderAction(key)" icon tile class="mr-2" style="position:relative; top: -3px">
+							<v-btn small @click="handleHeaderAction(key)" icon tile class="mr-2 mt-1" style="position:relative; top: -3px;">
 								<v-icon small v-on="on">{{ item.icon }}</v-icon>
 							</v-btn>
 						</template>
 						<span>{{ $t(item.text) }}</span>
 					</v-tooltip>
 				</div>
-
-				<v-btn small class="mr-2 mt-1" @click="saveRelations" v-if="action != 'view'">
-					<v-icon small>
-						mdi-check
-					</v-icon>
-					<span class="ml-1">
-						{{ $t('common.save') }}
-					</span>
-				</v-btn>
+				<div class="ml-auto" style="margin-top: 2px">
+					<v-btn small class="mr-2" @click="saveRelations" v-if="action != 'view'">
+						<v-icon small>
+							mdi-check
+						</v-icon>
+						<span class="ml-1">
+							{{ $t('common.save') }}
+						</span>
+					</v-btn>
+				</div>
 			</div>
 			<RelationWorkspace 
 				:action="action"
@@ -59,7 +52,7 @@
 			 />
 		</div>
 		<div class="relation-link" v-if="action != 'view'">
-			relation-link
+			<RelationLink />
 		</div>
 	</div>
 </template>
@@ -68,6 +61,7 @@
 import RelationWorkspace from '@/components/relation/RelationWorkspace';
 import DatasetAutocomplete from '@/components/dataset/DatasetAutocomplete';
 import DatasetSelectedItem from '@/components/dataset/DatasetSelectedItem.vue';
+import RelationLink from '@/components/relation/RelationLink.vue';
 import RelationEditorWorker from 'worker-loader!@/worker/relation/RelationEditor.Worker.js';
 import { util } from '@/plugins/util.js';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
@@ -133,7 +127,8 @@ export default {
 		RelationWorkspace,
 		DatasetAutocomplete,
 		DatasetSelectedItem,
-		VuePerfectScrollbar
+		VuePerfectScrollbar,
+		RelationLink
 	},
 	created(){
 		this.relationEditoWorker = new RelationEditorWorker()
