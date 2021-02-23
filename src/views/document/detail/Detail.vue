@@ -222,6 +222,7 @@ export default {
         });
     },
     created(){
+        debugger
         tinymce.remove();
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
