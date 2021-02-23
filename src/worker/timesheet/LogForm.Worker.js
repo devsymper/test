@@ -39,7 +39,8 @@ export const copyLogTime = async function(event) {
           id: event.id,
           date: event.date,
           categoryTask: event.category,
-          desc: event.desc || ""
+          desc: event.desc || "",
+          cateId: event.cateId
       })
       if(res.status==200){
          check = true

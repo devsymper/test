@@ -18,7 +18,6 @@
             <div style="width: 320px!important" 
                 class="ml-3 mr-1">
                 <v-autocomplete
-           
                     style="margin-top:-10px!important; " 
                     :menu-props="{'nudge-top':-10}" 
                     v-model="categoryTask"
@@ -725,6 +724,7 @@ export default {
                 duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
                 // task: this.findNameTask(this.task),
                 task:this.task,
+                cateId:this.getIdCategory(this.categoryTask),
                 type: type,
                 date: this.inputs.date,
                 categoryTask: this.categoryTask,
@@ -745,14 +745,30 @@ export default {
                 }
             }
         },
+        notify(type,name){
+            if(type=='success'){
+                this.$snotify({
+                    type: type,
+                    title:`${name} thành công`,
+                });
+            }
+            else if(type=='error'){
+                 this.$snotify({
+                    type: type,
+                    title:`${name} thất bại`,
+                });
+            }else{
+                this.$snotify({
+                    type: type,
+                    title:name,
+                });
+            }
+        },
         sendApiCreateLog(data){
             timesheetApi.createLogTime(data).then(res => {
                 if (res.status === 200) {
                     this.onSave();
-                    this.$snotify({
-                        type: "success",
-                        title:" Thêm thành công",
-                    });
+                    this.notify('success',"Thêm");
                     this.refreshAll();
                     if(this.typeCalendar=='month'){  
                         this.$emit('loadMonthView',data)
@@ -760,10 +776,8 @@ export default {
                 }else{
                     // xử lý
                     this.onSave();
-                    this.$snotify({
-                        type: "error",
-                        title:"Thêm thất bại",
-                });
+                    this.notify("error","Thêm");
+                 
                 }
             }).catch();
         },
@@ -810,34 +824,28 @@ export default {
             let endMinutes = this.$moment(data.end).format('mm');
             let totalDay = this.$moment.duration(endCalendar.diff(startCalendar)).asDays();
             let logtime = data;
-            for(let i=0;i<=totalDay;i++){
+            for(let i=0;i<=totalDay*4+3;i++){
                 logtime.date = this.$moment(startCalendar).add(i, 'days').format('YYYY-MM-DD');//date.logtime=2 = >date.date=2; date = 3
                 if(eval(condition)){
                     logtime.type=this.checkPlanOrLog(logtime.start);
                     logtime.start = this.$moment(logtime.date,"YYYY-MM-DD").add(startHour,'hours').add(startMinutes,'minutes').format('YYYY-MM-DD HH:mm');
                     logtime.end = this.$moment(logtime.date,"YYYY-MM-DD").add(endHour,'hours').add(endMinutes,'minutes').format('YYYY-MM-DD HH:mm');
                     logtime.configRepeat = JSON.stringify(this.repeatData);
-                    // this.sendApiCreateLog(logtime);
                     listLog.push({...logtime});
                 }
             }
             const listLogCopy = util.cloneDeep(listLog);
             this.$emit('create-list-log',listLogCopy);
-            // this.$emit('')
+            this.notify('info','Vui lòng chờ...')
             timesheetApi.createListLog(JSON.stringify(listLog)).then(res => {
                     if (res.status === 200) {
+                        self.notify('success','Thêm')
                         self.onSave();
                         // self.$emit('loadMonthView')
+                    }else{
+                         self.notify('error','Thêm')
                     }
             }).catch();
-            // test api 
-            // this.$emit('')
-            // timesheetApi.createListLog(JSON.stringify(listLog)).then(res => {
-            //         if (res.status === 200) {
-            //             self.onSave();
-            //             // self.$emit('loadMonthView')
-            //         }
-            // }).catch();
         },
         showError() {
             if (this.duration < 0) {
@@ -892,13 +900,10 @@ export default {
             let check = this.checkValidateLogForm();
             if (!check){
             } else {
-                let taskId = this.task;
-               // let test = this.items.filter(x=>x.name==this.task)[0].id;
                 let data = {
                     start: this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                     end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                     duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
-                    // task: this.findNameTask(taskId),
                     task: this.task,
                     type: this.checkPlanOrLog(this.newEvent.start),
                     id: this.newEvent.id,
@@ -908,11 +913,11 @@ export default {
                     taskName: this.findNameTask(this.task),
                     desc: this.inputs.description || "",
                     docObjId: this.newEvent.docObjId,
-
+                    cateId: this.getIdCategory(this.categoryTask)
                 }
                 let originLog=this.setOriginLog(data);
                 this.$emit('update-log',originLog);
-                timesheetApi.updateLogTime(data).then(res => {
+                timesheetApi.updateLogTime(data,data.id).then(res => {
                         if (res.status === 200) {
                         }
                     })

@@ -46,20 +46,8 @@ export default {
     getTaskDB() {
         return api.get('task');
     },
-    createLogTime({id, start, end, task, date, duration, type, categoryTask, accountId, desc,taskName }) {
-        return api.post('log-time', {
-            start,
-            id,
-            end,
-            task,
-            date,
-            duration,
-            type,
-            accountId,
-            desc,
-            categoryTask,
-            taskName
-        })
+    createLogTime(data) {
+        return api.post('log-time', data)
     },
     createListLog(data){
         return api.post('list-log-time', data);
@@ -70,72 +58,19 @@ export default {
     getConfigInfo() {
         return api.get('config');
     },
-    updateConfigInfo({
-        freSubmit,
-        firstDOM,
-        firstDOW,
-        hoursRequired,
-        isWorkingMonday,
-        isWorkingTuesday,
-        isWorkingWednesday,
-        isWorkingThursday,
-        isWorkingSunday,
-        isWorkingFriday,
-        isWorkingSaturday
-
-    }) {
-        return api.put('config-period', {
-            freSubmit,
-            firstDOM,
-            firstDOW,
-            hoursRequired,
-            isWorkingMonday,
-            isWorkingWednesday,
-            isWorkingThursday,
-            isWorkingTuesday,
-            isWorkingSunday,
-            isWorkingFriday,
-            isWorkingSaturday,
-            isWorkingSunday,
-
-
-        })
+    updateConfigInfo(data) {
+        return api.put('config-period', data)
     },
-    updateRemindInfo({
-        isDailyLog,
-        timeDailyLog,
-        submitTimesheet,
-        timeSubmit,
-        dateSubmit,
-        weekRemind
-
-    }) {
-        return api.put('config-remind', {
-            isDailyLog,
-            timeDailyLog,
-            submitTimesheet,
-            timeSubmit,
-            dateSubmit,
-            weekRemind
-        })
+    updateRemindInfo(data) {
+        return api.put('config-remind', data)
     },
     getTask(filter) {
              return taskApi.get('tasks?sort[0][column]=createTime&sort[0][type]=desc&search=%' + filter + '%&page=1&pageSize=50&variables=symper_last_executor_id%2Csymper_user_id_start_workflow%2Csymper_last_executor_name');
     },
-    updateLogTime({ start, end, task, date, duration, type, categoryTask, accountId,taskName, desc, id,docObjId }) {
-        return api.put('log-time-update' + '/' + id, {
-            start,
-            end,
-            task,
-            date,
-            duration,
-            type,
-            accountId,
-            taskName,
-            desc,
-            categoryTask,
-            id,
-            docObjId
-        })
+    updateLogTime(data,id) {
+        return api.put('log-time-update' + '/' + id, data)
     },
+    checkHasRepeatLog(data){
+        return api.post('check-repeat',data);
+    }
 }

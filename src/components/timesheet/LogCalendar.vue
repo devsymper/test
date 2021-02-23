@@ -336,9 +336,11 @@ export default {
         copyLogTime(event){
             let data = {...event};
             // data.nameTask = this.listTask.filter(task=>task.id==event.task)[0].name;
-            event.nameTask=data.name;
+            event.nameTask = data.name;
             data.categoryTask = event.category;
             data.desc = event.desc || "";
+            event.cateId = this.getIdCategory(event.category);
+            data.cateId = event.cateId ;
             this.events.push(data);
             this.logFormWorker.postMessage({
                 action:'copyLogTime',
@@ -517,23 +519,32 @@ export default {
             }
         
         },
+        getIdCategory(value) {
+            for(let i=0; i<this.listCategory.length; i++){
+                if(this.listCategory[i].name === value.split('-')[1].trim()){
+                    return this.listCategory[i].id;
+                }
+            }
+        },
         async updateEvent(event,duration){
             let start = this.$moment(event.start);
             let end = this.$moment(event.end);
             const self = this;
-            let res = await timesheetApi.updateLogTime({
+            let data = {
                 start: start.format("YYYY-MM-DD HH:mm"),
                 end: end.format("YYYY-MM-DD HH:mm"),
                 duration: duration,
                 task: event.task,
                 type: self.checkPlanOrLog(event.start),
                 id: event.id,
+                cateId: this.getIdCategory(event.category),
                 taskName:event.name,
                 date: start.format('YYYY-MM-DD'),
                 categoryTask: event.category,
                 desc: event.desc || "",
                 docObjId:event.docObjId
-            })
+            };
+            let res = await timesheetApi.updateLogTime(data,data.id)
             if (res.status === 200) {
                     // this.load();;
             } else {
