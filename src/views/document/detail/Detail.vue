@@ -338,6 +338,11 @@ export default {
                 }
                 let docDetailRes = await documentApi.detailDocument(documentId,dataPost);
                 if (docDetailRes.status == 200) {
+                    this.$store.commit("document/addToDocumentSubmitStore", {
+                        key: 'documentInfo',
+                        value: docDetailRes.data,
+                        instance:this.keyInstance
+                    });
                     this.dataPivotTable = docDetailRes.data.pivotConfig;
                     this.dataGroupTable = docDetailRes.data.groupConfig;
                     let content = docDetailRes.data.document.content;
