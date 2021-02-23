@@ -118,7 +118,7 @@ export default {
 
 
     dataObjectMethod(el, elKey, attr, bpmnModeler, attrName) {
-
+        debugger
         let moddle = bpmnModeler.get('moddle');
         let modeling = bpmnModeler.get('modeling');
         let mapDataObject = {};

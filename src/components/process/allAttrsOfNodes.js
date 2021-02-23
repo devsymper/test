@@ -2248,6 +2248,13 @@ let allAttrs = {
         dg: 'formula',
         pushToXML: attrToXMLMethods.notPushToXML
     },
+    autoUpdateTaskInfo: {
+        title: 'Auto update task title, task content, extra info label, extra info value',
+        type: 'checkbox',
+        value: false,
+        info: '',
+        dg: 'formula'
+    },
 
     approvalForElement: {
         title: 'Approval for element',
