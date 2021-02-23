@@ -5,6 +5,8 @@
         <div style="width:38%;float:right" 
              class="">
             <CalendarViewMode
+                ref="viewmode"
+                @change-color="changeColor"
                 @time_view="time_view = true"
                 @list_view="time_view = false" />
             <ActionButtons refs="action" />
@@ -16,8 +18,10 @@
             @showTaskForm="showTaskForm"
             @loadMonthView="loadMonthView"
             @create-log="createLog"
+            @create-list-log="creatListLog"
             @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
+            @update-log="updateLog"
             :updateAPICategory ="updateAPICate"
             @cancel="cancelSave()"
             :dateMonth ="dateMonth"
@@ -67,7 +71,8 @@
             :onDelete="onDeleteLogTimeEvent">
         </DeleteLogView>
     </v-dialog>
-    <LogCalendar 
+    <LogCalendar
+        @set-color="setColor"
         :userId="userId"
         @showLog="showLog" 
         :monEvents="monthEvents"
@@ -102,6 +107,7 @@ export default {
     },
     data() {
         return {
+            
             userId:'',
             monthEvents:{},
             showTask:false,
@@ -148,22 +154,60 @@ export default {
         })
     },
     methods: {
+        setListCategory(listCategory){
+
+        },
+      
+        setColor(data){
+            this.$refs.viewmode.logColor = data.color;
+            this.$refs.viewmode.randomColor = data.isRandom;
+        },
+        changeColor(data){
+            if(data.isRandom){
+                this.$refs.logCalendar.events.map(e=>{
+                    e.color = this.$refs.logCalendar.randomColor()})
+            }else{
+                this.$refs.logCalendar.events.map(e=>{
+                    e.color = data.color})
+            }
+        },
         // khi click ra ngoài log form
         deleteLog(){
             if(!this.update){
               this.$refs.logCalendar.events.pop()
             }
         },
+        //update lại log được update
+        updateLog(data){
+            let events = [...this.$refs.logCalendar.events];
+            let oldLog = events.filter(e=>e.id==data.id)[0];
+            let name = this.$refs.logCalendar.listTask.filter(task=>task.id==data.task)[0].name;
+            for(let i = 0; i<events.length;i++){
+                if(events[i].id==oldLog.id){
+                    events[i]=data,
+                    events[i].name = name;
+                }
+            }
+           this.$refs.logCalendar.events=events;
+        },
+        creatListLog(data){
+            data.map(d=>{
+                this.createLog(d)
+            })
+
+        },
         createLog(data){
-            
-            data.name=data.task;
+            data.name=this.$refs.logCalendar.listTask.filter(task=>task.id==data.task).length>0? this.$refs.logCalendar.listTask.filter(task=>task.id==data.task)[0].name:'';
             data.category=data.categoryTask;
+            data.color= this.$refs.logCalendar.colorLog;
+            data.type=data.type;
             data.category_key=data.categoryTask.split('-')[0];
             this.$refs.logCalendar.events.push(data);
+            if(!this.$refs.logCalendar.timeView){
+                this.$refs.logCalendar.resizeLogtime()
+            }
         },
         loadMonthView(data){
-            // this.$refs.logCalendar.monthEvents[data.date]=[];
-            // this.$refs.logCalendar.monthEvents[data.date].push(data);
             this.monthEvents = data;
             this.$refs.logCalendar.load()
         },
@@ -224,7 +268,6 @@ export default {
         onCreateTime({logtimeEvent, onSave, onCancel, update}) {
             this.logtimeDialog = true;
             this.$nextTick(() => {
-                console.log(this.onSave);
                 this.update = update;
                 this.logtimeEvent = logtimeEvent;
                 this.onSaveLogTimeEvent = onSave;

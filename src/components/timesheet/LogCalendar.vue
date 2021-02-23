@@ -6,8 +6,8 @@
                 :weekdays="weekday" 
                 :type="internalCalendarType" 
                 v-model="calendar"
-                :events="events" 
-                :color="color" 
+                :events="events"
+                :color="color"
                 @mousedown:event="startDrag" 
                 @mousemove:time="mouseMove" 
                 @mouseup:time="handleLogTimeAction" 
@@ -44,18 +44,19 @@
                 
                 </template>
                 <!-- màn hình week/day/weekday - event log -->
-                <template v-slot:event="{ event, eventSummary,timed, eventParsed  }">
+                <template v-slot:event="{ event, eventSummary,timed, eventParsed  }" >
                     <v-menu offset-x :nudge-right="10">
                         <template v-slot:activator="{on: detailEvents}">
-                            <div
+                            <div 
+                                :style="{background:event.color}"
                                 @dblclick="actionLogEvent(event, 0)"
                                 v-on="detailEvents"
                                 style="border:1px solid lightgrey"
                                 class="d-flex flex-column h-100">
                                 <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
                                     <div class="d-flex flex-row justify-space-between align-center pl-2">
-                                        <div class="fm text-ellipsis" style="width:calc(100% - 55px)" >
-                                            <span v-if="findDuration(event.start, event.end)<62">
+                                        <div class="fm text-ellipsis" :class="{'name-log':findDuration(event.start, event.end)<62}" >
+                                            <span v-show="findDuration(event.start, event.end)<62">
                                                 <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green']" class="mr-1"></i>
                                             </span>
                                             <b style="color:#303030" class="fs-12 fw-430">{{event.name}}</b>
@@ -63,15 +64,15 @@
                                         <div >
                                             <v-menu 
                                                 bottom left
-                                                nudge-left='5' 
-                                                nudge-top='-10'>
+                                                :nudge-left='5' 
+                                                :nudge-top='-10'>
                                                 <template v-slot:activator="{on:actionEvents }" >
                                                     <span class="fs-12 fw-400 color-black"
-                                                        v-if="findDuration(event.start, event.end)<62" >
+                                                        v-show="findDuration(event.start, event.end)<62" >
                                                         {{getDuration(eventParsed.input.start,eventParsed.input.end)}}
                                                     </span>
                                                     <!-- <v-btn class="ml-1" dense dark icon> -->
-                                                        <v-icon v-if="event.type"
+                                                        <v-icon v-show="event.id"
                                                             v-on="actionEvents"
                                                             small class="color-black"> mdi-dots-vertical</v-icon>
                                                     <!-- </v-btn> -->
@@ -85,24 +86,28 @@
                                     <div v-if="findDuration(event.start, event.end)>105" style="height:30px" class="text-ellipsis fs-12 pl-2 color-grey" >
                                         {{event.desc ? event.desc: "" }}
                                     </div>
-                                    <v-spacer />
-                                    <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center" v-if="findDuration(event.start, event.end)>61">
-                                        <div style="margin-top:17px">
-                                            <span >
+                                    <v-spacer v-show="findDuration(event.start, event.end)>60"/>
+                                    <div class="w-100 d-flex flex-row justify-space-between align-center" :class="{'pa-2 ':findDuration(event.start, event.end)>61,'px-2':findDuration(event.start, event.end)<=61}" v-if="findDuration(event.start, event.end)>61">
+                                        <div class="d-flex justify-start" :class="{'mt-4 ':findDuration(event.start, event.end)>80}">
+                                            <span class="color-black" >
+                                                <!-- {{findDuration(event.start, event.end)}} -->
                                                 <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
                                             </span>
-                                            <span class= "fs-11 text-ellipsis color-grey" style="margin-left:-50px" v-if="findDuration(event.start, event.end)>70"> 
+                                            <span class= "fs-11 color-grey mt-1" style="margin-left:-45px" v-if="findDuration(event.start, event.end)>61"> 
                                                 {{event.category_key}}
                                             </span>
                                         </div>
-                                        <div >
-                                            <span class="fs-11 color-black" style="margin-right:-5px">
+                                        <div style="margin-right:-5px" :class="{'mt-4 ':findDuration(event.start, event.end)>80}">
+                                            <span v-if="timeView" class="fs-11 color-black">
                                             {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
+                                            </span>
+                                             <span v-else class="fs-11 color-black" >
+                                           {{changeDuration(event.duration)}}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-                                <div v-if="timed" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
+                                <div v-show="timed&&timeView" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
                                 </div>
                             </template>
                             <div>
@@ -130,6 +135,8 @@
 </template>
 
 <script>
+import { formulasApi } from '../../api/Formulas';
+import {uiConfigApi} from "../../api/uiConfig";
 import LogTimeView from "./../../components/timesheet/LogTimeView";
 import ViewDetailMonth from "./../../components/timesheet/ViewDetailMonth";
 import DeleteLogView from "./../../components/timesheet/DeleteLogView";
@@ -154,7 +161,10 @@ export default {
     props: ['timeView','userId','monEvents'],
     data() {
         return {
+            listLogInTime:[],
             menu:false,
+            listCategory:[],
+            isRandom:false,
             calendar: '',// value calendar
             ready: false,
             color:'orange',
@@ -168,28 +178,126 @@ export default {
             createStart: null,
             extendOriginal: null,
             focus: '',
+            listTask:[],
             internalCalendarType: 'week',
             extend : false,
             sum: [],
+            colorLog:'#F0F8FF',
             events: [],// chứa event của calendar
-            hoursRequired: '',
+            hoursRequired: '8',
             logFormWorker:null
         };
     },
 
     created() {
+        this.getColor();
+        this.getConfigInfo()
         this.logFormWorker = new LogFormWorker();
+        this.getAllTask();
+        this.getCategory();
         this.load();
     },
-    methods: { 
-      
+    methods: {
+        getCategory(){
+            const self = this;
+             timesheetApi.getAllCategory({}).then(res => {
+                if (res.status === 200) {debugger
+                    self.listCategory = res.data.listObject;
+                    // self.category.category_name=[];
+                    // let category = res.data.listObject;
+                    // for(let i=0; i<category.length; i++){
+                    //     self.category.category_name.push(
+                    //         category[i].key+"-"+category[i].name
+                    //     )
+                    // }
+                }
+                }).catch(console.log);
+            },
+        async getAllTask(){
+            let self = this;
+            this.items = [];
+            await timesheetApi.getTaskDB().then(res => {
+                self.listTask.push(...res.data.task);
+            })
+            .catch(console.log);
+            await timesheetApi.getTask('').then(res => {
+                let name = res.data.listObject;
+                name.map(x=>{
+                    x.categoryId = "602e321e-0689-b438-887b-7dce711740c4";
+                    x.name = JSON.parse(x.description).content;
+                    x.description = 'Ngày tạo: '+ x.createTime;
+                })
+                self.listTask.push(...res.data.listObject);
+
+                })
+                .catch(console.log);
+                // debugger
+
+        },
+        getConfigInfo(){
+            const self = this;
+             timesheetApi.getConfigInfo().then(res => {
+                if (res.status === 200) {
+                    self.hoursRequired = res.data.listConfig[0].hoursRequired;
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+        },
+        getWidgetIdentifier(){
+            let widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
+            widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            return widgetIdentifier;
+		},
+        getColor(){
+            const self = this;
+            let widgetIdentifier = this.getWidgetIdentifier();
+            uiConfigApi.getUiConfig(widgetIdentifier).then(res=>{
+                if(res.status==200){
+                    self.colorLog = JSON.parse(res.data.detail).color;
+                    self.isRandom = JSON.parse(res.data.detail).isRandom;
+                    self.$emit('set-color',{color:self.colorLog,isRandom:self.isRandom})
+                }
+            })
+
+        },
         setResizeLogtime(event){
             this.events = event
         },
+         randomColor(){
+            var color = "";
+            for(var i = 0; i < 3; i++) {
+                var sub = Math.floor(Math.random() * 256).toString(16);
+                color += (sub.length == 1 ? "0" + sub : sub);
+            }
+        // debugger
+             return "#" + color;
+        },
+        
         setLogTimeList(data){
-            this.events =  data.events;
-            this.sum = data.sumLogTime;
-            this.hoursRequired = data.hoursRequired;
+            // data.events.map((evt,i)=>{
+            //     // let test = task.id;
+            //      let taskName = this.listTask.filter(task=>task.id==evt.task).length>0? this.listTask.filter(task=>task.id==evt.task)[0].name:'';
+            //     // evt.task = taskName;
+            //     evt.name = taskName;
+
+            // })
+            this.events = data.events;
+            if(this.isRandom){
+                this.events.map(e=>{
+                e.color = this.randomColor()
+                })
+            }else{
+                this.events.map(e=>{
+                    e.color = this.colorLog
+                })
+            }
+            // this.sum = data.sumLogTime;
+            // this.hoursRequired = data.hoursRequired;
+            // this.listCategory = data.category;
+            // this.$emit('set-list-category', data.category);
             if(!this.timeView){
                 this.resizeLogtime()
             }
@@ -227,8 +335,6 @@ export default {
         },
         copyLogTime(event){
             let data = {...event};
-            data.start = this.$moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm");
-            data.end = this.$moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm");
             data.categoryTask = event.category;
             data.desc = event.desc || "";
             this.events.push(data);
@@ -239,7 +345,7 @@ export default {
         },
         setEventCopy(data){
             if(data){
-                this.load()
+               // this.load()
             }else{
                 this.$snotify({
                     type: "error",
@@ -314,12 +420,7 @@ export default {
                 break;
             }
         },
-        createLogTime(event){
-            
-            this.events.push(event);
-        },
         openLogTimeDialog(event, update = false) {
-            
             this.$emit('create-time', {
                 update: update,
                 logtimeEvent: event,
@@ -340,7 +441,7 @@ export default {
             let defaultEnd = this.$moment().add(7,'days').format('YYYY-MM-DD')
             let data = {
                 start:this.$refs.calendar?this.$refs.calendar.lastStart.date:defaultStart,
-                end:this.$refs.calendar?this.$refs.calendar.lastEnd.date:defaultEnd
+                end:this.$refs.calendar?this.$refs.calendar.lastEnd.date:defaultEnd,
             }
              this.logFormWorker.postMessage({
                 action:'getLogTimeList',
@@ -364,6 +465,7 @@ export default {
                 this.createEvent = {
                     name: ``,
                     timed: true,
+                    color:this.colorLog,
                     date: this.createStart,
                     start: this.createStart,
                     end: this.createStart,
@@ -372,6 +474,7 @@ export default {
             }
         },
         mouseMove(tms) {
+            // debugger
             const mouse = this.toTime(tms);
             if (this.dragEvent && this.dragTime !== null) {
                 const start = this.dragEvent.start
@@ -397,6 +500,21 @@ export default {
             let check = this.$moment(time).isAfter(now)==true?0:1;
             return check
         },
+        sendFormular(formular){
+            formulasApi.getDataByAllScriptType(formular,"{}").then(res=>{
+                if(res.status==200){
+                }
+            })
+
+        },
+        findFormular(keyCateId){
+            let description = this.listCategory.filter(cate=>cate.key==keyCateId&&cate.type==1);
+            let formular = description.length>0?description[0].description:null;
+            if(formular){
+                this.sendFormular(formular)
+            }
+        
+        },
         async updateEvent(event,duration){
             let start = this.$moment(event.start);
             let end = this.$moment(event.end);
@@ -408,14 +526,13 @@ export default {
                 task: event.task,
                 type: self.checkPlanOrLog(event.start),
                 id: event.id,
+                taskName:event.name,
                 date: start.format('YYYY-MM-DD'),
                 categoryTask: event.category,
                 desc: event.desc || "",
                 docObjId:event.docObjId
             })
             if (res.status === 200) {
-                // alert ('Hello')
-               
                     // this.load();;
             } else {
                 self.$snotify({
@@ -433,15 +550,52 @@ export default {
                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
                         this.createEvent.duration = duration; 
                         this.updateEvent(this.createEvent, duration);
+                        this.findFormular(this.createEvent.category_key)
+                        // cập nhật vào doc
                     } catch(e) {console.log(e); }
                 } else {//1.2: tao moi event
-                    this.openLogTimeDialog(this.createEvent,false);
+                    if(this.timeView){
+                        //
+                         this.openLogTimeDialog(this.createEvent,false);
+                    }else{
+                        this.events.splice(this.events.indexOf(event), 1);
+                        this.$snotify({
+                            title:'error',
+                            text:"Quay lại time view để tạo log"
+                        })
+                    }
                 }
             } else if(this.dragEvent) {//2.sự kiện di chuyển logtime
                 try {
                     let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
-                    this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD')
-                    this.updateEvent(this.dragEvent, duration);
+                    this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD');
+                    if(this.timeView){
+                        this.dragEvent.type = this.checkPlanOrLog(this.dragEvent.start)?1:0;
+                        this.updateEvent(this.dragEvent, duration);
+                        this.findFormular(this.createEvent.category_key)
+
+                    }else{
+                        this.dragEvent.type = this.checkPlanOrLog(this.dragEvent.date)?1:0;
+                        let id = this.dragEvent.id;
+                        let oldLog = [...this.listLogInTime];
+                        oldLog = oldLog.filter(log=>log.id==id)[0]
+                        // lấy ngày giờ => chuyển sang dạng 
+                        let hour = this.$moment(oldLog.start).get('hour');
+                        let minutes = this.$moment(oldLog.start).get('minutes');
+                        let newStart = Number(this.$moment(this.dragEvent.start).hour(hour).minute(minutes).format('x'));
+                        let newEnd = Number(newStart)+Number(oldLog.duration*60*1000);
+                        // oldLog.date = this.dragEvent.date;
+                        oldLog.start = newStart;
+                        oldLog.date= this.$moment(newStart).format('YYYY-MM-DD');
+                        oldLog.end = newEnd;
+                        // oldLog.type=0;
+                        this.resizeLogtime();
+                         this.updateEvent(oldLog, oldLog.duration);
+                        this.findFormular(this.createEvent.category_key)
+
+
+                        
+                    }
                 } catch(e) { console.log(e);}
             }
             this.freshDrag();
@@ -495,7 +649,6 @@ export default {
                     div.setAttribute('style', div.getAttribute('style').replace('border-top: none; border-bottom: none', ''));
                      this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: block');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: block');
-
                 } else {
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: none');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: none');
@@ -510,10 +663,12 @@ export default {
                 }
             })
             if(!self.timeView){
+                this.listLogInTime = [...this.events];
                 this.resizeLogtime();
             }else{
-                 this.getLogByUserId(this.userId);
-                 this.load()
+                this.events = this.listLogInTime;
+                this.getLogByUserId(this.userId);
+                //  this.load()
             }
             
         },
@@ -524,6 +679,7 @@ export default {
                 end: this.$moment(this.$refs.calendar.lastEnd.date).format('DD/MM/YY'),
             });
             this.createCalendarHoverEvent();
+            this.load()
         },
         updateTotalHours() {
             let start = this.$moment(this.$refs['calendar'].lastStart.date);
@@ -587,10 +743,14 @@ export default {
         },
     },
     watch: {
+        period(){
+            this.load()
+        },
          userId(){
             this.getLogByUserId(this.userId);
         },
         calendarType(newType) {
+             this.load();
             this.getLogByUserId(this.userId);
             if (newType === 'weekday') {
                 this.internalCalendarType = 'week';
@@ -647,6 +807,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.v-application .primary{
+    
+}
 .calendar ::v-deep .v-btn {
     background-color: transparent !important;
 }
@@ -682,12 +845,11 @@ export default {
     height: 0px;
 }
 .calendar ::v-deep .v-event-timed {
-    left: 3% !important;
     white-space:pre-wrap!important;
-    width: 97% !important;
     user-select: none;
     -webkit-user-select: none;
-    background-color:white !important;
+    background-color:white!important;
+    // background-color:#F0F8FF !important;
 }
 .month-status{
     background-color:#90EE90; 
@@ -736,6 +898,9 @@ export default {
     display: flex;
     align-items: stretch;
     justify-content: center;
+}
+.name-log{
+    width:calc(100% - 55px)
 }
 .create-timesheet {
     line-height: 20px;
