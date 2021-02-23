@@ -158,7 +158,6 @@ export default {
             let leftDiff = inputOffset.left - detailFormOffset.left;
             let cardWidth = $(".s-floatting-popup").width();
             let cardHeight = $(".s-floatting-popup").height();
-            let inputWidth = input.width();
             let top = inputOffset.top - detailFormOffset.top + 26;
             this.style.top = top + "px";
             if (cardWidth + leftDiff > detailFormWidth) {
@@ -176,8 +175,6 @@ export default {
                 }
                 this.style.top = Math.abs(top1) +"px";
             }
-
-
         }
     }
 };

@@ -1555,7 +1555,7 @@ export default {
                         if (res.status == 200) {
                             thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                                 key: 'documentInfo',
-                                value: docDetailRes.data,
+                                value: res.data,
                                 instance:thisCpn.keyInstance
                             });
                             let content = res.data.document.content;

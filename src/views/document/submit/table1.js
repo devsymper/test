@@ -159,6 +159,9 @@ export default class SymperTable {
     }
         
     getUiConfig(){
+        if(this.viewType == 'submit'){
+            return;
+        }
         this.showLoadingOverlay();
         let docName = sDocument.state.submit[this.keyInstance].documentInfo.document.name;
         let tableDefinition = "table_document_instance:"+docName+":"+this.tableName;
