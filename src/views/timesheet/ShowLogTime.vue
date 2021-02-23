@@ -191,7 +191,8 @@ export default {
            this.$refs.logCalendar.events=events;
         },
         creatListLog(data){
-            data.map(d=>{
+            let listLog = [...data];
+            listLog.map(d=>{
                 this.createLog(d)
             })
 

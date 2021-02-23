@@ -17,7 +17,8 @@
         <v-row>
             <div style="width: 320px!important" 
                 class="ml-3 mr-1">
-                <v-autocomplete 
+                <v-autocomplete
+           
                     style="margin-top:-10px!important; " 
                     :menu-props="{'nudge-top':-10}" 
                     v-model="categoryTask"
@@ -236,6 +237,7 @@
 </template>
 
 <script>
+import { util } from '@/plugins/util';
 import timesheetApi from '../../api/timesheet';
 import TaskForm from '../timesheet/TaskForm';
 import ConfigRepeat  from '../timesheet/form/ConfigRepeat';
@@ -420,7 +422,7 @@ export default {
         task(){
            // this.categoryTask = 'BD-Business Development'
              if(this.checkNullTask){
-                if(this.task==undefined){
+                if(!this.task){
                     this.taskError = this.$t('timesheet.required_value');
                 }else{
                     this.taskError=""
@@ -436,7 +438,7 @@ export default {
         },
         categoryTask(){
             if(!this.categoryTask){// trường hợp create
-                this.getAllTask();
+                // this.getAllTask();
                 // this.filterTaskByCategory();
 
             }else{// trường hợp update
@@ -472,7 +474,9 @@ export default {
         },
     },
     created(){
+        debugger
         // load lại trang ở màn month
+        this.refreshAll();
         this.generateListHour();
         this.getDateMonth(this.dateMonth);
         // this.getAllTask();
@@ -677,6 +681,7 @@ export default {
                 }).catch(console.log);
         },
         refreshAll(){
+            debugger
             this.taskError="";
             this.cateError = '';
             this.timeError = "";
@@ -685,6 +690,8 @@ export default {
             this.task="";
             this.categoryTask="";
             this.inputs.description="";
+            this.repeat = false;
+            this.keepLog = false;
         },
         cancel() {
             this.onCancel();
@@ -727,26 +734,7 @@ export default {
             if(!this.repeat){
                 //this.onSave(data);
                 this.$emit('create-log',{...data});
-                timesheetApi.createLogTime(data).then(res => {
-                    if (res.status === 200) {
-                        this.onSave();
-                        this.$snotify({
-                            type: "success",
-                            title:" Thêm thành công",
-                        });
-                        this.refreshAll();
-                        if(this.typeCalendar=='month'){  
-                            this.$emit('loadMonthView',data)
-                        }
-                    }else{
-                        // xử lý
-                        this.onSave();
-                        this.$snotify({
-                            type: "error",
-                            title:"Thêm thất bại",
-                    });
-                    }
-                }).catch();
+                this.sendApiCreateLog(data);
                 if(!this.keepLog){
                     this.cancel();
                 }
@@ -756,6 +744,28 @@ export default {
                     this.cancel();
                 }
             }
+        },
+        sendApiCreateLog(data){
+            timesheetApi.createLogTime(data).then(res => {
+                if (res.status === 200) {
+                    this.onSave();
+                    this.$snotify({
+                        type: "success",
+                        title:" Thêm thành công",
+                    });
+                    this.refreshAll();
+                    if(this.typeCalendar=='month'){  
+                        this.$emit('loadMonthView',data)
+                    }
+                }else{
+                    // xử lý
+                    this.onSave();
+                    this.$snotify({
+                        type: "error",
+                        title:"Thêm thất bại",
+                });
+                }
+            }).catch();
         },
         // xử lý trường hợp repeat
         createRepeatLog(data){
@@ -800,24 +810,34 @@ export default {
             let endMinutes = this.$moment(data.end).format('mm');
             let totalDay = this.$moment.duration(endCalendar.diff(startCalendar)).asDays();
             let logtime = data;
-            for(let i=0;i<=totalDay*2+1;i++){
+            for(let i=0;i<=totalDay;i++){
                 logtime.date = this.$moment(startCalendar).add(i, 'days').format('YYYY-MM-DD');//date.logtime=2 = >date.date=2; date = 3
                 if(eval(condition)){
                     logtime.type=this.checkPlanOrLog(logtime.start);
                     logtime.start = this.$moment(logtime.date,"YYYY-MM-DD").add(startHour,'hours').add(startMinutes,'minutes').format('YYYY-MM-DD HH:mm');
                     logtime.end = this.$moment(logtime.date,"YYYY-MM-DD").add(endHour,'hours').add(endMinutes,'minutes').format('YYYY-MM-DD HH:mm');
                     logtime.configRepeat = JSON.stringify(this.repeatData);
+                    // this.sendApiCreateLog(logtime);
                     listLog.push({...logtime});
                 }
             }
-            this.$emit('create-list-log',listLog);
+            const listLogCopy = util.cloneDeep(listLog);
+            this.$emit('create-list-log',listLogCopy);
             // this.$emit('')
             timesheetApi.createListLog(JSON.stringify(listLog)).then(res => {
                     if (res.status === 200) {
                         self.onSave();
-                        self.$emit('loadMonthView')
+                        // self.$emit('loadMonthView')
                     }
             }).catch();
+            // test api 
+            // this.$emit('')
+            // timesheetApi.createListLog(JSON.stringify(listLog)).then(res => {
+            //         if (res.status === 200) {
+            //             self.onSave();
+            //             // self.$emit('loadMonthView')
+            //         }
+            // }).catch();
         },
         showError() {
             if (this.duration < 0) {
