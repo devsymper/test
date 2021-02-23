@@ -27,7 +27,7 @@
             @column-visible="onShowHideColumns"
             @column-pinned="afterPinnedColumns">
         </ag-grid-vue>
-        <div class="symper-table-pagination pl-1" style="height: 25px; margin-top: 5px" >
+        <div class="symper-table-pagination pl-1" style="height: 25px; margin-top: 5px" :style="customCssPagination" >
             <Pagination
                 :contentSize="'mini'"
                 :totalVisible="3"
@@ -253,7 +253,6 @@ export default {
         reStyleTotal(){
             let cellId = this.cellConfigs.sharedConfigs.cellId;
             let idCell = 'symper-table-wrapper-' + cellId;
-            debugger
             let style = this.convertCssObjToStr(this.options.totalRowStyle);
             let totalRowStyle = this.options.totalRowStyle;
             if(totalRowStyle){
@@ -283,7 +282,6 @@ export default {
                     `;
                 }
             }
-            debugger
             return style;
         },
         reStyleDataCell(){
@@ -317,6 +315,7 @@ export default {
             return style;
         },
         onTableRender(){
+            this.reStylePagination()
             let customStyle = this.reStyleHeader();
             customStyle += this.reStyleDataCell();
             customStyle += this.reStyleTotal();
@@ -328,7 +327,10 @@ export default {
             }, 500, this);
             this.addPerfectScrollBar();
         },
-
+        reStylePagination(){
+            debugger
+            this.customCssPagination = this.convertCssObjToStr(this.options.paginationStyle)
+        },
         /**
          * Điều chỉnh chiều rộng của cột trong bảng
          */
@@ -434,6 +436,7 @@ export default {
         return {
             currentPage: 1,
             isResizing: false,
+            customCssPagination: "",
             gridOptions:null,
             gridApi: null,
             columnApi: null,

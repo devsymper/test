@@ -20,6 +20,10 @@ export default class Pivot extends ReportBase {
 				"title":"Conditional Format",
 				"items":["conditionalFormatCondition"]
 			},
+            "pagination":{
+                title: 'Pagination',
+                items:['fontColor','borderWidth', 'borderColor', 'borderStyle']
+            },
 			"general":{
 				"title":"General",
 				"items":["bgColor","borderColor","borderWidth","colorPalette","fontFamily"]
@@ -70,6 +74,12 @@ export default class Pivot extends ReportBase {
             columns: [],
             cellStyle: this.getStyleItemsInConfig(style.cellFormat.children, 'px', ratio),
             headerStyle: this.getStyleItemsInConfig(style.headerFormat.children, 'px', ratio),
+            paginationStyle: {
+                color: style.pagination.children.fontColor.value,
+                borderWidth: style.pagination.children.borderWidth.value,
+                borderStyle: style.pagination.children.borderStyle.value,
+                borderColor: style.pagination.children.borderColor.value
+            }
         };
         
 
