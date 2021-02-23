@@ -162,10 +162,11 @@ export default class SymperTable {
         this.showLoadingOverlay();
         let docName = sDocument.state.submit[this.keyInstance].documentInfo.document.name;
         let tableDefinition = "table_document_instance:"+docName+":"+this.tableName;
-        let uiConfigRes = uiConfigApi.getUiConfig(tableDefinition).then(res=>{
+        let self = this;
+        uiConfigApi.getUiConfig(tableDefinition).then(res=>{
             let uiConfig = {};
-            if(uiConfigRes.status == 200){
-                uiConfig = uiConfigRes.data.detail;
+            if(res.status == 200){
+                uiConfig = res.data.detail;
                 try {
                     uiConfig = JSON.parse(uiConfig);
                     uiConfig = uiConfig.tableDefinition;
@@ -173,11 +174,25 @@ export default class SymperTable {
                     console.warn(error);
                 }
             }
-        // this.hideOverlay();
-
+            let newColdefs = [];
+            for(let control in uiConfig){
+                let colItem = self.columnDefs.find(el=>el.field == control);
+                if(colItem){
+                    // colItem.width = uiConfig[control];
+                    newColdefs.push(colItem);
+                    self.columnDefs.splice(self.columnDefs.indexOf(colItem),1);
+                }
+            }
+            newColdefs = newColdefs.concat(self.columnDefs);
+            self.columnDefs = newColdefs;
+            self.gridOptions.api.setColumnDefs([]);
+            self.gridOptions.api.setColumnDefs(newColdefs);
+            self.autoSizeAll()
         })
         
+
     }
+    
     /**
      * Hàm lấy các định nghĩa của cột
      */
@@ -275,20 +290,11 @@ export default class SymperTable {
             field: SQLITE_COLUMN_IDENTIFIER,
             hide:true
         };
-
-        // for (let index = 0; index < uiConfig.length; index++) {
-        //     const element = uiConfig[index];
-        // }
-
         colDefs.push(colObjectId);
         colDefs.push(colSqlId);
         return colDefs;
     }
-    arrayMove(arr, fromIndex, toIndex) {
-        var element = arr[fromIndex];
-        arr.splice(fromIndex, 1);
-        arr.splice(toIndex, 0, element);
-    }
+    
     checkEditableCell(control){
         if(this.viewType == 'detail'){
             return false;
@@ -905,7 +911,7 @@ export default class SymperTable {
             let docName = sDocument.state.submit[self.keyInstance].documentInfo.document.name;
             let tableDefinition = "table_document_instance:"+docName+":"+self.tableName;
             uiConfigApi.saveUiConfig({detail:JSON.stringify(configDetail), userId: userId, widgetIdentifier:tableDefinition});
-        }, 3000);
+        }, 2000);
     }
    
     /**
@@ -916,7 +922,7 @@ export default class SymperTable {
         this.tableInstance.getUiConfig()
         setTimeout((self)=>{
             self.onEventReady = true;
-        },2000,this.tableInstance)
+        },4000,this.tableInstance)
         const agBodyViewport = $(this.tableInstance.tableContainer).find('.ag-body-viewport')[0];
         const agBodyHorizontalViewport = $(this.tableInstance.tableContainer).find('.ag-body-horizontal-scroll-viewport')[0];
         if (agBodyViewport) {
