@@ -361,7 +361,7 @@ export const getDataInputFormula = (formulaInstance, listInput, extraData = null
                                 dataInput[inputControlName] = controlIns.value;
                             }
                         }
-                        if(controlIns.type == 'inputFilter'){
+                        if(['inputFilter','combobox'].includes(controlIns.type)){
                             let dataInputFilter = dataInput[inputControlName].split(',');
                             dataInputFilter = dataInputFilter.reduce((arr,item)=>{
                                 let data = item.replace(/'/g,"");

@@ -699,7 +699,7 @@ export default class Formulas extends FormulasEvent{
                     if(listInput.hasOwnProperty(inputControlName)){
                         let controlIns = listInput[inputControlName];
                         let valueInputControl = controlIns.value;
-                        if(controlIns.type == 'inputFilter'){
+                        if(['inputFilter','combobox'].includes(controlIns.type)){
                             valueInputControl = valueInputControl.split(',')
                         }
                         if(controlIns.type == 'time'){

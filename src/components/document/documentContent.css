@@ -545,6 +545,7 @@ button:hover {
 .info-control-btn {
     color: #e67e23 !important;
     text-decoration-line: underline;
+    background: #fff3e9 !important;
 }
 
 .s-control.s-control-image {
