@@ -383,8 +383,12 @@ export default {
             });
 
         },
+        /**
+         * Hàm thêm task vào kanban lúc tạo issue
+         * cần check user đang được filter có khớp với user được giao việc trong task ko
+         */
         checkUpdateTask(issue){
-            if(issue.tmg_assignee == this.$store.state.app.endUserInfo.id){
+            if(issue.tmg_assignee == this.$store.state.app.endUserInfo.id && this.checkCurrentUserFilter(issue.tmg_assignee)){
                 let data = {};
                 data.projectId = this.sCurrentProject.id;
                 data.listColumn = this.listColumn;
@@ -395,6 +399,20 @@ export default {
                 });
             }
             
+        },
+        /**
+         * Hàm kiểm tra xem danh sách kanban hiện tại có filter theo user của task được tạo hay không
+         */
+        checkCurrentUserFilter(tmgAssignee){
+            let filterValue = this.filterProps.tmg_assignee.value;
+            if(!filterValue){
+                return true;
+            }
+            let user = filterValue.find(el => el.id == tmgAssignee);
+            if(user){
+                return true;
+            }
+            return false;
         },
         onSearch(vl){
             let val = vl;
