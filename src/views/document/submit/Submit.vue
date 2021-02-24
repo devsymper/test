@@ -1553,6 +1553,11 @@ export default {
                     .detailDocument(this.documentId)
                     .then(res => {
                         if (res.status == 200) {
+                            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                                key: 'documentInfo',
+                                value: res.data,
+                                instance:thisCpn.keyInstance
+                            });
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
                             thisCpn.documentInfo = res.data.document;

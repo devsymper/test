@@ -215,6 +215,8 @@ export default class BasicControl extends Control {
             let thisObj = this;
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
+                // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
+                thisObj.checkRequire();
                 if(thisObj.checkAutoCompleteControl()){
                     return false;
                 }
@@ -241,8 +243,7 @@ export default class BasicControl extends Control {
                         thisObj.removeValidateIcon('TimeValid')
                     }
                 }
-                // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
-                thisObj.checkRequire();
+                
                 thisObj.value = valueChange;
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
             })
