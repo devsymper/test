@@ -559,12 +559,19 @@ export default {
             this.translateReportConfig(cellId, changeType)
         }, 
         getReportWraperSize(cellId){
-            let size = util.getComponentSize(this.$refs[cellId][0]);
-            let titleAttr = this.dashboardConfig.allCellConfigs[cellId].rawConfigs.style.title.children;
-            if(titleAttr.show.value){
-                size.h -= calcTitleCellHeight(titleAttr.textSize.value);
+            if(cellId == 'global'){
+                return {
+                    h: 0,
+                    w: 0
+                };
+            }else{
+                let size = util.getComponentSize(this.$refs[cellId][0]);
+                let titleAttr = this.dashboardConfig.allCellConfigs[cellId].rawConfigs.style.title.children;
+                if(titleAttr.show.value){
+                    size.h -= calcTitleCellHeight(titleAttr.textSize.value);
+                }
+                return size;
             }
-            return size;
         },
         getDashboardId(){
             let cond = this.$route.name == 'editDashboard' || this.$route.name == 'viewDashboard';
@@ -643,6 +650,9 @@ export default {
                         let classOfType = mapTypeToClasses[cell.sharedConfigs.type];
                         data.translatedData = classOfType.editTranslatedData(data.translatedData);
                         this.$set(cell.viewConfigs, 'displayOptions', data.translatedData);
+                        if(data.cellId == 'global'){
+                            this.setDashboardStyle(cell.rawConfigs.style);
+                        }
                     }
                 }
             } catch (error) {
