@@ -59,7 +59,8 @@ export default {
 		changeNodeInfor(params){
 			this.$set(this.nodeData.configs, 'idDataset', params.id)
 			this.$set(this.nodeData.configs, 'title', params.aliasName)
-			this.$set(this.nodeData.configs, 'name', params.aliasName)
+			this.$set(this.nodeData.configs, 'name', params.name)
+			this.$set(this.nodeData.configs, 'symperDocId', params.symperId)
 		},
 		handleGetDatasetColumns(data){
 			if(data.status == 200){
