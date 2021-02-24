@@ -1,4 +1,3 @@
-<script src="https://cdn.tiny.cloud/1/79eqkg3mxj7h6alrcmz1yxjsp6fxm1qhdvkrrfy9uxdxwjrf/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 import Control from "./control";
 import store from './../../../store'
 import sDocument from './../../../store/document'
@@ -11,6 +10,9 @@ import { documentApi } from "../../../api/Document";
 import { str } from "../../../plugins/utilModules/str";
 import PerfectScrollbar from "perfect-scrollbar";
 import { fileManagementApi } from "@/api/FileManagement";
+
+import 'tinymce/plugins/media';
+import 'tinymce/plugins/quickbars';
 let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
@@ -804,29 +806,28 @@ export default class BasicControl extends Control {
             toolbar = false;
         }
         tinymce.remove();
-        // if(this.controlProperties.isShowHeaderTinyMce.value){
-        tinymce.init({
-            toolbar: toolbar,
-            menubar: false,
-            branding: false,
-            readonly: isReadOnly,
-            content_style: "p{ font-family: Roboto; font-size: 13px,color:black; line-height:0;}",
-            // block_formats: 'Paragraph=p;Header 1=h1;Header 2=h2;Header 3=h3;Header 4=h4;Header 5=h5;Header 6=h6',
-            // fontsize_formats: '13pt',
-             quickbars_selection_toolbar: ' addHandsonTableBtn | bold italic underline strikethrough | fontselect fontsizeselect formatselect |numlist bullist checklist| forecolor backcolor casechange| blockquote quicklink| alignleft aligncenter alignright alignjustify| codesample | outdent indent quickimage media| emoticons | table',
-            plugins: ['quickbars','lineheight'],
-            lineheight_formats: "0pt 1pt 2pt 3pt 4pt 5pt 6pt 7pt 8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 36pt",
-            selector:  selector,
-            statusbar: false,
-            init_instance_callback : function(editor) {
-                self.editor = editor;
-                self.initEditor();
-            },
-            onchange_callback :function(data) {
-                self.changeData(data);
-            },
-        });    
-        // }
+        if(this.controlProperties.isShowHeaderTinyMce.value){
+            tinymce.init({
+                toolbar: toolbar,
+                menubar: false,
+                branding: false,
+                readonly: isReadOnly,
+                content_style: "p{ font-family: Roboto; font-size: 13px,color:black; line-height:0;}",
+                quickbars_selection_toolbar: 'quickimage media| emoticons | table',
+                quickbars_insert_toolbar: 'quicktable image media codesample',
+                plugins: ['quickbars','lineheight','media','image'],
+                lineheight_formats: "0pt 1pt 2pt 3pt 4pt 5pt 6pt 7pt 8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 36pt",
+                selector:  selector,
+                statusbar: false,
+                init_instance_callback : function(editor) {
+                    self.editor = editor;
+                    self.initEditor();
+                },
+                onchange_callback :function(data) {
+                    self.changeData(data);
+                },
+            });    
+         }
     }
     initEditor(){
         return this.editor.setContent(this.value);
