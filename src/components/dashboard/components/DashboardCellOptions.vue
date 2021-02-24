@@ -135,6 +135,11 @@
                     class="py-1 red-item">
                     <i class="mdi fs-14 mdi-trash-can-outline"></i> <span class="ml-2 fs-13">Xóa</span>
                 </v-list-item>
+                <v-list-item  
+                    @click="handleCellAction({action:'viewDetail'})" 
+                    class="py-1 red-item">
+                    <i class="mdi fs-14 mdi-eye"></i> <span class="ml-2 fs-13">Xem chi tiết</span>
+                </v-list-item>
             </v-list>
         </v-menu>
     </div>
@@ -258,6 +263,8 @@ export default {
             }else if(cmd.action == 'print-report'){
                 // let headerHTML = this.$refs.cellTitle.outerHTML;
                 // this.$refs[this.cellConfigs.sharedConfigs.type].printInnerHTML(headerHTML);
+            }else if(cmd.action == 'viewDetail'){
+                this.$emit('view-detail', this.cell.sharedConfigs.cellId)
             }
         },
     },

@@ -94,17 +94,27 @@ export default {
             this.relationLinkData = {}
             for(let i in allLinks){
                 let firstLinkInfo = this.translateLinkToGroupItem(allLinks[i])
+                let subItem = []
                 let obj = {
                     uid: allLinks[i].uid,
                     childItem: firstLinkInfo
                 }
+                subItem.push(allLinks[i].to)
                 for(let j = 1; j < allLinks.length; j++){
-                    if(allLinks[i].to == allLinks[j].from){
+                    if(allLinks[j]){
+                        if(subItem.includes(allLinks[j].from)){
+                            let item =  this.translateLinkToGroupItem(allLinks[j])
+                            obj.childItem = obj.childItem.concat(item[1])
+                            subItem.push(allLinks[j].to)
+                            delete allLinks[j]
+                        }
                     }
+                    
                 }
                 this.$set(this.relationLinkData, Object.keys(this.relationLinkData).length + 1, obj)
             }
         },
+
         translateLinkToGroupItem(link){
             let arrFrom = link.from.split("_")
             let arrTo = link.to.split("_")
@@ -156,7 +166,6 @@ export default {
                     this.$emit("add-link", obj)
                 }
             }
-           
         },
         translateItemToLink(uid, from , to){
             return{
