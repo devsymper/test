@@ -79,7 +79,9 @@ const setListStatusInColumnBoard = (state, data) => {
 const setListIssueTypeInProjects = (state, data) => {
     Vue.set(state.listIssueTypeInProjects, data.key , data.data);
 }
-
+const setCountIssueWithStatusInListProject = (state, data) => {
+    Vue.set(state.countIssueWithStatusInListProject, data.key , data.data);
+}
 const setAllWorkflow = (state, allWorkflow) => {
     Vue.set(state, 'allWorkflow', allWorkflow);
 }
@@ -356,5 +358,6 @@ export {
     updateSprintToListInStore,
     setListDataSprintAfterAfterMapIssue,
     updateCheckBoardChange,
-    removeCheckBoardChange
+    removeCheckBoardChange,
+    setCountIssueWithStatusInListProject
 };
