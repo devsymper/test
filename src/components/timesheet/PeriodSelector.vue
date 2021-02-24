@@ -41,6 +41,7 @@
 <script>
 import { mapState } from 'vuex';
 import { orgchartApi } from '../../api/orgchart.js';
+import timesheet from '../../api/timesheet.js';
 
 const dayjsTypeMapper = {
     'day': 'day',
@@ -51,10 +52,31 @@ const dayjsTypeMapper = {
 
 export default {
     methods: {
-        getPreLog(){
+        findRepeatLog(){
+            let start = this.$moment(this.startDate,'DD-MM-YY');
+            let end = this.$moment(this.endDate,'DD-MM-YY');
+            let duration = this.$moment.duration(end.diff(start)).asDays();
+            duration = Number(duration)*4+3;
+            let nextDate= this.$moment(start).add(duration, 'days').format('YYYY-MM-DD')// ngày bắt đầu sau 4 lần thời gian ở màn bắt đầu
+            let dateYearAgo = this.$moment(start).subtract(1,'years').format('YYYY-MM-DD');
+            let data = {
+                end: this.$moment(start).format('YYYY-MM-DD'),//mốc bắt đầu từ start Calendar
+                nextDate : nextDate,//đoạn thời gian gấp 4 lần tính từ mốc
+                start: dateYearAgo// 1 năm trước từ mốc
+            }
+            const self = this;
+            timesheet.checkHasRepeatLog(data).then(res=>{
+                if(res.status==200){
+                    self.logRepeat = [...res.data];
+                    self.handleRepeatedLog()
+
+                }
+            })
 
         },
-      
+        handleRepeatedLog(){
+
+        },
         getSubDepartmentUser(){
             const self = this;
             orgchartApi.getSubDepartMent().then(res=>{
@@ -112,10 +134,12 @@ export default {
         },
         next() {
             // this.getPrelog();
+            this.findRepeatLog();
             this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(this.showDate).add(1, dayjsTypeMapper[this.type]).format('YYYY-MM-DD'));
             if (this.type === 'month') {
                 this.$store.commit('timesheet/adjustCalendar', this.$store.state.timesheet.calendarAdjustment + 1);
             }
+
         },
         changeActions(newType) {
              const self = this;
@@ -182,6 +206,7 @@ export default {
     },
     data: () => ({
        listUser:[],
+       logRepeat:[],
         actions: [],
         user:'',
     }),
