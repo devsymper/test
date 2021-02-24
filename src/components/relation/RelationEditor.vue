@@ -47,13 +47,17 @@
 				ref="relationWorkspace"
 			 	style="height: calc(100% - 41px)"
 				:wrapper="wrapper"
+				@reduce-links="reduceLinks"
 				:width="width"
 				:height="height"
 			 />
 		</div>
 		<div class="relation-link" v-if="action != 'view'">
 			<RelationLink
+				ref="relationLink"
 				:allLinks="allLinks"
+				@add-link="handleAddLink"
+				@delete-link="handleDeleteLink"
 				:listDatasetSelected="listDatasetSelected"
 			/>
 		</div>
@@ -159,6 +163,24 @@ export default {
 				}
 			})
 		},
+		reduceLinks(){
+			let obj = this.$refs.relationWorkspace.getWorkspaceInfo()
+			this.$refs.relationLink.reduceLinks(obj.links)
+		},
+		handleDeleteLink(id){
+			let self = this
+			let links = this.$refs.relationWorkspace.getAllLinks()
+			links.forEach(function(e){
+				if(e.attributes.id == id){
+					self.$refs.relationWorkspace.linkAction(e)
+				}
+			})
+		},
+		handleAddLink(data){
+			this.handleDeleteLink(data.uid)
+			this.$refs.relationWorkspace.addLink(data)
+			this.reduceLinks()
+		},
 		getAllDataset(){
 			this.relationEditoWorker.postMessage({action: 'getAllDataset'})
 		},
@@ -204,7 +226,6 @@ export default {
 			})
 		},
 		handleRelationConfig(data){
-			this.allLinks = data.links
 			this.datasets = data.datasetsMap
 			this.selectedDatasetIds = data.selectedDatasetIds 
 			this.relationName = data.relationName
@@ -224,7 +245,6 @@ export default {
             });
 		},
 		handleDatasetSelected(arr){
-			debugger
 			this.handleChangeSelectDataset(arr[arr.length - 1],true);
 			this.listDatasetSelected = arr;
 		},

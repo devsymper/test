@@ -14,6 +14,8 @@
             <SelectColumn 
                 :allColumns="allColumns"
                 :model="item.column"
+                :itemValue="'name'"
+                @change-value="handleChangeColumn"
             />
        </div>
         <v-btn icon tile x-small class="mt-1"  @click="removeColumn">
@@ -38,8 +40,13 @@ export default {
     created(){
 		this.dashboardDatasetWorker = new DashboardDatasetWorker()
 		this.listenFromWorker()
+        this.getDatasetColumns()
 	},
     methods:{
+        handleChangeColumn(data){
+            this.item.column = data.value
+            this.$emit('change-value')
+        },
         removeColumn(){
             this.$emit('remove-column')
         },

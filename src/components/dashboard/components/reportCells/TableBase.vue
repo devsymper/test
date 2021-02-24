@@ -328,7 +328,6 @@ export default {
             this.addPerfectScrollBar();
         },
         reStylePagination(){
-            debugger
             this.customCssPagination = this.convertCssObjToStr(this.options.paginationStyle)
         },
         /**

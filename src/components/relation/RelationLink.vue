@@ -14,7 +14,7 @@
                     >
                         <v-expansion-panel-header>
                             <div class="flex-grow-1">
-                                 {{item.title}}
+                                 Group link {{i}}
                             </div>
                            <div class="d-flex flex-row-reverse">
                                 <v-icon small @click="removeGroup(i, $event)">
@@ -28,6 +28,7 @@
                                     @remove-column="removeColumn(i, j)"
                                     :listDatasetSelected="listDatasetSelected"
                                     :item="childItem"
+                                    @change-value="handleChangeValue(item)"
                                 />
                             </div>
                             <v-btn
@@ -70,12 +71,6 @@ export default {
         RelationLinkItem
     },
     props:{
-        allLinks:{
-            type: Array,
-            default(){
-                return []
-            }
-        },
         listDatasetSelected:{
             type: Array,
             default(){
@@ -86,48 +81,44 @@ export default {
     data(){
         return{
             menuItemsHeight: "",
-            relationLinkData:[
-                {
-                    title: "Group link 1",
-                    childItem:[
-                        {
-                            dataset:'',
-                            column:""
-                        },
-                        
-                    ]
-                },
-                {
-                    title: "Group link 2",
-                    childItem:[
-                        {
-                            dataset:'',
-                            column:""
-                        },
-                        
-                    ]
-                },
-            ]
-        }
-    },
-    watch:{
-        allLinks:{
-            deep: true,
-            immediate: true,
-            handler(obj){
-                if(obj){
-                    this.reduceLinks()
-                }
+            relationLinkData: {
             }
         }
     },
+  
     mounted(){
         this.menuItemsHeight = (util.getComponentSize(this).h - 60)+'px';
     },
     methods:{
-        reduceLinks(){
-            this.allLinks
-            debugger
+        reduceLinks(allLinks){
+            this.relationLinkData = {}
+            for(let i in allLinks){
+                let firstLinkInfo = this.translateLinkToGroupItem(allLinks[i])
+                let obj = {
+                    uid: allLinks[i].uid,
+                    childItem: firstLinkInfo
+                }
+                for(let j = 1; j < allLinks.length; j++){
+                    if(allLinks[i].to == allLinks[j].from){
+                    }
+                }
+                this.$set(this.relationLinkData, Object.keys(this.relationLinkData).length + 1, obj)
+            }
+        },
+        translateLinkToGroupItem(link){
+            let arrFrom = link.from.split("_")
+            let arrTo = link.to.split("_")
+            return[
+                {
+                    dataset:arrFrom[0],
+                    column:  arrFrom.slice(1).join("_"),
+                },
+                {
+                    dataset:arrTo[0],
+                    column:  arrTo.slice(1).join("_"),
+                },
+
+            ]
         },
         removeGroup(idx, event){
             event.preventDefault()
@@ -135,18 +126,16 @@ export default {
             this.relationLinkData.splice(idx, 1)
         },
         addGroup(){
-            let index = this.relationLinkData.length + 1 
+            let index = Object.keys(this.relationLinkData).length + 1 
             let obj =  {
-                    title: "Group link "+ index,
-                    childItem:[
-                        {
-                            dataset:'',
-                            column:""
-                        },
-                        
-                    ]
-                }
-            this.relationLinkData.push(obj)
+                childItem:[
+                    {
+                        dataset:'',
+                        column:""
+                    },
+                ]
+            }
+            this.$set(this.relationLinkData, index, obj)
         },
         addColumn(idx){
             this.relationLinkData[idx].childItem.push({
@@ -155,7 +144,33 @@ export default {
             },)
         },
         removeColumn(i, j){
-             this.relationLinkData[i].childItem.splice(j ,1)
+            this.relationLinkData[i].childItem.splice(j ,1)
+            if(this.relationLinkData[i].childItem.length == 1){
+                this.$emit('delete-link', this.relationLinkData[i].uid)
+            }
+        },
+        handleChangeValue(data){
+            if(data.childItem.length > 1){
+                for(let i = 0 ; i < data.childItem.length - 1; i++ ){
+                    let obj = this.translateItemToLink(data.uid, data.childItem[i], data.childItem[i+1])
+                    this.$emit("add-link", obj)
+                }
+            }
+           
+        },
+        translateItemToLink(uid, from , to){
+            return{
+                source:{
+                    id: from.dataset,
+                    port: from.dataset+"_" +from.column
+                },
+                symperLinkType: "oo",
+                target: { 
+                    id: to.dataset,
+                    port: to.dataset+"_" +to.column
+                },
+                uid: uid
+            }
         }
        
     }
