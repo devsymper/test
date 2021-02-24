@@ -5,7 +5,7 @@
 				<span class="mb-2 fs-13">
 					{{ $t('bi.relation.selector') }}
 				</span>
-				<DatasetAutocomplete @dataset-selector="handleDatasetSelected" :listDatasets="listDatasets" />
+				<DatasetAutocomplete @dataset-selector="handleDatasetSelected" :listDatasets="listDatasets" :listDatasetSelected="listDatasetSelected" />
 				<VuePerfectScrollbar class="mt-2 " :style="{ height: listHeight + 'px' }" v-if="listDatasetSelected.length > 0">
 					<dataset-selected-item  v-for="(item, i) in listDatasetSelected" :key="i" class="dataset-selected-item" :item="item" :showRemove="true" @remove-item="removeItem" />
 				</VuePerfectScrollbar>
@@ -52,7 +52,10 @@
 			 />
 		</div>
 		<div class="relation-link" v-if="action != 'view'">
-			<RelationLink />
+			<RelationLink
+				:allLinks="allLinks"
+				:listDatasetSelected="listDatasetSelected"
+			/>
 		</div>
 	</div>
 </template>
@@ -120,7 +123,8 @@ export default {
 			selectingNode: null,
 			listDatasets: null,
 			selectedDatasetIds: null,
-			relationName: ""
+			relationName: "",
+			allLinks: null
 		};
 	},
 	components: {
@@ -133,7 +137,6 @@ export default {
 	created(){
 		this.relationEditoWorker = new RelationEditorWorker()
         this.listenFromWorker();
-		this.getAllDataset()
 		if(this.action == 'edit'){
 			this.getRelationConfigs()
 		}
@@ -201,9 +204,11 @@ export default {
 			})
 		},
 		handleRelationConfig(data){
+			this.allLinks = data.links
 			this.datasets = data.datasetsMap
 			this.selectedDatasetIds = data.selectedDatasetIds 
 			this.relationName = data.relationName
+			this.getAllDataset()
 			this.$refs.relationWorkspace.loadRelations(data.originDataset , data.items , data.links)
 		},	
 		listenFromWorker(){
@@ -218,7 +223,8 @@ export default {
                 }
             });
 		},
-		handleDatasetSelected(arr) {
+		handleDatasetSelected(arr){
+			debugger
 			this.handleChangeSelectDataset(arr[arr.length - 1],true);
 			this.listDatasetSelected = arr;
 		},

@@ -1,5 +1,13 @@
 <template>
-	<JointPaperDataMapping :background="background" :gridSize="gridSize" :draw-grid="drawGrid" @init="setupGraph" ref="jointPaper" :width="width" :height="height" />
+	<JointPaperDataMapping 
+		:background="background" 
+		:gridSize="gridSize" 
+		:draw-grid="drawGrid" 
+		@init="setupGraph" 
+		ref="jointPaper" 
+		:width="width" 
+		:height="height"
+	/>
 </template>
 
 <script>
@@ -242,31 +250,12 @@ export default {
 		},
 		
 		linkAction(link) {
-			var dialog = new joint.ui.Dialog({
-				title: 'Confirmation',
-				width: 300,
-				content: 'Are you sure you want to delete this link?',
-				buttons: [
-					{ action: 'cancel', content: 'Cancel' },
-					{ action: 'remove', content: '<span style="color:#fe854f">Remove</span>' }
-				]
-			});
-
-			dialog.open();
-			dialog.on({
-				'action:remove': function() {
-					for(let cb of rsl.onLinkRemove){
-						if(typeof cb == 'function'){
-							cb(link);
-						}
-					}
-					link.remove();
-					dialog.remove();
-				},
-				'action:cancel': function() {
-					dialog.remove();
-				}
-			});
+			// for(let cb of rsl.onLinkRemove){
+			// 	if(typeof cb == 'function'){
+			// 		cb(link);
+			// 	}
+			// }
+			link.remove();
 		},
 		listenPaperEvent() {
 			let self = this;

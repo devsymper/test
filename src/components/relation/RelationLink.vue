@@ -26,6 +26,8 @@
                             <div v-for="(childItem, j) in item.childItem" :key="j">
                                 <RelationLinkItem
                                     @remove-column="removeColumn(i, j)"
+                                    :listDatasetSelected="listDatasetSelected"
+                                    :item="childItem"
                                 />
                             </div>
                             <v-btn
@@ -67,6 +69,20 @@ export default {
         VuePerfectScrollbar,
         RelationLinkItem
     },
+    props:{
+        allLinks:{
+            type: Array,
+            default(){
+                return []
+            }
+        },
+        listDatasetSelected:{
+            type: Array,
+            default(){
+                return []
+            }
+        }
+    },
     data(){
         return{
             menuItemsHeight: "",
@@ -94,10 +110,25 @@ export default {
             ]
         }
     },
+    watch:{
+        allLinks:{
+            deep: true,
+            immediate: true,
+            handler(obj){
+                if(obj){
+                    this.reduceLinks()
+                }
+            }
+        }
+    },
     mounted(){
         this.menuItemsHeight = (util.getComponentSize(this).h - 60)+'px';
     },
     methods:{
+        reduceLinks(){
+            this.allLinks
+            debugger
+        },
         removeGroup(idx, event){
             event.preventDefault()
             event.stopPropagation()
@@ -141,6 +172,6 @@ export default {
     box-shadow: unset !important;
 }
 .relation-link-config >>> .v-expansion-panel-content__wrap{
-    padding-bottom: unset;
+    padding: 0 10px !important;
 }
 </style>
