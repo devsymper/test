@@ -231,7 +231,6 @@ export default {
 
                 })
                 .catch(console.log);
-                // debugger
 
         },
         getConfigInfo(){
@@ -272,7 +271,6 @@ export default {
                 var sub = Math.floor(Math.random() * 256).toString(16);
                 color += (sub.length == 1 ? "0" + sub : sub);
             }
-        // debugger
              return "#" + color;
         },
         
@@ -474,7 +472,6 @@ export default {
             }
         },
         mouseMove(tms) {
-            // debugger
             const mouse = this.toTime(tms);
             if (this.dragEvent && this.dragTime !== null) {
                 const start = this.dragEvent.start

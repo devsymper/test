@@ -429,7 +429,6 @@ export default {
              }
              else{
                 let taskId = this.task;
-                // debugger
                 // this.findNameTask(this.task);
                 this.getCategoryByTaskId(taskId);
              }
@@ -527,7 +526,6 @@ export default {
         },
         // Lấy tên của category theo id task
         getCategoryByTaskId(taskId){
-            // debugger
             if(this.listTask.length>0){
                 let cateId = this.listTask.filter(x=>x.id==taskId)[0].categoryId;
                 if(cateId){
@@ -568,8 +566,6 @@ export default {
 
                 })
                 .catch(console.log);
-                // debugger
-
         },
         // lấy giờ
          getDateMonth(){

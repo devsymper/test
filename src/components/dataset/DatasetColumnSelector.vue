@@ -144,7 +144,6 @@ export default {
         },
 		onSelectionChanged(event) {
 			let rowIndex = event.node.id;
-			debugger
 			if(this.manualCheckSelected){
 				this.tableData[rowIndex].selected = event.node.selected;
 			}
