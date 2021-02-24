@@ -790,7 +790,6 @@ export default class BasicControl extends Control {
 
     }
     renderRichTextControl() {
-        debugger
         let isReadOnly = 1;
         this.editor = '';
         let selector = '';
