@@ -1,6 +1,12 @@
 function changeCalendarType(state, type) {
     state.calendarType = type;
 }
+function getListColor(state, color) {
+    state.listColor = color;
+}
+function getListCategory(state, cate) {
+    state.listCate = cate;
+}
 
 function getLogForm(state, { category, task, date, duration, start, end, description, type }) {
     state.category = category;
@@ -57,6 +63,8 @@ function setShowErrorDialog(state, { msg, show }) {
 
 export {
     getLogForm,
+    getListColor,
+    getListCategory,
     changeCalendarType,
     updateCalendarStartEnd,
     updateCalendarShowDate,

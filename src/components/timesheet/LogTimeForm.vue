@@ -401,10 +401,10 @@ export default {
             this.getDateMonth()
         },
         duration(){
-            if(this.duration<=0||Number.isNaN(this.duration)||this.duration=='0h'||this.duration=='0m'){
-                if(this.duration.match(/[^a-zA-Z0-9]/)){
+            if(!this.duration||this.duration<=0||Number.isNaN(this.duration)||this.duration=='0h'||this.duration=='0m'){
+                // if(this.duration.match(/[^a-zA-Z0-9]/)){
                      this.timeError = this.$t('timesheet.time_invalid');
-                }
+                // }
                }
             else{
                 this.timeError = ''
@@ -473,7 +473,6 @@ export default {
         },
     },
     created(){
-        debugger
         // load lại trang ở màn month
         this.refreshAll();
         this.generateListHour();
@@ -680,7 +679,6 @@ export default {
                 }).catch(console.log);
         },
         refreshAll(){
-            debugger
             this.taskError="";
             this.cateError = '';
             this.timeError = "";

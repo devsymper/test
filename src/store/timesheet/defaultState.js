@@ -3,11 +3,13 @@ import moment from 'moment';
 export default {
     // timesheet
     calendarType: 'week',
+    listCate:[],
     calendarStartDate: moment().format('YYYY-MM-DD'),
     calendarEndDate: moment().format('YYYY-MM-DD'),
     calendarShowDate: moment().format('YYYY-MM-DD'),
     calendarAdjustment: 0,
     totalHours: '0',
+    listColor:{},
 
     // manage timesheet
     manageTimesheetType: 'week',

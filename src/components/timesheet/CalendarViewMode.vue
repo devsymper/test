@@ -41,7 +41,7 @@
           <span style= "color:black!important; padding-left:4px"> {{format(type)}}</span>
         </template>
     </v-select>
-    <v-menu offset-y nudge-bottom='8' :max-width="210" :min-width="210" :close-on-content-click="false">
+    <v-menu offset-y nudge-bottom='8' :max-width="280" :min-width="280" :close-on-content-click="false">
         <template v-slot:activator="{ on:menu }">
             <v-tooltip top>
             <template v-slot:activator="{ on:tooltip }">
@@ -54,9 +54,34 @@
             </span>
         </v-tooltip>
         </template>
-        <PickColor 
-            v-model="logColor" :random="true" :swatchesColor="swatch" :randomColor="randomColor" :showSaveBtn="true" 
-            :name="'Chọn màu cho log time'" @save="saveColor"/>
+            <v-tabs centered v-model="tab" color="orange" >
+                <v-tab href="#tab-1" class="tab">
+                    <span class="fs-13">
+                        Logtime
+                    </span>
+                </v-tab>
+                <v-tab href="#tab-2" class="tab">
+                     <span class="fs-13">
+                         Loại c.việc
+                    </span>
+                </v-tab>
+            </v-tabs>
+            <v-tabs-items v-model="tab">
+                <v-tab-item :key="1" :value="'tab-' + 1" >
+                    <div class="mr-2">
+                       <PickColor 
+                            v-model="logColor" :random="true" :swatchesColor="swatch" 
+                            :randomColor="randomColor" :showSaveBtn="true" 
+                            :name="'Chọn màu cho log time'" @save="saveColor"/>
+                    </div>
+                </v-tab-item>
+                <v-tab-item :key="2" :value="'tab-' + 2" >
+                    <div>
+                        <CategoryColor :listColor="listColor" :value="listCate" @input="setListCateColor" @save="saveCategoryColor"/>
+                    </div> 
+                </v-tab-item>
+            </v-tabs-items>
+       
      </v-menu>
      <v-tooltip top>
         <template v-slot:activator="{ on }">
@@ -74,53 +99,80 @@
 
 <script>
 import {uiConfigApi} from "./../../api/uiConfig";
+import CategoryColor from './form/ConfigCategoryColor';
 import PickColor from "./../common/listItemComponents/PickColor"
 export default {
+  
     data: () => ({
         types: ['day', 'weekday', 'week', 'month'],
         timebtn:true,
         events:[],
-        widgetIdentifier:'',
         randomColor:false,
+        tab:1,
         swatch:[
             ['#FF0000', '#AA0000', '#550000','#00FFFF', '#00AAAA' ],
             ['#FFFF00', '#AAAA00', '#555500','#0000FF', '#0000AA'],
             ['#00FF00', '#00AA00', '#005500','#000055','#005555'],
+            ['#00FF01', '#00AA01', '#005501','#000051','#005551'],
+             
         ],
-        logColor:'green'
+        logColor:'green',
+        colorLog:{},
+        colorCate:{}
     }),
     computed: {
         type() {
             return this.$store.state.timesheet.calendarType;
+        },
+        listColor() {
+            return this.$store.state.timesheet.listColor;
+        },
+        listCate() {
+            return this.$store.state.timesheet.listCate;
         }
     },
     components:{
-        PickColor
+        PickColor,
+        CategoryColor
     },
     methods: {
-        saveColor(randomColor){
-            let data ={
-                widgetIdentifier: this.getWidgetIdentifier(),
-                detail:{isRandom: randomColor, color:this.logColor}
-            }
-            this.$emit('change-color',data.detail);
+        setListCateColor(cate){
+            this.$store.commit("timesheet/getListCategory", cate )
+        },
+        saveCategoryColor(listCateColor){
+            let data = {...this.listColor};
+             if(Object.keys(data).length== 0){
+                 data.detail = {colorCate:listCateColor}
+             }else{
+                  data.detail.colorCate  = listCateColor;
+             }
+            this.$emit('change-cate-color',listCateColor, this.logColor);
             data.detail = JSON.stringify(data.detail);
-            // let res = await uiConfigApi.getUiConfig(data.widgetIdentifier)
             uiConfigApi.saveUiConfig(data).then(res=>{
                 if(res.status == 200){
                 }
             })
         },
-		getWidgetIdentifier(){
-            let widgetIdentifier = '';
-            if(this.widgetIdentifier){
-                widgetIdentifier =  this.widgetIdentifier;
+        saveColor(randomColor){
+            let data = {...this.listColor};
+            let colorLog = {
+                isRandom: randomColor, 
+                color:this.logColor
+            };
+            if(Object.keys(data).length== 0){
+                 data.detail = {colorLog:colorLog};
             }else{
-                widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
+                 data.detail.colorLog = colorLog;
             }
-			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
-            return widgetIdentifier;
-		},
+                this.$emit('change-color',data.detail.colorLog,this.listCate);
+                data.detail = JSON.stringify(data.detail);
+          
+          
+            uiConfigApi.saveUiConfig(data).then(res=>{
+                if(res.status == 200){
+                }
+            })
+        },
         changeView(_type) {
             this.$store.commit("timesheet/changeCalendarType", _type);
         },

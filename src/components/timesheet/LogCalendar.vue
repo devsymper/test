@@ -161,6 +161,7 @@ export default {
     props: ['timeView','userId','monEvents'],
     data() {
         return {
+            listCategoryColor:[],
             listLogInTime:[],
             menu:false,
             listCategory:[],
@@ -201,15 +202,9 @@ export default {
         getCategory(){
             const self = this;
              timesheetApi.getAllCategory({}).then(res => {
-                if (res.status === 200) {debugger
+                if (res.status === 200) {
                     self.listCategory = res.data.listObject;
-                    // self.category.category_name=[];
-                    // let category = res.data.listObject;
-                    // for(let i=0; i<category.length; i++){
-                    //     self.category.category_name.push(
-                    //         category[i].key+"-"+category[i].name
-                    //     )
-                    // }
+                    self.$store.commit("timesheet/getListCategory", self.listCategory )
                 }
                 }).catch(console.log);
             },
@@ -244,7 +239,6 @@ export default {
             .catch(err => {
                 console.log(err)
             })
-
         },
         getWidgetIdentifier(){
             let widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
@@ -254,13 +248,20 @@ export default {
         getColor(){
             const self = this;
             let widgetIdentifier = this.getWidgetIdentifier();
+            let data = {
+                widgetIdentifier:widgetIdentifier,
+                detail:{}
+            }
             uiConfigApi.getUiConfig(widgetIdentifier).then(res=>{
                 if(res.status==200){
-                    self.colorLog = JSON.parse(res.data.detail).color;
-                    self.isRandom = JSON.parse(res.data.detail).isRandom;
-                    self.$emit('set-color',{color:self.colorLog,isRandom:self.isRandom})
+                    data.detail= JSON.parse(res.data.detail);
+                    self.colorLog = JSON.parse(res.data.detail).colorLog.color;
+                    self.isRandom = JSON.parse(res.data.detail).colorLog.isRandom;
+                    self.listCategoryColor =  JSON.parse(res.data.detail).colorCate;
+                    
                 }
             })
+            this.$store.commit("timesheet/getListColor", data )
 
         },
         setResizeLogtime(event){
@@ -275,29 +276,40 @@ export default {
         // debugger
              return "#" + color;
         },
-        
-        setLogTimeList(data){
-            // data.events.map((evt,i)=>{
-            //     // let test = task.id;
-            //      let taskName = this.listTask.filter(task=>task.id==evt.task).length>0? this.listTask.filter(task=>task.id==evt.task)[0].name:'';
-            //     // evt.task = taskName;
-            //     evt.name = taskName;
-
-            // })
-            this.events = data.events;
+        // set màu log time theo log hoặc category
+        setCateAndLogColor(log,oldColor,colorCate){
+            let color = oldColor;
+            colorCate.map(cate=>{
+                if(cate.key==log.category_key&&cate.isShow){
+                    color =  cate.color
+                }
+            })
+            return color
+        },
+        getColorLogTime(){
             if(this.isRandom){
                 this.events.map(e=>{
-                e.color = this.randomColor()
+                    e.color = this.randomColor();
+                    e.color = this.setCateAndLogColor(e,e.color,this.listCategoryColor)
                 })
             }else{
                 this.events.map(e=>{
-                    e.color = this.colorLog
+                    e.color = this.setCateAndLogColor(e,this.colorLog,this.listCategoryColor);
                 })
             }
-            // this.sum = data.sumLogTime;
-            // this.hoursRequired = data.hoursRequired;
-            // this.listCategory = data.category;
-            // this.$emit('set-list-category', data.category);
+        },
+        getColorWhenCreate(log){
+            let color = this.colorLog;
+            this.listCategoryColor.map(cate=>{
+                if(cate.key==log.category_key){
+                    color = cate.color
+                }
+            })
+            return color
+        },
+        setLogTimeList(data){
+            this.events = data.events;
+            this.getColorLogTime();
             if(!this.timeView){
                 this.resizeLogtime()
             }

@@ -6,6 +6,7 @@
              class="">
             <CalendarViewMode
                 ref="viewmode"
+                @change-cate-color="changeCateColor"
                 @change-color="changeColor"
                 @time_view="time_view = true"
                 @list_view="time_view = false" />
@@ -72,7 +73,6 @@
         </DeleteLogView>
     </v-dialog>
     <LogCalendar
-        @set-color="setColor"
         :userId="userId"
         @showLog="showLog" 
         :monEvents="monthEvents"
@@ -107,7 +107,6 @@ export default {
     },
     data() {
         return {
-            
             userId:'',
             monthEvents:{},
             showTask:false,
@@ -154,21 +153,36 @@ export default {
         })
     },
     methods: {
-        setListCategory(listCategory){
+       changeCateColor(listCateColor, logColor){
+           this.$refs.logCalendar.listCategoryColor = listCateColor;
+            this.$refs.logCalendar.events.map(e=>{
+                listCateColor.map(cate=>{
+                    if(cate.key == e.category_key){
+                        if(cate.isShow){
+                            e.color = cate.color
 
+                        }else{
+                            e.color = logColor
+                        }
+                    }
+                   
+                })
+            })
         },
-      
-        setColor(data){
-            this.$refs.viewmode.logColor = data.color;
-            this.$refs.viewmode.randomColor = data.isRandom;
-        },
-        changeColor(data){
+        changeColor(data,listCate){
+            let listCateColor = [...listCate];
             if(data.isRandom){
+                this.$refs.logCalendar.isRandom = true;
                 this.$refs.logCalendar.events.map(e=>{
-                    e.color = this.$refs.logCalendar.randomColor()})
+                    e.color = this.$refs.logCalendar.randomColor();
+                    e.color = this.$refs.logCalendar.setCateAndLogColor(e,e.color,listCate)
+                })
             }else{
+                this.$refs.logCalendar.colorLog = data.colorLog;
+                 this.$refs.logCalendar.isRandom = false;
                 this.$refs.logCalendar.events.map(e=>{
-                    e.color = data.color})
+                    e.color = this.$refs.logCalendar.setCateAndLogColor(e,data.color,listCate)
+                })
             }
         },
         // khi click ra ngoài log form
@@ -203,10 +217,10 @@ export default {
             data.end = Date.parse(data.end);
             data.name=this.$refs.logCalendar.listTask.filter(task=>task.id==data.task).length>0? this.$refs.logCalendar.listTask.filter(task=>task.id==data.task)[0].name:'';
             data.category=data.categoryTask;
-            data.color= this.$refs.logCalendar.colorLog;
+            data.category_key=data.categoryTask.split('-')[0];
+            data.color= this.$refs.logCalendar.getColorWhenCreate(data);
             data.type=data.type;
             data.timed= true;
-            data.category_key=data.categoryTask.split('-')[0];
             this.$refs.logCalendar.events.push(data);
             if(!this.$refs.logCalendar.timeView){
                 this.$refs.logCalendar.resizeLogtime()
