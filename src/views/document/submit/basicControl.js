@@ -4,7 +4,7 @@ import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
 import Util from './util'
 var numbro = require("numbro");
-import { appConfigs } from "@/configs.js";
+// import { appConfigs } from "@/configs.js";
 import tinymce from 'tinymce/tinymce';
 import { documentApi } from "../../../api/Document";
 import { str } from "../../../plugins/utilModules/str";
@@ -13,6 +13,7 @@ import { fileManagementApi } from "@/api/FileManagement";
 
 import 'tinymce/plugins/media';
 import 'tinymce/plugins/quickbars';
+
 let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
@@ -794,7 +795,7 @@ export default class BasicControl extends Control {
         this.editor = '';
         let selector = '';
         let self = this;
-        let toolbar = 'undo redo | styleselect | lineheightselect | quickimage | lineheight | fontselect | fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | emoticons |outdent indent | link image | code';
+        let toolbar = 'undo redo | styleselect | lineheightselect | quickimage | lineheight | fontselect | fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | emoticons |outdent indent | link';
         if(this.checkViewType('submit') || this.checkViewType('update')){ 
             this.ele = $('#sym-submit-'+this.keyInstance).find("#"+this.id);
             isReadOnly = 0;
@@ -805,35 +806,27 @@ export default class BasicControl extends Control {
             selector = '#sym-Detail-'+this.keyInstance+" #"+this.id;
             toolbar = false;
         }
+        let isShowToolBar = this.controlProperties.isShowHeaderTinyMce.value?true:false
         tinymce.remove();
-        if(this.controlProperties.isShowHeaderTinyMce.value){
-            tinymce.init({
-                toolbar: toolbar,
-                menubar: false,
-                branding: false,
-                readonly: isReadOnly,
-                content_style: "p{ font-family: Roboto; font-size: 13px,color:black; line-height:0;}",
-                quickbars_selection_toolbar: 'quickimage media| emoticons | table',
-                quickbars_insert_toolbar: 'quicktable image media codesample',
-                plugins: ['quickbars','lineheight','media','image'],
-                lineheight_formats: "0pt 1pt 2pt 3pt 4pt 5pt 6pt 7pt 8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 36pt",
-                selector:  selector,
-                statusbar: false,
-                init_instance_callback : function(editor) {
-                    self.editor = editor;
-                    self.initEditor();
-                },
-                onchange_callback :function(data) {
-                    self.changeData(data);
-                },
-            });    
-         }
+        tinymce.init({
+            toolbar: isShowToolBar,
+            menubar: false,
+            branding: false,
+            readonly: isReadOnly,
+            content_style: "p{ font-family: Roboto; font-size: 13px,color:black; line-height:0}",
+            quickbars_selection_toolbar: toolbar,
+            plugins: ['quickbars','image'],
+            lineheight_formats: "0pt 1pt 2pt 3pt 4pt 5pt 6pt",
+            selector:  selector,
+            statusbar: false,
+            init_instance_callback : function(editor) {
+                self.editor = editor;
+                self.initEditor();
+            },
+        });    
     }
     initEditor(){
         return this.editor.setContent(this.value);
-    }
-    changeData(content){
-        this.value =content;
     }
     getDefaultValue() {
         if (this.isCheckbox) {
