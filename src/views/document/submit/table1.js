@@ -29,14 +29,16 @@ import { checkCanBeBind } from "./handlerCheckRunFormulas";
 import PerfectScrollbar from "perfect-scrollbar";
 import {getDataInputFormula, prepareDataGetMultiple } from "./../../../components/document/dataControl";
 import { str } from "../../../plugins/utilModules/str";
+import { uiConfigApi } from "../../../api/uiConfig";
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
     event.preventDefault();
     event.stopPropagation();
     let thisListItem = util.getClosestVueInstanceFromDom(el,'submitDocument');
     thisListItem.$evtBus.$emit('on-add-data-to-pivot-table',{type:type, tableName:tableName})
-    
 }
+var delayTimerGridEvent;
+
 export default class SymperTable {
     constructor(tableControl, keyInstance, groupConfig = {}, pivotConfig = {}, formulasWorker) {
         this.keyInstance = keyInstance;
@@ -61,6 +63,7 @@ export default class SymperTable {
         this.pinnedRowNode = null;
         this.dataChange = {};
         this.allControlKeyCache = this.tableControl.getAllControlKeyCache();
+        this.onEventReady = false;
     }
     init(){
         this.viewType = sDocument.state.viewType[this.keyInstance];
@@ -89,17 +92,6 @@ export default class SymperTable {
         this.isCellFilling = false;
         this.isCellPasting = false;
         this.dataForCellpasting = {};
-    }
-
-    addCheckBoxForFirstColumn(){
-        var columnDefs = getColumnDefs();
-        columnDefs.forEach(function (colDef) {
-            if (colDef.field === 'index_increment') {
-                colDef.headerCheckboxSelection = true;
-                colDef.checkboxSelection = true
-            }
-        });
-        gridOptions.api.setColumnDefs(columnDefs);
     }
     getContextMenuItems(params){
         let self = params.context.thisComponent;
@@ -159,7 +151,51 @@ export default class SymperTable {
             return submitContextItem;
         }
     }
+    showLoadingOverlay(){
+        this.gridOptions.api.showLoadingOverlay()
+    }
+    hideOverlay(){
+        this.gridOptions.api.hideOverlay()
+    }
         
+    getUiConfig(){
+        if(this.viewType == 'submit'){
+            return;
+        }
+        this.showLoadingOverlay();
+        let docName = sDocument.state.submit[this.keyInstance].documentInfo.document.name;
+        let tableDefinition = "table_document_instance:"+docName+":"+this.tableName;
+        let self = this;
+        uiConfigApi.getUiConfig(tableDefinition).then(res=>{
+            let uiConfig = {};
+            if(res.status == 200){
+                uiConfig = res.data.detail;
+                try {
+                    uiConfig = JSON.parse(uiConfig);
+                    uiConfig = uiConfig.tableDefinition;
+                } catch (error) {
+                    console.warn(error);
+                }
+            }
+            let newColdefs = [];
+            for(let control in uiConfig){
+                let colItem = self.columnDefs.find(el=>el.field == control);
+                if(colItem){
+                    // colItem.width = uiConfig[control];
+                    newColdefs.push(colItem);
+                    self.columnDefs.splice(self.columnDefs.indexOf(colItem),1);
+                }
+            }
+            newColdefs = newColdefs.concat(self.columnDefs);
+            self.columnDefs = newColdefs;
+            self.gridOptions.api.setColumnDefs([]);
+            self.gridOptions.api.setColumnDefs(newColdefs);
+            self.autoSizeAll()
+        })
+        
+
+    }
+    
     /**
      * Hàm lấy các định nghĩa của cột
      */
@@ -212,8 +248,6 @@ export default class SymperTable {
             else{
                 col['cellRenderer'] = 'ValidateCellRenderer';
             }
-            
-          
             if(controlInstance.checkEmptyFormulas('autocomplete')){
                 col['cellEditor'] = 'AutoCompleteCellEditor';
                 col['cellEditorParams'] = {
@@ -263,6 +297,7 @@ export default class SymperTable {
         colDefs.push(colSqlId);
         return colDefs;
     }
+    
     checkEditableCell(control){
         if(this.viewType == 'detail'){
             return false;
@@ -596,6 +631,8 @@ export default class SymperTable {
             },
             enableRangeSelection: true,
             onGridReady:this.onGridReady,
+            onColumnResized:this.onColumnResized,
+            onColumnMoved:this.onColumnMoved,
             tableInstance:this,
 
             
@@ -843,16 +880,52 @@ export default class SymperTable {
             result[controlName] = 0;
         }
         return [result];
-      }
-
+    }
+    /**
+     * Sự kiện xảy ra sau khi resize cột
+     * @param {*} params 
+     */
+    onColumnResized(params){
+        let thisComponent = this.context.thisComponent;
+        thisComponent.onSaveConfigUi(params)
+    }
+    /**
+     * Sự kiện xảy ra sau khi ẩn cột
+     * @param {*} params 
+     */
+    onColumnMoved(params){
+        let thisComponent = this.context.thisComponent;
+        thisComponent.onSaveConfigUi(params)
+    }
+    onSaveConfigUi(params){
+        let self = this;
+        if(!self.onEventReady){
+            return;
+        }
+        clearTimeout(delayTimerGridEvent);
+        delayTimerGridEvent = setTimeout(function() {
+            let configDetail = {tableDefinition:{}};
+            params.columnApi.getAllDisplayedColumns().forEach(function (column) {
+                let actualWidth = column.actualWidth;
+                let colName = column.colDef.field;
+                configDetail['tableDefinition'][colName] = actualWidth;
+            });
+            let userId = store.state.app.endUserInfo.id;
+            let docName = sDocument.state.submit[self.keyInstance].documentInfo.document.name;
+            let tableDefinition = "table_document_instance:"+docName+":"+self.tableName;
+            uiConfigApi.saveUiConfig({detail:JSON.stringify(configDetail), userId: userId, widgetIdentifier:tableDefinition});
+        }, 2000);
+    }
+   
     /**
      * Đổi thanh cuộn trong table
      * @param {*} params 
      */
     onGridReady(params){
-        // setTimeout((self)=>{
-        //     // params.api.sizeColumnsToFit()
-        // },1000)
+        this.tableInstance.getUiConfig()
+        setTimeout((self)=>{
+            self.onEventReady = true;
+        },4000,this.tableInstance)
         const agBodyViewport = $(this.tableInstance.tableContainer).find('.ag-body-viewport')[0];
         const agBodyHorizontalViewport = $(this.tableInstance.tableContainer).find('.ag-body-horizontal-scroll-viewport')[0];
         if (agBodyViewport) {

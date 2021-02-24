@@ -252,8 +252,8 @@ export default {
                 if($(evt.target).is('.highlight-history') ){
                     this.$refs.historyView.show($(evt.target))    
                 }
-                else if($(evt.target).is('.info-control-btn')){
-                    this.focusingControlName = $(evt.target).attr('data-control');
+                else if($(evt.target).closest('.info-control-btn').length > 0){
+                    this.focusingControlName = $(evt.target).closest('.info-control-btn').attr('data-control');
                     this.$refs.floattingPopup.show(evt, $('#sym-Detail-'+this.keyInstance));
                 }
                 else{
@@ -338,6 +338,11 @@ export default {
                 }
                 let docDetailRes = await documentApi.detailDocument(documentId,dataPost);
                 if (docDetailRes.status == 200) {
+                    this.$store.commit("document/addToDocumentSubmitStore", {
+                        key: 'documentInfo',
+                        value: docDetailRes.data,
+                        instance:this.keyInstance
+                    });
                     this.dataPivotTable = docDetailRes.data.pivotConfig;
                     this.dataGroupTable = docDetailRes.data.groupConfig;
                     let content = docDetailRes.data.document.content;

@@ -36,6 +36,12 @@ ValidateCellRenderer.prototype.init = function(params) {
                 this.eGui.innerHTML = value;
             }
         }
+        if(control.tableCellHistoryData['row_'+params.rowIndex]){
+            this.eGui.classList.add('info-control-btn');
+            this.eGui.setAttribute('rowIndex',params.rowIndex);
+            this.eGui.setAttribute('data-control',control.name);
+            this.eGui.style.height = '100%'
+        }
         
     }
     
