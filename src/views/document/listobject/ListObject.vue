@@ -597,7 +597,7 @@ export default {
             if(this.$refs.listObject.isShowSidebar()){
                 let documentObject = data.data;
                 let event = data.event;
-                if(this.$refs.listObject.isShowCheckedRow()){
+                if(this.$refs.listObject.hasColumnsChecked){
                     return;
 				}
                 if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
