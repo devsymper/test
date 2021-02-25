@@ -258,13 +258,13 @@
                 @dragStopped="columnResized()"
                 @columnResized="resize()"
 				@rowClicked="handlerRowClicked"
+				@rowSelected="handlerRowSelected"
 				:rowData="rowData"
 				:frameworkComponents="frameworkComponents"
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
 				@cell-context-menu="cellContextMenu"
                 @cell-mouse-down="cellMouseDown"
-				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
                 @cell-clicked="onCellClicked"
@@ -768,6 +768,16 @@ export default {
                         }
                     });
                     self.columnDefs = data.dataAfter;
+                    self.columnDefs.unshift(
+                        { 
+                            headerName:"",
+                            field: 'checkboxColumn',
+                            headerCheckboxSelection: true,
+                            checkboxSelection: true,
+                            width: 50,
+                            hide:!self.hasColumnsChecked
+                        }	
+                    )
                     if(self.conditionalFormat&&self.conditionalFormat.length>0){
                         if(self.listSelectedCondition.length==0){
                             self.listSelectedCondition = self.getListSelectedConditionFormat();
@@ -775,6 +785,7 @@ export default {
                         self.columnDefs = self.handleConditionalFormat(data.dataAfter);
                     
                     }
+                    self.setSelectedRow();
 					break;
                 default:
                     break;
@@ -1008,6 +1019,7 @@ export default {
            	rowData: [
 				// {make: 'Toyota', model: 'Celica', price: 35000, test: 'SDASDASD',testA:'SDAdsdSDASD',testB:'SDAdsdSDASD',testC:'SDAdsdSDASD',testD:'SDAdsdSDASD',testE:'SDAdsdSDASD',testF:'SDAdsdSDASD',testG:'SDAdsdSDASD',testH:'SDAdsdSDASD',testJ:'SDAdsdSDASD',testK:'SDAdsdSDASD',testM:'SDAdsdSDASD',resizable: true},
 			],
+            rowSelected:[]
         }
     },
     components: {
@@ -1053,7 +1065,9 @@ export default {
 				}
 			},
 			suppressCopyRowsToClipboard: true,
-			modules:[ClipboardModule]
+			modules:[ClipboardModule],
+            rowSelection:'multiple',
+            suppressRowClickSelection: true,
 		},
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
@@ -1065,6 +1079,34 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+         /**
+         * select lại dòng đã được chọn trước đó nếu có refresh list
+         */
+        setSelectedRow(){
+            let self = this;
+            if(this.hasColumnsChecked){
+                this.gridOptions.api.forEachNode(node=> {
+                    /**
+                     * trường hợp danh sách bản ghi document thì lấy định danh theo document_object_id
+                     */
+                    if(node.data.document_object_id){
+                        let row = self.rowSelected.find(el => el.document_object_id == node.data.document_object_id);
+                        if(row && node.data.document_object_id == row.document_object_id){
+                            node.setSelected(true);
+                        }
+                    }
+                    else if(node.data.id){
+                        let row = self.rowSelected.find(el => el.id == node.data.id);
+                        if(row && node.data.id == row.id){
+                            node.setSelected(true);
+                        }
+                    }
+                })
+            }
+        },
+        getRowSelected(){
+            return this.rowSelected;
+        },
         // lấy ra danh sách cấu hình format được chọn
         getListSelectedConditionFormat(){
             let result = [];
@@ -1401,34 +1443,18 @@ export default {
             }, 100, this);
              this.$emit('cell-mouse-over',params)
 		},
-		isShowCheckedRow(){
-            return this.hasColumnsChecked
-		},
 		 // hoangnd: thêm cột checkbox
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
-            this.columnDefs.unshift(
-				{ 
-					headerName: 'Chọn', 
-					field: 'checkbox', 
-					editable:true,
-					cellRendererFramework : 'CheckBoxRendererListItems',
-					width: 50
-				}	
-			)
-			this.gridOptions.api.setColumnDefs([]);
+            this.gridOptions.columnApi.setColumnVisible('checkboxColumn', true) //In that case we hide it
 		},
 		emptyShowList(){
 			this.columnDefs = []
 			this.rowData = []
 		},
-		// dungna doi hasColumnsChecked = true
-		addColumnsChecked(){
-			this.hasColumnsChecked = true
-		},
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
-            this.columnDefs.shift();
+            this.gridOptions.columnApi.setColumnVisible('checkboxColumn', false) //In that case we hide it
         },
 		relistContextmenu(){
             if(!this.cellAboutSelecting){
@@ -1593,6 +1619,7 @@ export default {
 				}
 			})
 			this.hideOverlay()
+         
 			this.$emit('data-loaded', resData)
 
 		},
@@ -1735,8 +1762,6 @@ export default {
             this.$emit("save-item", {});
 		},
 		refreshList(){
-			this.allRowChecked = []
-			this.$emit('after-selected-row', this.allRowChecked)
 			this.getData();
 			this.$emit("refresh-list", {});
         },
@@ -1890,10 +1915,19 @@ export default {
 				this.agApi.copySelectedRowsToClipboard();
 			}
 		},
-		onSelectionChanged() {
-			var selectedRows = this.agApi.getSelectedRows();
-			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
-   		 },
+        handlerRowSelected(params){
+			let rowData = params.data;
+            let key = (rowData.document_object_id) ? 'document_object_id' : 'id'
+            let currentRow = this.rowSelected.find(el=>el[key] == rowData[key])
+            if(!currentRow){
+                this.rowSelected.push(rowData);
+            }
+            else{
+                if(!params.node.selected){
+                    this.rowSelected.splice(this.rowSelected.indexOf(currentRow),1);
+                }
+            }
+        },
 		onGridReady(params){
 			params.api.sizeColumnsToFit()
 			this.agApi = params.api
