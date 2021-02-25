@@ -19,6 +19,7 @@ const defaultState = {
     currentBoard:{},
     listBoardInProject:[],
     listComponentInProject:[],
+    listIssueLink:[],
     listVersionInProject:[],
     infoVersionCurrent:{},
     infoComponentCurrent:{},

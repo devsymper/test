@@ -58,6 +58,9 @@ const setListBoardInProject = (state, listBoardInProject) => {
 const setListComponent = (state, listComponentInProject) => {
     Vue.set(state, 'listComponentInProject', listComponentInProject);
 }
+const setListIssueLink = (state, IssueLink) => {
+    Vue.set(state, 'listIssueLink', IssueLink);
+}
 const setListVersion = (state, listVersionInProject) => {
     Vue.set(state, 'listVersionInProject', listVersionInProject);
 }
@@ -323,6 +326,7 @@ export {
     addBoardToStore,
     addToTaskManagementStore,
     updateBoardToStore,
+    setListIssueLink,
     setListComponent,
     setListVersion,
     setInfoVersionCurrent,
