@@ -15,6 +15,10 @@ export default class Table extends ReportBase {
                 title: 'Total',
                 items: ['show', 'fontColor', 'textSize','borderWidth', 'borderColor', 'borderStyle', 'bgColor']
             },
+            pagination:{
+                title: 'Pagination',
+                items:['fontColor','borderWidth', 'borderColor', 'borderStyle']
+            },
             conditionalFormat: {
                 title: 'Conditional format',
                 items: ['conditionalFormatCondition']
@@ -31,7 +35,6 @@ export default class Table extends ReportBase {
         let columns = rawConfig.setting;
         let style = rawConfig.style;
         let prevDisplayOptions = oldOutput;
-
         /** hàm cũ */
         let needTotal = style.total.children.show.value;
         let commonAttr = this.getCommonCellStyleAttr(style, ratio);
@@ -48,6 +51,12 @@ export default class Table extends ReportBase {
             tableSize: {
                 h: extraData.size.h,
                 w: extraData.size.w,
+            },
+            paginationStyle: {
+                color: style.pagination.children.fontColor.value,
+                borderWidth: style.pagination.children.borderWidth.value,
+                borderStyle: style.pagination.children.borderStyle.value,
+                borderColor: style.pagination.children.borderColor.value
             }
         };
         

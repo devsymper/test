@@ -5,7 +5,8 @@
             's-pagination-mini': contentSize == 'mini', 
             's-pagination-normal': contentSize != 'mini',
             'short-mode': shortMode
-        }">
+        }"
+    >
         <v-select
             class="s-select-page-size  float-left"
             :style="shortMode ? 'width:40px' : 'width:75px'"
@@ -77,6 +78,7 @@ export default {
 			type: String,
 			default: "normal"
 		},
+       
         total:{
             type:Number,
             default:0

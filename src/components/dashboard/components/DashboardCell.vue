@@ -7,6 +7,7 @@
         <DashboardCellOptions 
             :cell="cellConfigs"
             :instanceKey="instanceKey" 
+            @view-detail="handleViewDetail"
             :isView="isView"/>
         <preloader v-if="cellConfigs.viewConfigs.loadingData" :size="25"/>
         <div class="w-100 h-100 cell-placeholder" v-if="showIconOnly()">
@@ -63,6 +64,9 @@ export default {
         DashboardCellOptions
     },
     methods: {
+        handleViewDetail(data){
+            this.$emit('view-detail', data)
+        },
         showIconOnly(){
             let needData = Object.keys(this.cellConfigs.rawConfigs.setting).length > 0;
             let data = this.cellConfigs.sharedConfigs.data;
@@ -117,7 +121,7 @@ export default {
         isView: {
             default: true
         },
-    }
+    },
 }
 </script>
 
