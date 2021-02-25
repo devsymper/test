@@ -41,7 +41,6 @@ export default {
         printInnerHTML(headerHTML){
             let domHTML = this.$refs.highchartWrapper.innerHTML
             let fullHTML = headerHTML + domHTML;
-            debugger
             util.printDOM(fullHTML);
         }
     }

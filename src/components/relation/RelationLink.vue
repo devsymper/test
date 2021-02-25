@@ -5,7 +5,7 @@
                  Columns links
             </span>
         </div>
-        <div class="mx-1 ">
+        <div class="mx-1 d-flex flex-column">
             <VuePerfectScrollbar :style="{'max-height': menuItemsHeight}">
                 <v-expansion-panels multiple>
                     <v-expansion-panel
@@ -17,7 +17,7 @@
                                  Group link {{i}}
                             </div>
                            <div class="d-flex flex-row-reverse">
-                                <v-icon small @click="removeGroup(i, $event)">
+                                <v-icon small @click="removeGroup(item, i, $event)">
                                     mdi-close
                                 </v-icon>
                            </div>
@@ -32,30 +32,31 @@
                                 />
                             </div>
                             <v-btn
-                                small
+                                x-small
                                 color="gray"
                                 @click="addColumn(i)"
                             >
                                 <v-icon  x-small class="mr-2">mdi-plus</v-icon>
-                                <span class="fs-13">
+                                <span class="fs-13 font-weight-light">
                                         {{ $t('common.add-column')}}
                                 </span>
                             </v-btn>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
-                 <v-btn
-                    small
-                    color="gray"
-                    class="mt-1"
-                    @click="addGroup"
-                >
-                    <v-icon  x-small class="mr-2">mdi-plus</v-icon>
-                    <span class="fs-13">
-                        Thêm group
-                    </span>
-                </v-btn>
+                
             </VuePerfectScrollbar>
+             <v-btn
+                x-small
+                color="gray"
+                class="mt-1"
+                @click="addGroup"
+            >
+                <v-icon  x-small class="mr-2">mdi-plus</v-icon>
+                <span class="fs-13 font-weight-light">
+                    Thêm group
+                </span>
+            </v-btn>
         </div>
     </div>
 </template>
@@ -87,7 +88,7 @@ export default {
     },
   
     mounted(){
-        this.menuItemsHeight = (util.getComponentSize(this).h - 60)+'px';
+        this.menuItemsHeight = (util.getComponentSize(this).h - 80)+'px';
     },
     methods:{
         reduceLinks(allLinks){
@@ -96,7 +97,6 @@ export default {
                 let firstLinkInfo = this.translateLinkToGroupItem(allLinks[i])
                 let subItem = []
                 let obj = {
-                    uid: allLinks[i].uid,
                     childItem: firstLinkInfo
                 }
                 subItem.push(allLinks[i].to)
@@ -126,19 +126,37 @@ export default {
                 {
                     dataset:arrTo[0],
                     column:  arrTo.slice(1).join("_"),
+                    uid: link.uid
                 },
 
             ]
         },
-        removeGroup(idx, event){
+        removeGroup(item, idx, event){
             event.preventDefault()
             event.stopPropagation()
-            this.relationLinkData.splice(idx, 1)
+            let self = this
+            if(item.childItem.length > 1){
+                let flag = true
+                item.childItem.forEach(function(e){
+                    if(e.uid){
+                        flag = false
+                        self.$emit('delete-link', e.uid)
+                    }
+                })
+                if(flag){
+                    delete this.relationLinkData[idx]
+                }
+            }
+          
         },
         addGroup(){
             let index = Object.keys(this.relationLinkData).length + 1 
             let obj =  {
                 childItem:[
+                    {
+                        dataset:'',
+                        column:""
+                    },
                     {
                         dataset:'',
                         column:""
@@ -154,20 +172,36 @@ export default {
             },)
         },
         removeColumn(i, j){
-            this.relationLinkData[i].childItem.splice(j ,1)
-            if(this.relationLinkData[i].childItem.length == 1){
-                this.$emit('delete-link', this.relationLinkData[i].uid)
+            let flag = true
+            if(j == 0 && this.relationLinkData[i].childItem.length > 1){
+                if(this.relationLinkData[i].childItem[1].uid){
+                    this.$emit('delete-link', this.relationLinkData[i].childItem[1].uid)
+                    flag = false
+                }
+            }else{
+                if(this.relationLinkData[i].childItem[j].uid){
+                    flag = false
+                    this.$emit('delete-link', this.relationLinkData[i].childItem[j].uid)
+                }
+                if(this.relationLinkData[i].childItem[j].uid){
+                    flag = false
+                    this.$emit('delete-link', this.relationLinkData[i].childItem[j].uid)
+                }
             }
+            if(flag){
+                this.relationLinkData[i].childItem.splice(j, 1)
+            }
+
         },
         handleChangeValue(data){
             if(data.childItem.length > 1){
                 for(let i = 0 ; i < data.childItem.length - 1; i++ ){
-                    let obj = this.translateItemToLink(data.uid, data.childItem[i], data.childItem[i+1])
+                    let obj = this.translateItemToLink(data.childItem[i], data.childItem[i+1])
                     this.$emit("add-link", obj)
                 }
             }
         },
-        translateItemToLink(uid, from , to){
+        translateItemToLink(from , to){
             return{
                 source:{
                     id: from.dataset,
@@ -176,9 +210,9 @@ export default {
                 symperLinkType: "oo",
                 target: { 
                     id: to.dataset,
-                    port: to.dataset+"_" +to.column
+                    port: to.dataset+"_" +to.column,
+                    uid: to.uid
                 },
-                uid: uid
             }
         }
        
