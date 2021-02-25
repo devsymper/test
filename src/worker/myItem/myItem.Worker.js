@@ -11,7 +11,7 @@ async function updateProcessInstanceName(params) {
 
     if (needComplyFormula(formulaName)) {
         let newName = await formulasApi.getDataByAllScriptType(formulaName, dataInput);
-        BPMNEngine.updateProcessInstance(this.originData.processInstanceId, {
+        BPMNEngine.updateProcessInstance(params.processInstanceId, {
             name: newName,
         });
     }
@@ -38,7 +38,7 @@ function objectToStrIncludeFuncs(obj) {
 function getInitStatements(vars) {
     let varDefs = [];
     for(let name in vars){
-        let vl = vars[name];
+        let vl = addslashes(vars[name]);
         varDefs.push(`let ${name} = '${vl}';`);
     }
     varDefs = varDefs.join('');
@@ -82,10 +82,9 @@ async function checkNeedUpdateInfo(formula, allVars, curVars, task, initStatemen
     }else{
         let formulaAfter = formula;
         try {
-            // eval(initStatements);
             formulaAfter = eval(initStatements + "`"+formula+"`");
         } catch (error) {
-            console.warn(error);  
+            console.warn(error);
         } 
 
         if(formulaAfter != formula){
@@ -96,6 +95,22 @@ async function checkNeedUpdateInfo(formula, allVars, curVars, task, initStatemen
         }
     }
     return rsl;
+}
+function addslashes(string) {
+    if(typeof string != 'string'){
+        return string;
+    }else{
+
+        return string.replace(/\\/g, '\\\\').
+        replace(/\u0008/g, '\\b').
+        replace(/\t/g, '\\t').
+        replace(/\n/g, '\\n').
+        replace(/\f/g, '\\f').
+        replace(/\r/g, '\\r').
+        replace(/'/g, '\\\'').
+        replace(/"/g, '\\"');
+
+    }
 }
 
 async function updateTaskInfo(data) {
@@ -132,7 +147,9 @@ async function updateTaskInfo(data) {
             });
             for(let task of tasks.data){
                 if(changeTaskData(task, needUpdateTaskIden[task.taskDefinitionKey])){
-                    BPMNEngine.updateTask(task.id, task);
+                    BPMNEngine.updateDoneTaskInfo(task.id, {
+                        description: task.description
+                    });
                 }
             }
         }
@@ -154,7 +171,7 @@ function changeTaskData(task, newValue) {
 
 function updateTasksInfoAndProcessName(data) {
     updateProcessInstanceName(data.processInstance);
-    // updateTaskInfo(data.taskInfo);
+    updateTaskInfo(data.taskInfo);
 }
 
 self.onmessage = async function (event) {

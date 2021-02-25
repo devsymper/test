@@ -475,7 +475,8 @@ export default {
                     data: {
 						processInstance: {
 							formulaName: dataInput[processInstanceNameKey],
-							dataInput: dataInput
+							dataInput: dataInput,
+							processInstanceId: this.originData.processInstanceId
 						},
 						taskInfo: {
 							task: this.originData, 
