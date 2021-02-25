@@ -58,6 +58,7 @@
                                 v-if="item.active"
                                 :ref="item.cellId"
                                 @view-detail="handleViewDetail(item)"
+                                @download-excel="handleDownloadExcel(item)"
                                 :layoutItem="item"
                                 :isView="isView"
                                 :instanceKey="instanceKey"
@@ -164,6 +165,7 @@ import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportCo
 import { calcTitleCellHeight } from "@/components/dashboard/configPool/dashboardConfigs.js";
 import CrossFilterManagement from "@/components/dashboard/components/filter/CrossFilterManagement.js";
 import { getUsedDatasetsFromSetting } from "@/components/dashboard/configPool/reportConfig.js";
+import { appConfigs } from '../../../configs';
 
 var mapTypeToClasses = autoLoadChartClasses();
 
@@ -237,6 +239,116 @@ export default {
         handleViewDetail(item){
             this.currentItem = item
             this.changeTabDetail('tab-2')
+        },
+        handleDownloadExcel(item){
+            let cell = this.dashboardConfig.allCellConfigs[item.cellId]
+            let relations = this.dashboardConfig.info.relations;
+            let configs = this.getConfigsToGetReportData(cell, relations);
+            util.getExcelFile(configs, appConfigs.apiDomain.biService+"dashboards/export-data", configs.reportName);    
+        },
+        isDropListFilter(cell) {
+            return cell.sharedConfigs.type == 'filter' && cell.viewConfigs.queryKey;
+        },
+        getConfigsToGetReportData(cell, relations){
+            let columnsSetting = {};
+            let selectedDataset = {};
+            let cellType = cell.sharedConfigs.type;
+            for (let name in cell.rawConfigs.setting) {
+                columnsSetting[name] = cell.rawConfigs.setting[name].selectedColums;
+                for (let col of columnsSetting[name]) {
+                    if (cellType == 'table') {
+                        col.as = col.as.replace(/\./g, ' ');
+                    }
+                    if (!selectedDataset.hasOwnProperty(col.dataset)) {
+                        selectedDataset[col.dataset] = {};
+                    }
+                    selectedDataset[col.dataset][col.name] = true;
+                }
+            }
+            cell.viewConfigs.selectedDataset = selectedDataset;
+
+
+            if (cellType == 'card') {
+                columnsSetting['value'] = columnsSetting['value'].concat(columnsSetting['compareValue']);
+            } else if (cellType == 'treeMap') {
+                if (columnsSetting['group'][0]) {
+                    columnsSetting['group'][0].agg = 'not_agg';
+                }
+                if (columnsSetting['detail'][0]) {
+                    columnsSetting['detail'][0].agg = 'not_agg';
+                }
+            } else if (cellType == 'filter' && columnsSetting.value[0]) {
+                columnsSetting.value[0].selectionMode = cell.rawConfigs.style[0].children.selectionMode.value;
+            }
+            let filter = [];
+            for (let id in cell.viewConfigs.filter) {
+                filter = filter.concat(cell.viewConfigs.filter[id])
+            }
+
+            let condition = cell.rawConfigs.condition;
+            /**Phát hiện drop list filter để giới hạn các giá trị hiển thị cho lựa chọn */
+            if (this.isDropListFilter(cell)) {
+                let cond = [];
+                for (let item of condition) {
+                    cond.push(item);
+                }
+
+                let col = columnsSetting['value'][0];
+                if (col) {
+                    let condCol = Object.assign({}, col);
+                    condCol.cond = {
+                        type: "contains",
+                        val: cell.viewConfigs.queryKey
+                    };
+                    cond.push(condCol);
+                }
+                condition = cond;
+            }
+            let sortData = this.getSortData(cell);
+
+            let reportName = '';
+            for(let i in cell.rawConfigs.style){
+                if(cell.rawConfigs.style[i].name == 'title'){
+                    reportName = cell.rawConfigs.style[i].children.titleText.value;
+                    break;
+                }
+            }
+
+            let rsl = {
+                relations: relations,
+                columns: columnsSetting,
+                condition: condition,
+                reportType: cell.sharedConfigs.type,
+                cellId: cell.sharedConfigs.cellId,
+                filter: filter,
+                crossFilterCond: cell.viewConfigs.crossFilterCond,
+                sort: sortData,
+                reportName: reportName,
+                needTotal: this.checkNeedTotal(cell),
+                dashboardId: this.getDashboardId()
+            };
+
+            if(cellType == 'table' || cellType == 'pivot'){
+                rsl.pageSize = cell.sharedConfigs.pageSize ? cell.sharedConfigs.pageSize : 200;
+                rsl.currentPage = cell.sharedConfigs.currentPage ? cell.sharedConfigs.currentPage : 1;
+            }
+
+            return rsl;
+        },
+        checkNeedTotal(cell) {
+            if (cell.sharedConfigs.type == 'table' || cell.sharedConfigs.type == 'pivot') {
+                let styles = cell.rawConfigs.style;
+                for (let item of styles) {
+                    if (item.name == 'total') {
+                        return item.children.show.value;
+                    }
+                }
+            } else {
+                return false;
+            }
+        },
+        getSortData(cell) {
+            return cell.rawConfigs.extra ? cell.rawConfigs.extra.sortConfig : [];
         },
         initCrossFilterMng(idRelations){
             this.crossFilterMng = new CrossFilterManagement(idRelations);

@@ -8,6 +8,8 @@
             :cell="cellConfigs"
             :instanceKey="instanceKey" 
             @view-detail="handleViewDetail"
+            @download-excel="handleDownloadExcel"
+            @print-report="handlePrintReport"
             :isView="isView"/>
         <preloader v-if="cellConfigs.viewConfigs.loadingData" :size="25"/>
         <div class="w-100 h-100 cell-placeholder" v-if="showIconOnly()">
@@ -28,6 +30,7 @@
             </div>
             <component 
                 :is="reportTag"
+                ref="reportCell"
                 :isView="isView"
                 :instanceKey="instanceKey"
                 :cellConfigs="cellConfigs">
@@ -66,6 +69,13 @@ export default {
     methods: {
         handleViewDetail(data){
             this.$emit('view-detail', data)
+        },
+        handleDownloadExcel(){
+            this.$emit('download-excel')
+        },
+        handlePrintReport(){
+            let headerHTML = this.$refs.cellTitle.outerHTML
+            this.$refs.reportCell.printInnerHTML(headerHTML)
         },
         showIconOnly(){
             let needData = Object.keys(this.cellConfigs.rawConfigs.setting).length > 0;
