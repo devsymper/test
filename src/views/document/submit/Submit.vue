@@ -1827,34 +1827,7 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            if(!isSetEffectedControl){
-                let listInput = getListInputInDocument(this.keyInstance);
-                let mapControlEffected = getMapControlEffected(listInput);
-                this.controlInfinity = checkInfinityControl(mapControlEffected);
-                this.updateEffectedControlToStore(mapControlEffected);
-                this.handleAfterGetMapControlEffected();
-            }
-            else{
-                this.handleBeforeLoadedDocument()
-            }
-        },
-        handleAfterGetMapControlEffected(){
-            if(this.controlInfinity.length > 0 && this.isBa){
-                this.listMessageErr = [];
-                this.listMessageErr.push("Mối quan hệ giữa các control sau dẫn đến vòng lặp vô hạn");
-                for (let index = 0; index < this.controlInfinity.length; index++) {
-                    let controlName = this.controlInfinity[index];
-                    let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
-                    if(controlIns != false){
-                        this.listMessageErr.push(controlName + " - " + controlIns.title);
-                    }
-                }
-                this.$refs.errMessage.showDialog('checkInfinityControl');   
-            }
-            else{
-                this.handleBeforeLoadedDocument()
-            }
-            this.hidePreloader();   
+            this.handleBeforeLoadedDocument();
         },
         /**
          * Hàm xử lí tìm các control được coi là root (các control không có đầu vào)
@@ -1952,120 +1925,6 @@ export default {
             this.$refs.symDragPanel.$children[1].$refs.autocompleteInput.hide();
             this.$refs.symDragPanel.show();
         },        
-        /**
-         * Hàm lấy ra các control bị ảnh hưởng từ 1 control
-         * từ đó tạo dựng mối quan hệ cho các control
-         * lưu vào db cho lần submit sau không phải tìm lại
-         */
-        getEffectedControl() {
-            let mapControlEffected = {};
-            let allControlObj = this.sDocumentSubmit.listInputInDocument;
-            for (let name in allControlObj) {
-                let type = allControlObj[name].type;
-                if (type != "submit" && type != "reset" && type != "draft") {
-                    let formulas = allControlObj[name].controlFormulas;
-                    for (let formulaType in formulas) {
-                        if(formulaType == 'autocomplete'){
-                            continue
-                        }
-                        if(!mapControlEffected.hasOwnProperty(formulaType)){
-                            mapControlEffected[formulaType] = {}
-                        }
-                        if(formulaType == 'linkConfig'){
-                            let allConfig = formulas[formulaType].configData;
-                            for (let index = 0; index < allConfig.length; index++) {
-                                let config = allConfig[index];
-                                if(config.instance){
-                                  let inputControl = config.instance.inputControl;
-                                    for (let controlEffect in inputControl) {
-                                        if (!mapControlEffected[formulaType].hasOwnProperty(controlEffect)) {
-                                            mapControlEffected[formulaType][controlEffect] = {};
-                                        }
-                                        mapControlEffected[formulaType][controlEffect][name] = true;
-                                    }
-                                }
-                            }
-                        }
-                        else{
-                            if(formulas[formulaType].hasOwnProperty('instance')){
-                                let inputControl = formulas[formulaType].instance.inputControl;
-                                let inputLocalFormulas = formulas[formulaType].instance.inputForLocalFormulas;
-                                let inputFromDatasets = formulas[formulaType].instance.inputFromDatasets;
-                                for (let controlEffect in inputControl) {
-                                    if (!mapControlEffected[formulaType].hasOwnProperty(controlEffect)) {
-                                        mapControlEffected[formulaType][controlEffect] = {};
-                                    }
-                                    mapControlEffected[formulaType][controlEffect][name] = true;
-                                }
-                                for (let controlEffect in inputFromDatasets) {
-                                    if (!mapControlEffected[formulaType].hasOwnProperty(controlEffect)) {
-                                        mapControlEffected[formulaType][controlEffect] = {};
-                                    }
-                                    mapControlEffected[formulaType][controlEffect][name] = true;
-                                }
-                                for (let controlEffect in inputLocalFormulas) {
-                                    if (!mapControlEffected[formulaType].hasOwnProperty(controlEffect)) {
-                                        mapControlEffected[formulaType][controlEffect] = {};
-                                    }
-                                    mapControlEffected[formulaType][controlEffect][name] = true;
-                                }
-                                this.detectControlEffectedInTableInDoc(mapControlEffected[formulaType], name, formulas[formulaType].instance);
-                            }
-                        }
-                    }
-                }
-            }
-            if(this.baInfo && this.baInfo.id){
-                this.checkInfinityControl(mapControlEffected);
-            }
-            if(this.controlInfinity.length == 0){
-                this.updateEffectedControlToStore(mapControlEffected);
-            }
-        },
-        /**
-         * hoangnd: kiểm tra công thức chạy infinity hay ko 
-         *  
-        */       
-        checkInfinityControl(mapControlEffected){
-            this.controlInfinity = [];
-            for(let formulaType in mapControlEffected){
-                if(['list','formulas'].includes(formulaType)){
-                    for(let controlName in mapControlEffected[formulaType]){
-                        this.search(controlName, mapControlEffected[formulaType][controlName], mapControlEffected[formulaType]);
-                    }
-                }
-                
-            }
-        },
-      
-        /**
-         * DFS trong cây mối quan hệ để tìm control trùng lặp
-         */
-        search (controlCheck, effectedControl, mapControlEffected) {
-            var i, children = Object.keys(effectedControl), found;
-            for (i = 0; i < children.length; i += 1) {
-                if(mapControlEffected[children[i]]){
-                    if(children[i] == controlCheck){
-                        this.controlInfinity.push(children[i]);
-                        break;
-                    }
-                    else{
-                        if(!Object.keys(mapControlEffected[children[i]]).includes(children[i]) && children[i] != controlCheck){
-                            this.search(controlCheck, mapControlEffected[children[i]], mapControlEffected);
-                        }
-                    }
-                }
-            }
-        },
-      
-        /**
-         * Hàm lấy các control đầu vào là các cột của table sqllite
-         */
-        detectControlEffectedInTableInDoc(mapControlEffected,name,formulaInstance){
-            formulaInstance.detectControlInTable(mapControlEffected,name,formulaInstance.formulas,this.sDocumentSubmit.listInputInDocument)  
-        },
-
-
         handlerDraftClick(){
             this.isSubmitting = true;
             let thisCpn = this;
@@ -2459,30 +2318,6 @@ export default {
             return dataTable;
         },
 
-        updateEffectedControlToStore(mapControlEffected) {
-            let dataToPreProcessControl = {};
-            for(let type in mapControlEffected){
-                if(mapTypeToEffectedControl.hasOwnProperty(type)){
-                    for (let controlName in mapControlEffected[type]) {
-                        this.updateListInputInDocument(
-                            controlName,
-                            mapTypeToEffectedControl[type],
-                            mapControlEffected[type][controlName]
-                        );
-                        let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-                        if(controlInstance != false){
-                            if(!dataToPreProcessControl.hasOwnProperty(controlInstance.idField)){
-                                dataToPreProcessControl[controlInstance.idField] = {};
-                            }
-                            dataToPreProcessControl[controlInstance.idField][mapTypeToEffectedControl[type]] = mapControlEffected[type][controlName];
-                        }
-                        
-                    }
-                }
-                
-            }
-            documentApi.updatePreDataForField({prepareData:JSON.stringify(dataToPreProcessControl)}) 
-        },
         updateListInputInDocument(controlName, key, value) {
             let controlIns = getControlInstanceFromStore(this.keyInstance,controlName);
             let controlToWorker = {name:controlName,type:controlIns.type,value:controlIns.value}
