@@ -2,10 +2,9 @@
 <div class="w-100">
      <list-items
         ref="listCategory"
-        :showImportHistory="false"
         @after-open-add-panel="addCategory"
         :headerPrefixKeypath="'timesheet'"
-        :useDefaultContext="false"
+        :showTimesheetBtn="true"
         :pageTitle="$t('timesheet.table.category')"
         :containerHeight="containerHeight"
         :showExportButton="false"
@@ -178,7 +177,7 @@ export default {
                     // self.listDoc =res.data.listObject;
                     self.listDoc = [];
                     res.data.listObject.map(data=>{
-                        self.listDoc.push({id:data.title})
+                        self.listDoc.push({id:data.title,docId:data.id})
                     })
 
                 }

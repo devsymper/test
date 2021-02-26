@@ -135,6 +135,7 @@ export default {
         next() {
             // this.getPrelog();
             this.findRepeatLog();
+            debugger
             this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(this.showDate).add(1, dayjsTypeMapper[this.type]).format('YYYY-MM-DD'));
             if (this.type === 'month') {
                 this.$store.commit('timesheet/adjustCalendar', this.$store.state.timesheet.calendarAdjustment + 1);

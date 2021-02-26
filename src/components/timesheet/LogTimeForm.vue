@@ -183,6 +183,7 @@
                         style="margin-top:-12px"
                         background-color="#F7F7F7"
                         no-filter
+                        @click="reGenerateHour"
                         v-model="inputs.endTime"
                         class="category-task" 
                         :items="listHour"
@@ -240,6 +241,7 @@ import { util } from '@/plugins/util';
 import timesheetApi from '../../api/timesheet';
 import TaskForm from '../timesheet/TaskForm';
 import ConfigRepeat  from '../timesheet/form/ConfigRepeat';
+import { documentApi } from '../../api/Document';
 export default {
     name: 'LogTimeForm',
     props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
@@ -330,6 +332,7 @@ export default {
                 return this.durationTime
             }
         },
+        
         displayDuration() {
             if(!this.isCaculate){
             if (this.duration >= 0) {
@@ -371,6 +374,9 @@ export default {
             }else{
                  this.typeRepeat='general';
             }
+        },
+        endTime(){
+            debugger
         },
         datePicker(){
             let year = this.datePicker.slice(0,4);
@@ -430,17 +436,22 @@ export default {
              }
              else{
                 let taskId = this.task;
-                // debugger
-                // this.findNameTask(this.task);
                 this.getCategoryByTaskId(taskId);
              }
         },
+   
         categoryTask(){
             if(!this.categoryTask){// trường hợp create
                 // this.getAllTask();
                 // this.filterTaskByCategory();
 
             }else{// trường hợp update
+                let docId = this.listCategory.filter(cate=>cate.key==this.categoryTask.split('-')[0])[0].docId;
+                if(Number(docId)>0){
+                    this.getListTaskDoc(docId);
+                }
+                // if(this.l==){
+                // }
                 this.filterTaskByCategory();
                 // this.task = null
             }
@@ -481,6 +492,19 @@ export default {
         this.getCategory();
     },
     methods: {
+         getListTaskDoc(docId){
+             const self = this;
+            documentApi.getListDocumentObject(docId).then(res=>{
+                if(res.status==200){
+                    self.listTask=[];
+                    res.data.listObject.map(task=>{
+                        self.listTask.push({...task, name:task.task_name});
+                        
+                    })
+                }
+            })
+
+        },
     create_UUID() {
         var dt = new Date().getTime();
         var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
@@ -522,6 +546,17 @@ export default {
             this.durationTime =  event.currentTarget.value;
             this.changeDuration(this.durationTime);
             // this.isCaculate = false;
+        },
+        reGenerateHour(){
+            this.listHour = [];
+            debugger
+
+            let start = this.$moment(this.inputs.startTime,"HH:mm").format("HH");
+            for(let i=start; i<24; i++) {
+                for(let j=0; j<2; j++) {
+                    this.listHour.push(i + ":" + (j===0 ? "00" : 30*j) );
+                }
+            }
         },
         generateListHour(){
             for(let i=0; i<24; i++) {

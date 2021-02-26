@@ -262,7 +262,7 @@ export default {
         },
          showCategoryForm(value){
             this.eventLog = value;
-            this.$refs.cate.forBa = false;
+            // this.$refs.cate.forBa = false;
             this.$refs.cate.typeCate = 'normal';
             this.showCategory=true;
             this.showTask =true;

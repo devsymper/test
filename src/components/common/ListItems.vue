@@ -56,7 +56,7 @@
                             <v-icon left dark>mdi-refresh</v-icon>
                             <span >{{$t('common.refresh')}}</span>
                         </v-btn>
-
+                
                       
                         <v-btn
                             depressed
@@ -70,8 +70,6 @@
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
                             <span v-show="!actionPanel">{{$t('common.export_excel')}}</span>
                         </v-btn>
-
-                        
                         <v-btn
                             depressed
                             small
@@ -82,18 +80,17 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel')}}</span>
                         </v-btn>
-                        
-                    
-                        <v-btn
-                            depressed
-                            small
-                            @click="showImportHistory()"
-                            class="mr-2"
-                            v-if="showImportHistoryBtn && !actionPanel && !dialogMode"
-                        >
-                            <v-icon left dark>mdi-database-import</v-icon>
-                            <span>{{$t('common.import_excel_history')}}</span>
-                        </v-btn>
+                  
+                            <v-btn
+                                depressed
+                                small
+                                @click="showImportHistory()"
+                                class="mr-2"
+                                v-if="showImportHistoryBtn && !actionPanel && !dialogMode"
+                            >
+                                <v-icon left dark>mdi-database-import</v-icon>
+                                <span>{{$t('common.import_excel_history')}}</span>
+                            </v-btn>
                          <v-menu
                             bottom
                             left
@@ -185,6 +182,20 @@
                                 :filter="listFilters"/>
                         </v-menu>
                         <!-- filter button -->
+                        <v-tooltip top >
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    depressed
+                                    small
+                                    v-on="on"
+                                    @click="showTimesheet()"
+                                    class="mr-2"
+                                    v-if="showTimesheetBtn && !actionPanel && !dialogMode">
+                                        <v-icon left dark>mdi-calendar</v-icon>
+                                </v-btn>
+                            </template>
+                            <span >Timesheet</span>
+                        </v-tooltip>
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -509,6 +520,10 @@ export default {
             default:0
         },
         showImportButton: {
+            type: Boolean,
+            default: false
+        },
+        showTimesheetBtn: {
             type: Boolean,
             default: false
         },
@@ -1856,6 +1871,9 @@ export default {
             }
             
             window.open(exportUrl,'_blank');
+        },
+        showTimesheet(){
+             this.$router.push("/timesheet");
         },
         showImportHistory(){
             this.$router.push("/viewHistory");

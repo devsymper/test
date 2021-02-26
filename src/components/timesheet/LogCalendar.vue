@@ -2,11 +2,14 @@
     <div class="w-100 pr-5 mt-2 mr-3" style="height: calc(100vh - 120px)">
         <v-sheet :class="[calendarType=='month'? 'h-50' :'h-580']" 
         class="h-100 calendar">
+           <!-- :interval-minutes="30" -->
             <v-calendar ref="calendar"  
                 :weekdays="weekday" 
+                class="calendar"
                 :type="internalCalendarType" 
                 v-model="calendar"
                 :events="events"
+                :interval-height="75"
                 :color="color"
                 @mousedown:event="startDrag" 
                 @mousemove:time="mouseMove" 
@@ -18,7 +21,7 @@
                 <div
                     v-if="timeView"
                     class="v-current-time"
-                    :class="{ first: date === week[0].date }"
+                    :class="{ first: true }"
                     :style="{ top: nowY }"
                 ></div>
                 </template>
@@ -963,4 +966,5 @@ export default {
     margin-top:5px;
     color:#000080!important
 }
+
 </style>

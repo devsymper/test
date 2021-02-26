@@ -93,15 +93,68 @@
             {{$t('timesheet.category')}}
         </span>
     </v-tooltip>
- 
+    <!-- <v-autocomplete 
+        class="auto-complete" 
+        item-text="task_name"    
+        item-value="id"
+        return-object
+        :search-input.sync="searchLog"  
+        :items="listLog"
+        v-model="log">
+          <template v-slot:item="data">
+                <v-list-item-content>
+                    <v-list-item-title class="st-icon-pandora">
+                        {{data.item.task_name}}
+                    </v-list-item-title>
+                <v-list-item-subtitle class="fs-11 color-grey" >
+                    <span v-if="data.item.categoryId" style="color:black" class="color-grey">
+                          {{data.item.description!=''?data.item.description:"Chưa có mô tả"}} </span>
+                    <span v-else style="color:black" class="color-grey">
+                        </span>
+                        </v-list-item-subtitle>
+                </v-list-item-content>
+            </template>
+    </v-autocomplete> -->
+    	<v-combobox 
+            :search-input.sync="searchLogTime"
+            :items="list"
+            class="d-inline-block mx-2 sym-small-size"
+            item-text="task_name"    
+            item-value="id"
+            style="margin-top:2px"
+            outlined
+            dense
+            label="Search"
+            :placeholder="$t('common.search')"
+        >
+        <template  v-slot:item="{ item, attrs }">
+          <v-list-item @click="findStartEnd(item.start_time_at)">
+            <v-list-item-content>
+              <v-list-item-title>
+                  {{item.task_name}}
+              </v-list-item-title>
+               <v-list-item-subtitle class="fs-11 color-grey" >
+                    <span class="color-grey">
+                       Từ: {{$moment(item.start_time_at).format("HH:mm")}}- {{$moment(item.end_time_at).format("HH:mm")}}- Ngày:{{$moment(item.end_time_at).format("DD/MM/YY")}} </span>
+                    </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+        </v-combobox >
 </div>
 </template>
 
 <script>
+import _debounce from 'lodash/debounce';
+
 import {uiConfigApi} from "./../../api/uiConfig";
+import timesheetApi from "./../../api/timesheet";
 import CategoryColor from './form/ConfigCategoryColor';
 import PickColor from "./../common/listItemComponents/PickColor"
 export default {
+  created () {
+    // this.debouncedGetValueSearch = _debounce(this.getValueSearch, 200)
+  },
   
     data: () => ({
         types: ['day', 'weekday', 'week', 'month'],
@@ -109,6 +162,11 @@ export default {
         events:[],
         randomColor:false,
         tab:1,
+        list:['123'],
+        log:{},
+        searchLogTime:'',
+        searchLog:null,
+        listLog:[],
         swatch:[
             ['#FF0000', '#AA0000', '#550000','#00FFFF', '#00AAAA' ],
             ['#FFFF00', '#AAAA00', '#555500','#0000FF', '#0000AA'],
@@ -125,17 +183,63 @@ export default {
             return this.$store.state.timesheet.calendarType;
         },
         listColor() {
-            return this.$store.state.timesheet.listColor;
+            let listColor = this.$store.state.timesheet.listColor
+             if(listColor.detail&&Object.keys(listColor.detail).length> 0){
+                  this.logColor  = listColor.detail.colorLog.color;
+
+             }else{
+                 this.logColor = '#F0F8FF';
+                
+             }
+            return listColor;
         },
         listCate() {
             return this.$store.state.timesheet.listCate;
         }
+    },
+    watch:{
+       searchLogTime(){
+           this.searchLogTimeList(this.searchLogTime)
+       }
+
     },
     components:{
         PickColor,
         CategoryColor
     },
     methods: {
+        findStartEnd(time){
+            this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(time).format('YYYY-MM-DD'));
+            this.$store.commit('timesheet/adjustCalendar', this.$store.state.timesheet.calendarAdjustment + 1);
+        },
+        searchLogTimeList(data){
+            let list = [];
+            let userId = this.$store.state.app.endUserInfo.id;
+               timesheetApi.getFilterLog(data,2263).then(res=>{
+                if(res.status==200){
+                    debugger
+                    res.data.listObject.map(data=>{
+                        if(data.account_id==973){
+                            this.list.push(data)
+                        }
+                    })
+                    // self.list=['1232342349']
+                }
+            })
+            this.list = list;
+            
+        },
+        getData(){
+            debugger
+            const self = this;
+            timesheetApi.getFilterLog(this.searchLog,2263).then(res=>{
+                if(res.status==200){
+                    self.listLog = [];
+                    debugger
+                    self.listLog.push(res.data.listObject)
+                }
+            })
+        },
         setListCateColor(cate){
             this.$store.commit("timesheet/getListCategory", cate )
         },
@@ -279,5 +383,48 @@ button {
 .btn{
     height: 32px!important;
     min-width: 30px!important
+}
+
+.auto-complete ::v-deep .v-list {
+    width: 385px !important;
+}
+
+.auto-complete ::v-deep .v-input__slot {
+    background-color: #F7F7F7;
+    margin-top: -19px;
+}
+
+.auto-complete ::v-deep .v-label {
+    font-size: 13px;
+    padding-left: 10px;
+}
+
+.auto-complete ::v-deep .v-input__slot:after,
+.auto-complete ::v-deep .v-input__slot:before  {
+    border-color: transparent !important
+}
+
+.auto-complete ::v-deep .v-label--active {
+    display: none;
+}
+
+.auto-complete ::v-deep .v-list {
+    width: 385px !important;
+}
+
+.auto-complete ::v-deep .v-select__slot {
+    height: 25px
+}
+
+.auto-complete ::v-deep .v-input__icon {
+    padding-bottom: 6px !important
+}
+
+.auto-complete ::v-deep .v-select__slot>input {
+    padding-top: 15px;
+}
+
+.auto-complete ::v-deep .v-input__icon>button {
+    font-size: 14px !important
 }
 </style>
