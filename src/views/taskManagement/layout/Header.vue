@@ -97,8 +97,11 @@ export default {
         if (!this.sTaskManagement.allPriority || this.sTaskManagement.allPriority == 0) {
             this.$store.dispatch("taskManagement/getAllPriority");
         }
-        this.$evtBus.$on('add-issue-btn-click',() => {
+        this.$evtBus.$on('add-issue-btn-click',(currentStatus) => {
             this.$refs.popupIssue.show();
+            if(currentStatus && Object.keys(currentStatus).length > 0){
+                this.$refs.popupIssue.setStatusTask(currentStatus);
+            }
         })
         
     },
