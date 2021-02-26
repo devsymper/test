@@ -22,10 +22,10 @@
             </v-tooltip>
     </v-btn>
     <span style="padding-right: 10px" v-if="type === 'month'"> </span>
-    <v-select style="margin-top:0px;float:left" 
+    <v-select style="float:left" 
         @change="changeView" 
         :value="type" 
-        class="viewmode" 
+        class="viewmode mt-0" 
         :menu-props="{'nudge-top':-40}" 
         :items="types" 
         item-color="white" 
@@ -93,29 +93,7 @@
             {{$t('timesheet.category')}}
         </span>
     </v-tooltip>
-    <!-- <v-autocomplete 
-        class="auto-complete" 
-        item-text="task_name"    
-        item-value="id"
-        return-object
-        :search-input.sync="searchLog"  
-        :items="listLog"
-        v-model="log">
-          <template v-slot:item="data">
-                <v-list-item-content>
-                    <v-list-item-title class="st-icon-pandora">
-                        {{data.item.task_name}}
-                    </v-list-item-title>
-                <v-list-item-subtitle class="fs-11 color-grey" >
-                    <span v-if="data.item.categoryId" style="color:black" class="color-grey">
-                          {{data.item.description!=''?data.item.description:"Chưa có mô tả"}} </span>
-                    <span v-else style="color:black" class="color-grey">
-                        </span>
-                        </v-list-item-subtitle>
-                </v-list-item-content>
-            </template>
-    </v-autocomplete> -->
-    	<v-combobox 
+    	<v-combobox v-if="showSearch"
             :search-input.sync="searchLogTime"
             :items="list"
             class="d-inline-block mx-2 sym-small-size"
@@ -160,6 +138,7 @@ export default {
         types: ['day', 'weekday', 'week', 'month'],
         timebtn:true,
         events:[],
+        showSearch:false,
         randomColor:false,
         tab:1,
         list:['123'],
@@ -315,12 +294,7 @@ export default {
 }
 
 .calendar-viewmode {
-    float: right;
     height: 30px;
-    padding-right: 30px;
-    margin-top: 11px;
-    padding-bottom: 34px;
-   // border-left: 1px solid lightgrey
 }
 
 span {

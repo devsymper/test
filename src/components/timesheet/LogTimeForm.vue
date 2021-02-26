@@ -549,8 +549,6 @@ export default {
         },
         reGenerateHour(){
             this.listHour = [];
-            debugger
-
             let start = this.$moment(this.inputs.startTime,"HH:mm").format("HH");
             for(let i=start; i<24; i++) {
                 for(let j=0; j<2; j++) {

@@ -1,18 +1,17 @@
 <template>
-<div class='log-time h-100 pl-4' >
-    <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px">
-        <period-selector  @load-logtime="reloadLog" />
-        <div style="width:38%;float:right" 
-             class="">
+<div class='log-time h-100 pl-1' >
+    <div class="d-flex justify-space-between">
+        <period-selector style="width:60%" @load-logtime="reloadLog" />
+        <div style="width:40%" class="d-flex justify-end">
+            <ActionButtons ref="action" />
             <CalendarViewMode
                 ref="viewmode"
                 @change-cate-color="changeCateColor"
                 @change-color="changeColor"
                 @time_view="time_view = true"
                 @list_view="time_view = false" />
-            <ActionButtons refs="action" />
         </div>
-    </v-row>
+    </div>
     <v-dialog v-model="logtimeDialog" width="357" @click:outside="deleteLog()">
         <LogTimeForm v-show="!showTask"
             ref="logtime"

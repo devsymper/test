@@ -1,15 +1,16 @@
 <template>
-    <div class="w-100 pr-5 mt-2 mr-3" style="height: calc(100vh - 120px)">
+    <div class="w-100 " style="height: calc(100vh - 120px)">
         <v-sheet :class="[calendarType=='month'? 'h-50' :'h-580']" 
         class="h-100 calendar">
-           <!-- :interval-minutes="30" -->
+           <!--   :interval-height="100"
+                :interval-minutes="30"-->
             <v-calendar ref="calendar"  
                 :weekdays="weekday" 
                 class="calendar"
                 :type="internalCalendarType" 
                 v-model="calendar"
                 :events="events"
-                :interval-height="75"
+                :interval-height="60"
                 :color="color"
                 @mousedown:event="startDrag" 
                 @mousemove:time="mouseMove" 
@@ -18,12 +19,12 @@
                 @mouseleave.native="cancelDrag" 
                 :start="calendarShowDate">
                 <template v-slot:day-body="{ date, week }">
-                <div
-                    v-if="timeView"
-                    class="v-current-time"
-                    :class="{ first: true }"
-                    :style="{ top: nowY }"
-                ></div>
+                    <div
+                        v-if="timeView"
+                        class="v-current-time"
+                        :class="{ first: true }"
+                        :style="{ top: nowY }"
+                    ></div>
                 </template>
                 <template v-slot:day-label="{day,present,past, month, date}">
                     <MonthViewHeader 
@@ -54,8 +55,7 @@
                                 :style="{background:event.color}"
                                 @dblclick="actionLogEvent(event, 0)"
                                 v-on="detailEvents"
-                                style="border:1px solid lightgrey"
-                                class="d-flex flex-column h-100">
+                                class="d-flex flex-column h-100 border-lightgrey">
                                 <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
                                     <div class="d-flex flex-row justify-space-between align-center pl-2">
                                         <div class="fm text-ellipsis" :class="{'name-log':findDuration(event.start, event.end)<62}" >
@@ -121,7 +121,6 @@
                 <!-- màn hình week/day/weekday - header -->
                 <template v-slot:day-header="{day, present, month, weekday, date}">
                     <WeekdayHeader  
-                        class="pl-3 pt-1"
                         :monthEvents="monthEvents"
                         :month="month"
                         :present="present"
@@ -967,4 +966,20 @@ export default {
     color:#000080!important
 }
 
+</style>
+<style>
+.v-calendar-daily__scroll-area::-webkit-scrollbar {
+        width: 10px;
+        background-color: black;
+}
+.v-calendar-daily__scroll-area::-webkit-scrollbar-thumb {
+	border-radius: 50px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: lightgrey;
+}
+ .v-calendar-daily__scroll-area::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 50px;
+	background-color: #F5F5F5;
+}
 </style>

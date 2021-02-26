@@ -144,7 +144,6 @@ export default {
             let docId = 0;
             if(this.typeCate=='doc'){
                 docId = this.listDoc.filter(doc=>this.allInputs.taskName.value==doc.id)[0].docId;
-                debugger
             }
             if(check){
                 for(let i in this.allInputs){

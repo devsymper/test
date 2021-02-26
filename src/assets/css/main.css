@@ -669,7 +669,10 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.border-lightgrey{
+    border:1px solid lightgrey!important
 
+}
 .ps-container .ps__rail-y,
 .ps-container .ps__rail-x {
     z-index: 1;

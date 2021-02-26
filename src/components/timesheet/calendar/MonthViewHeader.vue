@@ -58,7 +58,6 @@ export default {
   },
   methods: {
       getStatusHeader(color){
-          debugger
           let result = 'New';
           switch(color){
             case 'grey-color':

@@ -1,7 +1,6 @@
 <template>
-<div style="width:62%;float:left" class="period-selector">
-    <div class="float-lg-left float-md-left  select-time" 
-        v-bind:class="[type=='month'?'width-55':'width-58']">
+<div class="period-selector d-flex justify-space-between">
+    <div class="select-time d-flex justify-start " style="width:50%">
         <!-- <v-menu offset-y>
             <v-list>
                 <v-list-item v-for="(item, index) in items" :key="index">
@@ -10,7 +9,7 @@
             </v-list>
         </v-menu> -->
         <v-autocomplete
-            style="width:30%; float:left"
+            style="width:30%"
             v-model="user"
             :items="listUser"
             return-object
@@ -18,23 +17,26 @@
             item-text="displayName"
             item-value="id"              
             class="auto-complete mr-1 "
-            dense
-            ></v-autocomplete>
-        <v-btn v-for="action in actions" :key="action.label"  :style="{background:action.hover?'	#E8E8E8':'#F7F7F7'}" depressed small class="mr-1" color="#F7F7F7" 
+            dense>
+        </v-autocomplete>
+        <v-btn v-for="action in actions" 
+            :key="action.label"  
+            :style="{background:action.hover?'#E8E8E8':'#F7F7F7'}" 
+            depressed small class="mr-1" color="#F7F7F7" 
             @click="action.action(action.idx)">
             {{format(action.label)}}
         </v-btn>
     </div>
-    <v-col class="pl-0 .d-lg-flex .d-lg-none d-none d-lg-block">
-        <v-btn icon @click="pre()">
+    <div class="d-flex justify-end mt-2">
+        <v-btn style="margin-top:-9px" icon @click="pre()">
             <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <span style="color:#008080">{{totalHours*10/10}}/{{hoursRequired}}</span>
         <span class="ml-1">{{$t('timesheet.of')}} {{startDate.slice(0,5)}} - {{endDate}}</span>
-        <v-btn icon @click="next()">
+        <v-btn style="margin-top:-9px" icon @click="next()">
             <v-icon>mdi-chevron-right </v-icon>
         </v-btn>
-    </v-col>
+    </div>
 </div>
 </template>
 
@@ -229,9 +231,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.v-btn:not(.v-btn--round).v-size--small {
-    padding: 0 4px !important;
-}
 .auto-complete ::v-deep .v-list {
     width: 385px !important;
 }
