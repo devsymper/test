@@ -913,6 +913,8 @@ export default {
                             }
                         }
                 }, 1000,this);
+                this.$emit('after-loaded',getListInputInDocument(this.keyInstance));
+                
             }
         },
         /**

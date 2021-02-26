@@ -66,7 +66,6 @@
 
 <script>
 import infoUser from "@/components/common/user/InfoUser";
-import { taskManagementApi } from "@/api/taskManagement.js";
 import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 export default {

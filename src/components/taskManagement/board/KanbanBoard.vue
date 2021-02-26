@@ -114,7 +114,7 @@
                         </div>
                     </VuePerfectScrollbar>
                     <div class="text-center mt-2">
-                        <v-btn @click="addIssueClick" depressed height="25">
+                        <v-btn @click="addIssueClick(column.statusInColumn)" depressed height="25">
                             <v-icon>mdi-plus</v-icon>
                         </v-btn>
                     </div>
@@ -629,8 +629,12 @@ export default {
                 projectId: this.sCurrentProject.id}
             });
         },
-        addIssueClick(){
-            this.$evtBus.$emit('add-issue-btn-click');
+        addIssueClick(statusInColumn){
+            let currentStatus = {}
+            if(statusInColumn.length > 0){
+                currentStatus = statusInColumn[0];
+            }
+            this.$evtBus.$emit('add-issue-btn-click',currentStatus);
         },
         
        
