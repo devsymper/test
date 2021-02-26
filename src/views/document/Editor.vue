@@ -115,10 +115,9 @@ import accountApi from "./../../api/account";
 import { biApi } from "./../../api/bi.js";
 import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
-import {checkInTable} from "./common/common";
+import {checkInTable, mapTypeToEffectedControl} from "./common/common";
 import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable';
-import { minimizeControl } from '../../store/document/mutations';
 
 import Submit from './submit/Submit'
 import tinymce from 'tinymce/tinymce';
@@ -140,6 +139,8 @@ import 'tinymce/plugins/fullscreen';
 import 'tinymce/plugins/paste';
 import 'tinymce/plugins/hr';
 import 'tinymce/plugins/charmap';
+import { checkInfinityControl, getMapControlEffected } from '../../components/document/dataControl';
+import Formulas from './submit/formulas';
 
                                 
 // biến lưu chiều rộng editor trước khi resize 
@@ -1134,7 +1135,82 @@ export default {
             return {minimizeControl:allControl,userControls:allUserControl}
             
         },
-   
+        getListInputInDoc(allControl, inTable = false){
+            let newAllControl = util.cloneDeep(allControl);
+            let listInput = {};
+            for(let controlId in newAllControl){
+                let controlName = (newAllControl[controlId].properties.name) ? newAllControl[controlId].properties.name.value : newAllControl[controlId].type;
+                let formulas = newAllControl[controlId].formulas;
+                let controlFormulas = {};
+                for(let formulaType in formulas){
+                    let formula = formulas[formulaType].value;
+                    formula = formula.trim();
+                    if(formula != ""){
+                        formula = formula.replace(/\r?\n|\r/g, ' ');
+                        controlFormulas[formulaType] = {};
+                        controlFormulas[formulaType].instance = new Formulas(this.keyInstance, formula, formulaType);
+                    }
+                }
+                if(newAllControl[controlId].type == 'table'){
+                    let listFields = newAllControl[controlId].listFields
+                    let listTableInput = this.getListInputInDoc(listFields, controlId);
+                    Object.assign(listInput,listTableInput);
+                }
+                newAllControl[controlId]['controlFormulas'] = controlFormulas;
+                newAllControl[controlId]['id'] = controlId;
+                if(inTable != false){
+                    newAllControl[controlId]['tableId'] = inTable;
+                }
+                listInput[controlName] = newAllControl[controlId];
+            }
+            return listInput;
+        },
+        /**
+         * Hàm lấy các mối quan hệ của control từ list công thức
+         */
+        getControlRelation(allControl){
+            let listInput = this.getListInputInDoc(allControl);
+            let mapControlEffected = getMapControlEffected(listInput);
+            let controlInfinity = checkInfinityControl(mapControlEffected);
+            if(controlInfinity.length > 0){
+                this.showInfinityControlMessage(controlInfinity);
+                return false;
+            }
+            else{
+                let dataEffectedControl = {}
+                for(let type in mapControlEffected){
+                    if(mapTypeToEffectedControl.hasOwnProperty(type)){
+                        for (let controlName in mapControlEffected[type]) {
+                            if(!dataEffectedControl.hasOwnProperty(controlName)){
+                                dataEffectedControl[controlName] = {};
+                            }
+                            dataEffectedControl[controlName][mapTypeToEffectedControl[type]] = mapControlEffected[type][controlName];
+                        }
+                    }
+                }       
+                for(let controlName in dataEffectedControl){
+                    let control = listInput[controlName];
+                    if(control){
+                        let controlId = control.id;
+                        if(allControl[controlId]){
+                            allControl[controlId].properties['dataPrepareSubmit'] = JSON.stringify(dataEffectedControl[controlName]);
+                        }
+                        else if(control.tableId){
+                            allControl[control.tableId]['listFields'][controlId].properties['dataPrepareSubmit'] = JSON.stringify(dataEffectedControl[controlName]);
+                        }
+                    }
+                } 
+                return true;
+            }
+        },
+        showInfinityControlMessage(controlInfinity){
+            this.listMessageErr = [];
+            this.listMessageErr.push("Mối quan hệ giữa các control sau dẫn đến vòng lặp vô hạn");
+            for (let index = 0; index < controlInfinity.length; index++) {
+                this.listMessageErr.push(controlName);
+            }
+            this.$refs.errMessage.showDialog('checkInfinityControl');  
+        },
         /**
          * Hàm thực thi api để lưu các công thức và lưu document sau khi check validate hợp lệ
          * update formulas -> insert formulas -> done -> save document
@@ -1143,7 +1219,11 @@ export default {
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
             let allControl = minimizeControl.minimizeControl;
-            console.log('allControl',allControl);
+            let checkValidate = this.getControlRelation(allControl);
+            if(!checkValidate){
+                this.$refs.actionView.hideLoading();
+                return;
+            }
             let userControls = minimizeControl.userControls
             let documentProperties = util.cloneDeep(this.sDocumentProp);
             documentProperties = Object.assign({controlInfo:userControls},documentProperties)
