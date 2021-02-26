@@ -2328,7 +2328,7 @@ export default {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
-					if(this.showSnackbarSuccess){
+					if(thisCpn.showSnackbarSuccess){
 						 thisCpn.$snotify({
 							type: "success",
 							title: "update document success!"

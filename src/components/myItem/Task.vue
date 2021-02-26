@@ -110,7 +110,7 @@
                     :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
                     :action="'update'"
                     :editableControls="taskInfo.approvalEditableControls"
-                    :documentObjectId="converstNumber(documentObjectId)"
+                    :documentObjectId="converstNumber(docObjInfo.docObjId)"
                     @submit-document-error="onSubmitError"
                     @submit-document-success="onDocumentUpdateSuccess"/>
             </div>
@@ -299,7 +299,8 @@ export default {
         getVarsMap(){
             return this.taskVarsMap;
         },
-        onDocumentUpdateSuccess(){
+        onDocumentUpdateSuccess(data){
+            this.$emit('task-submited', data)
             this.showDetailDocument = false;
             setTimeout((self) => {
                 self.showDetailDocument = true;            

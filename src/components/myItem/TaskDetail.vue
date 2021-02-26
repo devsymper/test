@@ -20,7 +20,6 @@
 				<v-btn small disabled class="mr-3" color="success" v-if="showSubmitSuccessBtn"> <v-icon small color="success" class="mr-1">mdi-check-outline</v-icon> Submited </v-btn>
 				<span v-if="!originData.endTime && !hideActionTask" class="mr-10">
 					<span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true" style="margin-right: 85px !important">
-						<!-- test -->
 						<v-btn 
 							small
 							depressed
@@ -248,11 +247,6 @@ export default {
 				this.setCustomDocControls();
 			},
 		},
-		delegationState(val) {
-			// if(val == 'pending'){
-			// 	this.taskStatus = this.getTaskStatus('#8E2D8C', 'Ủy quyền', 'delegate')
-			// }
-		},
 		originData: {
 			deep: true,
 			immediate: true,
@@ -260,11 +254,7 @@ export default {
 				this.isShowSidebar = false;
 				this.varsForBackend = {};
 				this.checkActionOfUser(valueAfter);
-				if (this.checkShowEditRecord()) {
-					this.rightAction = 120;
-				} else {
-					this.rightAction = 90;
-				}
+				
 			},
 		},
 		taskBreadcrumb: function() {
@@ -272,18 +262,6 @@ export default {
 		},
 		'sapp.collapseSideBar': function(newVl) {
 			this.getWidthHeaderTask();
-		},
-
-		taskActionBtns: {
-			deep: true,
-			immediate: true,
-			handler(arr) {
-				if (this.checkShowEditRecord()) {
-					this.rightAction = 120;
-				} else {
-					this.rightAction = 90;
-				}
-			},
 		},
 	},
 	components: {
@@ -513,16 +491,25 @@ export default {
 		},
 		checkShowEditRecord() {
 			let taskInfo = this.taskInfo;
+			let flag = false
 			if (this.delegationState == 'pending') {
-				return true;
+				flag = true
 			} else if (this.originData) {
 				let isPendding = !this.originData.endTime;
 				if (taskInfo.action) {
-					let isApprovalTask = taskInfo.action.action == 'approval';
-					let hasEditableControls = !taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length);
-					return isPendding && isApprovalTask && hasEditableControls;
+					if(taskInfo.action.action == 'submit' && taskInfo.action.parameter.documentObjectId && this.originData.isDone != '1'){
+						flag = true
+					}else{
+						let isApprovalTask = taskInfo.action.action == 'approval';
+						let hasEditableControls = !taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length);
+						flag = isPendding && isApprovalTask && hasEditableControls;
+					}
+				
 				}
 			}
+			this.rightAction = flag ? 120 : 90
+			return flag
+			
 		},
 		checkRole(assigneeId) {
 			if (assigneeId == this.$store.state.app.endUserInfo.id) {
@@ -661,10 +648,8 @@ export default {
 				} else if (this.taskAction == 'approval') {
 					let elId = this.originData.taskDefinitionKey;
 					let taskData = {
-						// action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
 						action: 'complete',
 						assignee: '1',
-						// "formDefinitionId": "12345",
 						outcome: value,
 						variables: [
 							{
@@ -802,7 +787,11 @@ export default {
 			let taskId = this.originData.id;
 			return BPMNEngine.updateTask(taskId, data);
 		},
-		async handleTaskSubmited(data) {
+		async handleTaskSubmited(data, reload = false){
+			debugger
+			if(reload){
+				this.reloadDetailTask()
+			}
 			this.$refs.snackbar.clickShowSnackbar();
 			this.showSubmitSuccessBtn = true;
 			let obj = {
@@ -885,6 +874,7 @@ export default {
 			self.changeTaskDetailInfo(self.taskInfo.action.parameter.taskId);
 		},
 		async reloadDetailTask() {
+			debugger
 			let self = this;
 			let filter = {};
 			filter.taskId = this.originData.id;

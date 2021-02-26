@@ -939,6 +939,7 @@ export default {
                 }
             }else if(obj.createTime && !overDue){
 				if(!obj.delegation){
+                    debugger
 					if(obj.assignee){
 						return {
 							class: 'orange' ,
