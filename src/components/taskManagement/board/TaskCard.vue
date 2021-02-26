@@ -83,10 +83,13 @@ export default {
 	},
 	methods:{
 		getDate(dateTime){
-			dateTime = dateTime.split(' ')[0];
-			dateTime = dateTime.split('-');
-			let date = dateTime[1]+"-"+dateTime[2];
-			return date
+			if(dateTime){
+				dateTime = dateTime.split(' ')[0];
+				dateTime = dateTime.split('-');
+				let date = dateTime[1]+"-"+dateTime[2];
+				return date
+			}
+			return "";
 		},
 		handleShowDetailIssue(){
 			this.documentObjectId = this.task.document_object_id;

@@ -128,6 +128,10 @@ export const taskManagementApi = {
 
 
 
+    ///////IssueLink
+    getListIssueLink(){
+        return taskManagement.get("issue-links");
+    },
     ///////component
     getListComponent(projectId){
         return taskManagement.get("components/"+projectId);

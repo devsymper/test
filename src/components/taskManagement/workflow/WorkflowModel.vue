@@ -313,7 +313,6 @@ export default {
                 dataPost['dataControl'] = JSON.stringify({tmg_data:JSON.stringify(self.dataWorkflow), document_object_uuid:self.infoWorkflow.id});
                 documentApi.updateDocument(taskLifeCircleDocObjId,dataPost);
             }, 1000,this);
-            
         },
         deleteElementOrLink(){
             if (this.selected) {
