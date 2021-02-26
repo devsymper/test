@@ -1079,6 +1079,9 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+        getSelectedRows(){
+            return this.agApi.getSelectedRows()
+        },
          /**
          * select lại dòng đã được chọn trước đó nếu có refresh list
          */
