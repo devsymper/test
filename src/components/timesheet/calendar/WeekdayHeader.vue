@@ -76,7 +76,6 @@ export default {
             return hour + minutes
         },
      getStatusHeader(color){
-          debugger
           let result = 'New';
           switch(color){
             case 'grey-color':

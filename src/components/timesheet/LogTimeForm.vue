@@ -213,6 +213,7 @@
             </v-select>
         </v-col>
     </v-row>
+   
     <!-- <div class="w-100 pb-5" style="margin-top: -15px!important;background:white"> -->
     <div class="w-100 " style="margin-top:-10px">
         <input class="ml-6 mr-1 mt-1" type="checkbox" id="checkbox" v-model="keepLog">
@@ -220,6 +221,9 @@
             Thêm liên tục
         </span>
      
+    </div>
+     <div class="ml-5">
+        <div class="fs-12 color-grey ml-1">*Tip: Alt+Q tạo nhanh log,  Ctrl+Z hoàn tác</div>
     </div>
     <div class="d-flex justify-end pb-3 mr-2">
            <v-btn text class='cancel' @click="cancel()">
@@ -374,9 +378,6 @@ export default {
             }else{
                  this.typeRepeat='general';
             }
-        },
-        endTime(){
-            debugger
         },
         datePicker(){
             let year = this.datePicker.slice(0,4);
@@ -799,6 +800,8 @@ export default {
             timesheetApi.createLogTime(data).then(res => {
                 if (res.status === 200) {
                     this.onSave();
+                    debugger
+                    this.$store.commit("timesheet/updateObjId", res.data.docObjId)
                     this.notify('success',"Thêm");
                     this.refreshAll();
                     if(this.typeCalendar=='month'){  

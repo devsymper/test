@@ -74,6 +74,7 @@
     <LogCalendar
         :userId="userId"
         @showLog="showLog" 
+         @quick-cancel="quickCancel"
         :monEvents="monthEvents"
         ref="logCalendar" 
         :time-view="time_view" 
@@ -152,6 +153,13 @@ export default {
         })
     },
     methods: {
+        quickCancel(isCreate){
+            if(isCreate){
+                this.deleteLog();
+            }
+            this.cancelSave();
+
+        },
        changeCateColor(listCateColor, logColor){
            this.$refs.logCalendar.listCategoryColor = listCateColor;
             this.$refs.logCalendar.events.map(e=>{
@@ -220,6 +228,8 @@ export default {
             data.color= this.$refs.logCalendar.getColorWhenCreate(data);
             data.type=data.type;
             data.timed= true;
+            data.action = 'create';
+            this.$store.commit("timesheet/getLogForm", data)
             this.$refs.logCalendar.events.push(data);
             if(!this.$refs.logCalendar.timeView){
                 this.$refs.logCalendar.resizeLogtime()
@@ -243,6 +253,7 @@ export default {
             this.load = true;
         },
         cancelTaskForm(){
+            debugger
             this.showTask=false;
             this.showCategory=false;
             this.cancelTask != this.cancelTask;

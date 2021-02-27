@@ -93,32 +93,7 @@
             {{$t('timesheet.category')}}
         </span>
     </v-tooltip>
-    	<v-combobox v-if="showSearch"
-            :search-input.sync="searchLogTime"
-            :items="list"
-            class="d-inline-block mx-2 sym-small-size"
-            item-text="task_name"    
-            item-value="id"
-            style="margin-top:2px"
-            outlined
-            dense
-            label="Search"
-            :placeholder="$t('common.search')"
-        >
-        <template  v-slot:item="{ item, attrs }">
-          <v-list-item @click="findStartEnd(item.start_time_at)">
-            <v-list-item-content>
-              <v-list-item-title>
-                  {{item.task_name}}
-              </v-list-item-title>
-               <v-list-item-subtitle class="fs-11 color-grey" >
-                    <span class="color-grey">
-                       Từ: {{$moment(item.start_time_at).format("HH:mm")}}- {{$moment(item.end_time_at).format("HH:mm")}}- Ngày:{{$moment(item.end_time_at).format("DD/MM/YY")}} </span>
-                    </v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-        </v-combobox >
+    
 </div>
 </template>
 
@@ -126,7 +101,6 @@
 import _debounce from 'lodash/debounce';
 
 import {uiConfigApi} from "./../../api/uiConfig";
-import timesheetApi from "./../../api/timesheet";
 import CategoryColor from './form/ConfigCategoryColor';
 import PickColor from "./../common/listItemComponents/PickColor"
 export default {
@@ -143,7 +117,6 @@ export default {
         tab:1,
         list:['123'],
         log:{},
-        searchLogTime:'',
         searchLog:null,
         listLog:[],
         swatch:[
@@ -177,9 +150,7 @@ export default {
         }
     },
     watch:{
-       searchLogTime(){
-           this.searchLogTimeList(this.searchLogTime)
-       }
+      
 
     },
     components:{
@@ -187,38 +158,7 @@ export default {
         CategoryColor
     },
     methods: {
-        findStartEnd(time){
-            this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(time).format('YYYY-MM-DD'));
-            this.$store.commit('timesheet/adjustCalendar', this.$store.state.timesheet.calendarAdjustment + 1);
-        },
-        searchLogTimeList(data){
-            let list = [];
-            let userId = this.$store.state.app.endUserInfo.id;
-               timesheetApi.getFilterLog(data,2263).then(res=>{
-                if(res.status==200){
-                    debugger
-                    res.data.listObject.map(data=>{
-                        if(data.account_id==973){
-                            this.list.push(data)
-                        }
-                    })
-                    // self.list=['1232342349']
-                }
-            })
-            this.list = list;
-            
-        },
-        getData(){
-            debugger
-            const self = this;
-            timesheetApi.getFilterLog(this.searchLog,2263).then(res=>{
-                if(res.status==200){
-                    self.listLog = [];
-                    debugger
-                    self.listLog.push(res.data.listObject)
-                }
-            })
-        },
+     
         setListCateColor(cate){
             this.$store.commit("timesheet/getListCategory", cate )
         },

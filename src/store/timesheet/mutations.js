@@ -6,17 +6,27 @@ function getListColor(state, color) {
 }
 function getListCategory(state, cate) {
     state.listCate = cate;
+}           
+function updateObjId(state, objId){
+    debugger
+    state.log.docObjId = objId
 }
 
-function getLogForm(state, { category, task, date, duration, start, end, description, type }) {
-    state.category = category;
-    state.task = task;
-    state.date = date;
-    state.duration = duration;
-    state.start = start;
-    state.end = end;
-    state.description = description;
-    state.type = type;
+function getLogForm(state, { action, category, task, category_key,date, duration, start, end, description, type,color,id,docObjId}) {
+    state.log.category = category;
+    state.log.task = task;
+    state.log.action = action;
+    debugger
+    state.log.date = date;
+    state.log.duration = duration;
+    state.log.start = start;
+    state.log.end = end;
+    state.log.description = description;
+    state.log.type = type;
+    state.log.color = color;
+    state.log.category_key = category_key;
+    state.log.id = id;
+    state.log.docObjId = docObjId;
 }
 
 function updateCalendarStartEnd(state, { start, end }) {
@@ -63,6 +73,7 @@ function setShowErrorDialog(state, { msg, show }) {
 
 export {
     getLogForm,
+    updateObjId,
     getListColor,
     getListCategory,
     changeCalendarType,

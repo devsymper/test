@@ -166,6 +166,7 @@ export default {
             listCategoryColor:[],
             listLogInTime:[],
             menu:false,
+            isCreate:false,
             listCategory:[],
             isRandom:false,
             calendar: '',// value calendar
@@ -201,6 +202,66 @@ export default {
         this.load();
     },
     methods: {
+        undoCreate(){
+            this.events.pop();
+            timesheetApi.deleteLogTime({
+                id: this.log.id,
+                docObjId:this.log.docObjId  
+            }).then(res => {
+                if (res.status === 200) {
+                }else{
+                    this.$snotify({
+                        type: "error",
+                        title: "Lỗi",
+                    })
+                }
+                }).catch(console.log)
+        },
+        undo(){
+            debugger
+            switch(this.log.action){
+                case "create":
+                    this.undoCreate();
+                    break;
+
+            }
+
+        },
+        quickCreateLog(){
+            let event = {
+                color: this.colorLog,
+                start:  Date.parse(this.$moment()),
+                end: Date.parse(this.$moment().add(1,'h')),
+                name: "",
+                date: this.$moment().format('YYYY-MM-DD'),
+                timed: true
+            };
+            this.openLogTimeDialog(event, false)
+
+        },
+        quickCancel(){
+            this.$emit('quick-cancel',this.isCreate);
+            // this.$emit('cancelForm');
+
+        },
+        handleEventKeyBoad(){
+            const self = this;
+            $(document).keydown(function(e){
+                // Alt + Q 
+                if(e.altKey && e.which === 81){
+                    self.quickCreateLog();
+                    this.isCreate = true
+                }
+                //ctrl + Z
+                else if( e.which === 90 && e.ctrlKey ){
+                    self.undo()
+                }
+                // else if(e.which === 87 && e.altKey){
+                //     self.quickCancel()̥
+
+                // }          
+            });
+        },
         getCategory(){
             const self = this;
              timesheetApi.getAllCategory({}).then(res => {
@@ -560,7 +621,7 @@ export default {
             };
             let res = await timesheetApi.updateLogTime(data,data.id)
             if (res.status === 200) {
-                    // this.load();;
+                    self.load();;
             } else {
                 self.$snotify({
                     type: "error",
@@ -583,6 +644,7 @@ export default {
                 } else {//1.2: tao moi event
                     if(this.timeView){
                         //
+                        
                          this.openLogTimeDialog(this.createEvent,false);
                     }else{
                         this.events.splice(this.events.indexOf(event), 1);
@@ -733,7 +795,9 @@ export default {
         ...mapState('timesheet', {
             calendarShowDate: 'calendarShowDate',
             calendarType: 'calendarType',
-            period: 'period'
+            period: 'period',
+            log:'log',
+            objId:'objId'
         }),
         weekday() {
             const dayOfWeekMap = {
@@ -776,6 +840,7 @@ export default {
          userId(){
             this.getLogByUserId(this.userId);
         },
+        
         calendarType(newType) {
              this.load();
             this.getLogByUserId(this.userId);
@@ -806,6 +871,7 @@ export default {
     mounted() {
         // this.$refs.calendar.scrollToTime('07:40');
         this.onChangeCalendar();
+        this.handleEventKeyBoad();
         this.ready = true;
         if(this.timeView){
             this.scrollToTime()
