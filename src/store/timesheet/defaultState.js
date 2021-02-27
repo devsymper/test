@@ -15,6 +15,7 @@ export default {
         action:'create',
         category: '',
         task : '',
+        taskName:'',
         date : moment().format('YYYY-MM-DD'),
         duration :0,
         start :moment(),

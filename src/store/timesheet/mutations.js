@@ -12,9 +12,12 @@ function updateObjId(state, objId){
     state.log.docObjId = objId
 }
 
-function getLogForm(state, { action, category, task, category_key,date, duration, start, end, description, type,color,id,docObjId}) {
+function getLogForm(state, { action,name, taskName, category, task, category_key,date, duration, start, end, description, type,color,id,docObjId}) {
     state.log.category = category;
     state.log.task = task;
+    state.log.name = name;
+
+    state.log.taskName = taskName;
     state.log.action = action;
     debugger
     state.log.date = date;

@@ -207,6 +207,8 @@ export default {
                 if(events[i].id==oldLog.id){
                     events[i]=data,
                     events[i].name = name;
+                    event[i].action = "update";
+                    this.$store.commit("timesheet/getLogForm",  events[i])
                 }
             }
            this.$refs.logCalendar.events=events;

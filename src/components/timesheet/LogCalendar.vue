@@ -166,6 +166,7 @@ export default {
             listCategoryColor:[],
             listLogInTime:[],
             menu:false,
+            oldEvents:[],
             isCreate:false,
             listCategory:[],
             isRandom:false,
@@ -202,13 +203,34 @@ export default {
         this.load();
     },
     methods: {
+        undoUpdate(){
+            debugger
+            let logInx = -1;
+            let events = [...this.events];
+            events.map((e,i)=>{
+                if(e.id==this.log.id){
+                    logInx = i;
+                }
+            })
+            if(logInx>=0){
+                 this.events[logInx] = this.log;
+                 let duration = Number(this.log.duration)
+                  this.events[logInx].end = this.$moment(this.log.start).add(duration,'m');
+
+                this.updateEvent(this.log,this.log.duration);
+            }
+            // let oldLogId = events.filter(e=>e.id==this.log.id)[0].id;
+           
+         },
         undoCreate(){
-            this.events.pop();
+            const self = this;
+            this.events = this.events.pop();
             timesheetApi.deleteLogTime({
                 id: this.log.id,
                 docObjId:this.log.docObjId  
             }).then(res => {
                 if (res.status === 200) {
+                    self.load()
                 }else{
                     this.$snotify({
                         type: "error",
@@ -223,6 +245,9 @@ export default {
                 case "create":
                     this.undoCreate();
                     break;
+                case "update":
+                    this.undoUpdate()
+                    break
 
             }
 
@@ -371,6 +396,7 @@ export default {
             return color
         },
         setLogTimeList(data){
+            this.oldEvents = [...data.events];
             this.events = data.events;
             this.getColorLogTime();
             if(!this.timeView){
@@ -602,6 +628,7 @@ export default {
             }
         },
         async updateEvent(event,duration){
+            debugger
             let start = this.$moment(event.start);
             let end = this.$moment(event.end);
             const self = this;
@@ -613,7 +640,7 @@ export default {
                 type: self.checkPlanOrLog(event.start),
                 id: event.id,
                 cateId: this.getIdCategory(event.category),
-                taskName:event.name,
+                taskName:event.name?event.name:'',
                 date: start.format('YYYY-MM-DD'),
                 categoryTask: event.category,
                 desc: event.desc || "",
@@ -621,7 +648,7 @@ export default {
             };
             let res = await timesheetApi.updateLogTime(data,data.id)
             if (res.status === 200) {
-                    self.load();;
+                self.load();
             } else {
                 self.$snotify({
                     type: "error",
@@ -635,8 +662,22 @@ export default {
             if (this.createEvent) {// 1. createEvent khac null, kéo xuống/di chuyển
                 if (this.extend) {//1.1: kéo xuống
                     try {
+                        debugger
+                        let oldLog = {action:'update',id:-1};
+                        let events = [...this.events];
+                        events.map((e,i)=>{
+                           if(e.id==this.createEvent.id){
+                               oldLog.id = i;
+                               oldLog = this.events[i]
+                           }
+                       })
+                        oldLog.action = 'update';
+                        this.$store.commit("timesheet/getLogForm",oldLog  )
                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
-                        this.createEvent.duration = duration; 
+                        this.createEvent.duration = duration;
+                        
+                        this.createEvent.taskName = this.createEvent.name ;
+                      
                         this.updateEvent(this.createEvent, duration);
                         this.findFormular(this.createEvent.category_key)
                         // cập nhật vào doc
@@ -840,7 +881,6 @@ export default {
          userId(){
             this.getLogByUserId(this.userId);
         },
-        
         calendarType(newType) {
              this.load();
             this.getLogByUserId(this.userId);
