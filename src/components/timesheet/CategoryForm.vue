@@ -38,12 +38,14 @@ import { documentApi } from '../../api/Document';
 import FormTpl from "./../../components/common/FormTpl";
 export default {
     created () {
-        this.allInputs.key.value = this.cate.key;
-        this.allInputs.taskName.value = this.cate.name;
-        this.id = this.cate.id;
-        this.allInputs.description.value = this.cate.description;
-        this.typeCate = this.cate.type;
-        this.docObjId = this.cate.docObjId
+        if(this.cate){
+            this.allInputs.key.value = this.cate.key;
+            this.allInputs.taskName.value = this.cate.name;
+            this.id = this.cate.id;
+            this.allInputs.description.value = this.cate.description;
+            this.typeCate = this.cate.type;
+            this.docObjId = this.cate.docObjId
+        }
     },
     watch: {
         typeCate(){

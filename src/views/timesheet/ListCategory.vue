@@ -6,7 +6,6 @@
         :headerPrefixKeypath="'timesheet'"
         :showTimesheetBtn="true"
         :pageTitle="$t('timesheet.table.category')"
-        :containerHeight="containerHeight"
         :showExportButton="false"
         :customAPIResult="customAPIResult"
         :tableContextMenu="tableContextMenu"
@@ -28,9 +27,7 @@
 </div>
 </template>
 <script>
-import ActionPanel from "./../../views/import/Detail.vue";
 import ListItems from "./../../components/common/ListItems.vue";
-import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
 import timesheetApi from '../../api/timesheet';
 import CategoryForm from "./../../components/timesheet/CategoryForm";
@@ -38,7 +35,6 @@ import {documentApi} from "../../api/Document"
 export default {
     components: {
         "list-items": ListItems,
-        "action-panel": ActionPanel,
         CategoryForm,
     },
     data(){
@@ -60,11 +56,6 @@ export default {
                     };
                     data.listObject = res.data.listObject;
                     data.columns.push(
-                        // {
-                        //     name:'stt',
-                        //     title:'table.stt',
-                        //     type:"numeric"
-                        // },
                         {
                             name:'name',
                             title:'table.name',
@@ -107,7 +98,7 @@ export default {
                         },
                       
                    );
-                   let i = 0;
+                    let i = 0;
                     let listUser = self.$store.state.app.allUsers;
                     data.listObject.map(d=>{
                         d.stt=++i;
@@ -123,24 +114,12 @@ export default {
                               if(d.userUpdate==user.id){
                                 d.userUpdate=user.displayName
                              }
-                        });
-                        // self.listDoc.map(doc=>{
-                        //     if(doc.id==d.name){
-                        //         d.name=doc.title
-                        //     }
-                        // })
+                        });           
                     })
                     return  data;
                 }
             },
              tableContextMenu:{
-                // view: {
-                //     name:"view",
-                //     text:this.$t('timesheet.table.view'),
-                //     callback: (cate, callback) => {
-                //         this.showDetail(cate);
-                //     }
-                // },
                  update: {
                     name:"update",
                     text:this.$t('common.update'),
@@ -157,8 +136,6 @@ export default {
                 }
             },
             getListUrl: '',
-            actionPanelWidth:800,
-            containerHeight: 200,
             columns: [],
         }
     },
@@ -174,7 +151,6 @@ export default {
             const self = this;
             documentApi.getSmallListDocument().then(res=>{
                 if(res.status==200){
-                    // self.listDoc =res.data.listObject;
                     self.listDoc = [];
                     res.data.listObject.map(data=>{
                         self.listDoc.push({id:data.title,docId:data.id})
@@ -234,9 +210,6 @@ export default {
             this.$refs.category.refreshAll();
             this.isAddView = true;
             this.showAddCategory = true;
-        },
-        calcContainerHeight() {
-            this.containerHeight = util.getComponentSize(this).h;
         },
         cancel(){
             this.$refs.listCategory.refreshList();

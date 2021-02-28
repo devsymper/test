@@ -97,7 +97,7 @@
                                                 <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
                                             </span>
                                             <span class= "fs-11 color-grey mt-1" style="margin-left:-45px" v-if="findDuration(event.start, event.end)>61"> 
-                                                {{event.category_key}}
+                                                {{listCategory&&listCategory.filter(c=>c.id==event.id)[0]?listCategory.filter(c=>c.id==event.id)[0].key:''}}
                                             </span>
                                         </div>
                                         <div style="margin-right:-5px" :class="{'mt-4 ':findDuration(event.start, event.end)>80}">
@@ -137,6 +137,7 @@
 </template>
 
 <script>
+import CategoryWorker from 'worker-loader!@/worker/timesheet/Category.Worker.js';
 import { formulasApi } from '../../api/Formulas';
 import {uiConfigApi} from "../../api/uiConfig";
 import LogTimeView from "./../../components/timesheet/LogTimeView";
@@ -190,7 +191,8 @@ export default {
             colorLog:'#F0F8FF',
             events: [],// chứa event của calendar
             hoursRequired: '8',
-            logFormWorker:null
+            logFormWorker:null,
+            categoryWorker:null
         };
     },
 
@@ -198,13 +200,13 @@ export default {
         this.getColor();
         this.getConfigInfo()
         this.logFormWorker = new LogFormWorker();
+        this.categoryWorker = new CategoryWorker();
         this.getAllTask();
         this.getCategory();
         this.load();
     },
     methods: {
         undoUpdate(){
-            debugger
             let logInx = -1;
             let events = [...this.events];
             events.map((e,i)=>{
@@ -240,7 +242,6 @@ export default {
                 }).catch(console.log)
         },
         undo(){
-            debugger
             switch(this.log.action){
                 case "create":
                     this.undoCreate();
@@ -287,14 +288,22 @@ export default {
                 // }          
             });
         },
+        setListCategory(data){
+              this.listCategory = data;
+             this.$store.commit("timesheet/getListCategory", data )
+        },
         getCategory(){
             const self = this;
-             timesheetApi.getAllCategory({}).then(res => {
-                if (res.status === 200) {
-                    self.listCategory = res.data.listObject;
-                    self.$store.commit("timesheet/getListCategory", self.listCategory )
-                }
-                }).catch(console.log);
+            this.categoryWorker.postMessage({
+                action:'getListCategory',
+                data:''
+            })
+            //  timesheetApi.getAllCategory({}).then(res => {
+            //     if (res.status === 200) {
+            //         self.listCategory = res.data.listObject;
+            //         self.$store.commit("timesheet/getListCategory", self.listCategory )
+            //     }
+            //     }).catch(console.log);
             },
         async getAllTask(){
             let self = this;
@@ -311,9 +320,7 @@ export default {
                     x.description = 'Ngày tạo: '+ x.createTime;
                 })
                 self.listTask.push(...res.data.listObject);
-
-                })
-                .catch(console.log);
+            }).catch(console.log);
                 // debugger
 
         },
@@ -628,7 +635,6 @@ export default {
             }
         },
         async updateEvent(event,duration){
-            debugger
             let start = this.$moment(event.start);
             let end = this.$moment(event.end);
             const self = this;
@@ -639,7 +645,7 @@ export default {
                 task: event.task,
                 type: self.checkPlanOrLog(event.start),
                 id: event.id,
-                cateId: this.getIdCategory(event.category),
+                cateId: event.category,
                 taskName:event.name?event.name:'',
                 date: start.format('YYYY-MM-DD'),
                 categoryTask: event.category,
@@ -648,7 +654,6 @@ export default {
             };
             let res = await timesheetApi.updateLogTime(data,data.id)
             if (res.status === 200) {
-                self.load();
             } else {
                 self.$snotify({
                     type: "error",
@@ -662,7 +667,6 @@ export default {
             if (this.createEvent) {// 1. createEvent khac null, kéo xuống/di chuyển
                 if (this.extend) {//1.1: kéo xuống
                     try {
-                        debugger
                         let oldLog = {action:'update',id:-1};
                         let events = [...this.events];
                         events.map((e,i)=>{
@@ -675,17 +679,14 @@ export default {
                         this.$store.commit("timesheet/getLogForm",oldLog  )
                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
                         this.createEvent.duration = duration;
-                        
+                        // this.createEvent.category_key = duration;
                         this.createEvent.taskName = this.createEvent.name ;
-                      
                         this.updateEvent(this.createEvent, duration);
                         this.findFormular(this.createEvent.category_key)
                         // cập nhật vào doc
                     } catch(e) {console.log(e); }
                 } else {//1.2: tao moi event
-                    if(this.timeView){
-                        //
-                        
+                    if(this.timeView){  
                          this.openLogTimeDialog(this.createEvent,false);
                     }else{
                         this.events.splice(this.events.indexOf(event), 1);
@@ -722,9 +723,6 @@ export default {
                         this.resizeLogtime();
                          this.updateEvent(oldLog, oldLog.duration);
                         this.findFormular(this.createEvent.category_key)
-
-
-                        
                     }
                 } catch(e) { console.log(e);}
             }
@@ -828,10 +826,10 @@ export default {
     },
     computed: {
         cal(){
-                return this.ready ? this.$refs.calendar : null
+            return this.ready ? this.$refs.calendar : null
         },
         nowY(){
-                return this.cal ? this.cal.timeToY(this.cal.times.now) + 'px' : '-10px'
+            return this.cal ? this.cal.timeToY(this.cal.times.now) + 'px' : '-10px'
         },
         ...mapState('timesheet', {
             calendarShowDate: 'calendarShowDate',
@@ -920,6 +918,16 @@ export default {
         }
         this.updateTime()
         const self = this
+        this.categoryWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getListCategory':
+                    self.setListCategory(data.dataAfter)
+                    break;
+                default:
+                    break;
+            }
+        });
         this.logFormWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {

@@ -221,14 +221,14 @@ export default {
 
         },
         createLog(data){
+            let taskName = this.$refs.logCalendar.listTask.filter(task=>task.id==data.task);
             data.start = Date.parse(data.start);
             data.date = this.$moment(data.end).format('YYYY-MM-DD');
             data.end = Date.parse(data.end);
-            data.name=this.$refs.logCalendar.listTask.filter(task=>task.id==data.task).length>0? this.$refs.logCalendar.listTask.filter(task=>task.id==data.task)[0].name:'';
-            data.category=data.categoryTask;
-            data.category_key=data.categoryTask.split('-')[0];
+            data.name = taskName.length>0? taskName[0].name:'';
+            data.category = data.categoryTask.id;
+            data.category_key = data.categoryTask.key;
             data.color= this.$refs.logCalendar.getColorWhenCreate(data);
-            data.type=data.type;
             data.timed= true;
             data.action = 'create';
             this.$store.commit("timesheet/getLogForm", data)
@@ -255,7 +255,6 @@ export default {
             this.load = true;
         },
         cancelTaskForm(){
-            debugger
             this.showTask=false;
             this.showCategory=false;
             this.cancelTask != this.cancelTask;
@@ -304,6 +303,7 @@ export default {
                 this.onSaveLogTimeEvent = onSave;
                 this.onCancelSave = onCancel;
             });
+            this.$refs.logtime.setValueLog(logtimeEvent);
         },
         deleteLogTime({deleteEvent, onDelete}) {
             this.deleteDialog = true;

@@ -8,7 +8,6 @@ function getListCategory(state, cate) {
     state.listCate = cate;
 }           
 function updateObjId(state, objId){
-    debugger
     state.log.docObjId = objId
 }
 
@@ -16,10 +15,8 @@ function getLogForm(state, { action,name, taskName, category, task, category_key
     state.log.category = category;
     state.log.task = task;
     state.log.name = name;
-
     state.log.taskName = taskName;
     state.log.action = action;
-    debugger
     state.log.date = date;
     state.log.duration = duration;
     state.log.start = start;
