@@ -108,7 +108,8 @@ export default class SymperTable {
         else{
             let submitContextItem = [
                 {
-                    name: 'Xóa dòng đã chọn',
+                    name: 'Xóa dòng đã chọn  ',
+                    shortcut: "Shift + Backspace",
                     action: function() {
                         // params.api.applyTransaction({ remove: [params.node.data]});
                         self.deleteRowSelection(params)
@@ -127,7 +128,19 @@ export default class SymperTable {
             if(self.tableControl.isInsertRow()){
                 submitContextItem.unshift(
                     {
-                        name: 'Thêm dòng phía trên ',
+                        name: 'Thêm dòng phía dưới  ',
+                        shortcut: "Shift + Enter",
+                        action: function() {
+                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
+                        },
+                        cssClasses: ['blueFont'],
+                        // icon:'mdi-table-row-plus-after'
+                    }
+                )
+                submitContextItem.unshift(
+                    {
+                        name: 'Thêm dòng phía trên  ',
                         action: function() {
                             let rowIndex = (params.node) ? params.node.rowIndex : 0;
                             params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex });
@@ -137,17 +150,7 @@ export default class SymperTable {
         
                     }
                 )
-                submitContextItem.unshift(
-                    {
-                        name: 'Thêm dòng phía dưới ' ,
-                        action: function() {
-                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
-                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
-                        },
-                        cssClasses: ['blueFont'],
-                        // icon:'mdi-table-row-plus-after'
-                    }
-                )
+                
             }
             return submitContextItem;
         }
