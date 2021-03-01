@@ -31,6 +31,7 @@
             <div style="width: 50%;">
                 <DashboardCell 
                     :layoutItem="item"
+                    ref="dashboardCell"
                     :instanceKey="instanceKey"
                     :cellConfigs="dashboardConfig.allCellConfigs[item.cellId]"
                 />
@@ -102,10 +103,12 @@ export default {
             this.$emit('back-to-dashboard')
         },
         print(){
+           this.$refs.dashboardCell.handlePrintReport()
 
         },
         exportExcel(){
-
+            this.$emit('download-excel')
+            
         }
     }
 }

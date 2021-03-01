@@ -72,6 +72,7 @@
                 <DashboardCellDetail 
                     @back-to-dashboard="dashboardTab = 'tab-1'" 
                     :item="currentItem"
+                    @download-excel="handleDownloadExcel(currentItem)"
                     :instanceKey="instanceKey"
                     :dashboardConfig="dashboardConfig"
                 />
