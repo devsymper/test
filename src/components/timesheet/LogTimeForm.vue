@@ -237,7 +237,7 @@ import CategoryWorker from 'worker-loader!@/worker/timesheet/Category.Worker.js'
 
 export default {
     name: 'LogTimeForm',
-    props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
+    props: ['formType', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
     data: () => ({
         typeRepeat:'general',//kiểu lặp lại 
         selectRepeat:['Hằng ngày',"Hằng tuần vào thứ 2","Từ thứ 2 đến thứ 7","Tùy chỉnh..."],
@@ -303,6 +303,10 @@ export default {
         startDate() {
             return this.$store.state.timesheet.calendarStartDate;
         },
+        newEvent(){
+            debugger
+            return this.$store.state.timesheet.log
+        },
         endDate() {
             return this.$store.state.timesheet.calendarEndDate;
         },
@@ -352,6 +356,9 @@ export default {
         },
     },
     watch: {
+        newEvent(){
+            this.setValueLog(this.newEvent)
+        },
         selectedRepeat(){
             if(this.selectedRepeat=='Tùy chỉnh...'){
                 this.showConfigRepeat = true;
@@ -445,18 +452,20 @@ export default {
       
     },
     created(){
+        
         // load lại trang ở màn month
         this.refreshAll();
         this.generateListHour();
+        this.getAllTask();
         this.getDateMonth(this.dateMonth);
         this.getCategory();
+        this.setValueLog(this.newEvent)
     },
     methods: {
           setValueLog(val) {
             this.clearError();
-            this.getAllTask(val.task);
             if(val){
-                    this.task = val?val.task:'';
+                this.task = val?val.task:'';
             }
             this.inputs.startTime = val ? this.$moment(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? this.$moment(val.end).format('HH:mm') : "08:40";
@@ -474,6 +483,7 @@ export default {
             this.showLog =  this.$moment(dateLog).isAfter(now)==true?false:true;
             this.showPlan = this.$moment(dateLog).isAfter(now);
             // this.filterTaskByCategory();
+            this.getAllTask(val.task);
             },
         clearError(){
             this.taskError = '';

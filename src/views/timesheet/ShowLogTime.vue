@@ -31,7 +31,6 @@
             :load ="load"
             @doneCate="doneCate()"
             :update ="update"
-            :newEvent="logtimeEvent" 
             :onSave="onSaveLogTimeEvent"
             :onCancel="onCancelSave">
         </LogTimeForm>
@@ -297,13 +296,18 @@ export default {
         },
         onCreateTime({logtimeEvent, onSave, onCancel, update}) {
             this.logtimeDialog = true;
+            debugger
+             this.$store.commit("timesheet/getLogForm", logtimeEvent)
             this.$nextTick(() => {
                 this.update = update;
                 this.logtimeEvent = logtimeEvent;
                 this.onSaveLogTimeEvent = onSave;
                 this.onCancelSave = onCancel;
             });
-            this.$refs.logtime.setValueLog(logtimeEvent);
+            
+            if(update&& this.$refs.logtime){
+                this.$refs.logtime.setValueLog(logtimeEvent);
+            }
         },
         deleteLogTime({deleteEvent, onDelete}) {
             this.deleteDialog = true;

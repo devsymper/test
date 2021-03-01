@@ -97,7 +97,7 @@
                                                 <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
                                             </span>
                                             <span class= "fs-11 color-grey mt-1" style="margin-left:-45px" v-if="findDuration(event.start, event.end)>61"> 
-                                                {{listCategory&&listCategory.filter(c=>c.id==event.id)[0]?listCategory.filter(c=>c.id==event.id)[0].key:''}}
+                                                {{listCategory&&listCategory.filter(c=>c.id==event.category)?listCategory.filter(c=>c.id==event.category)[0].key:''}}
                                             </span>
                                         </div>
                                         <div style="margin-right:-5px" :class="{'mt-4 ':findDuration(event.start, event.end)>80}">
