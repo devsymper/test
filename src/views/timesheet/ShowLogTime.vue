@@ -150,6 +150,11 @@ export default {
             console.log(err)
         })
     },
+    computed:{
+        type(){
+            return this.$store.state.timesheet.calendarType;
+        }
+    },
     methods: {
         quickCancel(isCreate){
             if(isCreate){
@@ -192,7 +197,7 @@ export default {
         },
         // khi click ra ngoài log form
         deleteLog(){
-            if(!this.update){
+            if(!this.update&&this.type!="month"){
               this.$refs.logCalendar.events.pop()
             }
         },

@@ -556,7 +556,7 @@ export default {
                 update: update,
                 logtimeEvent: event,
                 onSave: () => this.load(),
-                onCancel: update ? () => null : () => this.events.splice(this.events.indexOf(event), 1)
+                onCancel: update&&this.type=='month' ? () => null : () => this.events.splice(this.events.indexOf(event), 1)
             });
         },
         openDeleteLogtime(event) {
