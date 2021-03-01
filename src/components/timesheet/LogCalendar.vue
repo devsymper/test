@@ -719,7 +719,6 @@ export default {
                 }
             } else if(this.dragEvent) {//2.sự kiện di chuyển logtime
                 try {
-                    debugger
                     let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
                     this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD');
                     if(this.timeView){

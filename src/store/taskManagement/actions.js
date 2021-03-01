@@ -184,7 +184,6 @@ const getAllProject = async(context) => {
             filter.page = 1;
             filter.pageSize = 200;
             filter.distinct = false;
-
             let res = await taskManagementApi.getAllProject(filter);
             if (res.status == 200) {
                 context.commit('setAllProject', res.data.listObject);

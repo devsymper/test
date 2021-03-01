@@ -29,6 +29,9 @@ export default {
     getAllCategory() {
         return api.get('category')
     },
+    getAllCategory1(filter) {
+        return api.get('category1',filter)
+    },
     deleteCategory(id) {
         return api.delete('category' + '/' + id, id)
     },

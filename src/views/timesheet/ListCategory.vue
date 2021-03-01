@@ -1,7 +1,9 @@
 <template>
-<div class="w-100">
+<div class="w-100 h-100">
      <list-items
+        class="h-100"
         ref="listCategory"
+        :containerHeight="containerHeight"
         @after-open-add-panel="addCategory"
         :headerPrefixKeypath="'timesheet'"
         :showTimesheetBtn="true"
@@ -27,6 +29,7 @@
 </div>
 </template>
 <script>
+import { util } from "@/plugins/util.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import { appConfigs } from '../../configs';
 import timesheetApi from '../../api/timesheet';
@@ -41,6 +44,7 @@ export default {
         const self = this
         return {
             listDoc:[],
+            containerHeight:0,
             showPanel:false,
             cate:{},
             isAddView:true,
@@ -144,9 +148,23 @@ export default {
     },
     created(){
         this.getDocument();
+        // this.test();
         this.getListUrl = appConfigs.apiDomain.timesheet+'category';
     },
     methods:{
+        calcContainerHeight(){
+			this.containerHeight = util.getComponentSize(this).h;
+		},
+        async test(){
+            let filter={};
+            filter.page = 1;
+            filter.pageSize = 500;
+            filter.filter = '123';
+            filter.distinct = true;
+            let res = await timesheetApi.getAllCategory1(filter);
+            if(res.status==200){
+            }
+        },
         getDocument(){
             const self = this;
             documentApi.getSmallListDocument().then(res=>{

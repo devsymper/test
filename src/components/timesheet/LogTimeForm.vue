@@ -396,7 +396,6 @@ export default {
             this.getDateMonth()
         },
         duration(){
-            debugger
             if(!this.duration||this.duration<=0||Number.isNaN(this.duration)||this.duration=='0h'||this.duration=='0m'){
                 // if(this.duration.match(/[^a-zA-Z0-9]/)){
                      this.timeError = this.$t('timesheet.time_invalid');
@@ -880,7 +879,6 @@ export default {
             return check
         },
         setOriginLog(data){
-            debugger
             let updateLog = {
                 ...data,
                 start:Number(this.$moment(data.start).format('x')),
