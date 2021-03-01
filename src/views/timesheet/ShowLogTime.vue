@@ -105,7 +105,6 @@ export default {
     },
     data() {
         return {
-            userId:'',
             monthEvents:{},
             showTask:false,
             showCategory:false,
@@ -302,6 +301,7 @@ export default {
                 this.update = update;
                 this.logtimeEvent = logtimeEvent;
                 this.onSaveLogTimeEvent = onSave;
+
                 this.onCancelSave = onCancel;
             });
             

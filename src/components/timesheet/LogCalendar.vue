@@ -556,7 +556,7 @@ export default {
                 update: update,
                 logtimeEvent: event,
                 onSave: () => this.load(),
-                onCancel: update&&this.type=='month' ? () => null : () => this.events.splice(this.events.indexOf(event), 1)
+                onCancel: update||this.type=='month' ? () => null : () => this.events.splice(this.events.indexOf(event), 1)
             });
         },
         openDeleteLogtime(event) {
@@ -842,7 +842,9 @@ export default {
             }
             const totalInHours = totalInMinutes / 60;
             this.$store.commit('timesheet/updateTotalHours', totalInHours % 10 === 0 ? totalInHours : totalInHours.toFixed(1));
-        }
+        },
+        // đếm số log time hiển thị trên calendar view
+      
     },
     computed: {
         cal(){
@@ -910,7 +912,11 @@ export default {
              this.$nextTick(() => {
                 this.$nextTick(this.onChangeCalendar);
                 this.updateTotalHours();
-            });   
+            });
+            // if(this.calendarType=='month'){
+            //     this.countLogMonthView()
+
+            // }
         },
         calendarShowDate() {
             this.$nextTick(() => {
@@ -926,6 +932,7 @@ export default {
         }
     },
     mounted() {
+       
         // this.$refs.calendar.scrollToTime('07:40');
         this.onChangeCalendar();
         this.handleEventKeyBoad();

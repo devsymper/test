@@ -150,7 +150,8 @@
                 <input type="text" 
                     :value="displayDuration" 
                     @input="caculateDuration" 
-                    class="input-logtime"></div>
+                    class="input-logtime">
+            </div>
             <div class='input-time' style="margin-left:-3px">
                 <span class="label">{{$t('timesheet.start_time')}}
                     <span style="color:red"> *</span> 
@@ -385,7 +386,7 @@ export default {
         },
         cancelTask(){
             if(this.cancelTask){
-                this.getAllTask();
+                 this.getAllTask();
             }
         },
         eventLog(){
@@ -395,10 +396,11 @@ export default {
             this.getDateMonth()
         },
         duration(){
+            debugger
             if(!this.duration||this.duration<=0||Number.isNaN(this.duration)||this.duration=='0h'||this.duration=='0m'){
                 // if(this.duration.match(/[^a-zA-Z0-9]/)){
                      this.timeError = this.$t('timesheet.time_invalid');
-                // }
+                //  }
                }
             else{
                 this.timeError = ''
@@ -1039,7 +1041,10 @@ button {
 }
 .date {
     width: 105px;
-    margin-right: 5px;
+}
+.category-task ::v-deep .v-input__append-inner{
+    display:none
+
 }
 .date-picker ::v-deep .v-picker__body {
     width: 230px;
@@ -1054,7 +1059,6 @@ button {
 .duration {
     width: 60px;
     margin-left: -14px;
-    margin-right: 5px;
 }
 .v-autocomplete ::v-deep .v-input__control{
     margin-top:12px;
