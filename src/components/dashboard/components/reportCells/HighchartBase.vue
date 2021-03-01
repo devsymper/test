@@ -44,3 +44,8 @@ export default {
     }
 }
 </script>
+<style >
+.highcharts-credits{
+    display: none !important;
+}
+</style>
