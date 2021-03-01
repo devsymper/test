@@ -162,7 +162,7 @@ export default {
         MonthViewEvent,
         ViewDetailMonth
     },
-    props: ['timeView','userId','monEvents'],
+    props: ['timeView','monEvents'],
     data() {
         return {
             listCategoryColor:[],
@@ -198,6 +198,8 @@ export default {
     },
 
     created() {
+        this.$store.commit("timesheet/updateUserId", this.$store.state.app.endUserInfo.id)
+        this.userId = this.$store.state.app.endUserInfo.id;
         this.getColor();
         this.getConfigInfo()
         this.logFormWorker = new LogFormWorker();
@@ -438,16 +440,16 @@ export default {
         start(date){
             this.$emit('showLog',date);   
         },
-        getLogByUserId(id){
-            const self = this;
-            timesheetApi.getLogByUserId({userId:id})
-                .then(res => {
-                    if (res.status === 200) {
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
-                })
+        getLogByUserId(){
+            let data = {
+                start:this.$refs.calendar.lastStart.date,
+                end:this.$refs.calendar.lastEnd.date,
+                userId: this.userId
+            }
+             this.logFormWorker.postMessage({
+                action:'getLogTimeList',
+                data:data
+            })
         },
         create_UUID() {
             var dt = new Date().getTime();
@@ -571,6 +573,7 @@ export default {
             let data = {
                 start:this.$refs.calendar?this.$refs.calendar.lastStart.date:defaultStart,
                 end:this.$refs.calendar?this.$refs.calendar.lastEnd.date:defaultEnd,
+                userId: this.userId
 
             }
              this.logFormWorker.postMessage({
@@ -814,8 +817,6 @@ export default {
                 this.resizeLogtime();
             }else{
                 this.events = this.listLogInTime;
-                this.getLogByUserId(this.userId);
-                //  this.load()
             }
             
         },
@@ -855,7 +856,8 @@ export default {
             calendarType: 'calendarType',
             period: 'period',
             log:'log',
-            objId:'objId'
+            objId:'objId',
+            userId:'userId'
         }),
         weekday() {
             const dayOfWeekMap = {
@@ -895,12 +897,11 @@ export default {
         period(){
             this.load()
         },
-         userId(){
-            this.getLogByUserId(this.userId);
+        userId(){
+            this.getLogByUserId();
         },
         calendarType(newType) {
             this.load();
-            this.getLogByUserId(this.userId);
             if (newType === 'weekday') {
                 this.internalCalendarType = 'week';
             } else {
@@ -909,7 +910,6 @@ export default {
              this.$nextTick(() => {
                 this.$nextTick(this.onChangeCalendar);
                 this.updateTotalHours();
-                this.getLogByUserId(this.userId);
             });   
         },
         calendarShowDate() {

@@ -10,6 +10,10 @@ function getListCategory(state, cate) {
 function updateObjId(state, objId){
     state.log.docObjId = objId
 }
+//xem calendar theo id user
+function updateUserId(state, userId){
+    state.userId = userId
+}
 
 function getLogForm(state, { action,name, taskName, category, task, category_key,date, duration, start, end, description, type,color,id,docObjId}) {
     state.log.category = category;
@@ -83,6 +87,7 @@ export {
     changeManageTimesheetType,
     changeManageTimesheetRange,
     adjustCalendar,
+    updateUserId,
     adjustManageTimesheet,
     adjustSubmit,
     updateTotalHours,

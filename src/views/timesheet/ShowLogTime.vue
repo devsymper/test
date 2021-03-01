@@ -1,7 +1,7 @@
 <template>
 <div class='log-time h-100 pl-1' >
     <div class="d-flex justify-space-between">
-        <period-selector style="width:60%" @load-logtime="reloadLog" />
+        <period-selector style="width:60%" />
         <div style="width:40%" class="d-flex justify-end">
             <ActionButtons ref="action" />
             <CalendarViewMode
@@ -71,7 +71,6 @@
         </DeleteLogView>
     </v-dialog>
     <LogCalendar
-        :userId="userId"
         @showLog="showLog" 
          @quick-cancel="quickCancel"
         :monEvents="monthEvents"
@@ -242,9 +241,6 @@ export default {
         },
         doneCate(){
             this.updateAPICate = false
-        },
-        reloadLog(userId){
-            this.userId = userId;
         },
         updateAPICategory(){
             this.updateAPICate =true;

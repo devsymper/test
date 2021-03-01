@@ -11,6 +11,7 @@ export default {
     calendarAdjustment: 0,
     totalHours: '0',
     listColor:{},
+    userId:-1,
     log:{
         action:'create',
         category: '',

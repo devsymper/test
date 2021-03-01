@@ -87,6 +87,22 @@ export default {
                 }
             })
         },
+        showCurrentUser(){
+            let id = this.$store.state.app.endUserInfo.id;
+            this.listUser = [];
+            let listUser = [...this.$store.state.app.allUsers];
+            listUser.map(u=>{
+                if(u.id==id){
+                    this.listUser.push({
+                        id:id,
+                        displayName:u.displayName
+                    });
+                    this.user = u;
+                }
+            })
+            
+
+        },
         format(date){
             switch(date){
                 case'Next week':
@@ -202,9 +218,6 @@ export default {
         hoursRequired() {
             return this.$store.getters['timesheet/getTotalHoursBy']('timesheet');
         },
-        sapp() {
-            return this.$store.state.app;
-        },
     },
     data: () => ({
        listUser:[],
@@ -213,7 +226,8 @@ export default {
         user:'',
     }),
     created() {
-        this.getSubDepartmentUser(),
+        this.showCurrentUser();
+        this.getSubDepartmentUser();
         this.changeActions(this.type);
     },
     watch: {
@@ -221,9 +235,7 @@ export default {
             this.changeActions(newType);
         },
         user(){
-            let userId = this.user.id;
-            this.$emit('load-logtime', userId)
-          
+            this.$store.commit("timesheet/updateUserId", this.user.id)
         },
     }
 }

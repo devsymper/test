@@ -23,9 +23,6 @@ export default {
     getAllUserLogTimeList() {
         return api.get('manage-timesheet');
     },
-    getLogByUserId(id) {
-        return api.get("log-time-othersUser", id);
-    },
     createCategory(data) {
         return api.post('category', data)
     },

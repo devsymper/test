@@ -29,7 +29,6 @@ self.onmessage = async function (event) {
 
 export const copyLogTime = async function(event) {
     let check = false;
-    debugger
     let res = await timesheetApi.createLogTime({
           start:moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
           end: moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
