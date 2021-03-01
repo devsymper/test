@@ -38,6 +38,7 @@ window.addNewDataPivotTable = function(el, event, type){
     thisListItem.$evtBus.$emit('on-add-data-to-pivot-table',{type:type, tableName:tableName})
 }
 var delayTimerGridEvent;
+var delayTimerGridSize;
 
 export default class SymperTable {
     constructor(tableControl, keyInstance, groupConfig = {}, pivotConfig = {}, formulasWorker) {
@@ -881,6 +882,19 @@ export default class SymperTable {
         }
         return [result];
     }
+    caculatorRowHeightAfterColResize(params){
+        if(!this.onEventReady){
+            return;
+        }
+        if(params.source != 'uiColumnDragged'){
+            return;
+        }
+        let self = this;
+        clearTimeout(delayTimerGridSize);
+        delayTimerGridSize = setTimeout(function() {
+            self.gridOptions.api.resetRowHeights();
+        }, 400);
+    }
     /**
      * Sự kiện xảy ra sau khi resize cột
      * @param {*} params 
@@ -888,6 +902,7 @@ export default class SymperTable {
     onColumnResized(params){
         let thisComponent = this.context.thisComponent;
         thisComponent.onSaveConfigUi(params)
+        thisComponent.caculatorRowHeightAfterColResize(params);
     }
     /**
      * Sự kiện xảy ra sau khi ẩn cột
@@ -1413,6 +1428,9 @@ export default class SymperTable {
             }
 
             this.tableInstance.handlerAfterChangeCellByUser(columnChange,event.newValue,event.data, rowId);
+        }
+        if(this.tableInstance.tableControl.isWrapText()){
+            this.tableInstance.gridOptions.api.resetRowHeights();
         }
     }
 
