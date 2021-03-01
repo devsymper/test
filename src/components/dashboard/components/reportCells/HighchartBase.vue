@@ -1,13 +1,11 @@
 <template>
-
-    <div ref="highchartWrapper">
+    <div ref="highchartWrapper" class="w-100 h-100">
          <Highcharts
             class="w-100 h-100" 
             ref="highchartSymper"
             :options="cellConfigs.viewConfigs.displayOptions">
         </Highcharts>
     </div>
-   
 </template>
 <script>
 

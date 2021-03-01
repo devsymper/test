@@ -46,9 +46,16 @@
 								:key="objectType"
 								:class="{ 'menu-group-active': subMenu.active == true }"
 								@click="gotoPage(subMenu, true, item)"
-							>
+							>	
 								<v-list-item-title class="fm" style=" color:rgb(0,0,0,0.8)">
-									{{ $t('common.sidebar.' + subMenu.title) }}
+									<v-tooltip bottom>
+										<template v-slot:activator="{ on }">
+											<span v-on="on">
+												{{ $t('common.sidebar.' + subMenu.title) }}
+											</span>
+										</template>
+										<span> {{ $t('common.sidebar.' + subMenu.title) }} </span>
+									</v-tooltip>
 								</v-list-item-title>
 							</v-list-item>
 						</v-list-group>
@@ -398,6 +405,6 @@ export default {
 </style>
 <style>
 .report-sidebar{
-	z-index: 10000
+	z-index: 2
 }
 </style>

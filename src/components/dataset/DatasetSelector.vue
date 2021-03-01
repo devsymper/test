@@ -12,6 +12,7 @@
 			:showDisplayConfig="false"
 			:containerHeight="tableHeight"
 			:getDataUrl="getDataUrl"
+			:showFilter="false"
 			:customAPIResult="customAPIResult"
 			@data-loaded="addCheckboxColumn"
 			@after-selected-row="changeDatasetSelected"

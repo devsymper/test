@@ -71,7 +71,6 @@ export default {
                         field: i
                     }
                     arr.push(obj)
-                    debugger
                 }
             }
             return arr
