@@ -97,7 +97,8 @@
                                                 <i :class="[event.type==0?'mdi mdi-calendar color-blue fs-13':'mdi mdi-check-all color-green fs-15']" class=" mr-12"></i>
                                             </span>
                                             <span class= "fs-11 color-grey mt-1" style="margin-left:-45px" v-if="findDuration(event.start, event.end)>61"> 
-                                                {{listCategory&&listCategory.filter(c=>c.id==event.category)?listCategory.filter(c=>c.id==event.category)[0].key:''}}
+                                                {{event.category_key}}
+                                                <!-- {{listCategory&&listCategory.filter(c=>c.id==event.category)?listCategory.filter(c=>c.id==event.category)[0].key:''}} -->
                                             </span>
                                         </div>
                                         <div style="margin-right:-5px" :class="{'mt-4 ':findDuration(event.start, event.end)>80}">
@@ -289,8 +290,8 @@ export default {
             });
         },
         setListCategory(data){
-              this.listCategory = data;
-             this.$store.commit("timesheet/getListCategory", data )
+            this.listCategory = data;
+            this.$store.commit("timesheet/getListCategory", data )
         },
         getCategory(){
             const self = this;
@@ -403,8 +404,15 @@ export default {
             return color
         },
         setLogTimeList(data){
+            this.events= [];
             this.oldEvents = [...data.events];
-            this.events = data.events;
+            data.events.map(e=>{  
+                this.events.push({
+                    ...e,
+                    category_key: this.listCategory.filter(c=>c.id==e.category)[0].key
+                }) 
+            }
+            );
             this.getColorLogTime();
             if(!this.timeView){
                 this.resizeLogtime()
@@ -441,14 +449,23 @@ export default {
                     console.log(err);
                 })
         },
+        create_UUID() {
+            var dt = new Date().getTime();
+            var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+            /[xy]/g,
+            function(c) {
+            var r = (dt + Math.random() * 16) % 16 | 0;
+            dt = Math.floor(dt / 16);
+            return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
+            });
+            return uuid;
+        },
         copyLogTime(event){
             let data = {...event};
             // data.nameTask = this.listTask.filter(task=>task.id==event.task)[0].name;
             event.nameTask = data.name;
-            data.categoryTask = event.category;
+            event.id = this.create_UUID();
             data.desc = event.desc || "";
-            event.cateId = this.getIdCategory(event.category);
-            data.cateId = event.cateId ;
             this.events.push(data);
             this.logFormWorker.postMessage({
                 action:'copyLogTime',
@@ -554,6 +571,7 @@ export default {
             let data = {
                 start:this.$refs.calendar?this.$refs.calendar.lastStart.date:defaultStart,
                 end:this.$refs.calendar?this.$refs.calendar.lastEnd.date:defaultEnd,
+
             }
              this.logFormWorker.postMessage({
                 action:'getLogTimeList',
@@ -698,6 +716,7 @@ export default {
                 }
             } else if(this.dragEvent) {//2.sự kiện di chuyển logtime
                 try {
+                    debugger
                     let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
                     this.dragEvent.date =  this.$moment(this.dragEvent.start).format('YYYY-MM-DD');
                     if(this.timeView){
@@ -880,7 +899,7 @@ export default {
             this.getLogByUserId(this.userId);
         },
         calendarType(newType) {
-             this.load();
+            this.load();
             this.getLogByUserId(this.userId);
             if (newType === 'weekday') {
                 this.internalCalendarType = 'week';

@@ -206,7 +206,7 @@ export default {
                 if(events[i].id==oldLog.id){
                     events[i]=data,
                     events[i].name = name;
-                    event[i].action = "update";
+                    // event[i].action = "update";// 
                     this.$store.commit("timesheet/getLogForm",  events[i])
                 }
             }
@@ -225,8 +225,8 @@ export default {
             data.date = this.$moment(data.end).format('YYYY-MM-DD');
             data.end = Date.parse(data.end);
             data.name = taskName.length>0? taskName[0].name:'';
-            data.category = data.categoryTask.id;
-            data.category_key = data.categoryTask.key;
+            data.category = data.cateId;
+            // data.category_key = data.categoryTask.key;
             data.color= this.$refs.logCalendar.getColorWhenCreate(data);
             data.timed= true;
             data.action = 'create';
@@ -296,7 +296,6 @@ export default {
         },
         onCreateTime({logtimeEvent, onSave, onCancel, update}) {
             this.logtimeDialog = true;
-            debugger
              this.$store.commit("timesheet/getLogForm", logtimeEvent)
             this.$nextTick(() => {
                 this.update = update;
@@ -305,7 +304,7 @@ export default {
                 this.onCancelSave = onCancel;
             });
             
-            if(update&& this.$refs.logtime){
+            if(this.$refs.logtime){
                 this.$refs.logtime.setValueLog(logtimeEvent);
             }
         },

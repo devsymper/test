@@ -29,6 +29,7 @@ self.onmessage = async function (event) {
 
 export const copyLogTime = async function(event) {
     let check = false;
+    debugger
     let res = await timesheetApi.createLogTime({
           start:moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
           end: moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
@@ -38,9 +39,8 @@ export const copyLogTime = async function(event) {
           taskName:event.name,
           id: event.id,
           date: event.date,
-          categoryTask: event.category,
+          cateId: event.category,
           desc: event.desc || "",
-          cateId: event.cateId
       })
       if(res.status==200){
          check = true
@@ -76,6 +76,7 @@ export const getLogTimeList = async function(dateStartEnd){
         data.events = [...logTimeList.map((logTime, idx) => ({
             name: `${logTime.nameTask}`,
             timed: true,
+            action:'',
             date: logTime.date,
             start: Date.parse(logTime.startTimeAt),
             end: Date.parse(logTime.endTimeAt),

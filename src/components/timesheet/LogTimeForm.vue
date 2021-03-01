@@ -304,7 +304,6 @@ export default {
             return this.$store.state.timesheet.calendarStartDate;
         },
         newEvent(){
-            debugger
             return this.$store.state.timesheet.log
         },
         endDate() {
@@ -444,7 +443,7 @@ export default {
                     this.cateError = this.$t('timesheet.required_value');
                 }else{
                     this.cateError="";
-                    this.checkNullCate =false
+                    this.checkNullCate = false
                 }
              }
         },
@@ -472,7 +471,6 @@ export default {
             this.inputs.date = val ? this.$moment(val.date).format('YYYY-MM-DD') : this.$moment().format('YYYY-MM-DD');
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
-            debugger
             if(val.category){
                 let cateId = val.category;
                 this.categoryTask = this.listCategory.filter(c=>c.id==cateId)[0];
@@ -575,12 +573,12 @@ export default {
                 this.listTask.map(task=>{
                     if(task.id==taskId) cateId = task.categoryId
                 })
+             this.categoryTask = this.listCategory.filter(cate=>cate.id==cateId)[0]
             }
-            this.categoryTask = this.listCategory.filter(cate=>cate.id==cateId)[0]
+           
         },
         // lọc danh sách task theo id category
         filterTaskByCategory(){
-            debugger
             if(this.categoryTask){
                 let categoryId = this.categoryTask.id;
                 this.listTask = [...this.items.filter(x=>x.categoryId==categoryId)];
@@ -643,7 +641,6 @@ export default {
             })
         },
         getEventLog(){
-            debugger
             this.inputs.startTime = this.eventLog.startTime;
             this.inputs.endTime = this.eventLog.endTime;
             this.task  = this.eventLog.task;
@@ -664,7 +661,6 @@ export default {
             this.getEventLog();
          },
         showTaskForm(){
-            debugger
             this.$emit("showTaskForm",{
                 startTime:this.inputs.startTime,
                 endTime:this.inputs.endTime,
@@ -677,12 +673,7 @@ export default {
             this.getEventLog();
         },
         getCategory(){
-            debugger
             this.listCategory = this.$store.state.timesheet.listCate;
-            //  this.categoryWorker.postMessage({
-            //     action:'getListCategory',
-            //     data:''
-            // })
         },
         refreshAll(){
             this.checkNullCate = false;
@@ -892,9 +883,9 @@ export default {
                 ...data,
                 start:Number(this.$moment(data.start).format('x')),
                 end:Number(this.$moment(data.end).format('x')),
-                category_key:data.categoryTask.key,
                 name:data.task,
-                timed:true
+                timed:true,
+                category_key:this.newEvent.category_key
             };
             return updateLog
 
