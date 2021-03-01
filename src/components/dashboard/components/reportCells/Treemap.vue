@@ -1,5 +1,5 @@
 <template>
-    <HighchartBase :cellConfigs="cellConfigs"/>
+    <HighchartBase :cellConfigs="cellConfigs" ref="highChartBase"/>
 </template>
 
 <script>
@@ -15,6 +15,11 @@ export default {
             }
         }
     },
+    methods:{
+        printInnerHTML(headerHTML){
+            this.$refs.highChartBase.printInnerHTML(headerHTML)
+        }
+    }
 }
 </script>
 

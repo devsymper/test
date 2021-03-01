@@ -55,6 +55,7 @@ import PerfectScrollbar from "perfect-scrollbar";
 import Pagination from '@/components/common/Pagination.vue';
 import _cloneDeep from "lodash/cloneDeep";
 var mo = treeConditionConverter.mo;
+import { util } from "@/plugins/util";
  
 export default {
     props: {
@@ -120,7 +121,8 @@ export default {
                 self.inPrintingMode = true;
                 let domHTML = $(self.$el).find('.symper-table-report')[0].outerHTML;
                 domHTML = headerHTML + domHTML;
-                window.printDOM(domHTML);
+                debugger
+                util.printDOM(domHTML);
             }, 500);
         },
         onAgReady($event,gridContainer){
@@ -436,6 +438,7 @@ export default {
             currentPage: 1,
             isResizing: false,
             customCssPagination: "",
+            inPrintingMode: false,
             gridOptions:null,
             gridApi: null,
             columnApi: null,
