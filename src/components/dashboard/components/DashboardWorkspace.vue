@@ -9,76 +9,66 @@
         @ps-scroll-y="handleDashboardScrolled" 
         @keyup.ctrl.86="checkPasteReport"
         @click="selectDashboard()">
-        <v-tabs
-			v-model="dashboardTab"
-			v-show="false"
-		>
-		</v-tabs>
-        <v-tabs-items v-model="dashboardTab">
-            <v-tab-item value="tab-1">
-                <grid-layout
-                    tabindex="0"
-                    @layout-updated="handleLayoutRendered"
-                    ref="gridLayout"
-                    class="symper-dashboard-layout"
-                    :layout.sync="currentLayout"
-                    :col-num="48"
-                    :row-height="2"
-                    :is-resizable="!dashboardConfig.info.lockWorkspace"
-                    :is-draggable="!dashboardConfig.info.lockWorkspace"
-                    :is-mirrored="false"
-                    :vertical-compact="true"
-                    :margin="[8,8]"
-                    :use-css-transforms="true"
-                    :style="workspaceStyle">
-                                    
-                    <div 
-                        v-for="item in currentLayout " 
-                        tabindex="0"
-                        @click.stop="selectCell(item.cellId)"  
-                        @keyup.ctrl.67="checkCopyReport"
-                        @keyup.ctrl.86="checkPasteReport"
-                        @keyup.ctrl.88="checkCutReport"
-                        :key="item.i">
-                        <grid-item 
-                                :x="item.x"
-                                :y="item.y"
-                                :w="item.w"
-                                :h="item.h"
-                                :i="item.i"
-                                :symper-cell-id="item.cellId"
-                                :class="{   
-                                    'symper-grid-item symper-dashboard-cell-wrapper' : true,
-                                    'dashboard-cell-with-icon':dashboardConfig.allCellConfigs[item.cellId].viewConfigs.showIcon,
-                                    'selected-report':dashboardConfig.allCellConfigs[item.cellId].viewConfigs.isSelecting
-                                }"
-                                @resized="handleResizeItem"
-                                @resize="handleResizingItem">
-                            <DashboardCell 
-                                v-if="item.active"
-                                :ref="item.cellId"
-                                @view-detail="handleViewDetail(item)"
-                                @download-excel="handleDownloadExcel(item)"
-                                :layoutItem="item"
-                                :isView="isView"
-                                :instanceKey="instanceKey"
-                                :cellConfigs="dashboardConfig.allCellConfigs[item.cellId]">
-                            </DashboardCell>
-                        </grid-item>
-                    </div>
-                </grid-layout>
-            </v-tab-item>
-            <v-tab-item value="tab-2">
-                <DashboardCellDetail 
-                    @back-to-dashboard="dashboardTab = 'tab-1'" 
-                    :item="currentItem"
-                    @download-excel="handleDownloadExcel(currentItem)"
-                    :instanceKey="instanceKey"
-                    :dashboardConfig="dashboardConfig"
-                />
-            </v-tab-item>
-        </v-tabs-items>
+        <grid-layout
+            tabindex="0"
+            @layout-updated="handleLayoutRendered"
+            ref="gridLayout"
+            class="symper-dashboard-layout"
+            :layout.sync="currentLayout"
+            :col-num="48"
+            :row-height="2"
+            :is-resizable="!dashboardConfig.info.lockWorkspace"
+            :is-draggable="!dashboardConfig.info.lockWorkspace"
+            :is-mirrored="false"
+            :vertical-compact="true"
+            :margin="[8,8]"
+            :use-css-transforms="true"
+            :style="workspaceStyle">
+                            
+            <div 
+                v-for="item in currentLayout " 
+                tabindex="0"
+                @click.stop="selectCell(item.cellId)"  
+                @keyup.ctrl.67="checkCopyReport"
+                @keyup.ctrl.86="checkPasteReport"
+                @keyup.ctrl.88="checkCutReport"
+                :key="item.i">
+                <grid-item 
+                        :x="item.x"
+                        :y="item.y"
+                        :w="item.w"
+                        :h="item.h"
+                        :i="item.i"
+                        :symper-cell-id="item.cellId"
+                        :class="{   
+                            'symper-grid-item symper-dashboard-cell-wrapper' : true,
+                            'dashboard-cell-with-icon':dashboardConfig.allCellConfigs[item.cellId].viewConfigs.showIcon,
+                            'selected-report':dashboardConfig.allCellConfigs[item.cellId].viewConfigs.isSelecting
+                        }"
+                        @resized="handleResizeItem"
+                        @resize="handleResizingItem">
+                    <DashboardCell 
+                        v-if="item.active"
+                        :ref="item.cellId"
+                        @view-detail="handleViewDetail(item)"
+                        @download-excel="handleDownloadExcel(item)"
+                        :layoutItem="item"
+                        :isView="isView"
+                        :instanceKey="instanceKey"
+                        :cellConfigs="dashboardConfig.allCellConfigs[item.cellId]">
+                    </DashboardCell>
+                </grid-item>
+            </div>
+        </grid-layout>
+        <DashboardCellDetail 
+            ref="dashboardCellDetail"
+            @back-to-dashboard="dashboardTab = 'tab-1'" 
+            :item="currentItem"
+            :instanceKey="instanceKey"
+            :dashboardConfig="dashboardConfig"
+        />
     </VuePerfectScrollbar>
+
     <v-tabs ref="dashboardTabs" v-model="dashboardConfig.info.activeTabIndex" >
         <v-tab  v-for="(tab, idx) in dashboardConfig.info.tabsAndPages.tabs" :key="tab.id" :symper-id="tab.id">
             <div>
@@ -239,7 +229,7 @@ export default {
          */
         handleViewDetail(item){
             this.currentItem = item
-            this.changeTabDetail('tab-2')
+            this.$refs.dashboardCellDetail.show()
         },
         handleDownloadExcel(item){
             let cell = this.dashboardConfig.allCellConfigs[item.cellId]
@@ -327,9 +317,6 @@ export default {
             //     }
             // }
             return rsl;
-        },
-        changeTabDetail(value){
-            this.dashboardTab = value
         },
         getUsingDatasetAndColumns(){
             return this.thisDashboardData.allDatasetColumns;

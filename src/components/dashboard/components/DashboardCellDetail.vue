@@ -1,49 +1,57 @@
 <template>
-    <div class="d-flex flex-column ml-1">
-       <div class="d-flex border-bottom-1 w-100 align-items-center" style="height: 30px">
-            <v-btn icon tile x-small class="mt-1" @click="backToDashboard"> 
-                <v-icon x-small>
-					mdi-chevron-double-left
-                </v-icon>
-            </v-btn>
-            <div class="flex-grow-1 d-flex border-left-1 ml-4">
-                <div class="mx-2 mt-2">
-                     Chi tiết 
+    <v-dialog
+        v-model="showDialog"
+        persistent
+        class="h-100 w-100"
+        content-class="overflow-hidden"
+    >
+
+    <div class="d-flex flex-column ml-1 w-100 h-100 bg-white overflow-hidden" style="height: 700px">
+        <div class="d-flex border-bottom-1 w-100 align-items-center" style="height: 30px">
+                <div class="flex-grow-1 d-flex border-left-1  fs-15">
+                    <div class="mx-2 mt-1">
+                        Chi tiết 
+                    </div>
+                    <div class="mt-1">
+                        <span class="text-uppercase" style="color: orange">
+                            {{dashboardTitle}}
+                        </span>
+                    </div>
                 </div>
-                <div class="mt-2">
-                    <span class="text-uppercase" style="color: orange">
-                         {{dashboardTitle}}
-                    </span>
+                <v-btn icon tile small class=" mr-1" @click="print"> 
+                    <v-icon small>
+                        mdi-printer
+                    </v-icon>
+                </v-btn>
+                <v-btn icon tile small class="mr-1" @click="exportExcel"> 
+                    <v-icon small>
+                        mdi-microsoft-excel
+                    </v-icon>
+                </v-btn>
+                <v-btn icon tile small class="mr-1" @click="hide"> 
+                    <v-icon small>
+                        mdi-close
+                    </v-icon>
+                </v-btn>
+        </div>
+            <div class="d-flex w-100 h-100 mt-1">
+                <div style="width: 50%;">
+                    <DashboardCell 
+                        :layoutItem="item"
+                        ref="dashboardCell"
+                        :instanceKey="instanceKey"
+                        :cellConfigs="dashboardConfig.allCellConfigs[item.cellId]"
+                    />
                 </div>
-            </div>
-            <v-btn icon tile x-small class="mt-1 mr-1" @click="print"> 
-                <v-icon x-small>
-                    mdi-printer
-                </v-icon>
-            </v-btn>
-            <v-btn icon tile x-small class="mt-1 mr-1" @click="exportExcel"> 
-                <v-icon x-small>
-                    mdi-microsoft-excel
-                </v-icon>
-            </v-btn>
-       </div>
-        <div class="d-flex w-100 h-100 mt-1">
-            <div style="width: 50%;">
-                <DashboardCell 
-                    :layoutItem="item"
-                    ref="dashboardCell"
-                    :instanceKey="instanceKey"
-                    :cellConfigs="dashboardConfig.allCellConfigs[item.cellId]"
-                />
-            </div>
-            <div style="width: 50%">
-                <TableDataAgGrid 
-                    :columnDefs="columnDefs"
-                    :rowData="rowData"
-                />
+                <div style="width: 50%">
+                    <TableDataAgGrid 
+                        :columnDefs="columnDefs"
+                        :rowData="rowData"
+                    />
+                </div>
             </div>
         </div>
-    </div>
+    </v-dialog>
 </template>
 
 <script>
@@ -52,6 +60,7 @@ import TableDataAgGrid from "@/components/common/agDataTable/TableDataAgGrid"
 export default {
     data(){
         return {
+            showDialog: false,
         }
     },
     computed:{
@@ -107,7 +116,12 @@ export default {
         },
         exportExcel(){
             this.$emit('download-excel')
-            
+        },
+        show(){
+            this.showDialog = true
+        },
+        hide(){
+            this.showDialog = false
         }
     }
 }
