@@ -1,7 +1,9 @@
 <template>
     <TableBase
-    :instanceKey="instanceKey"
-    :cellConfigs="cellConfigs"/>
+        :instanceKey="instanceKey"
+        :cellConfigs="cellConfigs"
+        ref="tableBase"
+    />
 </template>
 
 <script>
@@ -20,6 +22,11 @@ export default {
             default: ''
         }
     },
+    methods:{
+        printInnerHTML(headerHTML){
+            this.$refs.tableBase.printInnerHTML(headerHTML)
+        }
+    }
 }
 </script>
 

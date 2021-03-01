@@ -1,6 +1,7 @@
 <template>
     <CardBase
     	:cellConfigs="cellConfigs"
+        ref="cardBase"
 	/>
 </template>
 
@@ -17,6 +18,11 @@ export default {
             }
         }
     },
+    methods:{
+        printInnerHTML(headerHTML){
+            this.$refs.cardBase.printInnerHTML(headerHTML)
+        }
+    }
 }
 </script>
 

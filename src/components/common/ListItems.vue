@@ -1931,6 +1931,10 @@ export default {
                 }
             }
         },
+		onSelectionChanged() {
+			var selectedRows = this.agApi.getSelectedRows();
+			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
+        },
 		onGridReady(params){
 			params.api.sizeColumnsToFit()
 			this.agApi = params.api

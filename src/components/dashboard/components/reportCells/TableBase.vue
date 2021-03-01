@@ -27,7 +27,7 @@
             @column-visible="onShowHideColumns"
             @column-pinned="afterPinnedColumns">
         </ag-grid-vue>
-        <div class="symper-table-pagination pl-1" style="height: 25px; margin-top: 5px" >
+        <div class="symper-table-pagination pl-1" style="height: 25px; margin-top: 5px" :style="customCssPagination" >
             <Pagination
                 :contentSize="'mini'"
                 :totalVisible="3"
@@ -55,6 +55,7 @@ import PerfectScrollbar from "perfect-scrollbar";
 import Pagination from '@/components/common/Pagination.vue';
 import _cloneDeep from "lodash/cloneDeep";
 var mo = treeConditionConverter.mo;
+import { util } from "@/plugins/util";
  
 export default {
     props: {
@@ -120,7 +121,8 @@ export default {
                 self.inPrintingMode = true;
                 let domHTML = $(self.$el).find('.symper-table-report')[0].outerHTML;
                 domHTML = headerHTML + domHTML;
-                window.printDOM(domHTML);
+                debugger
+                util.printDOM(domHTML);
             }, 500);
         },
         onAgReady($event,gridContainer){
@@ -253,7 +255,6 @@ export default {
         reStyleTotal(){
             let cellId = this.cellConfigs.sharedConfigs.cellId;
             let idCell = 'symper-table-wrapper-' + cellId;
-            
             let style = this.convertCssObjToStr(this.options.totalRowStyle);
             let totalRowStyle = this.options.totalRowStyle;
             if(totalRowStyle){
@@ -283,7 +284,6 @@ export default {
                     `;
                 }
             }
-            
             return style;
         },
         reStyleDataCell(){
@@ -317,6 +317,7 @@ export default {
             return style;
         },
         onTableRender(){
+            this.reStylePagination()
             let customStyle = this.reStyleHeader();
             customStyle += this.reStyleDataCell();
             customStyle += this.reStyleTotal();
@@ -328,7 +329,9 @@ export default {
             }, 500, this);
             this.addPerfectScrollBar();
         },
-
+        reStylePagination(){
+            this.customCssPagination = this.convertCssObjToStr(this.options.paginationStyle)
+        },
         /**
          * Điều chỉnh chiều rộng của cột trong bảng
          */
@@ -434,6 +437,8 @@ export default {
         return {
             currentPage: 1,
             isResizing: false,
+            customCssPagination: "",
+            inPrintingMode: false,
             gridOptions:null,
             gridApi: null,
             columnApi: null,
