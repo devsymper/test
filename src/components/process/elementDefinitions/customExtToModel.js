@@ -266,18 +266,23 @@ function filterValue(rows) {
 }
 
 export const collectInfoForTaskDescription = function(allVizEls, allSymEls, bpmnModeler) {
+    let infoReturn = {
+        autoUpdateTaskInfo: {}
+    };
     for (let idEl in allSymEls) {
         let el = allSymEls[idEl];
         if (el.type == 'UserTask' || el.type == 'Task') {
-            setInfoForTaskDescription(el);
+            setInfoForTaskDescription(el, infoReturn);
         }
         // else if(el.type == 'ServiceTask'){
         //     setInfoForServicesTask(el);
         // }
     }
+
+    return infoReturn;
 }
 
-function setInfoForTaskDescription(el){
+function setInfoForTaskDescription(el, infoReturn){
     let elDocumentation = util.cloneDeep(defaultTaskDescription);
     elDocumentation.action.action = el.attrs.taskAction.value;
     elDocumentation.action.parameter.activityId = el.id;
@@ -288,6 +293,15 @@ function setInfoForTaskDescription(el){
     elDocumentation.approvalEditableControls = el.attrs.approvalEditableControls.value;
     elDocumentation.selectDefaultControlDocument = el.attrs.selectDefaultControlDocument.value;
 
+    elDocumentation.autoUpdateTaskInfo = el.attrs.autoUpdateTaskInfo.value;
+    // Nếu kích hoạt việc tự động update lại task info
+    if(elDocumentation.autoUpdateTaskInfo){
+        infoReturn.autoUpdateTaskInfo[el.id] = {
+            content: elDocumentation.content,
+            extraLabel: elDocumentation.extraLabel,
+            extraValue: elDocumentation.extraValue
+        };
+    }
     if (el.attrs.taskAction.value == 'submit') {
         elDocumentation.action.parameter.documentId = el.attrs.formreference.value;
     } else if (el.attrs.taskAction.value == 'approval') {

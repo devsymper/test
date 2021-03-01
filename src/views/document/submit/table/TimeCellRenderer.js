@@ -31,7 +31,12 @@ TimeCellRenderer.prototype.init = function(params) {
         else{
             this.eGui.innerHTML = value;
         }
-
+        if(control.tableCellHistoryData['row_'+params.rowIndex]){
+            this.eGui.classList.add('info-control-btn');
+            this.eGui.setAttribute('rowIndex',params.rowIndex);
+            this.eGui.setAttribute('data-control',control.name);
+            this.eGui.style.height = '100%'
+        }
         this.eGui.addEventListener('dblclick', function(e){
             let event = e;
             if(event.target.classList.contains('validate-icon')){

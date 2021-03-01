@@ -51,7 +51,6 @@ export default {
 			}
 		},
 		idDataset:{
-			type: String,
 			default: ""
 		},
 		isMultiple:{

@@ -20,7 +20,7 @@ export const symperAjax = async(options) =>{
 		}
 	}
 	const response = await fetch(options.url,options)
-	return  response.status == 204  ? null : response.json()   
+	return  response.status == 204  ? null : (options.dataType == 'text' ? response.text() : response.json())   
 }
 
 /**

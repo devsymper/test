@@ -1,5 +1,5 @@
 <template>
-<div style="width:62%;float:left"  class="period-selector">
+<div style="width:62%;float:left" class="period-selector">
     <div class="float-lg-left float-md-left  select-time" 
         v-bind:class="[type=='month'?'width-55':'width-58']">
         <!-- <v-menu offset-y>
@@ -20,18 +20,17 @@
             class="auto-complete mr-1 "
             dense
             ></v-autocomplete>
-        <v-btn v-for="action in actions" :key="action.label" depressed small class="mr-1" color="#F7F7F7" 
-            @click="action.action">
+        <v-btn v-for="action in actions" :key="action.label"  :style="{background:action.hover?'	#E8E8E8':'#F7F7F7'}" depressed small class="mr-1" color="#F7F7F7" 
+            @click="action.action(action.idx)">
             {{format(action.label)}}
         </v-btn>
     </div>
-    <v-col style="padding-left:0px" class=".d-lg-flex .d-lg-none d-none d-lg-block">
+    <v-col class="pl-0 .d-lg-flex .d-lg-none d-none d-lg-block">
         <v-btn icon @click="pre()">
             <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <span style="color:#008080">{{totalHours*10/10}}/{{hoursRequired}}</span>
-      
-            <span class="ml-1">{{$t('timesheet.of')}} {{startDate.slice(0,5)}} - {{endDate}}</span>
+        <span class="ml-1">{{$t('timesheet.of')}} {{startDate.slice(0,5)}} - {{endDate}}</span>
         <v-btn icon @click="next()">
             <v-icon>mdi-chevron-right </v-icon>
         </v-btn>
@@ -42,6 +41,7 @@
 <script>
 import { mapState } from 'vuex';
 import { orgchartApi } from '../../api/orgchart.js';
+import timesheet from '../../api/timesheet.js';
 
 const dayjsTypeMapper = {
     'day': 'day',
@@ -52,7 +52,29 @@ const dayjsTypeMapper = {
 
 export default {
     methods: {
-        getPreLog(){
+        findRepeatLog(){
+            let start = this.$moment(this.startDate,'DD-MM-YY');
+            let end = this.$moment(this.endDate,'DD-MM-YY');
+            let duration = this.$moment.duration(end.diff(start)).asDays();
+            duration = Number(duration)*4+3;
+            let nextDate= this.$moment(start).add(duration, 'days').format('YYYY-MM-DD')// ngày bắt đầu sau 4 lần thời gian ở màn bắt đầu
+            let dateYearAgo = this.$moment(start).subtract(1,'years').format('YYYY-MM-DD');
+            let data = {
+                end: this.$moment(start).format('YYYY-MM-DD'),//mốc bắt đầu từ start Calendar
+                nextDate : nextDate,//đoạn thời gian gấp 4 lần tính từ mốc
+                start: dateYearAgo// 1 năm trước từ mốc
+            }
+            const self = this;
+            timesheet.checkHasRepeatLog(data).then(res=>{
+                if(res.status==200){
+                    self.logRepeat = [...res.data];
+                    self.handleRepeatedLog()
+
+                }
+            })
+
+        },
+        handleRepeatedLog(){
 
         },
         getSubDepartmentUser(){
@@ -112,37 +134,58 @@ export default {
         },
         next() {
             // this.getPrelog();
+            this.findRepeatLog();
             this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(this.showDate).add(1, dayjsTypeMapper[this.type]).format('YYYY-MM-DD'));
             if (this.type === 'month') {
                 this.$store.commit('timesheet/adjustCalendar', this.$store.state.timesheet.calendarAdjustment + 1);
             }
+
         },
         changeActions(newType) {
+             const self = this;
             this.$store.commit('timesheet/updateCalendarShowDate', this.$moment().format('YYYY-MM-DD'));
             newType = newType.replace('weekday', 'week');
             switch (newType) {
                 case 'month':
-                    const monthAction = (month) => ({
+                   
+                    const monthAction = (month,idx) => ({
                         label: this.$moment().subtract(month, 'M').format('MMM'),
-                        action: () => {
+                        hover:false,
+                        idx,
+                        action: (idx) => {
                             this.$store.commit('timesheet/updateCalendarShowDate', this.$moment().subtract(month, 'month').format('YYYY-MM-DD'));
-                            this.$store.commit('timesheet/adjustCalendar', -month);
+                            this.$store.commit('timesheet/adjustCalendar', month);
+                            self.actions = self.actions.map(act=>{
+                                    act.hover=false
+                                    return act;
+                            })
+                            self.actions[idx].hover=!self.actions[idx].hover;
                         }
                     });
-                    this.actions = [3,2,1,0].map(m => monthAction(m));
+                    this.actions = [3,2,1,0].map((m,i) => monthAction(m,i));
                     break;
                 default: 
+                   
                     this.actions = [
-                            {label: 'Last ' + newType, adjust: -1},
-                            {label: 'Current ' + newType, adjust: 0},
-                            {label: 'Next ' + newType, adjust: 1}
-                        ].map(({label, adjust}, idx) => ({
+                            {label: 'Last ' + newType, adjust: -1, hover:false},
+                            {label: 'Current ' + newType, adjust: 0, hover:true},
+                            {label: 'Next ' + newType, adjust: 1,hover: false}
+                        ].map(({label, adjust,hover}, idx) => ({
+                            hover,
                             label,
-                            action: () => {
+                            idx,
+                            action: (idx) => {
                                 this.$store.commit('timesheet/updateCalendarShowDate', this.$moment().add(adjust, newType).format('YYYY-MM-DD'))
                                 this.$store.commit('timesheet/adjustCalendar', 0);
+                                self.actions = self.actions.map(act=>{
+                                    act.hover=false
+                                    return act;
+                                })
+                                self.actions[idx].hover=!self.actions[idx].hover;
+
                             }
                         }));
+                     
             }
         }
     },
@@ -157,15 +200,15 @@ export default {
         hoursRequired() {
             return this.$store.getters['timesheet/getTotalHoursBy']('timesheet');
         },
-         sapp() {
+        sapp() {
             return this.$store.state.app;
         },
     },
     data: () => ({
        listUser:[],
+       logRepeat:[],
         actions: [],
         user:'',
-        actions: []
     }),
     created() {
         this.getSubDepartmentUser(),
@@ -202,11 +245,8 @@ export default {
     padding-left: 10px;
 }
 
-.auto-complete ::v-deep .v-input__slot:after {
-    border-color: transparent !important
-}
-
-.auto-complete ::v-deep .v-input__slot:before {
+.auto-complete ::v-deep .v-input__slot:after,
+.auto-complete ::v-deep .v-input__slot:before  {
     border-color: transparent !important
 }
 

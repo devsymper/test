@@ -13,6 +13,7 @@ import sDocument from '@/store/document'
 import store from './../../../store'
 
 import {NumberCellRenderer} from './table/NumberCellRenderer'
+import BaseCellRenderer from './table/BaseCellRenderer'
 import {BottomPinnedRowRenderer} from './table/BottomPinnedRowRenderer'
 import {SelectCellRenderer} from './table/SelectCellRenderer'
 import {DateCellRenderer} from './table/DateCellRenderer'
@@ -28,14 +29,16 @@ import { checkCanBeBind } from "./handlerCheckRunFormulas";
 import PerfectScrollbar from "perfect-scrollbar";
 import {getDataInputFormula, prepareDataGetMultiple } from "./../../../components/document/dataControl";
 import { str } from "../../../plugins/utilModules/str";
+import { uiConfigApi } from "../../../api/uiConfig";
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
     event.preventDefault();
     event.stopPropagation();
     let thisListItem = util.getClosestVueInstanceFromDom(el,'submitDocument');
     thisListItem.$evtBus.$emit('on-add-data-to-pivot-table',{type:type, tableName:tableName})
-    
 }
+var delayTimerGridEvent;
+
 export default class SymperTable {
     constructor(tableControl, keyInstance, groupConfig = {}, pivotConfig = {}, formulasWorker) {
         this.keyInstance = keyInstance;
@@ -60,6 +63,7 @@ export default class SymperTable {
         this.pinnedRowNode = null;
         this.dataChange = {};
         this.allControlKeyCache = this.tableControl.getAllControlKeyCache();
+        this.onEventReady = false;
     }
     init(){
         this.viewType = sDocument.state.viewType[this.keyInstance];
@@ -68,6 +72,7 @@ export default class SymperTable {
          */
         this.supportCellsType = {
             currency: 'NumberCellRenderer',
+            richText: 'BaseCellRenderer',
             number: 'NumberCellRenderer',
             date: 'DateCellRenderer',
             dateTime: 'DateCellRenderer',
@@ -88,55 +93,109 @@ export default class SymperTable {
         this.isCellPasting = false;
         this.dataForCellpasting = {};
     }
-
-    addCheckBoxForFirstColumn(){
-        var columnDefs = getColumnDefs();
-        columnDefs.forEach(function (colDef) {
-            if (colDef.field === 'index_increment') {
-                colDef.headerCheckboxSelection = true;
-                colDef.checkboxSelection = true
-            }
-        });
-        gridOptions.api.setColumnDefs(columnDefs);
-    }
     getContextMenuItems(params){
-        return [
-            {
-                name: 'Thêm dòng phía trên ',
-                action: function() {
-                    let rowIndex = (params.node) ? params.node.rowIndex : 0;
-                    params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex });
-                },
-                cssClasses: ['blueFont'],
-                // icon:'mdi mdi-table-row-plus-before'
+        let self = params.context.thisComponent;
+        if(self.viewType == 'detail'){
+            return [
+                'autoSizeAll',
+                'expandAll',
+                'contractAll',
+                'resetColumns',
+                'excelExport',
+            ]
+        }
+        else{
+            let submitContextItem = [
+                {
+                    name: 'Xóa dòng đã chọn',
+                    action: function() {
+                        // params.api.applyTransaction({ remove: [params.node.data]});
+                        self.deleteRowSelection(params)
 
-            },
-            {
-                name: 'Thêm dòng phía dưới ' ,
-                action: function() {
-                    let rowIndex = (params.node) ? params.node.rowIndex : 0;
-                    params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
+                    },
+                    cssClasses: ['redFont']
                 },
-                cssClasses: ['blueFont'],
-                // icon:'mdi-table-row-plus-after'
-            },
-            
-            {
-                name: 'Xóa dòng ' + params.value,
-                action: function() {
-                    params.api.applyTransaction({ remove: [params.node.data]});
-                },
-                cssClasses: ['redFont']
-            },
-            'autoSizeAll',
-            'expandAll',
-            'contractAll',
-            'copy',
-            'paste',
-            'resetColumns',
-            'excelExport',
-        ]
+                'autoSizeAll',
+                'expandAll',
+                'contractAll',
+                'copy',
+                'paste',
+                'resetColumns',
+                'excelExport',
+            ];
+            if(self.tableControl.isInsertRow()){
+                submitContextItem.unshift(
+                    {
+                        name: 'Thêm dòng phía trên ',
+                        action: function() {
+                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex });
+                        },
+                        cssClasses: ['blueFont'],
+                        // icon:'mdi mdi-table-row-plus-before'
+        
+                    }
+                )
+                submitContextItem.unshift(
+                    {
+                        name: 'Thêm dòng phía dưới ' ,
+                        action: function() {
+                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
+                        },
+                        cssClasses: ['blueFont'],
+                        // icon:'mdi-table-row-plus-after'
+                    }
+                )
+            }
+            return submitContextItem;
+        }
     }
+    showLoadingOverlay(){
+        this.gridOptions.api.showLoadingOverlay()
+    }
+    hideOverlay(){
+        this.gridOptions.api.hideOverlay()
+    }
+        
+    getUiConfig(){
+        if(this.viewType == 'submit'){
+            return;
+        }
+        this.showLoadingOverlay();
+        let docName = sDocument.state.submit[this.keyInstance].documentInfo.document.name;
+        let tableDefinition = "table_document_instance:"+docName+":"+this.tableName;
+        let self = this;
+        uiConfigApi.getUiConfig(tableDefinition).then(res=>{
+            let uiConfig = {};
+            if(res.status == 200){
+                uiConfig = res.data.detail;
+                try {
+                    uiConfig = JSON.parse(uiConfig);
+                    uiConfig = uiConfig.tableDefinition;
+                } catch (error) {
+                    console.warn(error);
+                }
+            }
+            let newColdefs = [];
+            for(let control in uiConfig){
+                let colItem = self.columnDefs.find(el=>el.field == control);
+                if(colItem){
+                    // colItem.width = uiConfig[control];
+                    newColdefs.push(colItem);
+                    self.columnDefs.splice(self.columnDefs.indexOf(colItem),1);
+                }
+            }
+            newColdefs = newColdefs.concat(self.columnDefs);
+            self.columnDefs = newColdefs;
+            self.gridOptions.api.setColumnDefs([]);
+            self.gridOptions.api.setColumnDefs(newColdefs);
+            self.autoSizeAll()
+        })
+        
+
+    }
+    
     /**
      * Hàm lấy các định nghĩa của cột
      */
@@ -147,6 +206,7 @@ export default class SymperTable {
                 field:'index_increment',
                 headerName:"",
                 minWidth:90,
+                width:90,
                 valueGetter: function(params) {
                     if(params.node.rowPinned){
                         return ""
@@ -167,6 +227,7 @@ export default class SymperTable {
                 field: controlInstance.name,
                 editable:this.checkEditableCell(controlInstance),
                 hide:controlInstance.checkProps('isHidden'),
+                minWidth:controlInstance.getWidth()
             };
             if(this.tableControl.isWrapText()){
                 col.wrapText = true;
@@ -187,8 +248,6 @@ export default class SymperTable {
             else{
                 col['cellRenderer'] = 'ValidateCellRenderer';
             }
-            
-          
             if(controlInstance.checkEmptyFormulas('autocomplete')){
                 col['cellEditor'] = 'AutoCompleteCellEditor';
                 col['cellEditorParams'] = {
@@ -226,7 +285,7 @@ export default class SymperTable {
         }
         let colObjectId = {
             headerName:'child_object_id',
-            field: 'child_object_id',
+            field: 'childObjectId',
             hide:true
         };
         let colSqlId = {
@@ -238,6 +297,7 @@ export default class SymperTable {
         colDefs.push(colSqlId);
         return colDefs;
     }
+    
     checkEditableCell(control){
         if(this.viewType == 'detail'){
             return false;
@@ -263,6 +323,7 @@ export default class SymperTable {
                 if(obj[col.name] && !arr.includes(obj[col.name])){
                     arr.push(obj[col.name]);
                     arr.push(obj[col.name]+"_____s_table_id_sql_lite");
+                    arr.push(obj[col.name]+"_____childObjectId");
                 }
                 return arr
             },[]);
@@ -278,23 +339,23 @@ export default class SymperTable {
                         control:controlValue,
                         controlColumn:colField
                     },
-                    hide:colField.includes('_____s_table_id_sql_lite'),
+                    hide:colField.includes('_____s_table_id_sql_lite') || colField.includes("_____childObjectId"),
                     editable:this.checkEditableCell(controlValue),
-                    cellStyle: function(params) {
-                        if (params.value=='R') {
-                            return {color: 'white', backgroundColor: 'green'};
-                        }
-                        if (params.value=='A') {
-                            return {color: 'white', backgroundColor: 'red'};
-                        }
-                        if (params.value=='C') {
-                            return {color: 'white', backgroundColor: 'orange'};
-                        }
-                        if (params.value=='I') {
-                            return {color: 'white', backgroundColor: 'gray'};
-                        }
-                        return null;
-                    }
+                    // cellStyle: function(params) {
+                    //     if (params.value=='R') {
+                    //         return {color: 'white', backgroundColor: 'green'};
+                    //     }
+                    //     if (params.value=='A') {
+                    //         return {color: 'white', backgroundColor: 'red'};
+                    //     }
+                    //     if (params.value=='C') {
+                    //         return {color: 'white', backgroundColor: 'orange'};
+                    //     }
+                    //     if (params.value=='I') {
+                    //         return {color: 'white', backgroundColor: 'gray'};
+                    //     }
+                    //     return null;
+                    // }
                 };
                 this.columnDefs.push(colBinding);
             }
@@ -336,6 +397,9 @@ export default class SymperTable {
                         if(column == newRow[this.cols[0]['name']]+"_____s_table_id_sql_lite"){
                             newRow[newColumn] = newRow['s_table_id_sql_lite'];
                         }
+                        if(column == newRow[this.cols[0]['name']]+"_____childObjectId"){
+                            newRow[newColumn] = newRow['childObjectId'];
+                        }
 
                     }
                     newData.push(newRow);
@@ -344,6 +408,7 @@ export default class SymperTable {
                     let columnCache = newRow[this.cols[0]['name']];
                     columnCache = columnCache.replace('\.','____');
                     newData[mapRowWithData.indexOf(rowKey)][columnCache+'_____s_table_id_sql_lite'] = newRow['s_table_id_sql_lite']
+                    newData[mapRowWithData.indexOf(rowKey)][columnCache+'_____childObjectId'] = newRow['childObjectId']
                     newData[mapRowWithData.indexOf(rowKey)][columnCache] = newRow[controlValue]
                 }
             }
@@ -486,6 +551,7 @@ export default class SymperTable {
             data = this.convertDataToGroup(data);
         }
         this.gridOptions.api.setRowData(data);
+        this.autoSizeAll();
         let controlBinding = Object.keys(data[0]);
         for (let index = 0; index < controlBinding.length; index++) {
             if(controlBinding[index] != 's_table_id_sql_lite'){
@@ -501,73 +567,10 @@ export default class SymperTable {
         this.caculatorHeight();
     }
     /**
-     * chuyển data dạng pivot sang data dạng flat thì cần xóa các dữ liệu của các cột được thêm vào
-     * @param {*} data 
-     */
-    minimizeData(data){
-        for (let index = 0; index < this.allColumnAppend.length; index++) {
-            delete data[this.allColumnAppend[index]];
-        }
-    }
-
-    /**
-     * ham trả về data của table
-     */
-    getGroupData(){
-        let rowData = [];
-        this.gridOptions.api.forEachNode(node => {
-                if(!node.group){
-                    if(this.allColumnAppend.length > 0){
-                        for (let index = 0; index < this.allColumnAppend.length; index++) {
-                            const column = this.allColumnAppend[index];
-                            let newRow = util.cloneDeep(node.data);
-                            newRow[this.cols[0].name] = column;
-                            newRow[this.values[0].name] = newRow[column];
-                            this.minimizeData(newRow);
-                            rowData.push(newRow);
-                        }
-                    }
-                    else{
-                        rowData.push(node.data)
-                    }
-                }
-            }
-        );
-        let dataForSubmit = {};
-        if(rowData.length > 0){
-            for (let index = 0; index < rowData.length; index++) {
-                let row = rowData[index];
-                for (let control in row){
-                    if(!dataForSubmit[control]){
-                        dataForSubmit[control] = []
-                    }
-                    dataForSubmit[control].push(row[control]);
-                }
-            }
-        }
-        return dataForSubmit;
-    }
-    /**
      * Hoangnd:
      * Hàm tính toán chiều cao cho table
      */
     caculatorHeight(){
-        // let dataHeight = (this.gridOptions.api.getDisplayedRowCount() + 1)*25;
-        // let headerHeight = 0;
-        // if(this.cols && this.cols.length > 0){
-        //     headerHeight += 25;
-        // }
-        // if(this.rows && this.rows.length > 0){
-        //     headerHeight += 25*this.rows.length;
-        // }
-        // let tableHeight = dataHeight + headerHeight + 4
-        // if(this.tableHasRowSum){
-        //     tableHeight += 25
-        // }
-        // if(tableHeight > 500){
-        //     tableHeight = 500;
-        // }
-        // tableHeight = 500;
         let h = $('#ag-'+this.tableControl.id).height();
         if(h >= 500){
             $('#ag-'+this.tableControl.id).css({height:"500px"});
@@ -588,6 +591,7 @@ export default class SymperTable {
             groupDefaultExpanded: -1,
             components: {
                 NumberCellRenderer: NumberCellRenderer,
+                BaseCellRenderer: BaseCellRenderer,
                 FileCellRenderer: FileCellRenderer,
                 PercentCellRenderer: PercentCellRenderer,
                 UserCellRenderer: UserCellRenderer,
@@ -600,7 +604,7 @@ export default class SymperTable {
                 BottomPinnedRowRenderer: BottomPinnedRowRenderer,
                 ValidateCellRenderer: ValidateCellRenderer,
             },
-            popupParent: document.querySelector('body'),
+            popupParent: document.querySelector('.wrapview-contextmenu'),
             getContextMenuItems: this.getContextMenuItems,
             rowDragManaged: true,
             pinnedBottomRowData: (this.tableHasRowSum) ? this.createBottomTotalRow() : false,
@@ -611,14 +615,15 @@ export default class SymperTable {
             },
             // debounceVerticalScrollbar:true,
             autoGroupColumnDef: { 
-                minWidth: (this.rows && this.rows.length > 1) ? 250 : 150,
+                minWidth: 0,
                 cellRendererParams: {
+                    checkbox: true,
                     suppressCount: true
                 }
             },
             defaultColDef: {
                 filter: true,
-                minWidth: 150,
+                minWidth: 100,
                 flex: 1,
                 sortable: true,
                 resizable: true,
@@ -626,22 +631,21 @@ export default class SymperTable {
             },
             enableRangeSelection: true,
             onGridReady:this.onGridReady,
+            onColumnResized:this.onColumnResized,
+            onColumnMoved:this.onColumnMoved,
             tableInstance:this,
 
             
         };
-        if(this.tableControl.isWrapText()){
-            // Object.assign(this.gridOptions,{rowHeight:25});
-        }
-        else{
-            // Object.assign(this.gridOptions,{getRowHeight:function (params) {
-            //     return 25;
-            // }});
-        }
+        this.gridOptions.context = {
+            thisComponent : this
+        };
         if(['submit','update'].includes(this.viewType)){
             let moreOptions = {
                 rowData: this.getRowDefaultData(),
                 rowSelection:'multiple',
+                suppressRowClickSelection: true,
+                groupSelectsChildren: true,
                 suppressRowTransform:true,
                 undoRedoCellEditing: true,
                 enableFillHandle:true,
@@ -681,6 +685,25 @@ export default class SymperTable {
         }
         this.caculatorHeight();
         
+    }
+    autoSizeAll() {
+        var allColumnIds = [];
+        this.gridOptions.columnApi.getAllDisplayedColumns().forEach(function (column) {
+            allColumnIds.push(column.colId);
+        });
+        
+        this.gridOptions.api.sizeColumnsToFit();
+        if(allColumnIds.length > 5 && !this.tableControl.isWrapText()){
+            this.gridOptions.columnApi.autoSizeColumns(allColumnIds, false);
+        }
+        else{
+            if(this.tableMode != 'Flat'){
+                this.gridOptions.columnApi.autoSizeColumns(['ag-Grid-AutoColumn'], false);
+            }
+        }   
+    }
+    redrawRows(){
+        this.gridOptions.api.redrawRows()
     }
     /**
      * tinh lại chiều cao table sau khi paste
@@ -806,11 +829,14 @@ export default class SymperTable {
                             let column = util.cloneDeep(this.allColumnAppend[index]);
                             let columnOld = util.cloneDeep(this.allColumnAppend[index]);
                             column = column.replace('\.','____')
-                            let newRow = util.cloneDeep(node.data);
-                            newRow[this.cols[0].name] = columnOld;
-                            newRow[this.values[0].name] = (newRow[column]) ? newRow[column] : "";
-                            this.minimizeData(newRow);
-                            rowData.push(newRow);
+                            if(column.indexOf('_____s_table_id_sql_lite') == -1 && column.indexOf('_____childObjectId') == -1){
+                                let newRow = util.cloneDeep(node.data);
+                                newRow['child_object_id'] = newRow[column+'_____childObjectId'];
+                                newRow[this.cols[0].name] = columnOld;
+                                newRow[this.values[0].name] = (newRow[column]) ? newRow[column] : "";
+                                this.minimizeData(newRow);
+                                rowData.push(newRow);   
+                            }
                         }
                     }
                     else{
@@ -824,6 +850,7 @@ export default class SymperTable {
             for (let index = 0; index < rowData.length; index++) {
                 let row = rowData[index];
                 delete row['s_table_id_sql_lite'];
+                delete row['childObjectId'];
                 for (let control in row){
                     if(!dataForSubmit[control]){
                         dataForSubmit[control] = []
@@ -840,8 +867,7 @@ export default class SymperTable {
         for(let controlName in this.tableControl.controlInTable){
             dataSubmit[controlName] = this.getColData(controlName);
         }
-        
-        dataSubmit['child_object_id'] = this.getColData('child_object_id');
+        dataSubmit['child_object_id'] = this.getColData('childObjectId');
         return dataSubmit
     }
     /**
@@ -854,16 +880,52 @@ export default class SymperTable {
             result[controlName] = 0;
         }
         return [result];
-      }
-
+    }
+    /**
+     * Sự kiện xảy ra sau khi resize cột
+     * @param {*} params 
+     */
+    onColumnResized(params){
+        let thisComponent = this.context.thisComponent;
+        thisComponent.onSaveConfigUi(params)
+    }
+    /**
+     * Sự kiện xảy ra sau khi ẩn cột
+     * @param {*} params 
+     */
+    onColumnMoved(params){
+        let thisComponent = this.context.thisComponent;
+        thisComponent.onSaveConfigUi(params)
+    }
+    onSaveConfigUi(params){
+        let self = this;
+        if(!self.onEventReady){
+            return;
+        }
+        clearTimeout(delayTimerGridEvent);
+        delayTimerGridEvent = setTimeout(function() {
+            let configDetail = {tableDefinition:{}};
+            params.columnApi.getAllDisplayedColumns().forEach(function (column) {
+                let actualWidth = column.actualWidth;
+                let colName = column.colDef.field;
+                configDetail['tableDefinition'][colName] = actualWidth;
+            });
+            let userId = store.state.app.endUserInfo.id;
+            let docName = sDocument.state.submit[self.keyInstance].documentInfo.document.name;
+            let tableDefinition = "table_document_instance:"+docName+":"+self.tableName;
+            uiConfigApi.saveUiConfig({detail:JSON.stringify(configDetail), userId: userId, widgetIdentifier:tableDefinition});
+        }, 2000);
+    }
+   
     /**
      * Đổi thanh cuộn trong table
      * @param {*} params 
      */
     onGridReady(params){
-        // setTimeout((self)=>{
-        //     // params.api.sizeColumnsToFit()
-        // },1000)
+        this.tableInstance.getUiConfig()
+        setTimeout((self)=>{
+            self.onEventReady = true;
+        },4000,this.tableInstance)
         const agBodyViewport = $(this.tableInstance.tableContainer).find('.ag-body-viewport')[0];
         const agBodyHorizontalViewport = $(this.tableInstance.tableContainer).find('.ag-body-horizontal-scroll-viewport')[0];
         if (agBodyViewport) {
@@ -874,6 +936,7 @@ export default class SymperTable {
         const ps = new PerfectScrollbar(agBodyHorizontalViewport);
             ps.update();
         }
+        this.tableInstance.autoSizeAll();
     }
 
     /**
@@ -903,7 +966,7 @@ export default class SymperTable {
         this.gridOptions.api.applyTransaction({ remove: rowData});
         this.formulasWorker.postMessage({action:'executeSQliteDB',data:
                 {
-                    func:'deleteRow',condition:'where s_table_id_sql_lite = ' + sqlRowId,keyInstance:this.keyInstance, tableName: this.tableName
+                    func:'deleteRow',condition:'where s_table_id_sql_lite IN (' + sqlRowId + ") ",keyInstance:this.keyInstance, tableName: this.tableName
                 }
             })
         this.caculatorHeight()
@@ -923,36 +986,74 @@ export default class SymperTable {
         if(!rowData){
             return;
         }
-        let sqlRowId = rowData.s_table_id_sql_lite;
         if(params.rowPinned){
             return;
         }
-        console.log(event,'eventevent');
         if(event.key == 'Enter' && event.shiftKey && this.tableInstance.tableControl.isInsertRow()){
-            let rowData = this.tableInstance.getRowDefaultData(false);
-            let listRootTable = sDocument.state.submit[this.tableInstance.keyInstance]['listTableRootControl'];
-            if (listRootTable.hasOwnProperty(this.tableInstance.tableName)){
-                let rowDataFromRoot = util.cloneDeep(listRootTable[this.tableInstance.tableName]['defaultRow']);
-                if(rowDataFromRoot){
-                    for (let index = 0; index < rowDataFromRoot.length; index++) {
-                        let cellValue = rowDataFromRoot[index];
-                        rowData[0][cellValue[1]] = cellValue[2];
+            if(this.tableInstance.tableMode == 'Flat'){
+                let rowData = this.tableInstance.getRowDefaultData(false);
+                let listRootTable = sDocument.state.submit[this.tableInstance.keyInstance]['listTableRootControl'];
+                if (listRootTable.hasOwnProperty(this.tableInstance.tableName)){
+                    let rowDataFromRoot = util.cloneDeep(listRootTable[this.tableInstance.tableName]['defaultRow']);
+                    if(rowDataFromRoot){
+                        for (let index = 0; index < rowDataFromRoot.length; index++) {
+                            let cellValue = rowDataFromRoot[index];
+                            rowData[0][cellValue[1]] = cellValue[2];
+                        }
                     }
+                    rowData[0].s_table_id_sql_lite = Date.now();
                 }
-                rowData[0].s_table_id_sql_lite = Date.now();
+                this.tableInstance.addNewRow(rowData, params.rowIndex + 1);
             }
-            this.tableInstance.addNewRow(rowData, params.rowIndex + 1);
+            else{
+                let groupRowData = this.tableInstance.getGroupRowData(rowData);
+                this.tableInstance.addNewRow([groupRowData], params.rowIndex);
+            }
+            
         }
         else if(event.key == 'Backspace' && (event.shiftKey || event.metaKey)){
-            let rowCount = this.api.getDisplayedRowCount();
-            let rowSelection = this.tableInstance.getSelectedRows();
-            this.tableInstance.deleteRow(rowSelection, sqlRowId);
-            let newCellIndex = params.rowIndex;
-            if(newCellIndex > rowCount - 1){
-                newCellIndex = rowCount - 1;
-            }
-            this.api.setFocusedCell(newCellIndex, params.colDef.field)
+            this.tableInstance.deleteRowSelection(params)
         }
+    }
+    /**
+     * Hàm xóa các dòng được chọn
+     * @param {*} params 
+     */
+    deleteRowSelection(params){
+        let rowCount = params.api.getDisplayedRowCount();
+        let rowSelection = this.getSelectedRows();
+        let sqlRowId = rowSelection.reduce((arr,obj)=>{
+            for(let controlName in obj){
+                if(controlName.indexOf('s_table_id_sql_lite') != -1){
+                    arr.push('"'+obj[controlName]+'"');
+                }
+            }
+            return arr;
+        },[]);
+        this.deleteRow(rowSelection, sqlRowId.join(","));
+        let newCellIndex = params.rowIndex;
+        if(newCellIndex > rowCount - 1){
+            newCellIndex = rowCount - 1;
+        }
+        params.api.setFocusedCell(newCellIndex, params.colDef.field)
+    }
+    getGroupRowData(rowData){
+        let newRow = util.cloneDeep(rowData);
+        let i = 0;
+        for(let controlName in newRow){
+            if(controlName.indexOf('s_table_id_sql_lite') != -1){
+                newRow[controlName] = Date.now() + i;
+            }
+            if(controlName.indexOf('childObjectId') != -1){
+                newRow[controlName] = "";
+            }
+            let rowGroup = this.rows.find(ele => ele.name == controlName);
+            if(!rowGroup){
+                newRow[controlName] = "";
+            }
+            i++;
+        }
+        return newRow;
     }
     /**
      * Kiểm tra xem đang ở view detail hay submit
@@ -1482,14 +1583,14 @@ export default class SymperTable {
      * @param {*} columnGroupName 
      */
     getDataInputFromGroupTable(listInput, formulaInstance){
-        let columnGroupName = this.dataChange['columnName']
-        let currentRowData = this.dataChange['currentRowData']
+        let columnGroupName = this.dataChange['columnName'];
+        let currentRowData = this.dataChange['currentRowData'];
         let extraData = {}
         let inputControl = formulaInstance.getInputControl();
         for (let inputControlName in inputControl) {
             if(listInput.hasOwnProperty(inputControlName)){
                 let controlIns = listInput[inputControlName];
-                if(controlIns.inTable == this.tableName){
+                if(controlIns.inTable == this.tableName && currentRowData){
                     if(currentRowData[inputControlName]){
                         extraData[inputControlName] = currentRowData[inputControlName];
                     }

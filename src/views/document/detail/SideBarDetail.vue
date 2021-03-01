@@ -177,7 +177,8 @@ export default {
 			showMainInfo:false,
 			showHistoryInfo:false,
 			showCommentInfo:false,
-			countModify:0
+			countModify:0,
+			listTableHasChanged:{}
 		}
 	},
 	props:{
@@ -332,7 +333,6 @@ export default {
 				}
 			});
 			if(res.status == 200){
-				let list = [];
 				this.listHistoryControl = this.getFormattedUpdateHistory(res.data);
 				this.countModify = this.listHistoryControl.length;
 				let param = {
@@ -360,12 +360,16 @@ export default {
 					controls: this.getAllControlValueChange(oldValue, newValue)
 				});
 			}
+			this.refreshTable();
 			return rsl;
 		},
+		refreshTable(){
+			for(let tableName in this.listTableHasChanged){
+				let table = this.listTableHasChanged[tableName];
+				table.tableInstance.redrawRows();
+			}
+		},
 		getAllControlValueChange(oldObj, newObj){
-			let controlValueIndoc = {};
-			let controlValueInTables = {};
-
 			let changedControls = {
 				doc: this.compareTwoRows(oldObj, newObj),
 				tables: []
@@ -373,19 +377,19 @@ export default {
 
 			let mapTableAndControls = {};
 			for(let name in newObj){
-				if($.isArray(newObj[name])){
+				if(Array.isArray(newObj[name])){
 					mapTableAndControls[name] = {
 						new: {},
 						old: {}
 					};
 
-					if($.isArray(newObj[name])){
+					if(Array.isArray(newObj[name])){
 						for(let row of newObj[name]){
 							mapTableAndControls[name].new[row.document_object_id] = row;
 						}
 					}
 
-					if($.isArray(oldObj[name])){
+					if(Array.isArray(oldObj[name])){
 						for(let row of oldObj[name]){
 							mapTableAndControls[name].old[row.document_object_id] = row;
 						}
@@ -402,40 +406,33 @@ export default {
 						tbChange[idRow] = this.compareTwoRows(oldObj, newObj);
 					}
 				}
-
 				if(!$.isEmptyObject(tbChange)){
 					let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
 					let table = mapDocControl[tbName];
-					let mapControlToIndex = table.mapControlToIndex;
-					let allColumnId = table.tableInstance.getColData('childObjectId');
-					
-					for(let rowId in tbChange){
-						let dataChange = tbChange[rowId];
-						let curRowIndex = allColumnId.indexOf(rowId);
-						for (let index = 0; index < dataChange.length; index++) {
-							let cellChange = dataChange[index];
-							if(cellChange.data.new != cellChange.data.old){
-								let cellPos = curRowIndex + "_" + mapControlToIndex[cellChange.name];
-								table.tableInstance.addToValueMap(cellPos, {
-									type: 'linkControl',
-								})
+					if(table){
+						this.listTableHasChanged[tbName] = table;
+						let allColumnId = table.tableInstance.getColData('childObjectId');
+						for(let rowId in tbChange){
+							let dataChange = tbChange[rowId];
+							let curRowIndex = allColumnId.indexOf(rowId);
+							for (let index = 0; index < dataChange.length; index++) {
+								let cellChange = dataChange[index];
+								if(cellChange.data.new != cellChange.data.old){
+									let controlIns = getControlInstanceFromStore(this.keyInstance, cellChange.name);
+									controlIns.tableCellHistoryData['row_'+curRowIndex] = true;
+								}
 							}
 						}
-						
-						
+						changedControls.tables.push({
+							id: table.id,
+							data: tbChange,
+							name: tbName,
+							isTable: true
+						});
 					}
-					setTimeout(() => {
-						table.tableInstance.tableInstance.render()
-					}, 50);
-					changedControls.tables.push({
-						id: table.id,
-						data: tbChange,
-						name: tbName,
-						isTable: true
-					});
 				}
 			}
-
+			
 			let rsl = changedControls.doc.concat(changedControls.tables);
 			return rsl;
 		},
@@ -447,8 +444,8 @@ export default {
 				let ctrl = mapDocControl[name];
 				// [{id:'s-control-id-1596780602772',data:[]}]
 				if(	ctrl
-					&& oldObj.hasOwnProperty(name) && !$.isArray(oldObj[name])
-					&& newObj.hasOwnProperty(name) && !$.isArray(newObj[name]) // nếu khác giá trị
+					&& oldObj.hasOwnProperty(name) && !Array.isArray(oldObj[name])
+					&& newObj.hasOwnProperty(name) && !Array.isArray(newObj[name]) // nếu khác giá trị
 				){
 					if( ['number','percent'].includes(ctrl.type)){
 						if(Number(oldObj[name]) === Number(newObj[name])){
@@ -471,7 +468,7 @@ export default {
 					let ctrlObj = getControlInstanceFromStore(this.keyInstance, name);
 					if(!ctrlObj.valueChanged){
 						ctrlObj.valueChanged = true;
-						ctrlObj.renderInfoIconToControl(name);
+						ctrlObj.renderMoreInfoControlIcon();
 					}
 				}
 			}

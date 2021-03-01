@@ -262,7 +262,6 @@ export default {
                 this.$emit('download-excel')
             }else if(cmd.action == 'print-report'){
                 this.$emit("print-report")
-                // this.$refs[this.cellConfigs.sharedConfigs.type].printInnerHTML(headerHTML);
             }else if(cmd.action == 'viewDetail'){
                 this.$emit('view-detail', this.cell.sharedConfigs.cellId)
             }

@@ -1,5 +1,5 @@
 <template>
-<v-card>
+<v-card class="h-100">
     <v-tabs v-model="tab" color="orange" grow style="flex-grow: 0">
         <v-tab href="#tab-2" class="tab">
             {{$t('timesheet.period')}}

@@ -61,11 +61,11 @@ export default {
                     };
                     data.listObject = res.data.listObject;
                     data.columns.push(
-                        {
-                            name:'id',
-                            title:'table.id',
-                            type:"numeric"
-                        },
+                        // {
+                        //     name:'stt',
+                        //     title:'table.stt',
+                        //     type:"numeric"
+                        // },
                         {
                             name:'name',
                             title:'table.name',
@@ -108,8 +108,10 @@ export default {
                         },
                       
                    );
+                   let i = 0;
                     let listUser = self.$store.state.app.allUsers;
                     data.listObject.map(d=>{
+                        d.stt=++i;
                         if(d.type==1){
                             d.type="DO"
                         }else{
@@ -183,7 +185,7 @@ export default {
             })
         },
         deleteOne(cate){
-            let data = {id: cate.id};
+            let data = {docObjId: cate.docObjId};
             const self = this;
             timesheetApi.deleteCategory(data).then(res=>{
                 if(res.status==200){
@@ -217,12 +219,14 @@ export default {
                 this.$refs.category.allInputs.taskName.value = category.name;
                 this.$refs.category.allInputs.description.value  = category.description;
                 this.$refs.category.typeCate=category.type=='TI'?"normal":"doc";
+                this.$refs.category.docObjId = category.docObjId;
             }else{
                 this.cate.id = category.id;
                 this.cate.key = category.key;
                 this.cate.name = category.name;
                 this.cate.description = category.description;
-                this.cate.type=category.type=='TI'?"normal":"doc"
+                this.cate.type=category.type=='TI'?"normal":"doc";
+                this.cate.docObjId = category.docObjId
             }
         },
         addCategory(){

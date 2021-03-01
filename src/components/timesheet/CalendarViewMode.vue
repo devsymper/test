@@ -1,7 +1,6 @@
 <template>
 <div class="calendar-viewmode">
-    
-    <v-btn style="float:left" v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="timeView()">
+    <v-btn style="float:left" v-if="type !='month'&&timebtn" class="mr-2" icon @click="timeView()">
         <v-tooltip top>
                     <!-- màn hình month - header ngày, giờ -->
             <template v-slot:activator="{ on }">
@@ -11,9 +10,8 @@
                 Time view
             </span>
         </v-tooltip>
-    </v-btn>
-      
-    <v-btn style="float:left" class="mr-2" v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="listView()">
+    </v-btn>       
+    <v-btn style="float:left" class="mr-2" v-if="type !='month'&&!timebtn" icon @click="listView()">
          <v-tooltip top>
           <template v-slot:activator="{ on }">
                     <v-icon v-on="on">mdi-apps</v-icon>
@@ -43,38 +41,97 @@
           <span style= "color:black!important; padding-left:4px"> {{format(type)}}</span>
         </template>
     </v-select>
+    <v-menu offset-y nudge-bottom='8' :max-width="210" :min-width="210" :close-on-content-click="false">
+        <template v-slot:activator="{ on:menu }">
+            <v-tooltip top>
+            <template v-slot:activator="{ on:tooltip }">
+                    <v-btn class="mt-1 ml-1 btn" v-on="{ ...tooltip, ...menu }" style="float:right" small text >
+                    <v-icon class="mdi-18px">mdi mdi-cog-outline</v-icon>
+                </v-btn>
+            </template>
+            <span>
+                Cài đặt
+            </span>
+        </v-tooltip>
+        </template>
+        <PickColor 
+            v-model="logColor" :random="true" :swatchesColor="swatch" :randomColor="randomColor" :showSaveBtn="true" 
+            :name="'Chọn màu cho log time'" @save="saveColor"/>
+     </v-menu>
      <v-tooltip top>
         <template v-slot:activator="{ on }">
-                <v-btn class="mt-1 ml-1"  v-on="on" style="float:right" small text @click="$router.push('/category')">
-                <v-icon class="mdi-18px">mdi mdi-cog-outline</v-icon>
+                <v-btn class="mt-1 ml-1 btn"  v-on="on" style="float:right" small text @click="$router.push('/category')">
+                <v-icon class="mdi-18px">mdi mdi-file-tree</v-icon>
             </v-btn>
         </template>
         <span>
-            Category
+            {{$t('timesheet.category')}}
         </span>
     </v-tooltip>
+ 
 </div>
 </template>
 
 <script>
+import {uiConfigApi} from "./../../api/uiConfig";
+import PickColor from "./../common/listItemComponents/PickColor"
 export default {
     data: () => ({
         types: ['day', 'weekday', 'week', 'month'],
+        timebtn:true,
+        events:[],
+        widgetIdentifier:'',
+        randomColor:false,
+        swatch:[
+            ['#FF0000', '#AA0000', '#550000','#00FFFF', '#00AAAA' ],
+            ['#FFFF00', '#AAAA00', '#555500','#0000FF', '#0000AA'],
+            ['#00FF00', '#00AA00', '#005500','#000055','#005555'],
+        ],
+        logColor:'green'
     }),
     computed: {
         type() {
             return this.$store.state.timesheet.calendarType;
         }
     },
+    components:{
+        PickColor
+    },
     methods: {
+        saveColor(randomColor){
+            let data ={
+                widgetIdentifier: this.getWidgetIdentifier(),
+                detail:{isRandom: randomColor, color:this.logColor}
+            }
+            this.$emit('change-color',data.detail);
+            data.detail = JSON.stringify(data.detail);
+            // let res = await uiConfigApi.getUiConfig(data.widgetIdentifier)
+            uiConfigApi.saveUiConfig(data).then(res=>{
+                if(res.status == 200){
+                }
+            })
+        },
+		getWidgetIdentifier(){
+            let widgetIdentifier = '';
+            if(this.widgetIdentifier){
+                widgetIdentifier =  this.widgetIdentifier;
+            }else{
+                widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
+            }
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            return widgetIdentifier;
+		},
         changeView(_type) {
             this.$store.commit("timesheet/changeCalendarType", _type);
         },
         timeView() {
-            this.$emit('time_view');
+            this.timebtn = false;
+            this.$emit('list_view');
+           
         },
         listView() {
-            this.$emit('list_view');
+            this.timebtn = true;
+             this.$emit('time_view');
         },
         format(date) {
             switch (date) {
@@ -166,5 +223,9 @@ button {
 .viewmode-item {
     color: rgba(0, 0, 0, 0.87) !important;
     caret-color: rgba(0, 0, 0, 0.87) !important;
+}
+.btn{
+    height: 32px!important;
+    min-width: 30px!important
 }
 </style>

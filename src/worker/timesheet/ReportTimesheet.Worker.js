@@ -28,9 +28,10 @@ export const showTotalHourInReportView = async function(data) {
         const dateList = _groupBy(res.data.listLogTime, 'date');
         const userName = _groupBy(res.data.listLogTime, 'account_id');
         const rows = Object.keys(logTimeList).map(k => {
+        let name = res.data.listLogTime.filter(log=>log.id==k).length>0?res.data.listLogTime.filter(log=>log.id==k)[0].task_name:'Chưa có';
             const returnObj = {
                 category: logTimeList[k][0].category_task,
-                name: [getName(listUser, logTimeList[k][0].account_id),k+'-'+logTimeList[k][0].task_id],
+                name: [getName(listUser, logTimeList[k][0].account_id),k+'-'+name],
             };
             let logged = 0;
             logTimeList[k].forEach(log => {

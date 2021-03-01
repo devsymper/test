@@ -253,7 +253,19 @@ export default {
                 let formulas = {};
                 formulas['syql'] = this.documentProps.titleObjectFormulas.value;
                 let formulaId = this.documentProps.titleObjectFormulas.formulasId;
-                await formulasApi.updateFormulas(formulaId,formulas);
+                let res = await formulasApi.updateFormulas(formulaId,formulas);
+                if(res.status != 200){
+                    let formulas = {};
+                    formulas['syql'] = this.documentProps.titleObjectFormulas.value;
+                    formulas['objectType'] = "document";
+                    formulas['objectIdentifier'] = this.documentProps.name.value;
+                    formulas['context'] = "";
+                    let res = await formulasApi.saveFormulas(formulas);
+                    if(res.status == 200){
+                        let formulaId = res.data['formulaId'];
+                        this.documentProps.titleObjectFormulas.formulasId = formulaId;
+                    }
+                }
             }
             else{
                 if(this.documentProps.titleObjectFormulas.value){

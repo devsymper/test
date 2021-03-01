@@ -110,8 +110,8 @@ export default {
 		}	
 	},
 	methods:{
-		handleConfigsChange(){
-			this.selectingNode.run();
+		handleConfigsChange(data){
+			this.selectingNode.run(true, 'change-config', data);
 		},
 		handleValueChange(name, inputInfo, data){
 			if(this.selectingNode.type == 'home'){

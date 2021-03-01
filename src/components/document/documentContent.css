@@ -545,6 +545,7 @@ button:hover {
 .info-control-btn {
     color: #e67e23 !important;
     text-decoration-line: underline;
+    background: #fff3e9 !important;
 }
 
 .s-control.s-control-image {
@@ -565,6 +566,14 @@ button:hover {
 .sym-form-Detail .ag-theme-balham .ag-cell {
     padding-left: 6px !important;
     padding-right: 6px !important;
+}
+.sym-form-submit .ag-theme-balham .ag-cell-wrap-text,
+.sym-form-Detail .ag-theme-balham .ag-cell-wrap-text {
+    word-break: break-word !important;
+}
+
+.sym-form-submit .ag-body-viewport{
+    padding-right: 15px;
 }
 
 .sym-form-submit .ag-theme-balham .ag-ltr .ag-header-select-all,
@@ -727,8 +736,8 @@ button:hover {
     outline: none;
 }
 
-.sym-form-submit div:not(.ag-cell):empty,
-.sym-form-Detail div:not(.ag-cell):empty {
+.sym-form-submit div:not(.ag-cell):not(.ps__thumb-x):empty,
+.sym-form-Detail div:not(.ag-cell):not(.ps__thumb-x):empty {
     height: 12px;
 }
 

@@ -94,27 +94,49 @@ self.onmessage = async function (event) {
                 if(res['status'] == 200 && res['data']){
                     if (res.data[data.projectId] && res.data[data.projectId].length > 0) {
                         let infoRes =  res.data[data.projectId];
-                        let dataProcess = {};
-                        let infoTodo = infoRes.find(ele => ele.status == "TO DO");
-                        if (infoTodo) {
-                            dataProcess.todo = infoTodo.count;
-                        }
-                        let infoInpro = infoRes.find(ele => ele.status == "IN PROGRESS");
-                        if (infoInpro) {
-                            dataProcess.inprogress = infoInpro.count;
-                        }
-                        let infoDone = infoRes.find(ele => ele.status == "DONE");
-                        if (infoDone) {
-                            dataProcess.done = infoDone.count;
-                        }
-                        dataProcess.total = 0
-                        for (let key in dataProcess) {
-                            if(dataProcess[key] && key != 'total'){
-                                dataProcess.total += Number(dataProcess[key])
-                            }
-                        }
-                        postMessage({action:'countIssueInListVersion', dataAfter : dataProcess})
+                        let listVersion = data.listVersion;
+                        let infoDataProgress = {};
+                        for (let i = 0; i < listVersion.length; i++) {
+                            let infoCountIssue = infoRes.filter(item => {
+                                return item.tmg_version_id == listVersion[i].id;
+                            });          
+                            if (infoCountIssue.length > 0) {
+                                let dataProcess = {
+                                    item : {},
+                                };
+                                let sum = 0;
+                                let infoTodo = infoCountIssue.find(ele => ele.status == "TO DO");
+                                if (infoTodo && Number(infoTodo.count) > 0 ) {
+                                    let item1 = {};
+                                    item1.value = Number(infoTodo.count);
+                                    item1.color = "grey";
+                                    dataProcess.item.todo = item1;
+                                    sum += Number(infoTodo.count);
+                                }
+                                let infoInpro = infoCountIssue.find(ele => ele.status == "IN PROGRESS");
+                                if (infoInpro  && Number(infoInpro.count) > 0) {
+                                    let item2 = {};
+                                    item2.value = Number(infoInpro.count);
+                                    item2.color = "blue";
+                                    dataProcess.item.inprogress = item2;
+                                    sum += Number(infoInpro.count);
 
+                                }
+                                let infoDone = infoCountIssue.find(ele => ele.status == "DONE");
+                                if (infoDone  && Number(infoDone.count) > 0) {
+                                    let item3 = {};
+                                    item3.value = Number(infoDone.count);
+                                    item3.color = "green";
+                                    dataProcess.item.done = item3;
+                                    sum += Number(infoDone.count);
+                                }
+                                dataProcess.total = sum;
+                              
+                                infoDataProgress[ listVersion[i].id] = dataProcess;
+                            }             
+                        }
+                       
+                        postMessage({action:'countIssueInListVersion', dataAfter : infoDataProgress})
                     }
 
                 }
@@ -130,13 +152,10 @@ function getDataFilterCountIssue(data){
     let listVersion = data.listVersion;
     let itemCondition = {};
     itemCondition.name = "tmg_version_id";
-    let vl = ""
+    let vl = [];
     if (listVersion.length > 0) {
         for (let i = 0; i < listVersion.length; i++) {
-            vl += "'"+listVersion[i].id+"',"
-        }
-        if (vl.length > 1) {
-           vl = vl.substring(0, vl.length-1);
+            vl.push(listVersion[i].id)
         }
         itemCondition.value = vl;
     }

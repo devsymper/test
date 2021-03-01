@@ -122,11 +122,11 @@ export default {
                 icon: "mdi-chart-line",
                 link: "/timesheet/report",
             },
-            timeSheetManage: {
-                title: "Manage timesheet",
-                icon: " mdi-calendar-text",
-                link: "/timesheet/manage",
-            }
+            // timeSheetManage: {
+            //     title: "Manage timesheet",
+            //     icon: " mdi-calendar-text",
+            //     link: "/timesheet/manage",
+            // }
         }
     },
     knowledge: {

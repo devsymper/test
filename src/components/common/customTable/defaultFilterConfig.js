@@ -104,9 +104,8 @@ function getOptionForGetList(configs, columns, filterData) {
         pageSize: configs.pageSize ? configs.pageSize : configs.pageSize,
         columns: columns ? columns : [],
         distinct: configs.distinct ? configs.distinct : false,
-        formulaCondition: configs.conditionByFormula ? configs.conditionByFormula : null
+        formulaCondition: configs.formulaCondition ? configs.formulaCondition : null
     };
-
     if(configs.moreApiParam){
         options = Object.assign(options, configs.moreApiParam); 
     }

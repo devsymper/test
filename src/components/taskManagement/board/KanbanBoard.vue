@@ -84,7 +84,7 @@
                     <VuePerfectScrollbar style="max-height: calc(100vh - 240px);" class="wrap-scroll-column">
                         <div v-for="(status, index) in column.statusInColumn"
                             :key="index"
-                            class="mt-2 list-control-autocomplete"
+                            class="mt-2 status-task"
                             :style="{
                                 'border': (dragging && !nodeMapPermission[status.nodeId].disable) ? '2px dashed '+ status.color : '2px dashed #f2f2f2',
                                 'min-height': (dragging) ? '50px' :''
@@ -106,7 +106,7 @@
                                     :task="task"
                                     :status="status"
 
-                                    class="mt-3 cursor-move sym-control"
+                                    class="mt-3 cursor-move task-card"
                                 ></task-card>
                                 <!-- </transition-group> -->
                             </draggable>
@@ -114,7 +114,7 @@
                         </div>
                     </VuePerfectScrollbar>
                     <div class="text-center mt-2">
-                        <v-btn @click="addIssueClick" depressed height="25">
+                        <v-btn @click="addIssueClick(column.statusInColumn)" depressed height="25">
                             <v-icon>mdi-plus</v-icon>
                         </v-btn>
                     </div>
@@ -215,18 +215,23 @@ export default {
         }
     },
     mounted(){
+        $.expr[":"].icontains = $.expr.createPseudo(function (arg) {                                                                                                                                                                
+            return function (elem) {                                                            
+                return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;        
+            };                                                                                  
+        });
         this.settingBoardMenuitems = [
-                { 
-                    title: this.$t("taskManagement.settingBoard"),
-                    menuAction: action => {
-                        if (Object.keys(this.currentBoard).length > 0) {
-                            this.$router.push("/task-management/projects/"+this.sCurrentProject.id+"/kanban-board/settings/" + this.currentBoard.id);
-                        }else{
-                            console.log("Chưa có data");
-                        }
-                    },
+            { 
+                title: this.$t("taskManagement.settingBoard"),
+                menuAction: action => {
+                    if (Object.keys(this.currentBoard).length > 0) {
+                        this.$router.push("/task-management/projects/"+this.sCurrentProject.id+"/kanban-board/settings/" + this.currentBoard.id);
+                    }else{
+                        console.log("Chưa có data");
+                    }
                 },
-            ]
+            },
+        ]
     },
     data() {
         let self = this;
@@ -383,8 +388,12 @@ export default {
             });
 
         },
+        /**
+         * Hàm thêm task vào kanban lúc tạo issue
+         * cần check user đang được filter có khớp với user được giao việc trong task ko
+         */
         checkUpdateTask(issue){
-            if(issue.tmg_assignee == this.$store.state.app.endUserInfo.id){
+            if(issue.tmg_assignee == this.$store.state.app.endUserInfo.id && this.checkCurrentUserFilter(issue.tmg_assignee)){
                 let data = {};
                 data.projectId = this.sCurrentProject.id;
                 data.listColumn = this.listColumn;
@@ -396,10 +405,24 @@ export default {
             }
             
         },
+        /**
+         * Hàm kiểm tra xem danh sách kanban hiện tại có filter theo user của task được tạo hay không
+         */
+        checkCurrentUserFilter(tmgAssignee){
+            let filterValue = this.filterProps.tmg_assignee.value;
+            if(!filterValue){
+                return true;
+            }
+            let user = filterValue.find(el => el.id == tmgAssignee);
+            if(user){
+                return true;
+            }
+            return false;
+        },
         onSearch(vl){
             let val = vl;
-            $('.list-control-autocomplete .sym-control').removeClass('d-none');
-            $('.list-control-autocomplete .sym-control:not(:Contains("' + val + '"))').addClass('d-none');
+            $('.status-task .task-card').removeClass('d-none');
+            $('.status-task .task-card:not(:icontains("' + val + '"))').addClass('d-none');
         },
         completeSprint(){
             let data={};
@@ -426,7 +449,7 @@ export default {
                 if (key == status.nodeId) {
                     continue ;
                 }
-                $(event.target).find('.sym-control').addClass('item-dragging');
+                $(event.target).find('.task-card').addClass('item-dragging');
 
                 let arrAllowTo = this.nodeMapPermission[key].allowTo;
                 let isCheck = arrAllowTo.indexOf(status.nodeId);
@@ -450,7 +473,7 @@ export default {
                         this.nodeMapPermission[key].disable = true;
                     }
 
-                    $('.list-control-autocomplete .sym-control:not(.item-dragging)').addClass('d-none');
+                    $('.status-task .task-card:not(.item-dragging)').addClass('d-none');
                 }
             }
         },
@@ -459,7 +482,7 @@ export default {
             for (const key in this.nodeMapPermission) {
                 this.nodeMapPermission[key].disable = false;
             }
-            $('.list-control-autocomplete .sym-control').removeClass('d-none').removeClass('item-dragging');
+            $('.status-task .task-card').removeClass('d-none').removeClass('item-dragging');
 
         },
         /**
@@ -611,8 +634,12 @@ export default {
                 projectId: this.sCurrentProject.id}
             });
         },
-        addIssueClick(){
-            this.$evtBus.$emit('add-issue-btn-click');
+        addIssueClick(statusInColumn){
+            let currentStatus = {}
+            if(statusInColumn.length > 0){
+                currentStatus = statusInColumn[0];
+            }
+            this.$evtBus.$emit('add-issue-btn-click',currentStatus);
         },
         
        

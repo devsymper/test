@@ -1,7 +1,7 @@
 import ReportBase from './ReportBase'
 export default class Global extends ReportBase {
     constructor(){
-        let columnSettingKeys = ['value'];
+        let columnSettingKeys = [];
         let styleKeys = {
             "legend":{
                 "title":"Cell legend",
