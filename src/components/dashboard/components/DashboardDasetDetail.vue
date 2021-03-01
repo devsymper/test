@@ -60,7 +60,7 @@
                                 <v-icon v-on="on" @click.prevent.stop="showDetailDataset(dataset)" v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
                                 <v-icon v-on="on" @click.prevent.stop="showDetailDataset(dataset)" v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
                                 <v-icon  class="selected-dataset-mark" v-show="dataset.isSelected">mdi-check-circle</v-icon>
-                                <span v-on="on" @click.prevent.stop="showDetailDataset(dataset)" class="dataset-item-title fs-13 pl-2">{{dataset.title}}</span>
+                                <span class="dataset-item-title fs-13 pl-2">{{dataset.title}}</span>
                             </template>
                             <dataset-detail-tooltip 
                                 v-if="dataSetDetail"
@@ -108,32 +108,33 @@
                                         <template v-slot:activator="{ on }">
                                             <v-icon v-on="on"  @click.prevent.stop="showDetailDataset(datasetAndColumn[subId])" class="fs-15 icon-table">mdi-table-large</v-icon>
                                             <v-icon class="selected-dataset-mark" v-show="datasetAndColumn[subId].isSelected">mdi-check-circle</v-icon>
-                                            <span v-on="on"  @click.prevent.stop="showDetailDataset(datasetAndColumn[subId])" class="dataset-item-title fs-13 pl-2">{{datasetAndColumn[subId].title}}</span>
+                                            <span class="dataset-item-title fs-13 pl-2">{{datasetAndColumn[subId].title}}</span>
                                         </template>
                                         <dataset-detail-tooltip 
                                              v-if="dataSetDetail"
                                             :info="dataSetDetail"
                                         />
-										<v-menu offset-y>
-											<template v-slot:activator="{ on, attrs }">
-													<v-icon 
-														class="fs-15 menu-add-column"
-														v-bind="attrs"
-														v-on="on"
-													>
-													mdi-dots-horizontal
-													</v-icon>
-											</template>
-											<div class="p-2 btn-add-column" @click="addMeasureToDataset(dataset)">
-												<v-icon small>
-													mdi-pencil-box-outline
-												</v-icon>
-												<span class="ml-1">
-													Thêm cột
-												</span>
-											</div>
-										</v-menu>
+										
 									</v-menu>
+                                    <v-menu offset-y>
+                                        <template v-slot:activator="{ on, attrs }">
+                                                <v-icon 
+                                                    class="fs-15 menu-add-column"
+                                                    v-bind="attrs"
+                                                    v-on="on"
+                                                >
+                                                mdi-dots-horizontal
+                                                </v-icon>
+                                        </template>
+                                        <div class="p-2 btn-add-column" @click="addMeasureToDataset(dataset)">
+                                            <v-icon small>
+                                                mdi-pencil-box-outline
+                                            </v-icon>
+                                            <span class="ml-1">
+                                                Thêm cột
+                                            </span>
+                                        </div>
+                                    </v-menu>
                                 </v-expansion-panel-header>
                                 <v-expansion-panel-content class="sym-v-expand-content">
                                     <!-- Danh sách các control trong table -->
