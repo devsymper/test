@@ -101,7 +101,7 @@ export default {
                 if(totalHour>hour*60){
                     color = type=='status'?"dark-red-color":"light-red-color"
                 }else if(totalHour==hour*60){
-                    color =  type=="status"?"light-green-color":"dark-sea-green"
+                    color =  type=="status"?"green":"light-green-color"
                 }
                 else{
                     color = type=="status"?"dark-yellow-color":"light-yellow-color"
