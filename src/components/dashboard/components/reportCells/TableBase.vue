@@ -409,7 +409,6 @@ export default {
             return this.cellConfigs.viewConfigs.displayOptions;
         },
         tableStyle(){
-            debugger
             let displayOptions = this.cellConfigs.viewConfigs.displayOptions;
             return Object.assign({
                 width: '100%', 

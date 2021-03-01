@@ -450,7 +450,9 @@
             "viewDetails": "View detail",
             "edit": "Edit",
             "grantPermission": "Grant Permission",
-            "remove": "Remove"
+            "remove": "Remove",
+            "clone":"Clone"
+            
         },
         "created": "Permission package created",
         "deleted": "Permission package deleted",
