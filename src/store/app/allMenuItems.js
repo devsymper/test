@@ -102,7 +102,7 @@ export default {
         group: "My work",
     },
    
-    timeSheet: {
+    timeTable: {
         icon: "mdi-calendar-month-outline",
         title: "myWork",
         group: "Applications",

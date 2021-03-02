@@ -1,17 +1,17 @@
 <template>
-<div class='log-time h-100 pl-4' >
-    <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px">
-        <period-selector  @load-logtime="reloadLog" />
-        <div style="width:38%;float:right" 
-             class="">
+<div class='log-time h-100 pl-1' >
+    <div class="d-flex justify-space-between">
+        <period-selector style="width:60%" />
+        <div style="width:40%" class="d-flex justify-end">
+            <ActionButtons ref="action" />
             <CalendarViewMode
                 ref="viewmode"
+                @change-cate-color="changeCateColor"
                 @change-color="changeColor"
                 @time_view="time_view = true"
                 @list_view="time_view = false" />
-            <ActionButtons refs="action" />
         </div>
-    </v-row>
+    </div>
     <v-dialog v-model="logtimeDialog" width="357" @click:outside="deleteLog()">
         <LogTimeForm v-show="!showTask"
             ref="logtime"
@@ -31,7 +31,6 @@
             :load ="load"
             @doneCate="doneCate()"
             :update ="update"
-            :newEvent="logtimeEvent" 
             :onSave="onSaveLogTimeEvent"
             :onCancel="onCancelSave">
         </LogTimeForm>
@@ -72,9 +71,8 @@
         </DeleteLogView>
     </v-dialog>
     <LogCalendar
-        @set-color="setColor"
-        :userId="userId"
         @showLog="showLog" 
+         @quick-cancel="quickCancel"
         :monEvents="monthEvents"
         ref="logCalendar" 
         :time-view="time_view" 
@@ -107,8 +105,6 @@ export default {
     },
     data() {
         return {
-            
-            userId:'',
             monthEvents:{},
             showTask:false,
             showCategory:false,
@@ -153,27 +149,54 @@ export default {
             console.log(err)
         })
     },
+    computed:{
+        type(){
+            return this.$store.state.timesheet.calendarType;
+        }
+    },
     methods: {
-        setListCategory(listCategory){
+        quickCancel(isCreate){
+            if(isCreate){
+                this.deleteLog();
+            }
+            this.cancelSave();
 
         },
-      
-        setColor(data){
-            this.$refs.viewmode.logColor = data.color;
-            this.$refs.viewmode.randomColor = data.isRandom;
+       changeCateColor(listCateColor, logColor){
+           this.$refs.logCalendar.listCategoryColor = listCateColor;
+            this.$refs.logCalendar.events.map(e=>{
+                listCateColor.map(cate=>{
+                    if(cate.key == e.category_key){
+                        if(cate.isShow){
+                            e.color = cate.color
+
+                        }else{
+                            e.color = logColor
+                        }
+                    }
+                   
+                })
+            })
         },
-        changeColor(data){
+        changeColor(data,listCate){
+            let listCateColor = [...listCate];
             if(data.isRandom){
+                this.$refs.logCalendar.isRandom = true;
                 this.$refs.logCalendar.events.map(e=>{
-                    e.color = this.$refs.logCalendar.randomColor()})
+                    e.color = this.$refs.logCalendar.randomColor();
+                    e.color = this.$refs.logCalendar.setCateAndLogColor(e,e.color,listCate)
+                })
             }else{
+                this.$refs.logCalendar.colorLog = data.colorLog;
+                 this.$refs.logCalendar.isRandom = false;
                 this.$refs.logCalendar.events.map(e=>{
-                    e.color = data.color})
+                    e.color = this.$refs.logCalendar.setCateAndLogColor(e,data.color,listCate)
+                })
             }
         },
         // khi click ra ngoài log form
         deleteLog(){
-            if(!this.update){
+            if(!this.update&&this.type!="month"){
               this.$refs.logCalendar.events.pop()
             }
         },
@@ -186,6 +209,8 @@ export default {
                 if(events[i].id==oldLog.id){
                     events[i]=data,
                     events[i].name = name;
+                    // event[i].action = "update";// 
+                    this.$store.commit("timesheet/getLogForm",  events[i])
                 }
             }
            this.$refs.logCalendar.events=events;
@@ -198,15 +223,17 @@ export default {
 
         },
         createLog(data){
+            let taskName = this.$refs.logCalendar.listTask.filter(task=>task.id==data.task);
             data.start = Date.parse(data.start);
             data.date = this.$moment(data.end).format('YYYY-MM-DD');
             data.end = Date.parse(data.end);
-            data.name=this.$refs.logCalendar.listTask.filter(task=>task.id==data.task).length>0? this.$refs.logCalendar.listTask.filter(task=>task.id==data.task)[0].name:'';
-            data.category=data.categoryTask;
-            data.color= this.$refs.logCalendar.colorLog;
-            data.type=data.type;
+            data.name = taskName.length>0? taskName[0].name:'';
+            data.category = data.cateId;
+            // data.category_key = data.categoryTask.key;
+            data.color= this.$refs.logCalendar.getColorWhenCreate(data);
             data.timed= true;
-            data.category_key=data.categoryTask.split('-')[0];
+            data.action = 'create';
+            this.$store.commit("timesheet/getLogForm", data)
             this.$refs.logCalendar.events.push(data);
             if(!this.$refs.logCalendar.timeView){
                 this.$refs.logCalendar.resizeLogtime()
@@ -218,9 +245,6 @@ export default {
         },
         doneCate(){
             this.updateAPICate = false
-        },
-        reloadLog(userId){
-            this.userId = userId;
         },
         updateAPICategory(){
             this.updateAPICate =true;
@@ -248,7 +272,7 @@ export default {
         },
          showCategoryForm(value){
             this.eventLog = value;
-            this.$refs.cate.forBa = false;
+            // this.$refs.cate.forBa = false;
             this.$refs.cate.typeCate = 'normal';
             this.showCategory=true;
             this.showTask =true;
@@ -272,12 +296,18 @@ export default {
         },
         onCreateTime({logtimeEvent, onSave, onCancel, update}) {
             this.logtimeDialog = true;
+             this.$store.commit("timesheet/getLogForm", logtimeEvent)
             this.$nextTick(() => {
                 this.update = update;
                 this.logtimeEvent = logtimeEvent;
                 this.onSaveLogTimeEvent = onSave;
+
                 this.onCancelSave = onCancel;
             });
+            
+            if(this.$refs.logtime){
+                this.$refs.logtime.setValueLog(logtimeEvent);
+            }
         },
         deleteLogTime({deleteEvent, onDelete}) {
             this.deleteDialog = true;

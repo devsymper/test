@@ -54,7 +54,6 @@
                         class="date-picker" 
                         no-title scrollable
                         color='orange' 
-                      
                         v-model="datePicker" 
                         nudge-top="-10" 
                         :close-on-content-click="false" 
@@ -139,6 +138,15 @@ export default {
     
 
   },
+  watch:{
+      endDate(){
+          if(this.endDate){
+              this.isRepeat = false
+          }else{
+              this.isRepeat = true
+          }
+      }
+  }
     
 }
 </script>

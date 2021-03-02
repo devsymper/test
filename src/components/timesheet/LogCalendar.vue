@@ -1,12 +1,16 @@
 <template>
-    <div class="w-100 pr-5 mt-2 mr-3" style="height: calc(100vh - 120px)">
+    <div class="w-100 " style="height: calc(100vh - 120px)">
         <v-sheet :class="[calendarType=='month'? 'h-50' :'h-580']" 
         class="h-100 calendar">
+           <!--   :interval-height="100"
+                :interval-minutes="30"-->
             <v-calendar ref="calendar"  
                 :weekdays="weekday" 
+                class="calendar"
                 :type="internalCalendarType" 
                 v-model="calendar"
                 :events="events"
+                :interval-height="60"
                 :color="color"
                 @mousedown:event="startDrag" 
                 @mousemove:time="mouseMove" 
@@ -15,12 +19,12 @@
                 @mouseleave.native="cancelDrag" 
                 :start="calendarShowDate">
                 <template v-slot:day-body="{ date, week }">
-                <div
-                    v-if="timeView"
-                    class="v-current-time"
-                    :class="{ first: date === week[0].date }"
-                    :style="{ top: nowY }"
-                ></div>
+                    <div
+                        v-show="timeView"
+                        class="v-current-time"
+                        :style="{ top: nowY }"
+                    ></div>
+                    {{getDate(nowY,week[0].date)}}
                 </template>
                 <template v-slot:day-label="{day,present,past, month, date}">
                     <MonthViewHeader 
@@ -51,8 +55,7 @@
                                 :style="{background:event.color}"
                                 @dblclick="actionLogEvent(event, 0)"
                                 v-on="detailEvents"
-                                style="border:1px solid lightgrey"
-                                class="d-flex flex-column h-100">
+                                class="d-flex flex-column h-100 border-lightgrey">
                                 <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
                                     <div class="d-flex flex-row justify-space-between align-center pl-2">
                                         <div class="fm text-ellipsis" :class="{'name-log':findDuration(event.start, event.end)<62}" >
@@ -95,6 +98,7 @@
                                             </span>
                                             <span class= "fs-11 color-grey mt-1" style="margin-left:-45px" v-if="findDuration(event.start, event.end)>61"> 
                                                 {{event.category_key}}
+                                                <!-- {{listCategory&&listCategory.filter(c=>c.id==event.category)?listCategory.filter(c=>c.id==event.category)[0].key:''}} -->
                                             </span>
                                         </div>
                                         <div style="margin-right:-5px" :class="{'mt-4 ':findDuration(event.start, event.end)>80}">
@@ -118,7 +122,6 @@
                 <!-- màn hình week/day/weekday - header -->
                 <template v-slot:day-header="{day, present, month, weekday, date}">
                     <WeekdayHeader  
-                        class="pl-3 pt-1"
                         :monthEvents="monthEvents"
                         :month="month"
                         :present="present"
@@ -135,6 +138,7 @@
 </template>
 
 <script>
+import CategoryWorker from 'worker-loader!@/worker/timesheet/Category.Worker.js';
 import { formulasApi } from '../../api/Formulas';
 import {uiConfigApi} from "../../api/uiConfig";
 import LogTimeView from "./../../components/timesheet/LogTimeView";
@@ -158,11 +162,14 @@ export default {
         MonthViewEvent,
         ViewDetailMonth
     },
-    props: ['timeView','userId','monEvents'],
+    props: ['timeView','monEvents'],
     data() {
         return {
+            listCategoryColor:[],
             listLogInTime:[],
             menu:false,
+            oldEvents:[],
+            isCreate:false,
             listCategory:[],
             isRandom:false,
             calendar: '',// value calendar
@@ -185,33 +192,130 @@ export default {
             colorLog:'#F0F8FF',
             events: [],// chứa event của calendar
             hoursRequired: '8',
-            logFormWorker:null
+            logFormWorker:null,
+            categoryWorker:null
         };
     },
 
     created() {
+        this.$store.commit("timesheet/updateUserId", this.$store.state.app.endUserInfo.id)
+        this.userId = this.$store.state.app.endUserInfo.id;
         this.getColor();
         this.getConfigInfo()
         this.logFormWorker = new LogFormWorker();
+        this.categoryWorker = new CategoryWorker();
         this.getAllTask();
         this.getCategory();
         this.load();
     },
     methods: {
+        getDate(a,b){
+            console.log('date');
+
+            console.log(a);
+            console.log('week');
+
+            console.log(b);
+
+        },
+        undoUpdate(){
+            let logInx = -1;
+            let events = [...this.events];
+            events.map((e,i)=>{
+                if(e.id==this.log.id){
+                    logInx = i;
+                }
+            })
+            if(logInx>=0){
+                 this.events[logInx] = this.log;
+                 let duration = Number(this.log.duration)
+                  this.events[logInx].end = this.$moment(this.log.start).add(duration,'m');
+
+                this.updateEvent(this.log,this.log.duration);
+            }
+            // let oldLogId = events.filter(e=>e.id==this.log.id)[0].id;
+           
+         },
+        undoCreate(){
+            const self = this;
+            this.events = this.events.pop();
+            timesheetApi.deleteLogTime({
+                id: this.log.id,
+                docObjId:this.log.docObjId  
+            }).then(res => {
+                if (res.status === 200) {
+                    self.load()
+                }else{
+                    this.$snotify({
+                        type: "error",
+                        title: "Lỗi",
+                    })
+                }
+                }).catch(console.log)
+        },
+        undo(){
+            switch(this.log.action){
+                case "create":
+                    this.undoCreate();
+                    break;
+                case "update":
+                    this.undoUpdate()
+                    break
+
+            }
+
+        },
+        quickCreateLog(){
+            let event = {
+                color: this.colorLog,
+                start:  Date.parse(this.$moment()),
+                end: Date.parse(this.$moment().add(1,'h')),
+                name: "",
+                date: this.$moment().format('YYYY-MM-DD'),
+                timed: true
+            };
+            this.openLogTimeDialog(event, false)
+
+        },
+        quickCancel(){
+            this.$emit('quick-cancel',this.isCreate);
+            // this.$emit('cancelForm');
+
+        },
+        handleEventKeyBoad(){
+            const self = this;
+            $(document).keydown(function(e){
+                // Alt + Q 
+                if(e.altKey && e.which === 81){
+                    self.quickCreateLog();
+                    this.isCreate = true
+                }
+                //ctrl + Z
+                else if( e.which === 90 && e.ctrlKey ){
+                    self.undo()
+                }
+                // else if(e.which === 87 && e.altKey){
+                //     self.quickCancel()̥
+
+                // }          
+            });
+        },
+        setListCategory(data){
+            this.listCategory = data;
+            this.$store.commit("timesheet/getListCategory", data )
+        },
         getCategory(){
             const self = this;
-             timesheetApi.getAllCategory({}).then(res => {
-                if (res.status === 200) {debugger
-                    self.listCategory = res.data.listObject;
-                    // self.category.category_name=[];
-                    // let category = res.data.listObject;
-                    // for(let i=0; i<category.length; i++){
-                    //     self.category.category_name.push(
-                    //         category[i].key+"-"+category[i].name
-                    //     )
-                    // }
-                }
-                }).catch(console.log);
+            this.categoryWorker.postMessage({
+                action:'getListCategory',
+                data:''
+            })
+            //  timesheetApi.getAllCategory({}).then(res => {
+            //     if (res.status === 200) {
+            //         self.listCategory = res.data.listObject;
+            //         self.$store.commit("timesheet/getListCategory", self.listCategory )
+            //     }
+            //     }).catch(console.log);
             },
         async getAllTask(){
             let self = this;
@@ -228,10 +332,7 @@ export default {
                     x.description = 'Ngày tạo: '+ x.createTime;
                 })
                 self.listTask.push(...res.data.listObject);
-
-                })
-                .catch(console.log);
-
+                }).catch(console.log);
         },
         getConfigInfo(){
             const self = this;
@@ -243,7 +344,6 @@ export default {
             .catch(err => {
                 console.log(err)
             })
-
         },
         getWidgetIdentifier(){
             let widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
@@ -253,13 +353,20 @@ export default {
         getColor(){
             const self = this;
             let widgetIdentifier = this.getWidgetIdentifier();
+            let data = {
+                widgetIdentifier:widgetIdentifier,
+                detail:{}
+            }
             uiConfigApi.getUiConfig(widgetIdentifier).then(res=>{
                 if(res.status==200){
-                    self.colorLog = JSON.parse(res.data.detail).color;
-                    self.isRandom = JSON.parse(res.data.detail).isRandom;
-                    self.$emit('set-color',{color:self.colorLog,isRandom:self.isRandom})
+                    data.detail= JSON.parse(res.data.detail);
+                    self.colorLog = JSON.parse(res.data.detail).colorLog.color;
+                    self.isRandom = JSON.parse(res.data.detail).colorLog.isRandom;
+                    self.listCategoryColor =  JSON.parse(res.data.detail).colorCate;
+                    
                 }
             })
+            this.$store.commit("timesheet/getListColor", data )
 
         },
         setResizeLogtime(event){
@@ -273,29 +380,48 @@ export default {
             }
              return "#" + color;
         },
-        
-        setLogTimeList(data){
-            // data.events.map((evt,i)=>{
-            //     // let test = task.id;
-            //      let taskName = this.listTask.filter(task=>task.id==evt.task).length>0? this.listTask.filter(task=>task.id==evt.task)[0].name:'';
-            //     // evt.task = taskName;
-            //     evt.name = taskName;
-
-            // })
-            this.events = data.events;
+        // set màu log time theo log hoặc category
+        setCateAndLogColor(log,oldColor,colorCate){
+            let color = oldColor;
+            colorCate.map(cate=>{
+                if(cate.key==log.category_key&&cate.isShow){
+                    color =  cate.color
+                }
+            })
+            return color
+        },
+        getColorLogTime(){
             if(this.isRandom){
                 this.events.map(e=>{
-                e.color = this.randomColor()
+                    e.color = this.randomColor();
+                    e.color = this.setCateAndLogColor(e,e.color,this.listCategoryColor)
                 })
             }else{
                 this.events.map(e=>{
-                    e.color = this.colorLog
+                    e.color = this.setCateAndLogColor(e,this.colorLog,this.listCategoryColor);
                 })
             }
-            // this.sum = data.sumLogTime;
-            // this.hoursRequired = data.hoursRequired;
-            // this.listCategory = data.category;
-            // this.$emit('set-list-category', data.category);
+        },
+        getColorWhenCreate(log){
+            let color = this.colorLog;
+            this.listCategoryColor.map(cate=>{
+                if(cate.key==log.category_key){
+                    color = cate.color
+                }
+            })
+            return color
+        },
+        setLogTimeList(data){
+            this.events= [];
+            this.oldEvents = [...data.events];
+            data.events.map(e=>{  
+                this.events.push({
+                    ...e,
+                    category_key: this.listCategory.filter(c=>c.id==e.category)[0].key
+                }) 
+            }
+            );
+            this.getColorLogTime();
             if(!this.timeView){
                 this.resizeLogtime()
             }
@@ -320,25 +446,34 @@ export default {
         start(date){
             this.$emit('showLog',date);   
         },
-        getLogByUserId(id){
-            const self = this;
-            timesheetApi.getLogByUserId({userId:id})
-                .then(res => {
-                    if (res.status === 200) {
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
-                })
+        getLogByUserId(){
+            let data = {
+                start:this.$refs.calendar.lastStart.date,
+                end:this.$refs.calendar.lastEnd.date,
+                userId: this.userId
+            }
+             this.logFormWorker.postMessage({
+                action:'getLogTimeList',
+                data:data
+            })
+        },
+        create_UUID() {
+            var dt = new Date().getTime();
+            var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+            /[xy]/g,
+            function(c) {
+            var r = (dt + Math.random() * 16) % 16 | 0;
+            dt = Math.floor(dt / 16);
+            return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
+            });
+            return uuid;
         },
         copyLogTime(event){
             let data = {...event};
             // data.nameTask = this.listTask.filter(task=>task.id==event.task)[0].name;
             event.nameTask = data.name;
-            data.categoryTask = event.category;
+            event.id = this.create_UUID();
             data.desc = event.desc || "";
-            event.cateId = this.getIdCategory(event.category);
-            data.cateId = event.cateId ;
             this.events.push(data);
             this.logFormWorker.postMessage({
                 action:'copyLogTime',
@@ -427,7 +562,7 @@ export default {
                 update: update,
                 logtimeEvent: event,
                 onSave: () => this.load(),
-                onCancel: update ? () => null : () => this.events.splice(this.events.indexOf(event), 1)
+                onCancel: update||this.type=='month' ? () => null : () => this.events.splice(this.events.indexOf(event), 1)
             });
         },
         openDeleteLogtime(event) {
@@ -444,6 +579,8 @@ export default {
             let data = {
                 start:this.$refs.calendar?this.$refs.calendar.lastStart.date:defaultStart,
                 end:this.$refs.calendar?this.$refs.calendar.lastEnd.date:defaultEnd,
+                userId: this.userId
+
             }
              this.logFormWorker.postMessage({
                 action:'getLogTimeList',
@@ -534,8 +671,8 @@ export default {
                 task: event.task,
                 type: self.checkPlanOrLog(event.start),
                 id: event.id,
-                cateId: this.getIdCategory(event.category),
-                taskName:event.name,
+                cateId: event.category,
+                taskName:event.name?event.name:'',
                 date: start.format('YYYY-MM-DD'),
                 categoryTask: event.category,
                 desc: event.desc || "",
@@ -543,7 +680,6 @@ export default {
             };
             let res = await timesheetApi.updateLogTime(data,data.id)
             if (res.status === 200) {
-                    // this.load();;
             } else {
                 self.$snotify({
                     type: "error",
@@ -557,15 +693,26 @@ export default {
             if (this.createEvent) {// 1. createEvent khac null, kéo xuống/di chuyển
                 if (this.extend) {//1.1: kéo xuống
                     try {
+                        let oldLog = {action:'update',id:-1};
+                        let events = [...this.events];
+                        events.map((e,i)=>{
+                           if(e.id==this.createEvent.id){
+                               oldLog.id = i;
+                               oldLog = this.events[i]
+                           }
+                       })
+                        oldLog.action = 'update';
+                        this.$store.commit("timesheet/getLogForm",oldLog  )
                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
-                        this.createEvent.duration = duration; 
+                        this.createEvent.duration = duration;
+                        // this.createEvent.category_key = duration;
+                        this.createEvent.taskName = this.createEvent.name ;
                         this.updateEvent(this.createEvent, duration);
                         this.findFormular(this.createEvent.category_key)
                         // cập nhật vào doc
                     } catch(e) {console.log(e); }
                 } else {//1.2: tao moi event
-                    if(this.timeView){
-                        //
+                    if(this.timeView){  
                          this.openLogTimeDialog(this.createEvent,false);
                     }else{
                         this.events.splice(this.events.indexOf(event), 1);
@@ -602,9 +749,6 @@ export default {
                         this.resizeLogtime();
                          this.updateEvent(oldLog, oldLog.duration);
                         this.findFormular(this.createEvent.category_key)
-
-
-                        
                     }
                 } catch(e) { console.log(e);}
             }
@@ -660,6 +804,7 @@ export default {
                      this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: block');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: block');
                 } else {
+                   
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: none');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: none');
                     div.setAttribute('style', div.getAttribute('style') + '; border-top: none; border-bottom: none');
@@ -677,8 +822,6 @@ export default {
                 this.resizeLogtime();
             }else{
                 this.events = this.listLogInTime;
-                this.getLogByUserId(this.userId);
-                //  this.load()
             }
             
         },
@@ -704,19 +847,24 @@ export default {
             }
             const totalInHours = totalInMinutes / 60;
             this.$store.commit('timesheet/updateTotalHours', totalInHours % 10 === 0 ? totalInHours : totalInHours.toFixed(1));
-        }
+        },
+        // đếm số log time hiển thị trên calendar view
+      
     },
     computed: {
         cal(){
-                return this.ready ? this.$refs.calendar : null
+            return this.ready ? this.$refs.calendar : null
         },
         nowY(){
-                return this.cal ? this.cal.timeToY(this.cal.times.now) + 'px' : '-10px'
+            return this.cal ? this.cal.timeToY(this.cal.times.now) + 'px' : '-10px'
         },
         ...mapState('timesheet', {
             calendarShowDate: 'calendarShowDate',
             calendarType: 'calendarType',
-            period: 'period'
+            period: 'period',
+            log:'log',
+            objId:'objId',
+            userId:'userId'
         }),
         weekday() {
             const dayOfWeekMap = {
@@ -756,12 +904,11 @@ export default {
         period(){
             this.load()
         },
-         userId(){
-            this.getLogByUserId(this.userId);
+        userId(){
+            this.getLogByUserId();
         },
         calendarType(newType) {
-             this.load();
-            this.getLogByUserId(this.userId);
+            this.load();
             if (newType === 'weekday') {
                 this.internalCalendarType = 'week';
             } else {
@@ -770,8 +917,11 @@ export default {
              this.$nextTick(() => {
                 this.$nextTick(this.onChangeCalendar);
                 this.updateTotalHours();
-                this.getLogByUserId(this.userId);
-            });   
+            });
+            // if(this.calendarType=='month'){
+            //     this.countLogMonthView()
+
+            // }
         },
         calendarShowDate() {
             this.$nextTick(() => {
@@ -787,16 +937,29 @@ export default {
         }
     },
     mounted() {
+       
         // this.$refs.calendar.scrollToTime('07:40');
         this.onChangeCalendar();
+        this.handleEventKeyBoad();
         this.ready = true;
-        if(this.timeView){
-            this.scrollToTime()
-        }else{
-            this.$refs.calendar.scrollToTime('07:40');
-        }
+         this.scrollToTime()
+        // if(this.timeView){
+        //     this.scrollToTime()
+        // }else{
+        //     this.$refs.calendar.scrollToTime('07:40');
+        // }
         this.updateTime()
         const self = this
+        this.categoryWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getListCategory':
+                    self.setListCategory(data.dataAfter)
+                    break;
+                default:
+                    break;
+            }
+        });
         this.logFormWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
@@ -903,6 +1066,16 @@ export default {
     left: -1px;
     right: 0;
     pointer-events: none;
+    &.first::before {
+    content: '';
+    position: absolute;
+    background-color: #ea4335;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: -5px;
+    margin-left: -6.5px;
+    }
 }
 .create-timesheet-container {
     display: flex;
@@ -947,5 +1120,22 @@ export default {
 .mdi-calendar{
     margin-top:5px;
     color:#000080!important
+}
+
+</style>
+<style>
+.v-calendar-daily__scroll-area::-webkit-scrollbar {
+        width: 10px;
+        background-color: black;
+}
+.v-calendar-daily__scroll-area::-webkit-scrollbar-thumb {
+	border-radius: 50px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: lightgrey;
+}
+ .v-calendar-daily__scroll-area::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 50px;
+	background-color: #F5F5F5;
 }
 </style>

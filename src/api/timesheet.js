@@ -4,10 +4,14 @@ import { appConfigs } from "./../configs.js";
 let api = new Api(appConfigs.apiDomain.timesheet);
 var userApi = new Api(appConfigs.apiDomain.user);
 let taskApi = new Api(appConfigs.apiDomain.workflowExtend);
+let sdocumentManagementApi = new Api(appConfigs.apiDomain.sdocumentManagement);
 export default {
     //lấy user
     getListUser({ page, pageSize }) {
         return userApi.get("users?page=" + page + "&pageSize=" + pageSize, { page, pageSize });
+    },
+    getFilterLog(data,docId){
+        return sdocumentManagementApi.get('documents/' + docId + '/objects?search='+data+'&page=1&pageSize=50')
     },
     getPreLog(data){
         return userApi.get('pre-log',data)
@@ -19,14 +23,14 @@ export default {
     getAllUserLogTimeList() {
         return api.get('manage-timesheet');
     },
-    getLogByUserId(id) {
-        return api.get("log-time-othersUser", id);
-    },
     createCategory(data) {
         return api.post('category', data)
     },
     getAllCategory() {
         return api.get('category')
+    },
+    getAllCategory1(filter) {
+        return api.get('category1',filter)
     },
     deleteCategory(id) {
         return api.delete('category' + '/' + id, id)

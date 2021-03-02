@@ -30,8 +30,8 @@
                 label="Màu ngẫu nhiên"
             ></v-switch>
         </div>
-         <div v-if="showSaveBtn" style="margin-top:-10px" class="pr-2 d-flex justify-end pb-2">
-            <v-btn class="fs-13 fw-400" x-small color="primary" @click="save()">OK</v-btn>
+         <div v-if="showSaveBtn" class="pr-2 d-flex justify-end pb-2">
+            <v-btn class="fs-13 fw-400" x-small color="primary" @click="save()">Áp dụng</v-btn>
         </div>
     </div>
 </template>

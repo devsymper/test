@@ -1,13 +1,13 @@
 <template>
-<div class="w-100">
+<div class="w-100 h-100">
      <list-items
+        class="h-100"
         ref="listCategory"
-        :showImportHistory="false"
+        :containerHeight="containerHeight"
         @after-open-add-panel="addCategory"
         :headerPrefixKeypath="'timesheet'"
-        :useDefaultContext="false"
+        :showTimesheetBtn="true"
         :pageTitle="$t('timesheet.table.category')"
-        :containerHeight="containerHeight"
         :showExportButton="false"
         :customAPIResult="customAPIResult"
         :tableContextMenu="tableContextMenu"
@@ -29,9 +29,8 @@
 </div>
 </template>
 <script>
-import ActionPanel from "./../../views/import/Detail.vue";
+import { util } from "@/plugins/util.js";
 import ListItems from "./../../components/common/ListItems.vue";
-import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
 import timesheetApi from '../../api/timesheet';
 import CategoryForm from "./../../components/timesheet/CategoryForm";
@@ -39,13 +38,13 @@ import {documentApi} from "../../api/Document"
 export default {
     components: {
         "list-items": ListItems,
-        "action-panel": ActionPanel,
         CategoryForm,
     },
     data(){
         const self = this
         return {
             listDoc:[],
+            containerHeight:0,
             showPanel:false,
             cate:{},
             isAddView:true,
@@ -61,11 +60,6 @@ export default {
                     };
                     data.listObject = res.data.listObject;
                     data.columns.push(
-                        // {
-                        //     name:'stt',
-                        //     title:'table.stt',
-                        //     type:"numeric"
-                        // },
                         {
                             name:'name',
                             title:'table.name',
@@ -108,7 +102,7 @@ export default {
                         },
                       
                    );
-                   let i = 0;
+                    let i = 0;
                     let listUser = self.$store.state.app.allUsers;
                     data.listObject.map(d=>{
                         d.stt=++i;
@@ -124,24 +118,12 @@ export default {
                               if(d.userUpdate==user.id){
                                 d.userUpdate=user.displayName
                              }
-                        });
-                        // self.listDoc.map(doc=>{
-                        //     if(doc.id==d.name){
-                        //         d.name=doc.title
-                        //     }
-                        // })
+                        });           
                     })
                     return  data;
                 }
             },
              tableContextMenu:{
-                // view: {
-                //     name:"view",
-                //     text:this.$t('timesheet.table.view'),
-                //     callback: (cate, callback) => {
-                //         this.showDetail(cate);
-                //     }
-                // },
                  update: {
                     name:"update",
                     text:this.$t('common.update'),
@@ -158,8 +140,6 @@ export default {
                 }
             },
             getListUrl: '',
-            actionPanelWidth:800,
-            containerHeight: 200,
             columns: [],
         }
     },
@@ -168,17 +148,30 @@ export default {
     },
     created(){
         this.getDocument();
+        // this.test();
         this.getListUrl = appConfigs.apiDomain.timesheet+'category';
     },
     methods:{
+        calcContainerHeight(){
+			this.containerHeight = util.getComponentSize(this).h;
+		},
+        async test(){
+            let filter={};
+            filter.page = 1;
+            filter.pageSize = 500;
+            filter.filter = '123';
+            filter.distinct = true;
+            let res = await timesheetApi.getAllCategory1(filter);
+            if(res.status==200){
+            }
+        },
         getDocument(){
             const self = this;
             documentApi.getSmallListDocument().then(res=>{
                 if(res.status==200){
-                    // self.listDoc =res.data.listObject;
                     self.listDoc = [];
                     res.data.listObject.map(data=>{
-                        self.listDoc.push({id:data.title})
+                        self.listDoc.push({id:data.title,docId:data.id})
                     })
 
                 }
@@ -235,9 +228,6 @@ export default {
             this.$refs.category.refreshAll();
             this.isAddView = true;
             this.showAddCategory = true;
-        },
-        calcContainerHeight() {
-            this.containerHeight = util.getComponentSize(this).h;
         },
         cancel(){
             this.$refs.listCategory.refreshList();
