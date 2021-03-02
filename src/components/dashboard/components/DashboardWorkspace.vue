@@ -60,12 +60,13 @@
                 </grid-item>
             </div>
         </grid-layout>
-        <!-- <DashboardCellDetail 
+        <DashboardCellDetail 
+            ref="dashboardCellDetail"
             @back-to-dashboard="dashboardTab = 'tab-1'" 
             :item="currentItem"
             :instanceKey="instanceKey"
             :dashboardConfig="dashboardConfig"
-        /> -->
+        />
     </VuePerfectScrollbar>
 
     <v-tabs ref="dashboardTabs" v-model="dashboardConfig.info.activeTabIndex" >
@@ -228,7 +229,7 @@ export default {
          */
         handleViewDetail(item){
             this.currentItem = item
-            this.changeTabDetail('tab-2')
+            this.$refs.dashboardCellDetail.show()
         },
         handleDownloadExcel(item){
             let cell = this.dashboardConfig.allCellConfigs[item.cellId]
@@ -316,9 +317,6 @@ export default {
             //     }
             // }
             return rsl;
-        },
-        changeTabDetail(value){
-            this.dashboardTab = value
         },
         getUsingDatasetAndColumns(){
             return this.thisDashboardData.allDatasetColumns;

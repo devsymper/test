@@ -3,7 +3,7 @@
 		<div class="title ml-1 mt-1" style="font-size: 13px !important">
 			{{ $t('bi.dashboard.condition-config') }}
 		</div>
-		<draggable group="drop-column" :list="conditions" @change="handleChangeCondition" class="dragArea list-group mt-1">
+		<draggable group="drop-column" :list="currentCellConfigs.rawConfigs.condition" @change="handleChangeCondition" class="dragArea list-group mt-1">
 			<VuePerfectScrollbar :style="{ height: height - 60 + 'px' }">
 				<v-expansion-panels accordion>
 					<div class="columns-condition" v-for="(condColumn, idx) in currentCellConfigs.rawConfigs.condition" :key="idx">
@@ -25,46 +25,6 @@ import VuePerfectScrollbar from 'vue-perfect-scrollbar';
 
 export default {
 	props: {
-		conditions: {
-			type: Array,
-			default() {
-				return [
-					{
-						as: 'REPORT BỞI',
-						agg: 'first',
-						cond: { val: '0', type: 'isnot' },
-						edit: false,
-						name: 'nguoi_report',
-						type: 'text',
-						dataset: '3614',
-						validValue: true,
-						origin_type: 'text',
-					},
-					{
-						as: 'REPORT BỞI',
-						agg: 'first',
-						cond: { val: '', type: 'notblank' },
-						edit: false,
-						name: 'nguoi_report',
-						type: 'text',
-						dataset: '3614',
-						validValue: true,
-						origin_type: 'text',
-					},
-					{
-						as: 'TRẠNG THÁI',
-						agg: 'first',
-						cond: { val: 'TESTING', type: 'is' },
-						edit: false,
-						name: 'ttsd',
-						type: 'text',
-						dataset: '3614',
-						validValue: true,
-						origin_type: 'text',
-					},
-				];
-			},
-		},
 		height: {
 			type: Number,
 			default: 0,
@@ -95,7 +55,7 @@ export default {
 		},
 		handleChangeCondition() {},
 		removeCondition(idx) {
-			this.conditions.splice(idx, 1);
+			this.currentCellConfigs.rawConfigs.condition.splice(idx, 1);
 		},
 	},
 };

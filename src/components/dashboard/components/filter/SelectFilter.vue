@@ -16,7 +16,6 @@
 			</label>
 			<div v-for="(item, idx) in data" :key="idx">
 				<label @click="changeSelectItem(item)" :class="{'mdi mdi-checkbox-blank-outline':!item.symper__selected, 'mdi mdi-checkbox-marked text-success': item.symper__selected }">
-					
 					<span @click="changeSelectItem(item)" :style="cellView.displayOptions.itemStyle" class="pl-2">{{ item[selectedCol.as] }} </span>
 				</label>
 			</div>

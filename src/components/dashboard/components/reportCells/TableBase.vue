@@ -121,7 +121,6 @@ export default {
                 self.inPrintingMode = true;
                 let domHTML = $(self.$el).find('.symper-table-report')[0].outerHTML;
                 domHTML = headerHTML + domHTML;
-                debugger
                 util.printDOM(domHTML);
             }, 500);
         },
@@ -489,7 +488,9 @@ export default {
 .symper-table-report .ag-root{
     border: none!important;
 }
-
+.symper-table-report{
+    border-style: unset !important;
+}
 .symper-table-report .ag-root .ag-row{
     border-top: none!important;
     border-bottom-style: solid;
@@ -569,7 +570,6 @@ export default {
     .symper-dashboard-layout .ag-virtual-list-viewport {
         height: 100%!important;
         overflow: hidden;
-        /* display: flex !important; */
     }
 }
 </style>

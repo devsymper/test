@@ -446,12 +446,6 @@ export default {
 				return {}
 			}
 		},
-		checkedRows:{
-			type: Array,
-			default(){
-				return []
-			}
-		},
 		/**
 		 * Truyeenf vao row height
 		 * 
@@ -862,15 +856,6 @@ export default {
 				this.showSearchBox = true
 			}
         },
-        checkedRows:{
-			deep: true,
-			immediate: true,
-			handler(arr){
-				if(arr.length > 0){
-					this.allRowChecked = arr
-				}
-			}
-		},
 		rowData:{
 			deep: true,
 			immediate: true,
@@ -1097,6 +1082,13 @@ export default {
         getSelectedRows(){
             return this.agApi.getSelectedRows()
         },
+        setRowChecked(){
+            let self = this
+            this.gridOptions.api.forEachNode(node=> {
+                let value = self.checkedRows.includes(node.data.id) ? true : false
+                node.setSelected(value);
+            })
+        },
          /**
          * select lại dòng đã được chọn trước đó nếu có refresh list
          */
@@ -1110,7 +1102,6 @@ export default {
                     if(node.data.document_object_id){
                         let row = self.rowSelected.find(el => el.document_object_id == node.data.document_object_id);
                         if(row && node.data.document_object_id == row.document_object_id){
-                            node.setSelected(true);
                         }
                     }
                     else if(node.data.id){

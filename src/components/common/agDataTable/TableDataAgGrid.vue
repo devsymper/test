@@ -1,7 +1,7 @@
 <template>
 	<div class="dataflow-output-column h-100">
 	
-		<div class="ml-2 mr-2" style="height: calc(100% - 57px)">
+		<div class="ml-2 mr-2" style="height: calc(100% - 4px)">
 			<ag-grid-vue
 				:style="{
 					width: '100%',
@@ -50,6 +50,7 @@ export default {
 			sortable: true,
 			resizable: true,
 			autoHeight: true,
+			flex: 1
 		};
 		this.gridOptions = {
 			enableRangeSelection: true,

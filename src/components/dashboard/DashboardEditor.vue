@@ -48,10 +48,9 @@
 		<DatasetSelector
             v-if="action != 'view'"
 			ref="datasetSelector"
-			v-model="listDatasetSelected"
 			@list-dataset-selected="changeSelectedDatasets"
-			@cancel="handlerCancelSelectDataset"
 			:tableHeight="tableHeight"
+            :listDatasetSelected="listDatasetSelected"
 		/>
 		<RelationSelector
             v-if="action != 'view'"
