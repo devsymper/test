@@ -1668,18 +1668,6 @@ export default {
          */
         togglePageSize() {
             this.docSize = this.docSize == "21cm" ? "100%" : "21cm";
-            let listInputInDocument = this.sDocumentSubmit.listInputInDocument;
-            let allControlInstance = Object.values(listInputInDocument);
-            let listTableControlInstance = allControlInstance.filter(control =>{
-                return control.type == 'table'
-            })
-            for (let index = 0; index < listTableControlInstance.length; index++) {
-                let table = listTableControlInstance[index];
-                setTimeout(() => {
-                    table.tableInstance.tableInstance.render();
-                }, 50);
-                
-            }
         },
         /**
          * Khởi tạo các đối tượng control từ html

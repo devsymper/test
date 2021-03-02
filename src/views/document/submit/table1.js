@@ -38,6 +38,7 @@ window.addNewDataPivotTable = function(el, event, type){
     thisListItem.$evtBus.$emit('on-add-data-to-pivot-table',{type:type, tableName:tableName})
 }
 var delayTimerGridEvent;
+var delayTimerGridSize;
 
 export default class SymperTable {
     constructor(tableControl, keyInstance, groupConfig = {}, pivotConfig = {}, formulasWorker) {
@@ -107,7 +108,8 @@ export default class SymperTable {
         else{
             let submitContextItem = [
                 {
-                    name: 'Xóa dòng đã chọn',
+                    name: 'Xóa dòng đã chọn  ',
+                    shortcut: "Shift + Backspace",
                     action: function() {
                         // params.api.applyTransaction({ remove: [params.node.data]});
                         self.deleteRowSelection(params)
@@ -126,7 +128,19 @@ export default class SymperTable {
             if(self.tableControl.isInsertRow()){
                 submitContextItem.unshift(
                     {
-                        name: 'Thêm dòng phía trên ',
+                        name: 'Thêm dòng phía dưới  ',
+                        shortcut: "Shift + Enter",
+                        action: function() {
+                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
+                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
+                        },
+                        cssClasses: ['blueFont'],
+                        // icon:'mdi-table-row-plus-after'
+                    }
+                )
+                submitContextItem.unshift(
+                    {
+                        name: 'Thêm dòng phía trên  ',
                         action: function() {
                             let rowIndex = (params.node) ? params.node.rowIndex : 0;
                             params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex });
@@ -136,17 +150,7 @@ export default class SymperTable {
         
                     }
                 )
-                submitContextItem.unshift(
-                    {
-                        name: 'Thêm dòng phía dưới ' ,
-                        action: function() {
-                            let rowIndex = (params.node) ? params.node.rowIndex : 0;
-                            params.api.applyTransaction({ add: [{s_table_id_sql_lite : Date.now()}], addIndex:rowIndex + 1 });
-                        },
-                        cssClasses: ['blueFont'],
-                        // icon:'mdi-table-row-plus-after'
-                    }
-                )
+                
             }
             return submitContextItem;
         }
@@ -881,6 +885,19 @@ export default class SymperTable {
         }
         return [result];
     }
+    caculatorRowHeightAfterColResize(params){
+        if(!this.onEventReady){
+            return;
+        }
+        if(params.source != 'uiColumnDragged'){
+            return;
+        }
+        let self = this;
+        clearTimeout(delayTimerGridSize);
+        delayTimerGridSize = setTimeout(function() {
+            self.gridOptions.api.resetRowHeights();
+        }, 400);
+    }
     /**
      * Sự kiện xảy ra sau khi resize cột
      * @param {*} params 
@@ -888,6 +905,7 @@ export default class SymperTable {
     onColumnResized(params){
         let thisComponent = this.context.thisComponent;
         thisComponent.onSaveConfigUi(params)
+        thisComponent.caculatorRowHeightAfterColResize(params);
     }
     /**
      * Sự kiện xảy ra sau khi ẩn cột
@@ -1413,6 +1431,9 @@ export default class SymperTable {
             }
 
             this.tableInstance.handlerAfterChangeCellByUser(columnChange,event.newValue,event.data, rowId);
+        }
+        if(this.tableInstance.tableControl.isWrapText()){
+            this.tableInstance.gridOptions.api.resetRowHeights();
         }
     }
 
