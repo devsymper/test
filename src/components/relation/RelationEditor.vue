@@ -5,17 +5,15 @@
 				<span class="mb-2 fs-13">
 					{{ $t('bi.relation.selector') }}
 				</span>
-
-				<DatasetAutocomplete @dataset-selector="handleDatasetSelected" :listDatasets="listDatasets" />
-
+				<DatasetAutocomplete @dataset-selector="handleDatasetSelected" :listDatasets="listDatasets" :listDatasetSelected="listDatasetSelected" />
 				<VuePerfectScrollbar class="mt-2 " :style="{ height: listHeight + 'px' }" v-if="listDatasetSelected.length > 0">
 					<dataset-selected-item  v-for="(item, i) in listDatasetSelected" :key="i" class="dataset-selected-item" :item="item" :showRemove="true" @remove-item="removeItem" />
 				</VuePerfectScrollbar>
 			</div>
 		</div>
 		<div class="relation-workspace flex-grow-1 d-flex flex-column">
-			<div class="relation-workspace-toolbar d-flex">
-				<div class="dflex" :class="{'flex-grow-1': dialogMode}">
+			<div class="d-flex  justify-content-center">
+				<div class="d-flex " style="width: 150px" :class="{'flex-grow-1': dialogMode}">
 					<v-icon small>
 						mdi-pencil-box-outline
 					</v-icon>
@@ -23,43 +21,45 @@
 						{{relationName}}
 					</span>
 				</div>
-			
-				<!-- <v-text-field
-					solo
-				>
-
-				</v-text-field> -->
-				<div>
+				<div class="flex-grow-1" style="margin-right: auto; margin-left: auto">
 					<v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
 						<template v-slot:activator="{ on }">
-							<v-btn @click="handleHeaderAction(key)" icon tile class="mr-2" style="position:relative; top: -3px">
+							<v-btn small @click="handleHeaderAction(key)" icon tile class="mr-2 mt-1" style="position:relative; top: -3px;">
 								<v-icon small v-on="on">{{ item.icon }}</v-icon>
 							</v-btn>
 						</template>
 						<span>{{ $t(item.text) }}</span>
 					</v-tooltip>
 				</div>
-
-				<v-btn small class="mr-2 mt-1" @click="saveRelations" v-if="action != 'view'">
-					<v-icon small>
-						mdi-check
-					</v-icon>
-					<span class="ml-1">
-						{{ $t('common.save') }}
-					</span>
-				</v-btn>
+				<div class="ml-auto" style="margin-top: 2px">
+					<v-btn small class="mr-2" @click="saveRelations" v-if="action != 'view'">
+						<v-icon small>
+							mdi-check
+						</v-icon>
+						<span class="ml-1">
+							{{ $t('common.save') }}
+						</span>
+					</v-btn>
+				</div>
 			</div>
 			<RelationWorkspace 
 				:action="action"
 				ref="relationWorkspace"
 			 	style="height: calc(100% - 41px)"
 				:wrapper="wrapper"
+				@reduce-links="reduceLinks"
 				:width="width"
 				:height="height"
 			 />
 		</div>
 		<div class="relation-link" v-if="action != 'view'">
-			relation-link
+			<RelationLink
+				ref="relationLink"
+				:allLinks="allLinks"
+				@add-link="handleAddLink"
+				@delete-link="handleDeleteLink"
+				:listDatasetSelected="listDatasetSelected"
+			/>
 		</div>
 	</div>
 </template>
@@ -68,6 +68,7 @@
 import RelationWorkspace from '@/components/relation/RelationWorkspace';
 import DatasetAutocomplete from '@/components/dataset/DatasetAutocomplete';
 import DatasetSelectedItem from '@/components/dataset/DatasetSelectedItem.vue';
+import RelationLink from '@/components/relation/RelationLink.vue';
 import RelationEditorWorker from 'worker-loader!@/worker/relation/RelationEditor.Worker.js';
 import { util } from '@/plugins/util.js';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
@@ -126,19 +127,20 @@ export default {
 			selectingNode: null,
 			listDatasets: null,
 			selectedDatasetIds: null,
-			relationName: ""
+			relationName: "",
+			allLinks: null
 		};
 	},
 	components: {
 		RelationWorkspace,
 		DatasetAutocomplete,
 		DatasetSelectedItem,
-		VuePerfectScrollbar
+		VuePerfectScrollbar,
+		RelationLink
 	},
 	created(){
 		this.relationEditoWorker = new RelationEditorWorker()
         this.listenFromWorker();
-		this.getAllDataset()
 		if(this.action == 'edit'){
 			this.getRelationConfigs()
 		}
@@ -160,6 +162,24 @@ export default {
 					id: id
 				}
 			})
+		},
+		reduceLinks(){
+			let obj = this.$refs.relationWorkspace.getWorkspaceInfo()
+			this.$refs.relationLink.reduceLinks(obj.links)
+		},
+		handleDeleteLink(id){
+			let self = this
+			let links = this.$refs.relationWorkspace.getAllLinks()
+			links.forEach(function(e){
+				if(e.attributes.id == id){
+					self.$refs.relationWorkspace.linkAction(e)
+				}
+			})
+		},
+		handleAddLink(data){
+			this.handleDeleteLink(data.uid)
+			this.$refs.relationWorkspace.addLink(data)
+			this.reduceLinks()
 		},
 		getAllDataset(){
 			this.relationEditoWorker.postMessage({action: 'getAllDataset'})
@@ -209,6 +229,7 @@ export default {
 			this.datasets = data.datasetsMap
 			this.selectedDatasetIds = data.selectedDatasetIds 
 			this.relationName = data.relationName
+			this.getAllDataset()
 			this.$refs.relationWorkspace.loadRelations(data.originDataset , data.items , data.links)
 		},	
 		listenFromWorker(){
@@ -223,7 +244,7 @@ export default {
                 }
             });
 		},
-		handleDatasetSelected(arr) {
+		handleDatasetSelected(arr){
 			this.handleChangeSelectDataset(arr[arr.length - 1],true);
 			this.listDatasetSelected = arr;
 		},

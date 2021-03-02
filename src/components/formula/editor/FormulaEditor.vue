@@ -268,6 +268,19 @@ export default {
             let dataInput = {};
             for(let input in this.allInput){
                 dataInput[input] = this.allInput[input].value;
+                let regStr = "[a-z]+?(?=\\s*{"+input+"})";
+                let reg = new RegExp(regStr,"gm");
+                let beforeLetter = selectionText.match(reg);
+                if(beforeLetter && beforeLetter.length > 0 && ['in','all','union','from'].includes(beforeLetter[0])){
+                    let dataInputFilter = dataInput[input].split(',');
+                    dataInputFilter = dataInputFilter.reduce((arr,item)=>{
+                        let data = item.replace(/'/g,"");
+                        data = data.trim();
+                        arr.push(data);
+                        return arr;
+                    },[])
+                    dataInput[input] = dataInputFilter;
+                }
                 this.cacheDataInput[input] = this.allInput[input].value;
             }
             this.startTimeDebug = Date.now();

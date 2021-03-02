@@ -8,7 +8,6 @@
 
 <script>
 import ListComponent from '../../../components/taskManagement/component/ListComponent.vue';
-import { taskManagementApi } from "@/api/taskManagement.js";
 import ComponentWorker from 'worker-loader!@/worker/taskManagement/component/Component.Worker.js';
 
 export default {

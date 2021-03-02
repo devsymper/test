@@ -63,6 +63,9 @@ export default {
         }
     },
     methods:{
+        printInnerHTML(headerHTML){
+            this.$snotifySuccess("Không hỗ trợ print gantt")
+        },
         removeTask(task){
             this.ganttchartWorker.postMessage({
                 action: 'ganttChartRemoveTask',

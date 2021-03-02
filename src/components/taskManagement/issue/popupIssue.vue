@@ -71,6 +71,7 @@
                 :projectId="currentProject.id"
                 :workflowVariable="workflowVariable"
                 :showSubmitButton="false"
+                @after-loaded="afterLoadedContent"
                 @submit-document-success="onSubmitDone"
                 />
                 <div v-else class="no-document-message">
@@ -121,6 +122,7 @@ export default {
             currentProject: {},
             currentIssueType: null,
             documentId:null,
+            currentStatus:null,
             workflowVariable:{
             }
         
@@ -167,8 +169,17 @@ export default {
             else{
                 this.currentProject = this.allProject[0];
             }
-            this.getListIssueType()
-           
+            this.getListIssueType();
+        },
+        setStatusTask(status){
+            this.currentStatus = status
+            
+        },
+        afterLoadedContent(listInput){
+            if(this.currentStatus){
+                listInput['tmg_status'].setValue({inputDislay:this.currentStatus.name,inputValue: this.currentStatus.id});
+                listInput['tmg_status_id'].setValue(this.currentStatus.id);
+            }
         },
         async getListIssueType(){
             if(!this.allIssueTypeInProject){

@@ -21,6 +21,11 @@ export default {
             default: ''
         },
     },
+    methods:{
+        printInnerHTML(headerHTML){
+            this.$snotifySuccess("Không hỗ trợ print filter")
+        }
+    }
 }
 </script>
 

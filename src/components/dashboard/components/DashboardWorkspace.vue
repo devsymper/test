@@ -50,6 +50,8 @@
                     <DashboardCell 
                         v-if="item.active"
                         :ref="item.cellId"
+                        @view-detail="handleViewDetail(item)"
+                        @download-excel="handleDownloadExcel(item)"
                         :layoutItem="item"
                         :isView="isView"
                         :instanceKey="instanceKey"
@@ -58,6 +60,12 @@
                 </grid-item>
             </div>
         </grid-layout>
+        <!-- <DashboardCellDetail 
+            @back-to-dashboard="dashboardTab = 'tab-1'" 
+            :item="currentItem"
+            :instanceKey="instanceKey"
+            :dashboardConfig="dashboardConfig"
+        /> -->
     </VuePerfectScrollbar>
 
     <v-tabs ref="dashboardTabs" v-model="dashboardConfig.info.activeTabIndex" >
@@ -133,6 +141,7 @@
 
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import DashboardCellDetail from "@/components/dashboard/components/DashboardCellDetail"
 import VueGridLayout from 'vue-grid-layout';
 import DashboardCell from "@/components/dashboard/components/DashboardCell.vue";
 import { util } from '../../../plugins/util';
@@ -145,6 +154,8 @@ import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportCo
 import { calcTitleCellHeight } from "@/components/dashboard/configPool/dashboardConfigs.js";
 import CrossFilterManagement from "@/components/dashboard/components/filter/CrossFilterManagement.js";
 import { getUsedDatasetsFromSetting } from "@/components/dashboard/configPool/reportConfig.js";
+import { appConfigs } from '../../../configs';
+import { getDataInputForReport } from "@/components/dashboard/configPool/reportConfig.js";
 
 var mapTypeToClasses = autoLoadChartClasses();
 
@@ -171,14 +182,17 @@ export default {
     components: {
         DashboardCell,
         VuePerfectScrollbar,
+        DashboardCellDetail,
         'grid-layout': VueGridLayout.GridLayout,
         'grid-item': VueGridLayout.GridItem
     },
     data(){
         return {
             filter: {},
+            dashboardTab: "tab-1",
             crossFilterMng: {},
             workspaceHeight:'',
+            currentItem: null,
             invalidTabName: false,
             showTabOptions: false,
             activeAutoScroll: false,
@@ -212,6 +226,16 @@ export default {
         /**
          * khởi tạo instance của Cross filter
          */
+        handleViewDetail(item){
+            this.currentItem = item
+            this.changeTabDetail('tab-2')
+        },
+        handleDownloadExcel(item){
+            let cell = this.dashboardConfig.allCellConfigs[item.cellId]
+            let relations = this.dashboardConfig.info.relations;
+            let configs = getDataInputForReport(cell, relations);
+            util.getExcelFile(configs, appConfigs.apiDomain.biService+"dashboards/export-data", configs.reportName);    
+        },
         initCrossFilterMng(idRelations){
             this.crossFilterMng = new CrossFilterManagement(idRelations);
         },
@@ -292,6 +316,9 @@ export default {
             //     }
             // }
             return rsl;
+        },
+        changeTabDetail(value){
+            this.dashboardTab = value
         },
         getUsingDatasetAndColumns(){
             return this.thisDashboardData.allDatasetColumns;
@@ -559,12 +586,19 @@ export default {
             this.translateReportConfig(cellId, changeType)
         }, 
         getReportWraperSize(cellId){
-            let size = util.getComponentSize(this.$refs[cellId][0]);
-            let titleAttr = this.dashboardConfig.allCellConfigs[cellId].rawConfigs.style.title.children;
-            if(titleAttr.show.value){
-                size.h -= calcTitleCellHeight(titleAttr.textSize.value);
+            if(cellId == 'global'){
+                return {
+                    h: 0,
+                    w: 0
+                };
+            }else{
+                let size = util.getComponentSize(this.$refs[cellId][0]);
+                let titleAttr = this.dashboardConfig.allCellConfigs[cellId].rawConfigs.style.title.children;
+                if(titleAttr.show.value){
+                    size.h -= calcTitleCellHeight(titleAttr.textSize.value);
+                }
+                return size;
             }
-            return size;
         },
         getDashboardId(){
             let cond = this.$route.name == 'editDashboard' || this.$route.name == 'viewDashboard';
@@ -643,6 +677,9 @@ export default {
                         let classOfType = mapTypeToClasses[cell.sharedConfigs.type];
                         data.translatedData = classOfType.editTranslatedData(data.translatedData);
                         this.$set(cell.viewConfigs, 'displayOptions', data.translatedData);
+                        if(data.cellId == 'global'){
+                            this.setDashboardStyle(cell.rawConfigs.style);
+                        }
                     }
                 }
             } catch (error) {

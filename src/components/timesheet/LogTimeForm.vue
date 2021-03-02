@@ -619,7 +619,6 @@ export default {
                 })
                 self.items.push(...res.data.listObject);
                 self.listTask.push(...res.data.listObject);
-
             }).catch(console.log);
         },
         // lấy giờ

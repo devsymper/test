@@ -97,7 +97,8 @@ const defaultState = {
             dataInputBeforeChange:{},
             mapValueToTextAutocompleteInput:{},
             tableInteractive:null,
-            optionalDataBinding:{}
+            optionalDataBinding:{},
+            documentInfo:null
             
         }
     },

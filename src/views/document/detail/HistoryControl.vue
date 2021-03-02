@@ -44,14 +44,20 @@ export default {
         },
     },
     watch:{
-        focusingControlName(vl){
-            if(vl){
-                this.computeDataTable();
-                setTimeout((self) => {
-                    self.tableHeight = util.getComponentSize(self).h;
-                }, 10, this);
+
+        focusingControlName:{
+            immediate:true,
+            deep:true,
+            handler:function(vl){
+                if(vl){
+                    this.computeDataTable();
+                    setTimeout((self) => {
+                        self.tableHeight = util.getComponentSize(self).h;
+                    }, 10, this);
+                }
             }
         }
+
     },
     data () { 
         return {
@@ -77,14 +83,11 @@ export default {
             let trackChange = this.$store.state.document.detail[this.instance].trackChange;
             let inTable = ctrlObj.inTable;
             let tableControl = (inTable != false) ? getControlInstanceFromStore(this.instance, inTable) : false;
-            let hotTable = null, cellMeta, rowId;
+            let rowId;
             if(tableControl != false){
-                hotTable = tableControl.tableInstance.tableInstance;
-                cellMeta = hotTable.getSelected();
-                if(cellMeta && cellMeta.length > 0){
-                    let curRowData = hotTable.getDataAtRow(cellMeta[0][0]);
-                    rowId = curRowData[curRowData.length - 2];
-                }
+                let cellMeta = tableControl.tableInstance.getFocusedCell();
+                let rowNode = tableControl.tableInstance.getRowNode(cellMeta.rowIndex);
+                rowId = rowNode.data['childObjectId']
             }
             let data = [];
             for(let item of trackChange){
@@ -94,7 +97,7 @@ export default {
                 };
                 for(let ctrl of item.controls){
                     if(inTable != false){
-                        if(ctrl.name == inTable){
+                            if(ctrl.name == inTable){
                             let dataRow = ctrl.data[rowId];
                             for(let child of dataRow){
                                 if(child.name == ctrlName){
@@ -125,12 +128,7 @@ export default {
         },
         hide(){
             this.isShow = false;
-            this.resetData();
         },
-        resetData(){
-            // this.dataTable = []
-        },
-      
         setData(data){
             this.dataTable = data.dataBody;
         },

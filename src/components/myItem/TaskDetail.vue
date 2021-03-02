@@ -1,5 +1,6 @@
 <template>
 	<div class="w-100" style="height: 100%">
+		<!-- <v-btn color="primary" @click="test">Test</v-btn> -->
 		<v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
 			<v-tooltip bottom>
 				<template v-slot:activator="{ on }">
@@ -182,8 +183,12 @@ import ResolveDialog from './taskLifeCycle/Dialogs/ResolveDialog';
 import UnClaimDialog from './taskLifeCycle/Dialogs/UnClaimDialog';
 import { taskApi } from '../../api/task';
 import { formulasApi } from '../../api/Formulas';
+import myItemWorker from 'worker-loader!@/worker/myItem/myItem.Worker.js';
 
 export default {
+	mounted(){
+		this.myItemWorkerInstance = new myItemWorker();
+	},
 	name: 'taskDetail',
 	props: {
 		// Thông tin của một task, cấu trúc giống như một item khi lấy danh sách task
@@ -247,11 +252,6 @@ export default {
 				this.showSubmitSuccessBtn = false;
 				this.setCustomDocControls();
 			},
-		},
-		delegationState(val) {
-			// if(val == 'pending'){
-			// 	this.taskStatus = this.getTaskStatus('#8E2D8C', 'Ủy quyền', 'delegate')
-			// }
 		},
 		originData: {
 			deep: true,
@@ -321,7 +321,7 @@ export default {
 			showSnackbar: false,
 			rightAction: 120,
 			showDialogAlert: false,
-			isRole: false, //value =falses khi assignee = userId, =true khi assignee = userId:role
+			isRole: false, //value = falses khi assignee = userId, =true khi assignee = userId:role
 			widthInfoTask: 330,
 			isShowSidebar: false,
 			breadcrumb: {
@@ -371,7 +371,7 @@ export default {
 		// },
 		showSubmitBtn() {
 			if (this.taskInfo.action) {
-				if (this.taskInfo.action.parameter.documentObjectId) {
+				if (this.taskInfo.action.parameter.documentObjectId && this.taskInfo.action.action != 'update') {
 					return false;
 				} else {
 					return true;
@@ -432,6 +432,21 @@ export default {
 	},
 	created() {},
 	methods: {
+		test(){
+			let data = {"task":{"id":"8046ef62-75fd-11eb-ac2a-0242d3b2b8da","processDefinitionId":"fxnktn_1614053440172:3:7c78a93b-75fd-11eb-ac2a-0242d3b2b8da","processDefinitionUrl":"http://127.0.0.1:8080/symper-rest/service/repository/process-definitions/fxnktn_1614053440172:3:7c78a93b-75fd-11eb-ac2a-0242d3b2b8da","processInstanceId":"801a12ec-75fd-11eb-ac2a-0242d3b2b8da","processInstanceUrl":"http://127.0.0.1:8080/symper-rest/service/history/historic-process-instances/801a12ec-75fd-11eb-ac2a-0242d3b2b8da","executionId":"801a12fe-75fd-11eb-ac2a-0242d3b2b8da","name":"Tạo WBS","description":"{\"action\":{\"module\":\"document\",\"resource\":\"document_object\",\"scope\":\"workflow\",\"action\":\"submit\",\"parameter\":{\"activityId\":\"tao_wbs\",\"documentId\":\"2186\",\"processDefinitionId\":\"fxnktn_1614053440172:3:7c78a93b-75fd-11eb-ac2a-0242d3b2b8da\",\"processInstanceId\":\"801a12ec-75fd-11eb-ac2a-0242d3b2b8da\",\"variables\":\"{\\\"symper_user_id_start_workflow\\\":\\\"977:orgchart:113:3779acaa-a3f4-499a-95d1-fb23d1ff7c6d\\\",\\\"symper_last_executor_id\\\":\\\"977:orgchart:113:3779acaa-a3f4-499a-95d1-fb23d1ff7c6d\\\",\\\"cv\\\":\\\"scc\\\",\\\"fxnktn_1614053440172_controlsForBizKey\\\":null,\\\"fxnktn_1614053440172_instanceDisplayText\\\":null,\\\"_ACTIVITI_SKIP_EXPRESSION_ENABLED\\\":true,\\\"SYMPER_EXTRA_RUNNING_INFO\\\":\\\"{\\\\\\\"autoUpdateTaskInfo\\\\\\\":{\\\\\\\"tao_wbs\\\\\\\":{\\\\\\\"content\\\\\\\":\\\\\\\"Tạo WBS ${execution.getVariable('rp_executor_id') != null ? 'cho report bug' : 'cá nhân'} ${execution.getVariable('rp_executor_id') != null ? rp_id_bug : ' '} \\\\\\\",\\\\\\\"extraLabel\\\\\\\":\\\\\\\"select case length('{tao_wbs_wbs_id}') when 0 then 'Tạo WBS cá nhân' else 'Tạo wbs cá nhân: {tao_wbs_wbs_id}' end\\\\\\\",\\\\\\\"extraValue\\\\\\\":\\\\\\\"\\\\\\\"},\\\\\\\"dev_rv\\\\\\\":{\\\\\\\"content\\\\\\\":\\\\\\\"WIP: WBS số ${tao_wbs_wbs_id}\\\\\\\",\\\\\\\"extraLabel\\\\\\\":\\\\\\\"${tao_wbs_executor_fullname}: ${tao_wbs_tmg_name}\\\\\\\",\\\\\\\"extraValue\\\\\\\":\\\\\\\"\\\\\\\"},\\\\\\\"cn\\\\\\\":{\\\\\\\"content\\\\\\\":\\\\\\\"Điền THỜI GIAN XỬ LÝ TT cho: ${tao_wbs_wbs_id}\\\\\\\",\\\\\\\"extraLabel\\\\\\\":\\\\\\\"IMPORTANT\\\\\\\",\\\\\\\"extraValue\\\\\\\":\\\\\\\"\\\\\\\"}}}\\\",\\\"symper_last_executor_name\\\":\\\"Đào Mạnh Khá\\\"}\",\"taskId\":\"8046ef62-75fd-11eb-ac2a-0242d3b2b8da\",\"documentObjectId\":\"5252200\"}},\"content\":\"Tạo WBS cá nhân\",\"extraLabel\":\"Tạo wbs cá nhân:\",\"extraValue\":\"\",\"approvalActions\":\"\",\"targetElement\":\"\",\"editableControlOnApproval\":[],\"approvalEditableControls\":\"\",\"selectDefaultControlDocument\":[],\"autoUpdateTaskInfo\":true}","deleteReason":null,"owner":null,"assignee":"977:orgchart:113:3779acaa-a3f4-499a-95d1-fb23d1ff7c6d","startTime":"2021-02-24T00:35:20.197+07:00","endTime":null,"durationInMillis":null,"workTimeInMillis":null,"claimTime":null,"taskDefinitionKey":"tao_wbs","formKey":"2186","priority":1,"dueDate":"2021-02-24T12:35:20.276+07:00","parentTaskId":null,"url":"http://127.0.0.1:8080/symper-rest/service/history/historic-task-instances/8046ef62-75fd-11eb-ac2a-0242d3b2b8da","variables":[],"scopeDefinitionId":null,"scopeId":null,"subScopeId":null,"scopeType":null,"propagatedStageInstanceId":null,"tenantId":"1","category":null,"assigneeInfo":{"id":"977","firstName":"Khá","lastName":"Đào Mạnh","userName":"khadm","displayName":"Đào Mạnh Khá","email":"khadm@symper.vn","password":null,"passwordProps":null,"phone":"0335912137","status":"1","avatar":"","createAt":"2020-08-29 14:51:25","updateAt":"2021-01-21 10:03:25","listForeignKey":[]},"assigneeRole":{"id":"55258","vizId":"3779acaa-a3f4-499a-95d1-fb23d1ff7c6d","name":"Developer","description":"","orgchartId":"113","roleIdentify":"orgchart:113:3779acaa-a3f4-499a-95d1-fb23d1ff7c6d"},"ownerInfo":{},"processDefinitionName":"test tự động cập nhật thông tin task"},"vars":{"symper_last_executor_id":"977:orgchart:113:3779acaa-a3f4-499a-95d1-fb23d1ff7c6d","symper_user_id_start_workflow":"977:orgchart:113:3779acaa-a3f4-499a-95d1-fb23d1ff7c6d","fxnktn_1614053440172_controlsForBizKey":null,"cv":"scc","fxnktn_1614053440172_instanceDisplayText":null,"_ACTIVITI_SKIP_EXPRESSION_ENABLED":true,"SYMPER_EXTRA_RUNNING_INFO":"{\"autoUpdateTaskInfo\":{\"tao_wbs\":{\"content\":\"Tạo WBS ${execution.getVariable('rp_executor_id') != null ? 'cho report bug' : 'cá nhân'} ${execution.getVariable('rp_executor_id') != null ? rp_id_bug : ' '} \",\"extraLabel\":\"select case length('{tao_wbs_wbs_id}') when 0 then 'Tạo WBS cá nhân' else 'Tạo wbs cá nhân: {tao_wbs_wbs_id}' end\",\"extraValue\":\"\"},\"dev_rv\":{\"content\":\"WIP: WBS số ${tao_wbs_wbs_id}\",\"extraLabel\":\"${tao_wbs_executor_fullname}: ${tao_wbs_tmg_name}\",\"extraValue\":\"\"},\"cn\":{\"content\":\"Điền THỜI GIAN XỬ LÝ TT cho: ${tao_wbs_wbs_id}\",\"extraLabel\":\"IMPORTANT\",\"extraValue\":\"\"}}}","symper_last_executor_name":"Đào Mạnh Khá","tao_wbs_document_object_create_time":"2021-02-24 00:36:08","tao_wbs_document_object_update_time":"2021-02-24 00:36:08","tao_wbs_document_object_parent_id":"0","tao_wbs_document_object_workflow_id":"fxnktn_1614053440172:3:7c78a93b-75fd-11eb-ac2a-0242d3b2b8da","tao_wbs_document_object_workflow_object_id":"801a12ec-75fd-11eb-ac2a-0242d3b2b8da","tao_wbs_document_object_user_created_id":"977","tao_wbs_document_object_last_user_update_id":"null","tao_wbs_document_object_task_id":"8046ef62-75fd-11eb-ac2a-0242d3b2b8da","tao_wbs_document_object_id":"5252200","tao_wbs_chi_tiet":"null","tao_wbs_tmg_priority_name":"CRITICAL","tao_wbs_ma_module":"TE","tao_wbs_ngay_start":"2021-02-23","tao_wbs_tmg_due_date":"2021-02-24","tao_wbs_giai_phap":"","tao_wbs_tmg_assignee":"977","tao_wbs_tmg_description":"test","tao_wbs_loai":"DEV WBS","tao_wbs_dev":"null","tao_wbs_nguon":"null","tao_wbs_reporter":"Đào Mạnh Khá","tao_wbs_wbs_id":"DEV2057","tao_wbs_id":"null","tao_wbs_tmg_status":"NEW","tao_wbs_ma_wbs":"DEV","tao_wbs_so_id":2057,"tao_wbs_dev_wbs":"null","tao_wbs_rm_wbs":"null","tao_wbs_id_bug":"","tao_wbs_bug_id":"null","tao_wbs_mo_ta_bug":"","tao_wbs_document_object_uuid":"60353d08-64c8-b444-03aa-4cd7711736b0","tao_wbs_tong_tg":0,"tao_wbs_ngay_end_tt":"null","tao_wbs_ten_module":"Test","tao_wbs_tong_tg_tt":0,"tao_wbs_tmg_project_key":"WBS@","tao_wbs_tmg_name":"test","tao_wbs_tmg_issue_type":"601a5f0e-75cc-910b-3f44-c5aa2a76378c","tao_wbs_tmg_version_name":"","tao_wbs_tmg_sprint_name":"","tao_wbs_tmg_component_name":"","tao_wbs_name_assignee":"Đào Mạnh Khá","tao_wbs_test_axpppppp":0,"tao_wbs_tep_dk":"\"\"","tao_wbs_phong_ban":"DEV","tao_wbs_tmg_status_id":"601a7386-5fb4-2e60-4a0e-774b2a76378c","tao_wbs_tmg_status_category_id":"","tao_wbs_tmg_priority_id":"601ccbeb-108a-7f9f-75c9-be3076470100","tao_wbs_tmg_version_id":"","tao_wbs_tmg_sprint_id":"","tao_wbs_tmg_project_id":"601a5f0e-75cc-2695-1776-3dd32a76378c","tao_wbs_tmg_task_life_circle_id":"601a64a2-586a-6993-be22-114e2a76378c","tao_wbs_tmg_component_id":"","tao_wbs_ngay_end":"null","tao_wbs_wbs_depe":"","tao_wbs_dev_ba_qa_tb1":"false","tao_wbs_qa_ba_dev_tb1":"false","tao_wbs_tb1":"[{\"document_object_create_time\":\"2021-02-24 00:36:08\",\"document_object_update_time\":\"2021-02-24 00:36:08\",\"document_object_parent_id\":\"5252200\",\"document_object_workflow_id\":\"fxnktn_1614053440172:3:7c78a93b-75fd-11eb-ac2a-0242d3b2b8da\",\"document_object_workflow_object_id\":\"801a12ec-75fd-11eb-ac2a-0242d3b2b8da\",\"document_object_user_created_id\":\"977\",\"document_object_last_user_update_id\":null,\"document_object_task_id\":\"8046ef62-75fd-11eb-ac2a-0242d3b2b8da\",\"document_object_id\":\"5252201\",\"tb1_priority\":\"NEW\",\"tb1_duration\":null,\"tb1_cv\":\"\",\"tb1_end\":null,\"tb1_start\":null,\"tb1_ngay_bd\":\"2021-02-23\",\"tb1_ngay_kt\":\"2021-02-23\",\"tb1_task_id\":\"\"}]","tao_wbs_documentId":"2186","tao_wbs_userCreateInfo":"{\"role\":\"orgchart:113:3779acaa-a3f4-499a-95d1-fb23d1ff7c6d\"}","tao_wbs_otherInfo":"false","tao_wbs_outcome":"submit","tao_wbs_executor_fullname":"Đào Mạnh Khá","tao_wbs_executor_id":"977"},"currentVars":{"tao_wbs_document_object_create_time":"2021-02-24 00:36:08","tao_wbs_document_object_update_time":"2021-02-24 00:36:08","tao_wbs_document_object_parent_id":"0","tao_wbs_document_object_workflow_id":"fxnktn_1614053440172:3:7c78a93b-75fd-11eb-ac2a-0242d3b2b8da","tao_wbs_document_object_workflow_object_id":"801a12ec-75fd-11eb-ac2a-0242d3b2b8da","tao_wbs_document_object_user_created_id":"977","tao_wbs_document_object_last_user_update_id":"null","tao_wbs_document_object_task_id":"8046ef62-75fd-11eb-ac2a-0242d3b2b8da","tao_wbs_document_object_id":"5252200","tao_wbs_chi_tiet":"null","tao_wbs_tmg_priority_name":"CRITICAL","tao_wbs_ma_module":"TE","tao_wbs_ngay_start":"2021-02-23","tao_wbs_tmg_due_date":"2021-02-24","tao_wbs_giai_phap":"","tao_wbs_tmg_assignee":"977","tao_wbs_tmg_description":"test","tao_wbs_loai":"DEV WBS","tao_wbs_dev":"null","tao_wbs_nguon":"null","tao_wbs_reporter":"Đào Mạnh Khá","tao_wbs_wbs_id":"DEV2057","tao_wbs_id":"null","tao_wbs_tmg_status":"NEW","tao_wbs_ma_wbs":"DEV","tao_wbs_so_id":2057,"tao_wbs_dev_wbs":"null","tao_wbs_rm_wbs":"null","tao_wbs_id_bug":"","tao_wbs_bug_id":"null","tao_wbs_mo_ta_bug":"","tao_wbs_document_object_uuid":"60353d08-64c8-b444-03aa-4cd7711736b0","tao_wbs_tong_tg":0,"tao_wbs_ngay_end_tt":"null","tao_wbs_ten_module":"Test","tao_wbs_tong_tg_tt":0,"tao_wbs_tmg_project_key":"WBS@","tao_wbs_tmg_name":"test","tao_wbs_tmg_issue_type":"601a5f0e-75cc-910b-3f44-c5aa2a76378c","tao_wbs_tmg_version_name":"","tao_wbs_tmg_sprint_name":"","tao_wbs_tmg_component_name":"","tao_wbs_name_assignee":"Đào Mạnh Khá","tao_wbs_test_axpppppp":0,"tao_wbs_tep_dk":"\"\"","tao_wbs_phong_ban":"DEV","tao_wbs_tmg_status_id":"601a7386-5fb4-2e60-4a0e-774b2a76378c","tao_wbs_tmg_status_category_id":"","tao_wbs_tmg_priority_id":"601ccbeb-108a-7f9f-75c9-be3076470100","tao_wbs_tmg_version_id":"","tao_wbs_tmg_sprint_id":"","tao_wbs_tmg_project_id":"601a5f0e-75cc-2695-1776-3dd32a76378c","tao_wbs_tmg_task_life_circle_id":"601a64a2-586a-6993-be22-114e2a76378c","tao_wbs_tmg_component_id":"","tao_wbs_ngay_end":"null","tao_wbs_wbs_depe":"","tao_wbs_dev_ba_qa_tb1":"false","tao_wbs_qa_ba_dev_tb1":"false","tao_wbs_tb1":"[{\"document_object_create_time\":\"2021-02-24 00:36:08\",\"document_object_update_time\":\"2021-02-24 00:36:08\",\"document_object_parent_id\":\"5252200\",\"document_object_workflow_id\":\"fxnktn_1614053440172:3:7c78a93b-75fd-11eb-ac2a-0242d3b2b8da\",\"document_object_workflow_object_id\":\"801a12ec-75fd-11eb-ac2a-0242d3b2b8da\",\"document_object_user_created_id\":\"977\",\"document_object_last_user_update_id\":null,\"document_object_task_id\":\"8046ef62-75fd-11eb-ac2a-0242d3b2b8da\",\"document_object_id\":\"5252201\",\"tb1_priority\":\"NEW\",\"tb1_duration\":null,\"tb1_cv\":\"\",\"tb1_end\":null,\"tb1_start\":null,\"tb1_ngay_bd\":\"2021-02-23\",\"tb1_ngay_kt\":\"2021-02-23\",\"tb1_task_id\":\"\"}]","tao_wbs_documentId":"2186","tao_wbs_userCreateInfo":"{\"role\":\"orgchart:113:3779acaa-a3f4-499a-95d1-fb23d1ff7c6d\"}","tao_wbs_otherInfo":"false","tao_wbs_outcome":"submit","tao_wbs_executor_fullname":"Đào Mạnh Khá","tao_wbs_executor_id":"977","symper_last_executor_id":"977:orgchart:113:3779acaa-a3f4-499a-95d1-fb23d1ff7c6d","symper_last_executor_name":"Đào Mạnh Khá"}};
+			this.myItemWorkerInstance.postMessage({
+				action: 'updateTasksInfoAndProcessNameAndProcessName',
+				data: {
+					processInstance: {
+						formulaName: '',
+						dataInput: data.vars
+					},
+					taskInfo: {
+						...data
+					} 
+				}
+			});
+		},
 		handleSuccessActionOnTask(taskData){
 			let vars = taskData.variables.reduce((map, el) => {
 				map[el.name] = el.value;
@@ -455,12 +470,27 @@ export default {
 				let processInstanceNameKey = processKey + '_instanceDisplayText';
 				let formulaName = dataInput[processInstanceNameKey];
 				dataInput = Object.assign(dataInput, variables);
-				if (this.needComplyFormula(formulaName)) {
-					let newName = await formulasApi.getDataByAllScriptType(formulaName, dataInput);
-					BPMNEngine.updateProcessInstance(this.originData.processInstanceId, {
-						name: newName,
-					});
-				}
+				this.myItemWorkerInstance.postMessage({
+                    action: 'updateTasksInfoAndProcessNameAndProcessName',
+                    data: {
+						processInstance: {
+							formulaName: dataInput[processInstanceNameKey],
+							dataInput: dataInput,
+							processInstanceId: this.originData.processInstanceId
+						},
+						taskInfo: {
+							task: this.originData, 
+							vars: dataInput,
+							currentVars: variables
+						} 
+                    }
+                });
+				// if (this.needComplyFormula(formulaName)) {
+				// 	let newName = await formulasApi.getDataByAllScriptType(formulaName, dataInput);
+				// 	BPMNEngine.updateProcessInstance(this.originData.processInstanceId, {
+				// 		name: newName,
+				// 	});
+				// }
 			}
 		},
 		submitError() {
@@ -646,13 +676,17 @@ export default {
 		closeDetail() {
 			this.$emit('close-detail', {});
 		},
+		isAssigneeCurrentUser(assigneeId){
+			let userIdInAssignee = (assigneeId + '').split(':')[0];
+			return userIdInAssignee == this.$store.state.app.endUserInfo.id;
+		},
 		async saveTaskOutcome(value, idx) {
 			// hành động khi người dùng submit task của họ
 			this.indexAction = idx;
 			//check xem user có phải assignee
 			this.loadingAction = true;
 			// kiểm tra xem user hiện tại có role được phân quyền trong task không?
-			if (this.$store.state.app.endUserInfo.id != this.originData.assigneeInfo.id) {
+			if (!this.isAssigneeCurrentUser(this.originData.assigneeInfo.id)) {
 				this.showDialogAlert = true;
 				this.loadingAction = false;
 			} else if (this.checkRoleUser(this.originData)) {
@@ -767,7 +801,8 @@ export default {
 						return true;
 					} else {
 						self.isRole = false;
-						return false;
+						// return false;
+						return true;
 					}
 				} else {
 					self.isRole = false;
@@ -810,7 +845,6 @@ export default {
 				value: 'submit',
 				color: 'blue',
 			};
-			this.taskActionBtns.splice(this.taskActionBtns.indexOf(obj), 1);
 			let elId = this.taskInfo.action.parameter.activityId;
 			let docId = data.document_id;
 			if (!docId) {
@@ -856,7 +890,7 @@ export default {
 			self.taskAction = self.taskInfo.action.action;
 			if (self.taskAction == 'approval') {
 				self.showApprovalOutcomes(JSON.parse(self.taskInfo.approvalActions));
-			} else if (self.showSubmitBtn == true && self.taskAction == 'submit') {
+			} else if (self.showSubmitBtn == true && (self.taskAction == 'submit' || self.taskAction == 'update')) {
 				self.taskActionBtns = [
 					{
 						text: 'Submit',

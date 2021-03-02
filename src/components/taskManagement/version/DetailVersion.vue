@@ -20,9 +20,9 @@
             <p>{{infoVersion.description}}</p>
         </div>
         <div class="mx-4 d-flex progress" >
-            <div class="progress-item" v-for="(item, key) in dataProgess.item " :key="key" 
+            <div class="progress-item" v-for="(item, key) in infoCountIssueStatusInVersion.item " :key="key" 
                 :style="{
-                    width: (item.value/dataProgess.total)*100 +'%',
+                    width: (item.value/infoCountIssueStatusInVersion.total)*100 +'%',
                     background:item.color
                 }"
             >
@@ -31,25 +31,25 @@
         <div class="w-100" style="height:calc(100% - 125px)">
             <v-tabs class="h-100 pl-4 mt-2 fs-13 tab-version">
                 <v-tab>
-                    <span class="mr-1" style="font-size:40px">{{dataProgess.total}}</span>
+                    <span class="mr-1" style="font-size:40px">{{infoCountIssueStatusInVersion.total}}</span>
                     <span>Issue in <br> version</span>
                 </v-tab>
                 <v-tab  :style="{
-                            color:dataProgess.item.done.color
+                            color:infoCountIssueStatusInVersion.item.done ? infoCountIssueStatusInVersion.item.done.color : 'green'
                         }">
-                    <span class="mr-1" style="font-size:40px">{{dataProgess.item.done.value}}</span>
+                    <span class="mr-1" style="font-size:40px">{{infoCountIssueStatusInVersion.item.done ? infoCountIssueStatusInVersion.item.done.value : 0}}</span>
                     <span>Issue <br> done</span>
                 </v-tab>
                 <v-tab  :style="{
-                            color:dataProgess.item.inprogress.color
+                            color:infoCountIssueStatusInVersion.item.inprogress ? infoCountIssueStatusInVersion.item.inprogress.color : 'blue'
                         }">
-                    <span class="mr-1" style="font-size:40px">{{dataProgess.item.inprogress.value}}</span>
+                    <span class="mr-1" style="font-size:40px">{{infoCountIssueStatusInVersion.item.inprogress ? infoCountIssueStatusInVersion.item.inprogress.value : 0}}</span>
                     <span>Issue in <br> progress</span>
                 </v-tab>
                 <v-tab  :style="{
-                            color:dataProgess.item.todo.color
+                            color:infoCountIssueStatusInVersion.item.todo ? infoCountIssueStatusInVersion.item.todo.color : 'grey'
                         }">
-                    <span class="mr-1" style="font-size:40px">{{dataProgess.item.todo.value}}</span>
+                    <span class="mr-1" style="font-size:40px">{{infoCountIssueStatusInVersion.item.todo ? infoCountIssueStatusInVersion.item.todo.value : 0}}</span>
                     <span>Issue<br> to do</span>
                 </v-tab>
                 <!-- content -->
@@ -96,6 +96,12 @@ export default {
     computed:{
         listDocumentIdsInProject(){
             return this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId];
+        },
+        infoCountIssueStatusInVersion(){
+            if (this.$store.state.taskManagement.countIssueWithStatusInListProject[this.projectId] &&
+                this.$store.state.taskManagement.countIssueWithStatusInListProject[this.projectId][this.infoVersion.id] ) {
+                return this.$store.state.taskManagement.countIssueWithStatusInListProject[this.projectId][this.infoVersion.id];
+            }
         }
     },
     watch:{
@@ -126,23 +132,6 @@ export default {
             listType: self.$t('taskManagement.listIssueVersion'),
             projectId: null,
             listIssue:[],
-            dataProgess:{
-                total:6,
-                item:{
-                    todo:{
-                        value:2,
-                        color:'grey'
-                    },
-                    inprogress:{
-                        value:3,
-                        color:'blue'
-                    },
-                    done:{
-                        value:1,
-                        color:'green'
-                    }
-                }
-            },
             filter:{
                 ids: null,
                 filter:[

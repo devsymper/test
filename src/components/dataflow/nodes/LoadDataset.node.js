@@ -18,6 +18,9 @@ export default class LoadDataset extends NodeBase {
     getFullConfigsFromSavedData(configs, datasetsMap){
         let fullConfigs = this.restoreSharedProp(configs);
         let idDts = configs.idDataset ? configs.idDataset : 0;
+        if(!datasetsMap[idDts]){
+            return fullConfigs;
+        }
         let map = datasetsMap;
         let originDatasetInfo = datasetsMap[idDts].info;
         fullConfigs.idDataset = idDts;
@@ -72,6 +75,8 @@ export default class LoadDataset extends NodeBase {
         let columnGroup = {};
         if(data){
             columnGroup = data.columns ? data.columns : this.configs.columns;
+        }else{
+            columnGroup = this.configs.columns;
         }
 
         let newTBName = this.configs.newIdDataset = this.getNewDatasetId();

@@ -367,6 +367,17 @@ export default class Control {
                 });
             }
         }
+        else{
+            if(Array.isArray(values)){
+                values=values[0]
+            }
+            if(this.isEmpty()&&(values==1||values==true)){
+                this.renderValidateIcon('Không được bỏ trống trường thông tin '+this.title,'Require')
+            }
+            else{
+                this.removeValidateIcon('Require');
+            }
+        }
     }
     handlerDataAfterRunFormulasHidden(values) {
         if (this.inTable != false) {
@@ -376,8 +387,21 @@ export default class Control {
                 var plugin = tableControl.tableInstance.tableInstance.getPlugin('hiddenColumns');
                 plugin.hideColumn(colIndex);
             }
-           
-
+        }
+        else{
+            if(Array.isArray(values)){
+                values=values[0];
+            }
+            let display = (values == 1 || values==true ) ? 'none' : 'inline-block'
+            if(this.type == 'page'){
+                this.setHiddenPage()
+            }
+            else if(this.type == 'tab'){
+                this.setHiddenTab()
+            }
+            else{
+                this.ele.parent().css({'display':display})
+            }
         }
     }
     handlerDataAfterRunFormulasReadonly(values) {

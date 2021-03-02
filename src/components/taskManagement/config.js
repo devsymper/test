@@ -227,6 +227,8 @@ export const convertFormatNode = function(node) {
     status.name.value.name=node.name;
     status.name.value.id=node.statusId;
     status.id.value=node.nodeId;
+    status.id.documentObjectId = node.document_object_id;
+    status.id.documentObjectUuid = node.statusid;
     status.description.value=node.description;
     status.common.value=1;
     status.statusCategory.value=node.statusCategoryId;
@@ -243,6 +245,8 @@ export const convertFormatLink = function(link) {
     let infoLink = util.cloneDeep(linkInfo);
     infoLink.name.value=link.name;
     infoLink.id.value=link.linkId;
+    infoLink.id.documentObjectId=link.documentObjectId;
+    infoLink.id.documentObjectUuid=link.id;
     infoLink.from.value=link.fromStatusId;
     infoLink.to.value=link.toStatusId;
     return infoLink;

@@ -1,5 +1,13 @@
 <template>
-	<JointPaperDataMapping :background="background" :gridSize="gridSize" :draw-grid="drawGrid" @init="setupGraph" ref="jointPaper" :width="width" :height="height" />
+	<JointPaperDataMapping 
+		:background="background" 
+		:gridSize="gridSize" 
+		:draw-grid="drawGrid" 
+		@init="setupGraph" 
+		ref="jointPaper" 
+		:width="width" 
+		:height="height"
+	/>
 </template>
 
 <script>
@@ -85,7 +93,6 @@ export default {
 			let linkAttr = linkView.model.attributes;
 			let sourceId = linkAttr.source.port;
 			let targetId = linkAttr.target.port;
-
 			$('.record-item-body[item-id=' + sourceId + ']').css('fill', '#00000000');
 			$('.record-item-body[item-id=' + targetId + ']').css('fill', '#00000000');
 		},
@@ -242,31 +249,16 @@ export default {
 		},
 		
 		linkAction(link) {
-			var dialog = new joint.ui.Dialog({
-				title: 'Confirmation',
-				width: 300,
-				content: 'Are you sure you want to delete this link?',
-				buttons: [
-					{ action: 'cancel', content: 'Cancel' },
-					{ action: 'remove', content: '<span style="color:#fe854f">Remove</span>' }
-				]
-			});
-
-			dialog.open();
-			dialog.on({
-				'action:remove': function() {
-					for(let cb of rsl.onLinkRemove){
-						if(typeof cb == 'function'){
-							cb(link);
-						}
-					}
-					link.remove();
-					dialog.remove();
-				},
-				'action:cancel': function() {
-					dialog.remove();
-				}
-			});
+			// for(let cb of rsl.onLinkRemove){
+			// 	if(typeof cb == 'function'){
+			// 		cb(link);
+			// 	}
+			// }
+			link.remove();
+			this.reduceLinks()
+		},
+		reduceLinks(){
+			this.$emit('reduce-links')
 		},
 		listenPaperEvent() {
 			let self = this;
@@ -283,6 +275,7 @@ export default {
 			paper.on('link:mouseleave', function(linkView) {
 				this.removeTools();
 				self.removeRelateColumn(linkView);
+				self.reduceLinks()
 			});
 
 			paper.on('element:magnet:pointerdblclick', function(elementView, evt, magnet) {
@@ -430,7 +423,7 @@ export default {
 				);
 			}
 		},
-		addLink(slink) {
+		addLink(slink){
 			let link = new joint.shapes.mapping.Link(slink);
 			link.label(0, this.getLabelToLink('source', slink.symperLinkType[0]));
 			link.label(1, this.getLabelToLink('target', slink.symperLinkType[1]));
@@ -447,19 +440,19 @@ export default {
 			for (let slink of links) {
 				this.addLink(slink);
 			}
+			this.reduceLinks()
 		},
 		getWorkspaceInfo() {
-			//mapping.Link
 			let childs = this.graph.getCells();
 			let dataLink = [];
 			let dtss = [];
-
 			for (let c of childs) {
 				if (c.attributes.type == 'mapping.Link') {
 					dataLink.push({
 						from: c.attributes.source.port,
 						to: c.attributes.target.port,
 						type: c.attributes.symperLinkType,
+						uid: c.attributes.id
 					});
 				} else {
 					dtss.push({

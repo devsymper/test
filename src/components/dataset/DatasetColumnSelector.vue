@@ -24,6 +24,7 @@
                 @cell-value-changed="onCellValueChanged"
                 @row-selected="onSelectionChanged"
 				@cell-context-menu="cellContextMenu"
+				@model-updated="handleTableDataChange"
 			>
 			</ag-grid-vue>
 		</div>
@@ -33,6 +34,9 @@
 <script>
 import { AgGridVue } from 'ag-grid-vue';
 export default {
+	created(){
+		this.manualCheckSelected = true;
+	},
 	props:{
 		rowData:{
 			type: Array,
@@ -93,24 +97,21 @@ export default {
 	},
 	computed:{
 		tableData(){
-			let self = this
+			let self = this;
+			this.manualCheckSelected = false;
 			if(this.searchKey == ""){
 				return this.rowData
 			}else{
-				let arr = []
+				let arr = [];
+				let searchKey = self.searchKey.toLowerCase();
 				this.rowData.forEach(function(e){
-					let tableColumn = ['columnName', 'type', 'title']
-					tableColumn.forEach(function(i){
-						if(e[i]){
-							if(e[i].toLowerCase()){
-								if(e[i].toLowerCase().includes(self.searchKey.toLowerCase())){
-									arr.push(e)
-								}
-							}
-						}
-					})
+					if(	e.columnName.toLowerCase().includes(searchKey) ||
+						e.type.toLowerCase().includes(searchKey) ||
+						e.title.toLowerCase().includes(searchKey) ){
+						arr.push(e)
+					}
 				})
-				return arr
+				return arr;
 			}
 		},
 	},
@@ -133,19 +134,29 @@ export default {
 		};
 	},
 	methods:{
+		handleTableDataChange(){
+			if(!this.manualCheckSelected){
+				this.setSelectedRow();
+			}
+		},
 		onCellValueChanged(event){
             this.$emit('change-configs',{type: 'change-cell-value', data: event});
         },
 		onSelectionChanged(event) {
 			let rowIndex = event.node.id;
-            this.rowData[rowIndex].selected = event.node.selected;
+			if(this.manualCheckSelected){
+				this.tableData[rowIndex].selected = event.node.selected;
+			}
 			
 			if(this.debounceChangeConfigEmit){
 				clearTimeout(this.debounceChangeConfigEmit);
 			}
 			
 			this.debounceChangeConfigEmit = setTimeout((self) => {
-				self.$emit('change-configs',{type:'select-row-change', data: event});			
+				if(self.manualCheckSelected){
+					self.$emit('change-configs',{type:'select-row-change', data: event});			
+				}
+				self.manualCheckSelected = true;
 			}, 200, this);
         },
 		cellContextMenu(params) {},
@@ -155,11 +166,12 @@ export default {
 		},
 		setSelectedRow(){
 			if(this.gridApi){
+				this.manualCheckSelected = false;
 				this.gridApi.forEachNode(node=>{
 					if(node.data.selected){
 						node.setSelected(true)
 					}
-				})
+				});
 			}
 			
 		},
@@ -171,15 +183,6 @@ export default {
 		AgGridVue,
 	},
 	watch:{
-		rowData:{
-			deep: true,
-			immediate: true,
-			handler(arr){
-				setTimeout(self=>{
-					self.setSelectedRow()
-				},10, this)
-			}
-		}
 	}
 };
 </script>

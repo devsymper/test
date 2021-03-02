@@ -140,9 +140,8 @@ export default {
 			let type = self.currentObjectType
 			let arr = []
 			for(let i in self.listItemSelected){
-				let id = self.listItemSelected[i].id ? self.listItemSelected[i].id : self.listItemSelected[i].document_object_id
+				let id = self.listItemSelected[i].document_object_id ? self.listItemSelected[i].document_object_id : self.listItemSelected[i].id
 				arr.push(id)
-				
 			}
 			let ids = {
 				"ids":arr
