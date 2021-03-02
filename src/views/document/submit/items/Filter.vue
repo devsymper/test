@@ -97,6 +97,12 @@ export default {
         };
     },
     methods:{
+        showLoadingOverlay(){
+            this.gridOptions.api.showLoadingOverlay()
+        },
+        hideOverlay(){
+            this.gridOptions.api.hideOverlay()
+        },
         rowSelected(params){
             let data = params.data;
             let rowKey = this.getRowkey(data);
@@ -125,6 +131,7 @@ export default {
             return 25;
         },
         setData(data){
+            this.hideOverlay();
             let dataTable = [];
             this.columnDefs = [];
             for (let index = 0; index < data.length; index++) {
@@ -153,6 +160,7 @@ export default {
             setTimeout((self) => {
                 self.setSelection();
             }, 500,this);
+            
         },
         getRowkey(rowData){
             let key = []
@@ -184,6 +192,7 @@ export default {
             );
         },
         setFormulas(formulas){
+            this.showLoadingOverlay()
             this.formulas = formulas;
             this.getSearchField(formulas.instance.formulas)
         },

@@ -514,7 +514,8 @@
             "viewDetails": "Xem chi tiết",
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
-            "remove": "Xóa"
+            "remove": "Xóa",
+            "clone":"Nhân bản"
         },
         "created": "Đã tạo mới nhóm quyền",
         "deleted": "Đã xóa nhóm quyền",
@@ -557,6 +558,7 @@
             "name": "Tên nhóm ",
             "key": "Key",
             "id": "id",
+            "stt":"Stt",
             "description": "Mô tả",
             "status": "Trạng thái",
             "user_created": "Người tạo",

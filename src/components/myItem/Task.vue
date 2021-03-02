@@ -50,11 +50,11 @@
             @showPopupTracking="showPopupTracking"
         />
         <KHShowFile
-        @downloadOrBackupFile="downloadOrBackupFile"
-        v-bind:fileId="fileId"
-        v-bind:name="name"
-        v-bind:serverPath="serverPath"
-        v-bind:type="type"
+            @downloadOrBackupFile="downloadOrBackupFile"
+            v-bind:fileId="fileId"
+            v-bind:name="name"
+            v-bind:serverPath="serverPath"
+            v-bind:type="type"
         />
         <PopupProcessTracking 
             :taskInfo="taskInfo"

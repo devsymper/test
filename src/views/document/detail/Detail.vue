@@ -27,7 +27,7 @@
                 </v-tooltip>
             </div>
         </div>
-        <VuePerfectScrollbar style="height: calc(100% - 30px);" class="content-scroll">
+        <VuePerfectScrollbar style="height: calc(100% - 30px);" class="content-scroll wrapview-contextmenu">
             <div
                 class="sym-form-Detail"
                 :id="'sym-Detail-'+keyInstance"
@@ -57,8 +57,8 @@
         <HistoryControl ref="historyView" />
         <Comment style="margin-left:-12px;margin-right:8px" 
 				:showComment="true" 
-				:objectIdentifier="String(docObjId)" 
-				:objectType="'document'" 
+				:objectIdentifier="taskId ? taskId : String(docObjId)" 
+				:objectType="taskId ? 'task' : 'document'" 
 				:height="'480px'"
                 :listCommentHeight="425"
                 ref="commentView"
@@ -252,9 +252,9 @@ export default {
                 if($(evt.target).is('.highlight-history') ){
                     this.$refs.historyView.show($(evt.target))    
                 }
-                else if($(evt.target).is('.info-control-btn')){
+                else if($(evt.target).closest('.info-control-btn').length > 0){
+                    this.focusingControlName = $(evt.target).closest('.info-control-btn').attr('data-control');
                     this.$refs.floattingPopup.show(evt, $('#sym-Detail-'+this.keyInstance));
-                    this.focusingControlName = $(evt.target).attr('data-control');
                 }
                 else{
                     if(!$(evt.target).hasClass("v-data-table") &&
@@ -263,22 +263,14 @@ export default {
                     }
                     if(!$(evt.target).hasClass("s-floatting-popup") &&
                         $(evt.target).closest(".s-floatting-popup").length == 0){
-                            this.focusingControlName = "";
+                        this.focusingControlName = "";
                         this.$refs.floattingPopup.hide() 
                     }
                 }
             }
             
         })
-        this.$evtBus.$on("on-info-btn-in-table-click", locate => {
-            if(thisCpn._inactive == true) return;
-            let e = locate.e;
-            let row = locate.row;
-            let controlName = locate.controlName;
-            this.focusingControlName = controlName;
-            this.$refs.floattingPopup.show(e, $('#sym-Detail-'+this.keyInstance), row);
-            
-        });
+        
         /**
          * Nhận xử lí sự kiện click chuyển đổi dạng table <=> pivot mode
          */
@@ -346,6 +338,11 @@ export default {
                 }
                 let docDetailRes = await documentApi.detailDocument(documentId,dataPost);
                 if (docDetailRes.status == 200) {
+                    this.$store.commit("document/addToDocumentSubmitStore", {
+                        key: 'documentInfo',
+                        value: docDetailRes.data,
+                        instance:this.keyInstance
+                    });
                     this.dataPivotTable = docDetailRes.data.pivotConfig;
                     this.dataGroupTable = docDetailRes.data.groupConfig;
                     let content = docDetailRes.data.document.content;
@@ -475,7 +472,6 @@ export default {
                     ".s-control:not(.bkerp-input-table .s-control)"
                 );
             }
-            // let listTableIns = [];
             let thisCpn = this;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');

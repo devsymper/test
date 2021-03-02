@@ -26,14 +26,10 @@ export default {
         },
         async getListLink(){
             let self=this;
-            let id=this.$route.params.id;
-            if (id) {
-                let listLink =await taskManagementApi.getListComponent(id);
-                if (listLink.status==200 && listLink.data) {
-                    self.listLink=listLink.data.listObject;
-                    self.$store.commit("taskManagement/setListComponent", listLink.data.listObject);
-                }
-              
+            let listLink = await taskManagementApi.getListIssueLink();
+            if (listLink.status==200 && listLink.data) {
+                self.listLink = listLink.data;
+                self.$store.commit("taskManagement/setListIssueLink", listLink.data);
             }
         },
     },

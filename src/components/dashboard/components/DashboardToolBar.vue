@@ -9,6 +9,7 @@
             v-else class="mdi mdi-view-dashboard-outline fs-18">
         </i>
         <div style="line-height: 30px;" class="ml-8">
+            <v-icon small style="margin-top: -4px">  mdi-pencil </v-icon>
             <input 
                 :style="{
                     width: inputWidth

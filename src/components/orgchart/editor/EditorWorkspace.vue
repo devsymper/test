@@ -123,7 +123,6 @@ export default {
                 lastDynamicAttr: '.dynamic-attr-value/text',
                 highlight: '.border-bottom/fill'
 			};
-			
 			let cell = this.$refs.jointPaper.graph.getCell(cellId);
             if(cell && mapName[attrName]){
                 if(typeof value == 'object'){
@@ -136,7 +135,7 @@ export default {
 						cell.attr(mapName[attrName], value,
 					);
                     }else{
-						if(value && attrName == 'name'){
+						if(attrName == 'name'){
 							let newValue =   joint.util.breakText(
 									value, 
 									{

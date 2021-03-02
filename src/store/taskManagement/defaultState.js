@@ -19,6 +19,7 @@ const defaultState = {
     currentBoard:{},
     listBoardInProject:[],
     listComponentInProject:[],
+    listIssueLink:[],
     listVersionInProject:[],
     infoVersionCurrent:{},
     infoComponentCurrent:{},
@@ -42,6 +43,7 @@ const defaultState = {
     checkBoardChange:[],
     backLogData:{},
     listUserInProject:{},
+    countIssueWithStatusInListProject:{},// có dạng {key : []} , key là projectId,
 };
 
 export default defaultState;

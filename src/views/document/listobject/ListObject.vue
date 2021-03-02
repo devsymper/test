@@ -23,7 +23,6 @@
 			@data-loaded="afterGetData"
 			@before-keydown="afterRowSelected"
 			@after-cell-mouse-down="afterRowSelected"
-			@after-selected-row="afterSelectedRow"
 			@row-selected="afterCellSelection"
 			:commonActionProps="commonActionProps"
 			:customAPIResult="customAPIResult"
@@ -48,7 +47,7 @@
                     color="orange"
                     ></v-progress-linear>
                     <br>
-                <v-btn small @click="showDialog" class="delete-record-btn">
+                <v-btn small @click="deleteRowSelected" class="delete-record-btn">
                     <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
                 </v-btn>
                 <!-- test -->
@@ -209,7 +208,7 @@
                 <v-btn
                     color="green"
                     text
-                    @click="deleteSelectedRecord">
+                    @click="confirmDelete">
                     {{$t('common.delete')}}
                 </v-btn>
                 </v-card-actions>
@@ -288,7 +287,7 @@ export default {
             currentDocObjectActiveIndex:'',
             panelDocTitle:"",
             docObjInfo:{},
-            actionPanelWidth:800,
+            actionPanelWidth:850,
             containerHeight: 200,
             dataTable:[],
             countRecordSelected:0,
@@ -432,18 +431,6 @@ export default {
             thisCpn.listTabletItem[0].activeSb = true;
         }).catch(err => {}).finally(() => {});
     },
-    activated(){
-        if(this.$refs.listObject && this.$refs.listObject.isShowCheckedRow()){
-            if(this.isDeleteMultiple){
-                // for(let row in this.recordSelected){
-                //     this.$refs.listObject.getHotInstance().setDataAtCell(row,0,true,'edit');
-                // }
-            }
-            else{
-                this.showBottomSheet();
-            }
-        }
-    },
     methods:{
 		convertToPlain(rtf) {
 			return "<span>value</span>"
@@ -482,8 +469,8 @@ export default {
         handleClickPrint(){
             this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:this.docObjInfo.docObjId}]});
         },
-        deleteSelectedRecord(){
-            let itemSelected = Object.values(this.recordSelected);
+        confirmDelete(){
+            let itemSelected = Object.values(this.$refs.listObject.getRowSelected());
             let ids = itemSelected.reduce((arr,obj)=>{
                 arr.push(obj.document_object_id);
                 return arr;
@@ -512,14 +499,17 @@ export default {
             })
             .finally(() => {});
         },
-        showDialog(){
+        deleteRowSelected(){
+            let listRowSelected = this.$refs.listObject.getRowSelected();
+            this.countRecordSelected = listRowSelected.length;
+            this.recordSelected = listRowSelected; 
             this.dialog = true;
         },
         closePanelFormulas(){
             this.formulasInput.formula.value = "";
             this.isDeleteMultiple = false;
             this.$refs.listObject.removeCheckBoxColumn();
-            this.actionPanelWidth = 800;
+            this.actionPanelWidth = 850;
             this.$refs.listObject.closeactionPanel();
             setTimeout((self) => {
                 self.$refs.listObject.refreshList(); 
@@ -531,9 +521,6 @@ export default {
         },
         afterGetData(data){
             this.showProgress = false;
-            if(this.isDeleteMultiple){
-                this.$refs.listObject.addCheckBoxColumn();
-            }
             this.dataTable = data;
         },
         nextRecord(){
@@ -572,7 +559,7 @@ export default {
         },
         showDetailInfoDocument(){
             if(this.$refs.viewDetail.isShow()){
-                this.actionPanelWidth = 800;
+                this.actionPanelWidth = 850;
                 this.$refs.viewDetail.setLayoutFromQuickView('21cm','auto')
             }
             else{
@@ -583,7 +570,7 @@ export default {
             this.$refs.viewDetail.toggleSideBar()
         },
         afterHideSidebarDetail(){
-            this.actionPanelWidth = 800;
+            this.actionPanelWidth = 850;
             this.$refs.viewDetail.setLayoutFromQuickView('21cm','auto')
         },
         
@@ -610,7 +597,7 @@ export default {
             if(this.$refs.listObject.isShowSidebar()){
                 let documentObject = data.data;
                 let event = data.event;
-                if(this.$refs.listObject.isShowCheckedRow()){
+                if(this.$refs.listObject.hasColumnsChecked){
                     return;
 				}
                 if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
@@ -640,17 +627,12 @@ export default {
          * Hàm hiển thị cột checkbox trong compon listItem
          */
         toggleCheckBoxListItem(isShowBottomSheet = true){
-            if(!this.$refs.listObject.isShowCheckedRow()){
-                if(isShowBottomSheet){
-                    this.showBottomSheet();
-                }
-                this.$refs.listObject.addCheckBoxColumn();
+            if(isShowBottomSheet){
+                this.showBottomSheet();
             }
+            this.$refs.listObject.addCheckBoxColumn();
         },
-        afterSelectedRow(dataSelected){
-            this.countRecordSelected = dataSelected.length;
-            this.recordSelected = dataSelected; 
-        },
+        
         /**
          * Ấn để in các bản ghi đã chọn
          */

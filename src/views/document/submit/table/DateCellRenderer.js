@@ -32,6 +32,12 @@ DateCellRenderer.prototype.init = function(params) {
             }
         }
         this.eGui.innerHTML = div;
+        if(control.tableCellHistoryData['row_'+params.rowIndex]){
+            this.eGui.classList.add('info-control-btn');
+            this.eGui.setAttribute('rowIndex',params.rowIndex);
+            this.eGui.setAttribute('data-control',control.name);
+            this.eGui.style.height = '100%'
+        }
         this.eGui.classList.add('ag-input-date');
         this.eGui.addEventListener('dblclick', function(e){
             let event = e;

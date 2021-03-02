@@ -264,7 +264,8 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		stroke: '#FFFFFF',
 		strokeWidth: 0.1,
 		event:"visiblePainted",
-		text: '+'
+		text: '+',
+		'margin-left': '2px'
 	},
 	'.button-add-delete': {
 		stroke: '#FFFFFF',
@@ -385,9 +386,9 @@ export const departmentMarkup =
 
 		toggleButtonSign: function (plus) {
 			if (plus) {
-				this.attr('.buttonSign', { text: "+" });
+				this.attr('.buttonSign', { text: "--" });
 			} else {
-				this.attr('.buttonSign', { text: "-" });
+				this.attr('.buttonSign', { text: "+" });
 			}
 		}
 	});

@@ -35,5 +35,7 @@ export const biApi = {
 	getDetailDataflowWithDatasetIds(strDatasetIds){
         return api.get("dataflow/nodes/datasets-inside/"+strDatasetIds);
 	},
-	
+	deleteDashboard(id){
+		return api.get("dashboards/"+ id + "/delete")
+	}
 };

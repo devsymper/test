@@ -1,4 +1,5 @@
 import { dashboardApi } from "@/api/dashboard.js";
+import { biApi } from "@/api/bi.js";
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig";
 import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/dashboardConfigs.js";
 import _cloneDeep from 'lodash/cloneDeep';
@@ -187,5 +188,17 @@ var handler = {
                 data: datasetColInfo
             });
         }
+    },
+    async deleteRows(data){
+        console.log(data, 'dataaaaaaaaaaa')
+        let arr = []
+        data.rows.forEach(async function(e){
+            let res = await biApi.deleteDashboard(e.id)
+            self.postMessage({
+                action: 'handleDeleteRows',
+                data: res.status
+            });
+        })
+        
     }
 };

@@ -114,6 +114,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import {
     util
 } from "@/plugins/util.js";
+import { documentApi } from '@/api/Document';
 require('@/components/common/rappid/jointjs');
 
 export default {
@@ -159,6 +160,29 @@ export default {
                 this.getDataDetailWorkflow(vl);
             }
         },
+        nodeConfig:{
+            deep:true,
+            immediate:true,
+            handler:function(newVal, oldVal){
+                if(newVal && newVal.id && oldVal.id && !newVal.id.newNode && newVal.id.value == oldVal.id.value){
+                    if(newVal.to){
+                        if(newVal.id.documentObjectId){
+                            let operatorDocId = this.infoWorkflow.operatorDocId;
+                            let dataControl = {tmg_name:newVal.name.value,tmg_to_status_id:newVal.to.value,tmg_from_status_id:newVal.from.value, document_object_uuid:newVal.id.documentObjectUuid}
+                            this.updateElement(operatorDocId, newVal.id.documentObjectId, dataControl)
+                        }
+                    }
+                    else{
+                        if(newVal.id.documentObjectId){
+                            let statusDocId = this.infoWorkflow.statusDocId;
+                            let dataControl = {tmg_name:newVal.name.value.name,tmg_status_category_id:newVal.statusCategory.value,
+                            tmg_role_ids:newVal.roleAcess.value, tmg_color:newVal.colorStatus.value, document_object_uuid:newVal.id.documentObjectUuid}
+                            this.updateElement(statusDocId, newVal.id.documentObjectId, dataControl)
+                        }
+                    }
+                }
+            }
+        }
     },
     data(){
         return {
@@ -271,6 +295,25 @@ export default {
         }
     },
     methods:{
+        /**
+         * Hàm xử lý update element vào db
+         */
+        updateElement(documentId, objectId, dataControl){
+            let dataPost ={};
+            dataPost['documentId'] = documentId;
+            dataPost['documentObjectWorkflowObjectId'] = "";
+            dataPost['documentObjectWorkflowId'] = "";
+            dataPost['documentObjectTaskId'] = "";
+            dataPost['dataControl'] = JSON.stringify(dataControl);
+            documentApi.updateDocument(objectId,dataPost);
+            let taskLifeCircleDocId = this.infoWorkflow.taskLifeCircleDocId;
+            let taskLifeCircleDocObjId = this.infoWorkflow.documentObjectId;
+            dataPost['documentId'] = taskLifeCircleDocId;
+            setTimeout((self) => {
+                dataPost['dataControl'] = JSON.stringify({tmg_data:JSON.stringify(self.dataWorkflow), document_object_uuid:self.infoWorkflow.id});
+                documentApi.updateDocument(taskLifeCircleDocObjId,dataPost);
+            }, 1000,this);
+        },
         deleteElementOrLink(){
             if (this.selected) {
                 // remove in dataWorkflow , in list node
@@ -513,6 +556,7 @@ export default {
 
             rectReview.addTo(this.graph);
             this.$set(newStatus.id,"value",rectReview.id);
+            this.$set(newStatus.id,"newNode",true);
             this.nodeConfig = newStatus;
             this.listNode.push(newStatus);
 
@@ -557,6 +601,7 @@ export default {
                 }
             });
             this.$set(linkInfo.id,"value",link1.id);
+            this.$set(linkInfo.id,"newLink",true);
             this.listLink.push(linkInfo);
             this.dataWorkflow.links.push(link1);
             link1.addTo(this.graph);
@@ -667,7 +712,6 @@ export default {
                 }
             })
         });
-
         if (!this.statusDetail) {
             var rectStart = new joint.shapes.standard.Rectangle();
             rectStart.position(100, 130);
@@ -714,7 +758,6 @@ export default {
             if (todoNode) {
                 nodeDefaultInfo.name.value.name = "To Do";
                 nodeDefaultInfo.name.value.id = todoNode.id;
-                nodeDefaultInfo.common.value = 1;
                 nodeDefaultInfo.colorStatus.value = todoNode.color;
                 self.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
                 self.$set(nodeDefaultInfo.statusCategory,"value",todoNode.statusCategoryId);
