@@ -20,11 +20,11 @@
                 :start="calendarShowDate">
                 <template v-slot:day-body="{ date, week }">
                     <div
-                        v-if="timeView"
+                        v-show="timeView"
                         class="v-current-time"
-                        :class="{ first: true }"
                         :style="{ top: nowY }"
                     ></div>
+                    {{getDate(nowY,week[0].date)}}
                 </template>
                 <template v-slot:day-label="{day,present,past, month, date}">
                     <MonthViewHeader 
@@ -209,6 +209,15 @@ export default {
         this.load();
     },
     methods: {
+        getDate(a,b){
+            console.log('date');
+
+            console.log(a);
+            console.log('week');
+
+            console.log(b);
+
+        },
         undoUpdate(){
             let logInx = -1;
             let events = [...this.events];
@@ -799,6 +808,7 @@ export default {
                      this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: block');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: block');
                 } else {
+                   
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: none');
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-body').setAttribute('style', 'display: none');
                     div.setAttribute('style', div.getAttribute('style') + '; border-top: none; border-bottom: none');
@@ -936,11 +946,12 @@ export default {
         this.onChangeCalendar();
         this.handleEventKeyBoad();
         this.ready = true;
-        if(this.timeView){
-            this.scrollToTime()
-        }else{
-            this.$refs.calendar.scrollToTime('07:40');
-        }
+         this.scrollToTime()
+        // if(this.timeView){
+        //     this.scrollToTime()
+        // }else{
+        //     this.$refs.calendar.scrollToTime('07:40');
+        // }
         this.updateTime()
         const self = this
         this.categoryWorker.addEventListener("message", function (event) {
@@ -1059,6 +1070,16 @@ export default {
     left: -1px;
     right: 0;
     pointer-events: none;
+    &.first::before {
+    content: '';
+    position: absolute;
+    background-color: #ea4335;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: -5px;
+    margin-left: -6.5px;
+    }
 }
 .create-timesheet-container {
     display: flex;

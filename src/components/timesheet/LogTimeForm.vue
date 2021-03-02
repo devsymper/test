@@ -13,6 +13,7 @@
         <v-divider class="mx-3"></v-divider>
         <v-card-text class="mt-2" >
             <span class="label ">{{$t('timesheet.category_task')}}</span>
+              <span style="color:red"> *</span>
             <v-btn text @click="showCategoryForm()" depressed x-small class="add-btn mr-2 ml-1 fs-13">
                 <v-icon style="font-size:15px!important; margin-top:-3px">mdi-plus</v-icon>
             </v-btn>
@@ -149,7 +150,7 @@
                 </span>
                 <input type="text" 
                     :value="displayDuration" 
-                    @input="caculateDuration" 
+                    @input="handleDuration" 
                     class="input-logtime">
             </div>
             <div class='input-time' style="margin-left:-3px">
@@ -313,46 +314,15 @@ export default {
         typeCalendar() {
             return this.$store.state.timesheet.calendarType;
         },
-        duration(value) {
-            if(!this.isCaculate){
-                  let startTime = this.inputs.startTime.split(":");
-                    let endTime = this.inputs.endTime.split(":");
-                    let hourStart = Number(startTime[0]);
-                    let minutesStart = Number(startTime[1]);
-                    let hourEnd = Number(endTime[0]);
-                    let minutesEnd = Number(endTime[1]);
-                    return ((hourEnd * 60 + minutesEnd) - (hourStart * 60 + minutesStart));      
-            }else{
-                return this.durationTime
-            }
+        duration() {
+            debugger
+            let start = this.inputs.startTime;
+            let end = this.inputs.endTime;
+           return this.canculateDurationByStartEnd(start,end)
         },
         
         displayDuration() {
-            if(!this.isCaculate){
-            if (this.duration >= 0) {
-                if (this.duration > 60) {
-                    if (this.duration / 60 == 0) {
-                        return this.duration / 60 + 'h';
-                    } else {
-                        let hour = Math.floor(this.duration / 60);
-                        let minutes = this.duration % 60;
-                        if (minutes == 0) {
-                            return hour + 'h';
-                        } else {
-                            return hour + 'h' + minutes + 'm';
-                        }
-                    }
-                } else {
-                    return this.duration + "m";
-                }
-                return this.$moment(this.event.start).format('HH:mm');
-            } else {
-                return '';
-            }
-            }
-            else{
-                return this.durationTime
-            }
+            return this.changeMinutesToHourAndMinutes(this.duration)
         },
     },
     watch: {
@@ -377,7 +347,7 @@ export default {
             this.displayDate= this.datePicker
         },
         durationTime(){
-            this.changeDuration(this.durationTime);
+            this.changeStartEndFromDuration(this.durationTime);
             //  this.isCaculate = false;
         },
         updateAPICategory(){
@@ -396,7 +366,9 @@ export default {
             this.getDateMonth()
         },
         duration(){
-            if(!this.duration||this.duration<=0||Number.isNaN(this.duration)||this.duration=='0h'||this.duration=='0m'){
+            debugger
+            let hasSpecialCharacters = (/[^a-zA-Z0-9]/).test(this.duration);// kí tự đặc biệt trả về true
+            if(!this.duration||this.duration<=0||Number.isNaN(this.duration)||hasSpecialCharacters || this.duration=='0h'||this.duration=='0m'){
                 // if(this.duration.match(/[^a-zA-Z0-9]/)){
                      this.timeError = this.$t('timesheet.time_invalid');
                 //  }
@@ -452,7 +424,6 @@ export default {
       
     },
     created(){
-        
         // load lại trang ở màn month
         this.refreshAll();
         this.generateListHour();
@@ -462,13 +433,59 @@ export default {
         this.setValueLog(this.newEvent)
     },
     methods: {
-          setValueLog(val) {
+        //
+        changeMinutesToHourAndMinutes(duration){
+             if(!this.isCaculate){
+                if (duration >= 0) {
+                    if (duration > 60) {
+                        if (duration / 60 == 0) {
+                            return duration / 60 + 'h';
+                        } else {
+                            let hour = Math.floor(duration / 60);
+                            let minutes = duration % 60;
+                            if (minutes == 0) {
+                                return hour + 'h';
+                            } else {
+                                return hour + 'h' + minutes + 'm';
+                            }
+                        }
+                    } else {
+                        return duration + "m";
+                    }
+                    return this.$moment(this.event.start).format('HH:mm');
+                }else {
+                    return '';
+                }
+            }else{
+                return this.durationTime
+            }
+        },
+            // tính duration dựa theo start và end
+        canculateDurationByStartEnd(start,end){
+             if(!this.isCaculate){
+                let startTime = start.split(":");
+                let endTime = end.split(":");
+                let hourStart = Number(startTime[0]);
+                let minutesStart = Number(startTime[1]);
+                let hourEnd = Number(endTime[0]);
+                let minutesEnd = Number(endTime[1]);
+                 return ((hourEnd * 60 + minutesEnd) - (hourStart * 60 + minutesStart));      
+            }else{
+                return this.durationTime
+            }
+        },
+        setValueLog(val) {
+            debugger
             this.clearError();
             if(val){
                 this.task = val?val.task:'';
             }
+            debugger
+            this.isCaculate = false;
             this.inputs.startTime = val ? this.$moment(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? this.$moment(val.end).format('HH:mm') : "08:40";
+            this.duration = this.canculateDurationByStartEnd(this.inputs.startTime,this.inputs.endTime);
+
             this.inputs.date = val ? this.$moment(val.date).format('YYYY-MM-DD') : this.$moment().format('YYYY-MM-DD');
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
@@ -483,7 +500,7 @@ export default {
             this.showPlan = this.$moment(dateLog).isAfter(now);
             // this.filterTaskByCategory();
             this.getAllTask(val.task);
-            },
+        },
         clearError(){
             this.taskError = '';
             this.timeError = '';
@@ -527,21 +544,22 @@ export default {
             minutes = time.includes('h')?time.split('m')[0].split('h')[1]:time.split('m')[0];
             return hour*60+minutes;
         },
-        changeDuration(duration){
+        // từ duration tính lại start end
+        changeStartEndFromDuration(duration){
             let minutes = 0;
             let hour = 0;
             hour = duration.indexOf('h')>-1?duration.split('h')[0]:0;
             minutes = duration.indexOf('h')>-1?duration.split('m')[0].split('h')[1]:duration.split('m')[0];
             if(this.inputs.startTime){
-                this.inputs.endTime = this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).add(hour,'h').add(minutes,'m').format("HH:mm")
+                this.inputs.endTime = this.$moment(this.newEvent.start).add(hour,'h').add(minutes,'m').format("HH:mm")
             }else{
-                this.input.startTime = this.$moment(this.newEvent.end).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).subtract(hour,'h').subtract(minutes,'m').format("HH:mm")
+                this.input.startTime = this.$moment(this.newEvent.end).subtract(hour,'h').subtract(minutes,'m').format("HH:mm")
             }
         },
-        caculateDuration(event){
+        handleDuration(duration){
             this.isCaculate = true;
-            this.durationTime =  event.currentTarget.value;
-            this.changeDuration(this.durationTime);
+            this.durationTime =  duration.currentTarget.value;
+            this.changeStartEndFromDuration(this.durationTime);
             // this.isCaculate = false;
         },
         reGenerateHour(){
