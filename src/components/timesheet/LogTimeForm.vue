@@ -315,12 +315,10 @@ export default {
             return this.$store.state.timesheet.calendarType;
         },
         duration() {
-            debugger
             let start = this.inputs.startTime;
             let end = this.inputs.endTime;
            return this.canculateDurationByStartEnd(start,end)
         },
-        
         displayDuration() {
             return this.changeMinutesToHourAndMinutes(this.duration)
         },
@@ -366,7 +364,6 @@ export default {
             this.getDateMonth()
         },
         duration(){
-            debugger
             let hasSpecialCharacters = (/[^a-zA-Z0-9]/).test(this.duration);// kí tự đặc biệt trả về true
             if(!this.duration||this.duration<=0||Number.isNaN(this.duration)||hasSpecialCharacters || this.duration=='0h'||this.duration=='0m'){
                 // if(this.duration.match(/[^a-zA-Z0-9]/)){
@@ -475,12 +472,10 @@ export default {
             }
         },
         setValueLog(val) {
-            debugger
             this.clearError();
             if(val){
                 this.task = val?val.task:'';
             }
-            debugger
             this.isCaculate = false;
             this.inputs.startTime = val ? this.$moment(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? this.$moment(val.end).format('HH:mm') : "08:40";
