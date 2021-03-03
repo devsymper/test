@@ -270,6 +270,9 @@ export default class SymperTable {
                     }}
                 }
             }
+            if(controlInstance.type == 'user'){
+                controlInstance.setMappingUserId();
+            }
             
             if(this.cols && this.cols.length > 0){
                 if(this.cols[0].name == controlName){

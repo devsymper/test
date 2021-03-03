@@ -103,6 +103,10 @@ export default {
                                 if(child.name == ctrlName){
                                     info.beforeValue = child.data.old;
                                     info.afterValue = child.data.new;
+                                    if(ctrlObj.type == 'user'){
+                                        info.beforeValue = ctrlObj.mapData[info.beforeValue];
+                                        info.afterValue = ctrlObj.mapData[info.afterValue];
+                                    }
                                     data.push(info);
                                 }
                             }
@@ -112,6 +116,10 @@ export default {
                         if(ctrl.name == ctrlName){
                             info.beforeValue = ctrl.data.old;
                             info.afterValue = ctrl.data.new;
+                            if(ctrlObj.type == 'user'){
+                                info.beforeValue = ctrlObj.mapData[info.beforeValue];
+                                info.afterValue = ctrlObj.mapData[info.afterValue];
+                            }
                             data.push(info);
                         }
                     }

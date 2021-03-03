@@ -11,6 +11,9 @@ AutoCompleteCellRenderer.prototype.init = function(params) {
         let control = params.control;
         let mapValueToText = sDocument.state.submit[control.keyInstance].mapValueToTextAutocompleteInput[control.name];
         var text = (params.value && mapValueToText && mapValueToText[params.value]) ? mapValueToText[params.value] : params.value;
+        if(control.type == 'user'){
+            text = control.mapData[params.value];
+        }
         if(!text){
             text = ""
         }

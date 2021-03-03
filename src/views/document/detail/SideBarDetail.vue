@@ -455,6 +455,9 @@ export default {
 					if(oldObj[name] === newObj[name]){
 						continue
 					}
+					if([null,""].includes(oldObj[name]) && [null,""].includes(newObj[name])){
+						continue
+					}
 					let item = {
 						id: ctrl.id,
 						data: {

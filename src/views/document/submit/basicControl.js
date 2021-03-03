@@ -13,6 +13,7 @@ import { fileManagementApi } from "@/api/FileManagement";
 
 import 'tinymce/plugins/media';
 import 'tinymce/plugins/quickbars';
+import { util } from "../../../plugins/util";
 
 let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
@@ -732,7 +733,21 @@ export default class BasicControl extends Control {
     }
     renderUserControl() {
         this.ele.attr('type', 'text');
-        this.ele.parent().css({ display: 'block' })
+        this.ele.parent().css({ display: 'block' });
+        this.setMappingUserId();
+    }
+    /**
+     * hàm map userId vơi thông tin input đã được cấu hình trong control
+     */
+    setMappingUserId(){
+        let listUser = util.cloneDeep(store.state.app.allUsers);
+        let inputValue = this.controlProperties.itemValue.value;
+        inputValue = (typeof inputValue == 'object') ? "id" : inputValue;
+        listUser = listUser.reduce((arr,obj) => {
+            arr[obj[inputValue]] = obj['displayName'];
+            return arr;
+        },{});
+        this.mapData = listUser;
     }
     renderLabelControl() {
         this.ele.text('').css({ border: 'none' })
