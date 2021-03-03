@@ -260,7 +260,13 @@ const commonProps = {
         groupType: "display"
     },
     isRequired: {
-        title: "Required",
+        title: "Require",
+        type: "checkbox",
+        value: "",
+        groupType: "display"
+    },
+    isRequireChange: {
+        title: "Require change",
         type: "checkbox",
         value: "",
         groupType: "display"
@@ -387,6 +393,13 @@ let commonFormulas = {
 
     require: {
         title: "Công thức require",
+        value: "",
+        formulasId: 0,
+        type: "script",
+        groupType: "formulas"
+    },
+    requireChange: {
+        title: "Công thức require change",
         value: "",
         formulasId: 0,
         type: "script",
@@ -584,49 +597,49 @@ const controlTypes = {
         html: `<input class="s-control s-control-text mdi" contenteditable="false" s-control-type="textInput" type="text" title="Text Input">&nbsp;&nbsp;`,
         title: "Text input",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','autoHeight', 'dataFlowId', 'formatNumber', 'formatDate','isInsertRow','isShowHeaderTinyMce', 'isSumTable', 'isAllowUpdate'],
-        formulas: ['linkConfig', 'linkConfig', 'formulas', 'hidden', 'readOnly', 'autocomplete', 'require', 'validate']
+        formulas: ['linkConfig', 'linkConfig', 'formulas', 'hidden', 'readOnly', 'autocomplete', 'require', 'validate','requireChange']
     },
     department: {
         icon: "/icon/ic_textinput.png",
         html: `<input class="s-control s-control-text mdi" contenteditable="false" s-control-type="department" type="text" title="Department">&nbsp;&nbsp;`,
         title: "Department",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey','isInsertRow','isShowHeaderTinyMce', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate'],
-        formulas: ['formulas', 'autocomplete', 'hidden', 'readOnly', 'require', 'validate']
+        formulas: ['formulas', 'autocomplete', 'hidden', 'readOnly', 'require', 'validate','requireChange']
     },
     richText: {
         icon: "/icon/ic_richtext.png",
         html: `<input class="s-control s-control-rich-text" contenteditable="false"  s-control-type="richText" type="text" title="Rich text">&nbsp;&nbsp;`,
         title: "Rich text",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId','isInsertRow', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['linkConfig', 'formulas', 'hidden', 'readOnly', 'require']
+        formulas: ['linkConfig', 'formulas', 'hidden', 'readOnly', 'require','requireChange']
     },
     number: {
         icon: "/icon/ic_number.png",
         html: `<input class="s-control s-control-number" contenteditable="false"  title="Number" s-control-type="number" type="number">&nbsp;&nbsp;`,
         title: "Number",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','isVarchar','isQuickSubmit', 'autoHeight','isInsertRow','isShowHeaderTinyMce', 'dataFlowId', 'minValue', 'maxValue', 'formatDate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['linkConfig', 'formulas', 'hidden', 'readOnly', 'require', 'validate']
+        formulas: ['linkConfig', 'formulas', 'hidden', 'readOnly', 'require', 'validate','requireChange']
     },
     date: {
         icon: "/icon/ic_date.png",
         html: `<input class="s-control s-control-date" contenteditable="false"  title="Date" s-control-type="date" type="date">&nbsp;&nbsp;`,
         title: "Date",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId','isInsertRow','isShowHeaderTinyMce', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate', 'minDate', 'maxDate']
+        formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate', 'minDate', 'maxDate','requireChange']
     },
     dateTime: {
         icon: "/icon/ic_date.png",
         html: `<input class="s-control s-control-datetime" contenteditable="false"  title="Date time" s-control-type="dateTime" type="datetime-local">&nbsp;&nbsp;`,
         title: "Date time",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId','isInsertRow','isShowHeaderTinyMce', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
+        formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate','requireChange']
     },
     time: {
         icon: "/icon/ic_date.png",
         html: `<input class="s-control s-control-time" contenteditable="false"  title="Time" s-control-type="time" type="time" style="width: 150px;">&nbsp;&nbsp;`,
         title: "Time",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId','isInsertRow','isShowHeaderTinyMce', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
+        formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate','requireChange']
     },
     month: {
         icon: "/icon/ic_date.png",
@@ -640,14 +653,14 @@ const controlTypes = {
         html: `<input class="s-control s-control-select" readonly="readonly" contenteditable="false" title="Select" s-control-type="select" type="select">&nbsp;&nbsp;`,
         title: "Select",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','isVarchar','autoHeight', 'dataFlowId', 'isPrimaryKey','isInsertRow','isShowHeaderTinyMce', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'linkConfig', 'require']
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'linkConfig', 'require','requireChange']
     },
     combobox: {
         icon: "/icon/ic_select.png",
         html: `<input class="s-control s-control-combobox" readonly="readonly" contenteditable="false" title="Combobox" s-control-type="combobox">&nbsp;&nbsp;`,
         title: "Combobox",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','isVarchar','autoHeight', 'dataFlowId', 'isPrimaryKey','isInsertRow','isShowHeaderTinyMce', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'list','validate', 'hidden', 'readOnly', 'linkConfig', 'require']
+        formulas: ['formulas', 'list','validate', 'hidden', 'readOnly', 'linkConfig', 'require','requireChange']
     },
     documentSelect: {
         icon: "/icon/ic_document_select.png",
@@ -689,7 +702,7 @@ const controlTypes = {
         html: `<input type="checkbox" value="false" class="s-control s-control-checkbox" title="Checkbox" s-control-type="checkbox" contenteditable="false">&nbsp;`,
         title: "Checkbox",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','isVarchar','isInsertRow','isShowHeaderTinyMce','isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'formatNumber', 'isSumTable', 'isDBOnly', 'isRequired', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
-        formulas: ['formulas', 'hidden', 'readOnly', 'require']
+        formulas: ['formulas', 'hidden', 'readOnly', 'require','requireChange']
     },
     color: {
         icon: "/icon/ic_date.png",
@@ -703,28 +716,28 @@ const controlTypes = {
         html: `<input class="s-control s-control-percent" contenteditable="false" title="Percent" s-control-type="percent" type="number" step="0.01">&nbsp;`,
         title: "Percent",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','displayFieldInUser','isInsertRow','isShowHeaderTinyMce','isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatDate', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'hidden', 'readOnly','validate']
+        formulas: ['formulas', 'hidden', 'readOnly','validate','requireChange']
     },
     user: {
         icon: "/icon/ic_user.png",
         html: `<input class="s-control s-control-user" contenteditable="false" title="User" s-control-type="user" type="text">&nbsp;`,
         title: "User",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','isInsertRow','isShowHeaderTinyMce','isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['hidden', 'readOnly','formulas','autocomplete']
+        formulas: ['hidden', 'readOnly','formulas','autocomplete','requireChange']
     },
     inputFilter: {
         icon: "/icon/ic_input_filter.png",
         html: `<input class="s-control s-control-filter" contenteditable="false" title="Input filter" type="text" s-control-type="inputFilter">&nbsp;`,
         title: "Input filter",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','isInsertRow','isShowHeaderTinyMce','isVarchar','autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'linkConfig', 'require', 'validate']
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'linkConfig', 'require', 'validate','requireChange']
     },
     hidden: {
         icon: "/icon/ic_hidden.png",
         html: `<input class="s-control s-control-hidden" contenteditable="false" title="Hidden" type="text" s-control-type="hidden" placeholder="Hidden control">&nbsp;`,
         title: "Hidden",
         notInProps: ['tableWrapText','tablePrimaryKey','tableView','itemValue','isInsertRow','isShowHeaderTinyMce','isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate'],
-        formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
+        formulas: ['isRequireChange','formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     table: {
         icon: "/icon/ic_table.png",
@@ -750,7 +763,7 @@ const controlTypes = {
             </tbody>
             </table></div> &nbsp;&nbsp;`,
         title: "Table",
-        notInProps: ['isKeyCacheInTable','itemValue','isVarchar','isShowHeaderTinyMce','isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'width', 'height', 'formatDate', 'isPrimary', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
+        notInProps: ['isRequireChange','isKeyCacheInTable','itemValue','isVarchar','isShowHeaderTinyMce','isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'width', 'height', 'formatDate', 'isPrimary', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
         formulas: ['formulas', 'hidden', 'readOnly', 'headerTable', 'filterOptions']
     },
     panel: {
@@ -762,7 +775,7 @@ const controlTypes = {
                     </div>
                 </div>&nbsp;`,
         title: "Panel",
-        notInProps: ['isKeyCacheInTable','tableWrapText','tablePrimaryKey','tableView','itemValue','isShowHeaderTinyMce','isInsertRow','isVarchar','isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatNumber', 'formatDate', 'isPrimary', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
+        notInProps: ['isRequireChange','isKeyCacheInTable','tableWrapText','tablePrimaryKey','tableView','itemValue','isShowHeaderTinyMce','isInsertRow','isVarchar','isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatNumber', 'formatDate', 'isPrimary', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
         formulas: ['hidden']
     },
     fileUpload: {
@@ -781,7 +794,7 @@ const controlTypes = {
                 <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-weight:normal">Report</h5>
                 </div>&nbsp;`,
         title: "Report",
-        notInProps: ['isKeyCacheInTable','tableWrapText','tablePrimaryKey','tableView','itemValue','isShowHeaderTinyMce','isInsertRow','isVarchar','isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatDate', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
+        notInProps: ['isRequireChange','isKeyCacheInTable','tableWrapText','tablePrimaryKey','tableView','itemValue','isShowHeaderTinyMce','isInsertRow','isVarchar','isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatDate', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
         formulas: ['hidden', 'report']
     },
     dataFlow: {

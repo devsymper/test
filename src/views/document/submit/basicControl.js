@@ -14,6 +14,7 @@ import { fileManagementApi } from "@/api/FileManagement";
 import 'tinymce/plugins/media';
 import 'tinymce/plugins/quickbars';
 import { util } from "../../../plugins/util";
+import { getControlInstanceFromStore } from "../common/common";
 
 let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
@@ -130,6 +131,9 @@ export default class BasicControl extends Control {
             // this.ele.addClass('detail-view');
             this.ele.attr('disabled', 'disabled');
         }
+        if (this.checkViewType('update')) {
+            this.checkRequireChangeControl()
+        }
         if (this.checkViewType('submit')) {
             this.setDefaultValue()
         }
@@ -158,7 +162,46 @@ export default class BasicControl extends Control {
                     .finally(() => {});
             }
         }
-
+    }
+    /**
+     * ghi đè thuộc tính của control
+     * @param {*} prop 
+     * @param {*} value 
+     */
+    overrideProps(prop, value){
+        if(this.checkProps(prop)){
+            this.controlProperties[prop].value = value;
+        }
+    }
+    /**
+     * ghi đè công thức của control
+     */
+    overrideFormula(type, value){
+        if(this.checkEmptyFormulas[type]){
+            this.controlFormulas[type].value = value;
+            value = value.replace(/\r?\n|\r/g, ' ');
+            value = value.trim();
+            this.controlFormulas[type].instance = new Formulas(this.keyInstance, value, type);
+        }
+    }
+    /**
+     * Hàm kiểm tra có check vào thuộc tính phải thay đổi khi cập nhật bản ghi hay không,
+     * nếu có thì validate
+     */
+    checkRequireChangeControl(){
+        let isRequireChange = this.getValueProp('isRequireChange');
+        if(this.inTable == false){
+            this.oldValue = this.value;
+        }
+        else{
+            let tableName = this.inTable;
+            let tableIns = getControlInstanceFromStore(this.keyInstance, tableName);
+            let val = tableIns.tableInstance.getColDataWithRowId(this.name);
+            this.oldValue = val;
+        }
+        if(isRequireChange){
+            this.renderValidateIcon('Yêu cầu thay đổi giá trị trường '+this.name, 'RequireChange');
+        }
     }
     /**
      * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
@@ -221,7 +264,7 @@ export default class BasicControl extends Control {
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
                 // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
-                thisObj.checkRequire();
+                thisObj.checkRequire(valueChange);
                 if(thisObj.checkAutoCompleteControl()){
                     return false;
                 }
@@ -332,13 +375,21 @@ export default class BasicControl extends Control {
         SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: this })
     }
 
-    checkRequire(){
+    checkRequire(valueChange = false){
         if(this.isRequiredControl()){
             if(this.isEmpty()){
                 this.renderValidateIcon('Không được bỏ trống trường thông tin '+this.name, 'Require')
             }
             else{
                 this.removeValidateIcon('Require')
+            }
+        }
+        if(this.checkProps('isRequireChange')){
+            if(this.oldValue == valueChange){
+                this.renderValidateIcon('Yêu cầu thay đổi giá trị trường '+this.name, 'RequireChange');
+            }
+            else{
+                this.removeValidateIcon('RequireChange')
             }
         }
     }
