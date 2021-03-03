@@ -1,9 +1,8 @@
 <template>
     <v-row>
         <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
-            <v-col :cols="4"> <v-toolbar-title class="nofitication-title-bar" style="font-weight:400">
-                Notifications
-            </v-toolbar-title>
+            <v-col :cols="4"> 
+                <v-toolbar-title class="nofitication-title-bar fw-400" > Notifications</v-toolbar-title>
             </v-col>
             <v-col :cols="8" class="text-right pt-1 pb-1 pr-0">
                 <!-- Tìm kiếm -->
@@ -29,218 +28,47 @@
                             x-small 
                             solo
                             class="bg-grey h-30"
-                            text
-                        >
+                            text>
                             <v-icon size="18">mdi-dots-horizontal</v-icon>
                         </v-btn>
                     </template>
                     <v-list dense light nav>
                         <v-list-item dense flat>
-                                <v-list-item-content class="pt-0 pb-0 notification-global-action" @click="markReadAll()">
-                                    <v-chip>
-                                        <v-icon size="15" >mdi-check-all</v-icon>
-                                        <span> Mark all as read</span> 
-                                    </v-chip>
-                                </v-list-item-content>
-                            
+                            <v-list-item-content class="pt-0 pb-0 notification-global-action" @click="markReadAll()">
+                                <v-chip>
+                                    <v-icon size="15" >mdi-check-all</v-icon>
+                                    <span> Mark all as read</span> 
+                                </v-chip>
+                            </v-list-item-content>
                         </v-list-item>     
                     </v-list>
                 </v-menu>
             </v-col>
         </v-app-bar>
-        <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
-            <v-row v-if="checkToday" class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-2px">
-                 <span class="fw-430 " style="color:orange">{{$t('notification.today')}}</span>
-            </v-row>
-            <v-row v-if="checkToday" 
-                v-for="item in listNotification.filter(x=>changeDate(x.createTime)==today)" 
-                :key="item.id"
-                style="height:58px"
-                class="text-left notification-item pt-0 pb-0"
-            >
-                <v-col cols="2">
-                    <v-row> 
-                         <v-list-item-avatar v-if="!item.icon">
-                            <SymperAvatar  :userId="item.userRelatedId"/>
-                        </v-list-item-avatar>
-                        <v-list-item-avatar v-else>
-                            <SymperAvatar  v-if="item.icon=='default.png'" />
-                            <v-avatar v-else>
-                                <!-- {{item.icon}} -->
-                                <img v-if="!checkIcon(item.icon)" :src="setAvaOrIcon(item.icon)">
-                                 <v-icon v-else >{{item.icon}}</v-icon>
-                            </v-avatar>
-                        </v-list-item-avatar>
-                    </v-row>
-                </v-col>
-                <v-col cols="10" style="padding:6px!important" @click="openNotification(item)">
-                    <v-row v-if="item.title.indexOf('<*')>-1" style="margin-top:-10px" >
-                        <v-col style="margin-top:-8px"  class="ellipsis">
-                            <span class="notification-item-title" style="margin-left:-12px">
-                            {{reNameContent(item.title)}}
-                            </span>
-                        </v-col>
-                        <v-col style="margin-top:-8px" class="text-right pr-3">
-                            <v-chip v-if="getDeadline(item.title)!='Invalid date'&&getDeadline(item.title)"
-                         class="notification-item-title deadline-tag"
-                         >
-                              {{(getDeadline(item.title))}}
-                        </v-chip>
-                        </v-col>
-                    </v-row>
-                     <v-row v-else style="margin-top:-10px" class="ellipsis">
-                        <v-col style="margin-top:-8px">
-                            <span  style="margin-left:-12px" class="notification-item-title">
-                                {{reNameContent(item.title)}}
-                            </span>
-                        </v-col>
-                    </v-row>
-                    <v-row class="notification-item-info" style="margin-top:-5px">
-                        <v-col cols="6" class="ellipsis">
-                            <v-icon class="mr-2" size="12">{{$i('input.'+getScope(item.action))}}</v-icon>
-                            <span >{{item.extraLabel?item.extraLabel:''}} {{item.extraValue?item.extraValue:''}}</span>
-                        </v-col>
-                        <v-col cols="6" class="text-right pr-3">
-                            <span>{{$moment.unix(item.createTime).fromNow()}}</span>
-                            <v-icon size="9" color="blue" class="ml-1" v-if="item.state=='0'">mdi-circle</v-icon>
-                        </v-col>
-                    </v-row>
-                </v-col>
-                   <v-divider style="width:95%; margin-top:-8px" class="ml-2" ></v-divider>
-                <v-menu
-                    :close-on-content-click="true"
-                    :open-on-hover="true"
-                    :max-width="200"
-                    :min-width="200"
-                    :max-height="500"
-                    offset-y
-                    >
-                    <template v-slot:activator="{ on }">
-                        <v-btn depressed icon v-on="on" :absolute="true" :right="true" class="mt-3 notification-item-action">
-                            <v-avatar color="#ffffff" size="30">
-                                <v-icon>mdi-dots-horizontal</v-icon>
-                            </v-avatar> 
-                        </v-btn>
-                    </template>
-                    <v-list dense light nav>
-                        <v-list-item dense flat
-                            v-for="(actionItem, i) in item.actionMenu"
-                            :key="i"
-                        >
-                            <template>
-                                <v-list-item-content class="pt-0 pb-0" 
-                                    @click="actionNotification(item,actionItem.value)">
-                                    <v-list-item-title class="font-weight-regular" 
-                                    v-text="actionItem.text">
-                                    </v-list-item-title>
-                                </v-list-item-content>
-                            </template>
-                        </v-list-item>    
-                    </v-list>
-                </v-menu>
-            </v-row>
+        <v-row class="mx-0 px-5 list-notification bg-white" :z-index="99999">
+                <v-row v-if="checkToday" class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-2px">
+                    <span class="fw-430 " style="color:orange">{{$t('notification.today')}}</span>
+                </v-row>
+                <div 
+                    v-for="item in listNotification.filter(x=>changeDate(x.createTime)==today&&checkToday)" 
+                    :key="item.id"
+                    style="height:58px"
+                    class="text-left notification-item py-0" >
+                    <DetailNotificationBar :item="item" />
+                </div>
             <!-- older -->
             <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px">
-                <span style="color:orange; font-weight:430">
+                <span class="fw-430 " style="color:orange">
                 {{$t('notification.older')}}
                 </span>
             </v-row>
-            <v-row
+            <div
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)!=today)" 
                 :key="item.id"
                 style="height:58px"
-                class="text-left notification-item  pt-0 pb-0"
-            >
-                <v-col cols="2">
-                    <v-row>
-                         <v-list-item-avatar v-if="!item.icon">
-                            <SymperAvatar  :userId="item.userRelatedId"/>
-                        </v-list-item-avatar>
-                        <v-list-item-avatar v-else>
-                            <SymperAvatar  v-if="item.icon=='default.png'" />
-                            <v-avatar v-else>
-                                <!-- {{item.icon}} -->
-                                <img v-if="!checkIcon(item.icon)" :src="setAvaOrIcon(item.icon)">
-                                 <v-icon v-else >{{item.icon}}</v-icon>
-                            </v-avatar>
-                        </v-list-item-avatar>
-                    </v-row>
-                </v-col>
-                <v-col cols="10" style="padding:6px" @click="openNotification(item)">
-                    <v-row v-if="getScope(item.action)=='comment'">
-                        <span class="notification-item-title">
-                            {{getName(item.userRelatedId)}} 
-                        </span>
-                         <span style="color:grey" class="fs-12 ml-1">
-                             nhắc đến bạn trong bình luận
-                        </span>
-                    </v-row>
-                    <v-row v-else>
-                        <v-col v-if="item.title.indexOf('<*')>-1"  style="margin-top:-18px" cols="9"  class="ellipsis">
-                            <span 
-                                class="notification-item-title"
-                                style="margin-left:-10px"
-                                >
-                                {{reNameContent(item.title)}}
-                            </span>
-                        
-                        </v-col>
-                           <v-col v-else style="margin-top:-15px" cols="12"  class="ellipsis">
-                            <span 
-                                class="notification-item-title"
-                                style="margin-left:-10px"
-                                >
-                                {{item.title}}
-                            </span>
-                        </v-col>
-                        <v-col  v-if="item.title.indexOf('<*')>-1" cols="3" style="margin-top:-18px" class="text-right pr-3">
-                            <v-chip v-if="item.title.indexOf('<*')>-1&&getDeadline(item.title)!='Invalid date'&&getDeadline(item.title)" 
-                                class="notification-item-title deadline-tag " >
-                                {{(getDeadline(item.title))}}
-                            </v-chip>
-                        </v-col>
-                    </v-row>
-                    <v-row class="notification-item-info" style="margin-top:-5px">
-                        <v-col cols="6"  class="ellipsis" >
-                            <v-icon class="mr-2" size="12">{{$i('input.'+getScope(item.action))}}</v-icon>
-                            <span>{{item.extraLabel}} {{item.extraValue}}</span>
-                        </v-col>
-                        <v-col cols="6" class="text-right pr-3">
-                            <span>{{$moment.unix(item.createTime).fromNow()}}</span>
-                            <v-icon size="9" color="blue" class="ml-1" v-if="item.state=='0'">mdi-circle</v-icon>
-                        </v-col>
-                    </v-row>
-                </v-col>
-                   <v-divider style="width:95%; margin-top:-8px" class="ml-2" ></v-divider>
-                <v-menu
-                    :close-on-content-click="true"
-                    :open-on-hover="true"
-                    :max-width="200"
-                    :min-width="200"
-                    :max-height="500"
-                    offset-y
-                    >
-                    <template v-slot:activator="{ on }">
-                        <v-btn depressed icon v-on="on" :absolute="true" :right="true" class="mt-3 notification-item-action">
-                            <v-avatar color="#ffffff" size="30">
-                                <v-icon>mdi-dots-horizontal</v-icon>
-                            </v-avatar> 
-                        </v-btn>
-                    </template>
-                    <v-list dense light nav>
-                        <v-list-item dense flat
-                            v-for="(actionItem, i) in item.actionMenu"
-                            :key="i"
-                        >
-                            <template>
-                                <v-list-item-content class="pt-0 pb-0" @click="actionNotification(item,actionItem.value)">
-                                    <v-list-item-title class="font-weight-regular" v-text="actionItem.text"></v-list-item-title>
-                                </v-list-item-content>
-                            </template>
-                        </v-list-item>    
-                    </v-list>
-                </v-menu>
-            </v-row>
+                class="text-left notification-item  py-0">
+                <DetailNotificationBar :item="item" />
+            </div>
             <!-- older -->
             <v-overlay :value="overlay">
                 <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -261,8 +89,7 @@
             <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="999">
                 <slot name="body">
                     <v-row
-                        class="text-left notification-item"
-                    >
+                        class="text-left notification-item">
                     <v-col cols="1">
                         <v-row>
                             <v-icon size="30">mdi-file-document-outline </v-icon>
@@ -304,18 +131,15 @@
                     <v-row
                         class="text-left notification-topic"
                         v-for="item in listTopic" 
-                        :key="item.id"
-                    >
+                        :key="item.id">
                         <v-col cols="10" style="padding:6px!important">
                             <v-row>
                                 <span class="notification-topic-title">{{item.name}}</span><br>
-                                
                             </v-row>
                             <v-row>
                                 <span class="notification-topic-description">{{item.description}}</span>
                             </v-row>
                         </v-col>
-                
                         <v-col cols="2">
                             <v-row class="float-right">
                                 <v-switch
@@ -340,11 +164,14 @@ import icon from "../common/SymperIcon";
 import { appConfigs } from '../../configs';
 import Vue from "vue";
 import SymperAvatar from "@/components/common/SymperAvatar";
+import DetailNotificationBar from "./DetailNotificationBar";
+
 export default {
     name: "listApp",
     components: {
         icon,
-        SymperAvatar
+        SymperAvatar,
+        DetailNotificationBar
     },
     data: function() {
         return {
@@ -377,41 +204,6 @@ export default {
         })
     },
     methods: {
-        checkIcon(icon){
-            let check = true;
-            if(icon.indexOf('user_avatar_')>-1){
-                check = false;
-            }
-            return check
-        },
-        setAvaOrIcon(icon){
-            if(icon){
-                if(icon.indexOf('user_avatar_')>-1||icon=='default.png'){
-                    return appConfigs.apiDomain.fileManagement+'readFile/'+icon ;}
-            }       
-        },
-        getDeadline(description){
-            let deadline= description.split("<*")[1].split('*>')[0];
-            deadline = deadline.slice(0, 10);
-            let result = '';
-            if(deadline){
-                result= this.$moment.unix(deadline).fromNow().replace("giờ",'h').replace("trước",'').replace("tới",'').replace('năm','y');
-                result.replace('ngày','d').replace('tháng','m').replace("một",'1')
-            }
-            return result
-        },
-         reNameContent(description){
-             //this.deadLine = '';
-            let name = description;
-            if(description.indexOf('<*')>-1){
-                let newValue = '';
-                let value = description.split("<*")[1].split('*>')[0];
-                // 
-                let oldValue= "<*"+value+"*>";
-                name= name.replace(oldValue,newValue);
-                }
-            return name
-        },
         getSource(){
             const self = this;
             notificationApi.showAllModuleConfig().then(res=>{
@@ -419,26 +211,6 @@ export default {
                     self.listSource = res.data
                 }
             })
-        },
-         getName(id){
-            this.listUser = this.$store.state.app.allUsers;
-            for(let i = 0; i<this.listUser.length;i++){
-                if(this.listUser[i].id==id){
-                    return this.listUser[i].userName;
-                }
-            }
-        },
-        getScope(action){
-            let result = "";
-            try{
-                if(JSON.parse(action).module=="document"&&JSON.parse(action).scope=="workflow"){
-                     result = "taskBPM"
-                }else{
-                    result =  JSON.parse(action).module
-                }
-            }catch (error){
-            }
-            return result;
         },
         changeDate(value){
             return this.$moment.unix(value).format('DD/MM/YYYY')
@@ -469,27 +241,6 @@ export default {
             .catch(err => {
                 this.showError();
             })
-        },
-        openNotification(notificationItem){
-            let extraParams = {
-                openInNewTab: true
-            };
-            this.$evtBus.$emit('symper-app-call-action-handler', notificationItem.action, this, extraParams)
-            this.markRead(notificationItem);
-        },
-        actionNotification(notificationItem,action){
-            switch(action){
-                case 'read':
-                    this.markRead(notificationItem)
-                    break;
-                default:
-                    var actionData=JSON.parse(notificationItem.action); 
-                    actionData['action']=action;
-                    console.log(actionData);
-                    this.$evtBus.$emit('symper-app-call-action-handler', actionData, this, {openInNewTab: true})
-                    this.markRead(notificationItem);
-                    break;
-            }
         },
         markRead(notificationItem){
             if(notificationItem.state=='0'){
@@ -613,22 +364,14 @@ export default {
 .notification-item-title{
     font-size: 12px;
 }
-.notification-item-info .col{
-    padding: 0;
-    font-size: 11px;
 
-}
 .right-180{
     right:-180px!important
 }
 .right-200{
-      right:-200px!important
-}
-.notification-item-info{
-    color: #8E8E8E;
+    right:-200px!important
 }
 .notification-item{
-    
     cursor: pointer;
     width: 100%;
     padding: 10px;
@@ -644,12 +387,6 @@ export default {
 }
 .notification-topic:hover{
     background: #eeeeee!important;
-}
-.notification-item-action{
-    display: none;
-}
-.notification-item:hover .notification-item-action{
-    display: block;
 }
 .v-list-item{
     cursor: pointer;
@@ -692,24 +429,7 @@ export default {
     color: #777777;
     font-weight: normal;
 }
-.v-list-item__avatar{
-   margin-left:10px!important;
-    margin-top:-8px!important;
-}
 .theme--light.v-divider {
     border-color: rgba(0, 0, 0, 0.05);
-}
-.ellipsis{
-    overflow: hidden;
-    white-space: nowrap; 
-    text-overflow: ellipsis
-}
-.deadline-tag{
-    height: 13px; 
-    font-size: 10px;
-    background-color:#2196F3 !important;
-    color: white; 
-    top:3px;
-   
 }
 </style>
