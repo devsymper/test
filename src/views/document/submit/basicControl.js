@@ -376,20 +376,30 @@ export default class BasicControl extends Control {
     }
 
     checkRequire(valueChange = false){
+        let isRequired = false;
+        this.removeValidateIcon('Require');
+        this.removeValidateIcon('RequireChange');
         if(this.isRequiredControl()){
             if(this.isEmpty()){
+                isRequired = true;
                 this.renderValidateIcon('Không được bỏ trống trường thông tin '+this.name, 'Require')
             }
-            else{
-                this.removeValidateIcon('Require')
-            }
         }
-        if(this.checkProps('isRequireChange')){
+        if(this.checkProps('isRequireChange') && !isRequired){
             if(this.oldValue == valueChange){
                 this.renderValidateIcon('Yêu cầu thay đổi giá trị trường '+this.name, 'RequireChange');
             }
-            else{
-                this.removeValidateIcon('RequireChange')
+        }
+    }
+
+    overrideProperties(props){
+        let mapPropToFunction = {
+            isRequired:'checkRequire',
+            isRequireChange:'checkRequire'
+        }
+        for(let prop in props){
+            if(mapPropToFunction[prop]){
+                eval(mapPropToFunction[prop])();
             }
         }
     }

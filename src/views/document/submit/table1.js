@@ -1310,9 +1310,7 @@ export default class SymperTable {
     getColDataWithRowId(colName){
         let colData = [];
         this.gridOptions.api.forEachNode(node => {
-            let item = {};
-            item[node.id] = node.data[colName];
-            colData.push(Object.assign({},item))
+            colData[node.id] = node.data[colName];
         });
         return colData;
     }
