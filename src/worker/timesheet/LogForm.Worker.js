@@ -49,9 +49,13 @@ export const copyLogTime = async function(event) {
 export const resizeLogtime = async function(events) {
     let taskLength = 85*60*1000;
     let padding = 60*60*300;
-    let lastDate, lastEnd;
+    let lastDate, lastEnd;//ngày, thời gian log kết thúc, thời gian bắt đầu log 
+    // sắp xếp theo date;
+    events.sort((after, before)=>{
+        return after.start - before.start;
+    });
     let newTasks = events.map(task=>{
-        if(task.date!== lastDate){
+        if(task.date!== lastDate){// kiểm tra log có nằm cùng 1 ngày không
             lastDate = task.date;
             task.start = moment(task.start).startOf('day').hour(1).toDate().getTime()
             task.end = task.start + taskLength;
