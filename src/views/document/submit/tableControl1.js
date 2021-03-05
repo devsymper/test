@@ -86,14 +86,7 @@ export default class TableControl1 extends Control {
             return;
         }
         if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
-            if (this.tableInstance.tableInstance) {
-                this.tableInstance.tableInstance.updateSettings({
-                    data: [
-                        []
-                    ]
-                })
-                this.tableInstance.tableInstance.render();
-            }
+            
         }
         if (this.isPrintView) {
             let dataTablePrint = [];

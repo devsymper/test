@@ -39,7 +39,7 @@ const dockerGroups = {
 export const nodeAttrsDefinition = {
     'UserTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'updateForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition", "approvalForElement", "approvalEditableControls", "extraInfoLabel", "extraInfoValue","selectDefaultControlDocument"],
+        attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', "autoUpdateTaskInfo", 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'updateForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition", "approvalForElement", "approvalEditableControls", "extraInfoLabel", "extraInfoValue","selectDefaultControlDocument"],
         exclude: ['asynchronousdefinition', 'exclusivedefinition'],
         validate: function(attrs) {
 

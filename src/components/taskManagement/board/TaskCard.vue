@@ -14,7 +14,7 @@
 			</div>
 			<div class="right-content">
 				<v-icon>mdi-calendar-month</v-icon>
-				<span>{{getDate(task.document_object_create_time)}}</span>
+				<span>{{getDate(task.tmg_due_date)}}</span>
 				<symper-avatar :size="16" :userId="task.tmg_assignee"/>
 			</div>
 		</div>
@@ -83,10 +83,13 @@ export default {
 	},
 	methods:{
 		getDate(dateTime){
-			dateTime = dateTime.split(' ')[0];
-			dateTime = dateTime.split('-');
-			let date = dateTime[1]+"-"+dateTime[2];
-			return date
+			if(dateTime){
+				dateTime = dateTime.split(' ')[0];
+				dateTime = dateTime.split('-');
+				let date = dateTime[1]+"-"+dateTime[2];
+				return date
+			}
+			return "";
 		},
 		handleShowDetailIssue(){
 			this.documentObjectId = this.task.document_object_id;

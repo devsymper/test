@@ -35,10 +35,11 @@ export const copyLogTime = async function(event) {
           duration:event.duration,
           task: event.task,
           type: event.type,
+          taskName:event.name,
           id: event.id,
           date: event.date,
-          categoryTask: event.category,
-          desc: event.desc || ""
+          cateId: event.category,
+          desc: event.desc || "",
       })
       if(res.status==200){
          check = true
@@ -46,7 +47,7 @@ export const copyLogTime = async function(event) {
       return check
 }
 export const resizeLogtime = async function(events) {
-    let taskLength = 60*60*1000;
+    let taskLength = 85*60*1000;
     let padding = 60*60*300;
     let lastDate, lastEnd;
     let newTasks = events.map(task=>{
@@ -67,33 +68,31 @@ export const resizeLogtime = async function(events) {
 export const getLogTimeList = async function(dateStartEnd){
     let res = await timesheetApi.getLogTimeList(dateStartEnd);
     let data = {
-        sumLogTime: 0,
-        hoursRequired: 0,
         events:[]
     }
     if(res.status == 200){
         const logTimeList = res.data.listLogTime;
-        data.sum = res.data.sumLogTime;
-        data.hoursRequired = res.data.hourRequired[0].hoursRequired;
         data.events = [...logTimeList.map((logTime, idx) => ({
-            name: `${logTime.task_id}`,
+            name: `${logTime.nameTask}`,
             timed: true,
-            // log form data
+            action:'',
             date: logTime.date,
-            start: Date.parse(logTime.start_time_at),
-            end: Date.parse(logTime.end_time_at),
+            start: Date.parse(logTime.startTimeAt),
+            end: Date.parse(logTime.endTimeAt),
             duration: logTime.duration,
-            category: logTime.category_task,
+            category: logTime.categoryId,
             category_key: logTime.key,
-            task: logTime.task_id,
+            task: logTime.taskId,
             desc: logTime.description,
+            color:'#F0F8FF',
             type: logTime.type,
             id: logTime.id,
-            docObjId:logTime.doc_obj_id
+            docObjId:logTime.docObjId
         }))];
     }
     return data
 }
+
 export const changeDuration = async function(duration){
     let hour = duration / 60;
     let minutes = duration % 60;

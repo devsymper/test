@@ -56,7 +56,7 @@
                             <v-icon left dark>mdi-refresh</v-icon>
                             <span >{{$t('common.refresh')}}</span>
                         </v-btn>
-
+                
                       
                         <v-btn
                             depressed
@@ -70,8 +70,6 @@
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
                             <span v-show="!actionPanel">{{$t('common.export_excel')}}</span>
                         </v-btn>
-
-                        
                         <v-btn
                             depressed
                             small
@@ -82,18 +80,17 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel')}}</span>
                         </v-btn>
-                        
-                    
-                        <v-btn
-                            depressed
-                            small
-                            @click="showImportHistory()"
-                            class="mr-2"
-                            v-if="showImportHistoryBtn && !actionPanel && !dialogMode"
-                        >
-                            <v-icon left dark>mdi-database-import</v-icon>
-                            <span>{{$t('common.import_excel_history')}}</span>
-                        </v-btn>
+                  
+                            <v-btn
+                                depressed
+                                small
+                                @click="showImportHistory()"
+                                class="mr-2"
+                                v-if="showImportHistoryBtn && !actionPanel && !dialogMode"
+                            >
+                                <v-icon left dark>mdi-database-import</v-icon>
+                                <span>{{$t('common.import_excel_history')}}</span>
+                            </v-btn>
                          <v-menu
                             bottom
                             left
@@ -185,6 +182,20 @@
                                 :filter="listFilters"/>
                         </v-menu>
                         <!-- filter button -->
+                        <v-tooltip top >
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    depressed
+                                    small
+                                    v-on="on"
+                                    @click="showTimesheet()"
+                                    class="mr-2"
+                                    v-if="showTimesheetBtn && !actionPanel && !dialogMode">
+                                        <v-icon left dark>mdi-calendar</v-icon>
+                                </v-btn>
+                            </template>
+                            <span >Timesheet</span>
+                        </v-tooltip>
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -258,15 +269,16 @@
                 @dragStopped="columnResized()"
                 @columnResized="resize()"
 				@rowClicked="handlerRowClicked"
+				@rowSelected="handlerRowSelected"
 				:rowData="rowData"
 				:frameworkComponents="frameworkComponents"
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
 				@cell-context-menu="cellContextMenu"
                 @cell-mouse-down="cellMouseDown"
-				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
+                @cell-clicked="onCellClicked"
 			>
 			</ag-grid-vue>
 			 <display-config
@@ -434,12 +446,6 @@ export default {
 				return {}
 			}
 		},
-		checkedRows:{
-			type: Array,
-			default(){
-				return []
-			}
-		},
 		/**
 		 * Truyeenf vao row height
 		 * 
@@ -509,6 +515,10 @@ export default {
             default:0
         },
         showImportButton: {
+            type: Boolean,
+            default: false
+        },
+        showTimesheetBtn: {
             type: Boolean,
             default: false
         },
@@ -767,6 +777,16 @@ export default {
                         }
                     });
                     self.columnDefs = data.dataAfter;
+                    self.columnDefs.unshift(
+                        { 
+                            headerName:"",
+                            field: 'checkboxColumn',
+                            headerCheckboxSelection: true,
+                            checkboxSelection: true,
+                            width: 50,
+                            hide:!self.hasColumnsChecked
+                        }	
+                    )
                     if(self.conditionalFormat&&self.conditionalFormat.length>0){
                         if(self.listSelectedCondition.length==0){
                             self.listSelectedCondition = self.getListSelectedConditionFormat();
@@ -774,6 +794,7 @@ export default {
                         self.columnDefs = self.handleConditionalFormat(data.dataAfter);
                     
                     }
+                    self.setSelectedRow();
 					break;
                 default:
                     break;
@@ -835,15 +856,6 @@ export default {
 				this.showSearchBox = true
 			}
         },
-        checkedRows:{
-			deep: true,
-			immediate: true,
-			handler(arr){
-				if(arr.length > 0){
-					this.allRowChecked = arr
-				}
-			}
-		},
 		rowData:{
 			deep: true,
 			immediate: true,
@@ -1007,6 +1019,7 @@ export default {
            	rowData: [
 				// {make: 'Toyota', model: 'Celica', price: 35000, test: 'SDASDASD',testA:'SDAdsdSDASD',testB:'SDAdsdSDASD',testC:'SDAdsdSDASD',testD:'SDAdsdSDASD',testE:'SDAdsdSDASD',testF:'SDAdsdSDASD',testG:'SDAdsdSDASD',testH:'SDAdsdSDASD',testJ:'SDAdsdSDASD',testK:'SDAdsdSDASD',testM:'SDAdsdSDASD',resizable: true},
 			],
+            rowSelected:[]
         }
     },
     components: {
@@ -1052,7 +1065,9 @@ export default {
 				}
 			},
 			suppressCopyRowsToClipboard: true,
-			modules:[ClipboardModule]
+			modules:[ClipboardModule],
+            rowSelection:'multiple',
+            suppressRowClickSelection: true,
 		},
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
@@ -1064,6 +1079,43 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+        getSelectedRows(){
+            return this.agApi.getSelectedRows()
+        },
+        setRowChecked(){
+            let self = this
+            this.gridOptions.api.forEachNode(node=> {
+                let value = self.checkedRows.includes(node.data.id) ? true : false
+                node.setSelected(value);
+            })
+        },
+         /**
+         * select lại dòng đã được chọn trước đó nếu có refresh list
+         */
+        setSelectedRow(){
+            let self = this;
+            if(this.hasColumnsChecked){
+                this.gridOptions.api.forEachNode(node=> {
+                    /**
+                     * trường hợp danh sách bản ghi document thì lấy định danh theo document_object_id
+                     */
+                    if(node.data.document_object_id){
+                        let row = self.rowSelected.find(el => el.document_object_id == node.data.document_object_id);
+                        if(row && node.data.document_object_id == row.document_object_id){
+                        }
+                    }
+                    else if(node.data.id){
+                        let row = self.rowSelected.find(el => el.id == node.data.id);
+                        if(row && node.data.id == row.id){
+                            node.setSelected(true);
+                        }
+                    }
+                })
+            }
+        },
+        getRowSelected(){
+            return this.rowSelected;
+        },
         // lấy ra danh sách cấu hình format được chọn
         getListSelectedConditionFormat(){
             let result = [];
@@ -1400,34 +1452,18 @@ export default {
             }, 100, this);
              this.$emit('cell-mouse-over',params)
 		},
-		isShowCheckedRow(){
-            return this.hasColumnsChecked
-		},
 		 // hoangnd: thêm cột checkbox
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
-            this.columnDefs.push(
-				{ 
-					headerName: 'Chọn', 
-					field: 'checkbox', 
-					editable:true,
-					cellRendererFramework : 'CheckBoxRendererListItems',
-					width: 50
-				}	
-			)
-			this.gridOptions.api.setColumnDefs([]);
+            this.gridOptions.columnApi.setColumnVisible('checkboxColumn', true) //In that case we hide it
 		},
 		emptyShowList(){
 			this.columnDefs = []
 			this.rowData = []
 		},
-		// dungna doi hasColumnsChecked = true
-		addColumnsChecked(){
-			this.hasColumnsChecked = true
-		},
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
-            this.columnDefs.shift();
+            this.gridOptions.columnApi.setColumnVisible('checkboxColumn', false) //In that case we hide it
         },
 		relistContextmenu(){
             if(!this.cellAboutSelecting){
@@ -1592,6 +1628,7 @@ export default {
 				}
 			})
 			this.hideOverlay()
+         
 			this.$emit('data-loaded', resData)
 
 		},
@@ -1734,8 +1771,6 @@ export default {
             this.$emit("save-item", {});
 		},
 		refreshList(){
-			this.allRowChecked = []
-			this.$emit('after-selected-row', this.allRowChecked)
 			this.getData();
 			this.$emit("refresh-list", {});
         },
@@ -1857,6 +1892,9 @@ export default {
             
             window.open(exportUrl,'_blank');
         },
+        showTimesheet(){
+             this.$router.push("/timesheet");
+        },
         showImportHistory(){
             this.$router.push("/viewHistory");
         },
@@ -1889,10 +1927,23 @@ export default {
 				this.agApi.copySelectedRowsToClipboard();
 			}
 		},
+        handlerRowSelected(params){
+			let rowData = params.data;
+            let key = (rowData.document_object_id) ? 'document_object_id' : 'id'
+            let currentRow = this.rowSelected.find(el=>el[key] == rowData[key])
+            if(!currentRow){
+                this.rowSelected.push(rowData);
+            }
+            else{
+                if(!params.node.selected){
+                    this.rowSelected.splice(this.rowSelected.indexOf(currentRow),1);
+                }
+            }
+        },
 		onSelectionChanged() {
 			var selectedRows = this.agApi.getSelectedRows();
 			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
-   		 },
+        },
 		onGridReady(params){
 			params.api.sizeColumnsToFit()
 			this.agApi = params.api
@@ -2169,13 +2220,13 @@ export default {
 </script>
 <style scoped>
 
-.symper-list-items >>> .ag-row{
-	border-top-style:unset !important;
+.symper-list-items .ag-list-items-table >>>  .ag-row{
+	border-top-style: unset !important;
 }
-.symper-list-items >>> .ag-theme-balham .ag-root-wrapper{
+.symper-list-items .ag-list-items-table >>> .ag-theme-balham .ag-root-wrapper{
 	border: unset !important;
 }
-.symper-list-items >>> .ag-cell{
+.symper-list-items .ag-list-items-table >>> .ag-cell{
 	-webkit-touch-callout: none;
 	-webkit-user-select: none; 
 	-khtml-user-select: none; 
@@ -2199,7 +2250,7 @@ export default {
 	height: 28px !important;
 	min-height: unset !important;
 	background-color: #ffffff !important;
-	border-top: 1px solid lightgray !important;
+	/* border-top: 1px solid lightgray !important; */
 	border-bottom: 1px solid lightgray !important;
 }
 .symper-list-items .ag-list-items-table >>> .ag-header-row {

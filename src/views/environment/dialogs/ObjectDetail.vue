@@ -28,7 +28,6 @@
 			:tableContextMenu="tableContextMenu"
 			:customAPIResult="customAPIResult"
 			:isTablereadOnly="false"
-			@after-selected-row="afterSelectedRow"
 		/>
 		<DialogsConfirmSync 
 			:showDialog="showDialog"
@@ -101,12 +100,6 @@ export default {
 				}
 			},
 			customHeaderBtn:{
-				showCheckBox:{
-					title: "Chọn",
-					callback(){
-						self.addCheckBoxColumn()
-					}
-				},
 				sync:{
 					title: "Đồng bộ",
 					callback(){
@@ -137,31 +130,21 @@ export default {
 			this.showDialog = true
 		},
 		handleDataLoaded(){
-			if(!this.customHeaderBtn.showCheckBox){
-				let self = this
-				this.customHeaderBtn.showCheckBox = {
-					title: "Chọn",
-					callback(){
-						self.addCheckBoxColumn()
-					}
-				}
-			}
+			this.addCheckBoxColumn()
 		},
 		back(){
 			this.$emit('back')
 		},
 		addCheckBoxColumn(){
-			delete this.customHeaderBtn.showCheckBox
 			this.$refs.listObject.addCheckBoxColumn()
 		},
 		handlerSuccess(){
 			this.showDialog = false 
 			this.$refs.listObject.refreshList()
 		},
-		afterSelectedRow(items){
-			this.$set(this, 'listItemSelected', items)
-		},
 		handleSyncClick(){
+			let rows = this.$refs.listObject.getSelectedRows()
+			this.$set(this, 'listItemSelected', rows)
 			this.showDialog = true
 		},
 		handleSyncAll(){

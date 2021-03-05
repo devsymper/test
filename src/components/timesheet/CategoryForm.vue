@@ -38,13 +38,14 @@ import { documentApi } from '../../api/Document';
 import FormTpl from "./../../components/common/FormTpl";
 export default {
     created () {
-        this.allInputs.key.value = this.cate.key;
-        this.allInputs.taskName.value = this.cate.name;
-        this.id = this.cate.id;
-        this.allInputs.description.value = this.cate.description;
-        this.typeCate = this.cate.type;
-        this.docObjId = this.cate.docObjId
-
+        if(this.cate){
+            this.allInputs.key.value = this.cate.key;
+            this.allInputs.taskName.value = this.cate.name;
+            this.id = this.cate.id;
+            this.allInputs.description.value = this.cate.description;
+            this.typeCate = this.cate.type;
+            this.docObjId = this.cate.docObjId
+        }
     },
     watch: {
         typeCate(){
@@ -142,12 +143,17 @@ export default {
         save(){
             let check = this.checkValidate();
             let data = {};
+            let docId = 0;
+            if(this.typeCate=='doc'){
+                docId = this.listDoc.filter(doc=>this.allInputs.taskName.value==doc.id)[0].docId;
+            }
             if(check){
                 for(let i in this.allInputs){
                     data[i] = this.allInputs[i].value;
                     data.status= 1;
                     data.docObjId=this.docObjId;
                     data.description = this.allInputs[i].value?this.allInputs[i].value:' ';
+                    data.docId = docId;
                     // this.listDoc.map(doc=>{
                     //     if(doc.id==data[i]){
                     //         this.allInputs[i].value=doc.title

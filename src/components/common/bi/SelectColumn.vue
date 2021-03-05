@@ -59,7 +59,7 @@ export default {
         },
         configPadding:{
             type: Number,
-            default:4
+            default: 4
         }
 
     },

@@ -9,6 +9,7 @@
 		"inputAddPlaceholder": "Kéo field vào để thêm dữ liệu",
 		"placeholder-search": "Tìm kiếm",
 		"dblclick": "Click đúp để đổi tên",
+        "add-column":"Thêm cột",
         "format_table":"Định dạng",
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
@@ -513,7 +514,8 @@
             "viewDetails": "Xem chi tiết",
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
-            "remove": "Xóa"
+            "remove": "Xóa",
+            "clone":"Nhân bản"
         },
         "created": "Đã tạo mới nhóm quyền",
         "deleted": "Đã xóa nhóm quyền",
@@ -567,6 +569,12 @@
             "create": "Thêm",
             "delete": "Xóa",
             "view": "Chi tiết"
+        },
+        "status":{
+            "New":"New",
+            "Underload":"Underload",
+            "Fullload":"Fullload",
+            "Overload":"Overload"
         },
         "view_des":"Chưa có mô tả",
         "assignee": "Người được giao",

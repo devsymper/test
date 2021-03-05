@@ -58,6 +58,9 @@ const setListBoardInProject = (state, listBoardInProject) => {
 const setListComponent = (state, listComponentInProject) => {
     Vue.set(state, 'listComponentInProject', listComponentInProject);
 }
+const setListIssueLink = (state, IssueLink) => {
+    Vue.set(state, 'listIssueLink', IssueLink);
+}
 const setListVersion = (state, listVersionInProject) => {
     Vue.set(state, 'listVersionInProject', listVersionInProject);
 }
@@ -79,7 +82,9 @@ const setListStatusInColumnBoard = (state, data) => {
 const setListIssueTypeInProjects = (state, data) => {
     Vue.set(state.listIssueTypeInProjects, data.key , data.data);
 }
-
+const setCountIssueWithStatusInListProject = (state, data) => {
+    Vue.set(state.countIssueWithStatusInListProject, data.key , data.data);
+}
 const setAllWorkflow = (state, allWorkflow) => {
     Vue.set(state, 'allWorkflow', allWorkflow);
 }
@@ -321,6 +326,7 @@ export {
     addBoardToStore,
     addToTaskManagementStore,
     updateBoardToStore,
+    setListIssueLink,
     setListComponent,
     setListVersion,
     setInfoVersionCurrent,
@@ -356,5 +362,6 @@ export {
     updateSprintToListInStore,
     setListDataSprintAfterAfterMapIssue,
     updateCheckBoardChange,
-    removeCheckBoardChange
+    removeCheckBoardChange,
+    setCountIssueWithStatusInListProject
 };

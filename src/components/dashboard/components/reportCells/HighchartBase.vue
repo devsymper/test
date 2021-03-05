@@ -1,12 +1,16 @@
 <template>
-    <Highcharts
-        class="w-100 h-100" 
-        :options="cellConfigs.viewConfigs.displayOptions">
-    </Highcharts>
+    <div ref="highchartWrapper" class="w-100 h-100">
+         <Highcharts
+            class="w-100 h-100" 
+            ref="highchartSymper"
+            :options="cellConfigs.viewConfigs.displayOptions">
+        </Highcharts>
+    </div>
 </template>
 <script>
 
 import {Chart} from 'highcharts-vue'
+import { util } from "@/plugins/util";
 import Highcharts from 'highcharts';
 import Treemap from 'highcharts/modules/treemap'
 import HighchartsMore from 'highcharts/highcharts-more';
@@ -32,7 +36,16 @@ export default {
         }
     },
     methods:{
-        
+        printInnerHTML(headerHTML){
+            let domHTML = this.$refs.highchartWrapper.innerHTML
+            let fullHTML = headerHTML + domHTML;
+            util.printDOM(fullHTML);
+        }
     }
 }
 </script>
+<style >
+.highcharts-credits{
+    display: none !important;
+}
+</style>

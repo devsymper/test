@@ -450,7 +450,9 @@
             "viewDetails": "View detail",
             "edit": "Edit",
             "grantPermission": "Grant Permission",
-            "remove": "Remove"
+            "remove": "Remove",
+            "clone":"Clone"
+            
         },
         "created": "Permission package created",
         "deleted": "Permission package deleted",
@@ -749,6 +751,29 @@
         }
     },
     "timesheet": {
+        "status":{
+            "New":"New",
+            "Underload":"Underload",
+            "Fullload":"Fullload",
+            "Overload":"Overload"
+        },
+        "table": {
+            "category": "Category",
+            "name": "Name ",
+            "key": "Key",
+            "id": "id",
+            "stt":"Stt",
+            "description": "Description",
+            "status": "Status",
+            "user_created": "User created",
+            "date_created": "Date created",
+            "user_updated": "User updated",
+            "date_updated": "Date updated",
+            "type":"Type",
+            "create": "Create",
+            "delete": "Delete",
+            "view": "View   "
+        },
         "assignee": "Assignee",
         "fre_submit": "Frequency Submission",
         "fow": "First day of month",

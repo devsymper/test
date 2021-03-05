@@ -38,15 +38,19 @@ import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/D
 
 export default {
 	props:{
-
 		listDatasets:{
 			type: Array, 
 			default(){
 				return []
 			}
 		},
+		listDatasetSelected:{
+			type: Array, 
+			default(){
+				return []
+			}
+		},
 		idDataset:{
-			type: String,
 			default: ""
 		},
 		isMultiple:{
@@ -79,7 +83,6 @@ export default {
 	data(){
 		return {
 			isLoading: false,
-			listDatasetSelected: [],
 			searchKey: "",
 			dashboardDatasetWorker:null,
 			searchCache: {

@@ -3,12 +3,14 @@
      <div v-if="monthEvents[date]" class= "fs-12 px-1 mt-1"  >
         <!-- <v-menu   :close-on-content-click="false" v-model="menu">
             <template v-slot:activator="{on}"> -->
-                <div v-for="event in monthEvents[date]" 
+                <div v-for="event in monthEvents[date].filter((e,i)=>i<countLog)" 
                     :key="event.id" 
-                    class="honey-drew mb-1 text-ellipsis" 
+                    :style="{background:event.color}"
+                    class=" mb-1 text-ellipsis" 
                     style='height: 10%; overflow: hidden!important'>
-                    <i class="mdi mdi-check color-green"></i>
-                    {{event.category_key}} -
+                    <i  v-if="event.type==1" class="mdi mdi-check color-green"></i>
+                    <i  v-else class="mdi mdi-calendar color-blue"></i>
+                    {{event.category_key}} -{{countLog}}
                     {{event.name}}
                 </div>
         <!-- </template>
@@ -22,9 +24,13 @@
 import ViewDetailMonth from "./../ViewDetailMonth";
 
 export default {
+  created () {
+    //   this.countLogMonthView()
+  },
   data () {
     return {
-        menu:false
+        menu:false,
+        countLog: 3
     }
   },
     name: "MonthViewEvent",
@@ -47,10 +53,26 @@ export default {
             default:''
         },
     },
+    mounted(){
+        this.countLogMonthView()
+    },
     methods: {
         start(date){
             this.$emit('showLog',date);   
         },
+        countLogMonthView(){
+            if($(".v-calendar-weekly__day").length>0){
+                 let dayH = $(".v-calendar-weekly__day")[0].clientHeight;
+                 console.log(dayH);
+                // let dayHeaderH =  $(".v-calendar-weekly__day-label")[0].clientHeight;
+                let marginYpHeaderH = 8;//
+                let log =  20;
+                let countLog = parseInt((dayH-20)/log);
+                countLog = countLog-1;
+                this.countLog = countLog;
+                console.log(countLog);
+            }
+        }
     },
         
 }
@@ -63,7 +85,8 @@ export default {
     opacity: 1;
     color:grey
 }
+/* #F0FFF0 */
 .honey-drew{
-    background-color:#F0FFF0
+    background-color: pink
 }
 </style>

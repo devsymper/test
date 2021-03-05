@@ -103,6 +103,7 @@ import { pushCustomElementsToModel, collectInfoForTaskDescription } from "./elem
 import Api from "./../../api/api.js";
 import { appConfigs } from '../../configs';
 import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
+import attrToXMLMethods from "@/components/process/elementDefinitions/attrToXMLMethods.js";
 
 const apiCaller = new Api('');
 
@@ -408,12 +409,37 @@ export default {
                 }
             }
         },
+        addRunningInfoVarsToModel(info, allVizEls, bpmnModeler){
+            let process = null;
+            for (let vizEl of allVizEls) {
+                let bizVizEl = vizEl.businessObject;
+                if (bizVizEl.$type == 'bpmn:Process') {
+                    process = bizVizEl;
+                    break;
+                }
+            }
+
+            let dataToSave = JSON.stringify(info);
+            let props = {
+                value: [
+                    {
+                        defaultValue: dataToSave,
+                        id: "SYMPER_EXTRA_RUNNING_INFO",
+                        name: "SYMPER_EXTRA_RUNNING_INFO",
+                        type: "string"
+                    }
+                ]
+            };
+            attrToXMLMethods.dataObjectMethod(process, 'flowElements', props, bpmnModeler, '');
+        },
         getModelDataForSymperService(){
             let allVizEls = this.$refs.symperBpmn.getAllNodes(false);
             let allSymEls = this.stateAllElements;
             let bpmnModeler = this.$refs.symperBpmn.bpmnModeler;
-            collectInfoForTaskDescription(allVizEls, allSymEls,  bpmnModeler);
+            let info = collectInfoForTaskDescription(allVizEls, allSymEls,  bpmnModeler);
             pushCustomElementsToModel(allVizEls, allSymEls,  bpmnModeler);
+            this.addRunningInfoVarsToModel(info, allVizEls, bpmnModeler);
+            
             for(let el of allVizEls){
                 if(el.businessObject.$type == 'bpmn:Task'){
                     this.$refs.symperBpmn.changeTaskNodeToUserTaskNode(el.id);

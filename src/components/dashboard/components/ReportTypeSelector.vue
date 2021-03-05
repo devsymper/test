@@ -112,7 +112,7 @@ export default {
 		return{
 			tabs: null,
 			configHeight: 0,
-			panels: null,
+			panels: 0,
 			tabItems:{
 				columnConfig:{
 					title: this.$t('bi.dashboard.column-config'),
@@ -138,7 +138,6 @@ export default {
 			deep: true,
 			immediate: true,
 			handler(val){
-			
 				setTimeout((self) => {
 					self.getConfigsHeight(val)
 				}, 500, this);

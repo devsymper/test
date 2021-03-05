@@ -179,47 +179,30 @@ export const getMapControlEffected = (allControlObj) => {
                if(!mapControlEffected.hasOwnProperty(formulasType)){
                    mapControlEffected[formulasType] = {}
                }
-               if(formulasType == 'linkConfig'){
-                   let allConfig = formulas[formulasType].configData;
-                   for (let index = 0; index < allConfig.length; index++) {
-                       let config = allConfig[index];
-                       if(config.instance){
-                         let inputControl = config.instance.inputControl;
-                           for (let controlEffect in inputControl) {
-                               if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                                   mapControlEffected[formulasType][controlEffect] = {};
-                               }
-                               mapControlEffected[formulasType][controlEffect][name] = true;
-                           }
-                       }
-                   }
-               }
-               else{
-                   if(formulas[formulasType].hasOwnProperty('instance')){
-                       let inputControl = formulas[formulasType].instance.inputControl;
-                       let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
-                       let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
-                       for (let controlEffect in inputControl) {
-                           if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                               mapControlEffected[formulasType][controlEffect] = {};
-                           }
-                           mapControlEffected[formulasType][controlEffect][name] = true;
-                       }
-                       for (let controlEffect in inputFromDatasets) {
-                           if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                               mapControlEffected[formulasType][controlEffect] = {};
-                           }
-                           mapControlEffected[formulasType][controlEffect][name] = true;
-                       }
-                       for (let controlEffect in inputLocalFormulas) {
-                           if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                               mapControlEffected[formulasType][controlEffect] = {};
-                           }
-                           mapControlEffected[formulasType][controlEffect][name] = true;
-                       }
-                       detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance, allControlObj);
-                   }
-               }
+               if(formulas[formulasType].hasOwnProperty('instance')){
+                    let inputControl = formulas[formulasType].instance.inputControl;
+                    let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
+                    let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
+                    for (let controlEffect in inputControl) {
+                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                            mapControlEffected[formulasType][controlEffect] = {};
+                        }
+                        mapControlEffected[formulasType][controlEffect][name] = true;
+                    }
+                    for (let controlEffect in inputFromDatasets) {
+                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                            mapControlEffected[formulasType][controlEffect] = {};
+                        }
+                        mapControlEffected[formulasType][controlEffect][name] = true;
+                    }
+                    for (let controlEffect in inputLocalFormulas) {
+                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                            mapControlEffected[formulasType][controlEffect] = {};
+                        }
+                        mapControlEffected[formulasType][controlEffect][name] = true;
+                    }
+                    detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance, allControlObj);
+                }
            }
        }
    }
@@ -361,7 +344,7 @@ export const getDataInputFormula = (formulaInstance, listInput, extraData = null
                                 dataInput[inputControlName] = controlIns.value;
                             }
                         }
-                        if(controlIns.type == 'inputFilter'){
+                        if(['inputFilter','combobox'].includes(controlIns.type)){
                             let dataInputFilter = dataInput[inputControlName].split(',');
                             dataInputFilter = dataInputFilter.reduce((arr,item)=>{
                                 let data = item.replace(/'/g,"");

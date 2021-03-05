@@ -118,7 +118,7 @@ export default {
 .v-simple-checkbox .v-icon{
 	font-size: 16px;
 }
-.custom-selected-display{
+/* .custom-selected-display{
 	margin-left: -12px ;
-}
+} */
 </style>

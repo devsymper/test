@@ -1,23 +1,27 @@
 <template>
-<div class='log-time h-100 pl-4' >
-    <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px">
-        <period-selector  @load-logtime="reloadLog" />
-        <div style="width:38%;float:right" 
-             class="">
+<div class='log-time h-100 pl-1' >
+    <div class="d-flex justify-space-between">
+        <period-selector style="width:60%" />
+        <div style="width:40%" class="d-flex justify-end">
+            <ActionButtons ref="action" />
             <CalendarViewMode
+                ref="viewmode"
+                @change-cate-color="changeCateColor"
+                @change-color="changeColor"
                 @time_view="time_view = true"
                 @list_view="time_view = false" />
-            <ActionButtons refs="action" />
         </div>
-    </v-row>
+    </div>
     <v-dialog v-model="logtimeDialog" width="357" @click:outside="deleteLog()">
         <LogTimeForm v-show="!showTask"
             ref="logtime"
             @showTaskForm="showTaskForm"
             @loadMonthView="loadMonthView"
             @create-log="createLog"
+            @create-list-log="creatListLog"
             @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
+            @update-log="updateLog"
             :updateAPICategory ="updateAPICate"
             @cancel="cancelSave()"
             :dateMonth ="dateMonth"
@@ -27,7 +31,6 @@
             :load ="load"
             @doneCate="doneCate()"
             :update ="update"
-            :newEvent="logtimeEvent" 
             :onSave="onSaveLogTimeEvent"
             :onCancel="onCancelSave">
         </LogTimeForm>
@@ -67,9 +70,9 @@
             :onDelete="onDeleteLogTimeEvent">
         </DeleteLogView>
     </v-dialog>
-    <LogCalendar 
-        :userId="userId"
+    <LogCalendar
         @showLog="showLog" 
+         @quick-cancel="quickCancel"
         :monEvents="monthEvents"
         ref="logCalendar" 
         :time-view="time_view" 
@@ -102,7 +105,6 @@ export default {
     },
     data() {
         return {
-            userId:'',
             monthEvents:{},
             showTask:false,
             showCategory:false,
@@ -147,31 +149,102 @@ export default {
             console.log(err)
         })
     },
+    computed:{
+        type(){
+            return this.$store.state.timesheet.calendarType;
+        }
+    },
     methods: {
+        quickCancel(isCreate){
+            if(isCreate){
+                this.deleteLog();
+            }
+            this.cancelSave();
+
+        },
+       changeCateColor(listCateColor, logColor){
+           this.$refs.logCalendar.listCategoryColor = listCateColor;
+            this.$refs.logCalendar.events.map(e=>{
+                listCateColor.map(cate=>{
+                    if(cate.key == e.category_key){
+                        if(cate.isShow){
+                            e.color = cate.color
+
+                        }else{
+                            e.color = logColor
+                        }
+                    }
+                   
+                })
+            })
+        },
+        changeColor(data,listCate){
+            let listCateColor = [...listCate];
+            if(data.isRandom){
+                this.$refs.logCalendar.isRandom = true;
+                this.$refs.logCalendar.events.map(e=>{
+                    e.color = this.$refs.logCalendar.randomColor();
+                    e.color = this.$refs.logCalendar.setCateAndLogColor(e,e.color,listCate)
+                })
+            }else{
+                this.$refs.logCalendar.colorLog = data.colorLog;
+                 this.$refs.logCalendar.isRandom = false;
+                this.$refs.logCalendar.events.map(e=>{
+                    e.color = this.$refs.logCalendar.setCateAndLogColor(e,data.color,listCate)
+                })
+            }
+        },
         // khi click ra ngoài log form
         deleteLog(){
-            if(!this.update){
+            if(!this.update&&this.type!="month"){
               this.$refs.logCalendar.events.pop()
             }
         },
+        //update lại log được update
+        updateLog(data){
+            let events = [...this.$refs.logCalendar.events];
+            let oldLog = events.filter(e=>e.id==data.id)[0];
+            let name = this.$refs.logCalendar.listTask.filter(task=>task.id==data.task)[0].name;
+            for(let i = 0; i<events.length;i++){
+                if(events[i].id==oldLog.id){
+                    events[i]=data,
+                    events[i].name = name;
+                    // event[i].action = "update";// 
+                    this.$store.commit("timesheet/getLogForm",  events[i])
+                }
+            }
+           this.$refs.logCalendar.events=events;
+        },
+        creatListLog(data){
+            let listLog = [...data];
+            listLog.map(d=>{
+                this.createLog(d)
+            })
+
+        },
         createLog(data){
-            debugger
-            data.name=data.task;
-            data.category=data.categoryTask;
-            data.category_key=data.categoryTask.split('-')[0];
+            let taskName = this.$refs.logCalendar.listTask.filter(task=>task.id==data.task);
+            data.start = Date.parse(data.start);
+            data.date = this.$moment(data.end).format('YYYY-MM-DD');
+            data.end = Date.parse(data.end);
+            data.name = taskName.length>0? taskName[0].name:'';
+            data.category = data.cateId;
+            // data.category_key = data.categoryTask.key;
+            data.color= this.$refs.logCalendar.getColorWhenCreate(data);
+            data.timed= true;
+            data.action = 'create';
+            this.$store.commit("timesheet/getLogForm", data)
             this.$refs.logCalendar.events.push(data);
+            if(!this.$refs.logCalendar.timeView){
+                this.$refs.logCalendar.resizeLogtime()
+            }
         },
         loadMonthView(data){
-            // this.$refs.logCalendar.monthEvents[data.date]=[];
-            // this.$refs.logCalendar.monthEvents[data.date].push(data);
             this.monthEvents = data;
             this.$refs.logCalendar.load()
         },
         doneCate(){
             this.updateAPICate = false
-        },
-        reloadLog(userId){
-            this.userId = userId;
         },
         updateAPICategory(){
             this.updateAPICate =true;
@@ -199,7 +272,7 @@ export default {
         },
          showCategoryForm(value){
             this.eventLog = value;
-            this.$refs.cate.forBa = false;
+            // this.$refs.cate.forBa = false;
             this.$refs.cate.typeCate = 'normal';
             this.showCategory=true;
             this.showTask =true;
@@ -223,13 +296,18 @@ export default {
         },
         onCreateTime({logtimeEvent, onSave, onCancel, update}) {
             this.logtimeDialog = true;
+             this.$store.commit("timesheet/getLogForm", logtimeEvent)
             this.$nextTick(() => {
-                console.log(this.onSave);
                 this.update = update;
                 this.logtimeEvent = logtimeEvent;
                 this.onSaveLogTimeEvent = onSave;
+
                 this.onCancelSave = onCancel;
             });
+            
+            if(this.$refs.logtime){
+                this.$refs.logtime.setValueLog(logtimeEvent);
+            }
         },
         deleteLogTime({deleteEvent, onDelete}) {
             this.deleteDialog = true;

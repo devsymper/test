@@ -3,11 +3,31 @@ import moment from 'moment';
 export default {
     // timesheet
     calendarType: 'week',
+    listCate:[],
+    objId:0,
     calendarStartDate: moment().format('YYYY-MM-DD'),
     calendarEndDate: moment().format('YYYY-MM-DD'),
     calendarShowDate: moment().format('YYYY-MM-DD'),
     calendarAdjustment: 0,
     totalHours: '0',
+    listColor:{},
+    userId:-1,
+    log:{
+        action:'create',
+        category: '',
+        task : '',
+        taskName:'',
+        date : moment().format('YYYY-MM-DD'),
+        duration :0,
+        start :moment(),
+        end :moment(),
+        description :'',
+        type :1,
+        color :'',
+        category_key :'',
+        id :'',
+        docObjId :0,
+    },
 
     // manage timesheet
     manageTimesheetType: 'week',

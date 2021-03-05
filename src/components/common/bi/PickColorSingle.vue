@@ -1,31 +1,28 @@
 <template>
     <div class="px-1">
-        <div class="d-flex">
-            <div class="item-color"
-                :style="{
-                    'background-color': myValue ? myValue : ''
-                }" 
-                @click="showPickColor(myValue)"
-            >
-            </div>
-            <div>
-                <input style="margin-top:3px"  v-on:input="changeValueInput"  :value="myValue" type="text">
-            </div>
-        </div>
-     
-        <v-menu
-            v-model="isShow"
-            scrollable
-            content-class="dialog-pick-color"
-        >   
-            <div>
-                <pick-color 
+        <v-menu 
+            top
+            offset-y
+        >
+            <template v-slot:activator="{ on, attrs }">
+                 <div class="d-flex" v-on="on" v-bind="attrs">
+                    <div class="item-color"
+                        :style="{
+                            'background-color': myValue ? myValue : ''
+                        }" 
+                    >
+                    </div>
+                    <div>
+                        <input style="margin-top:3px"  v-on:input="changeValueInput"  :value="myValue" type="text">
+                    </div>
+                </div>
+                
+            </template>
+            <pick-color 
                 :value="myValue"
                 @input="handleSelected"
-                />
-            </div>
-         
-        </v-menu>
+            />
+        </v-menu>            
     </div>
 </template>
 
@@ -54,7 +51,6 @@ export default {
     },
     data(){
         return{
-            isShow:false,
             myValue: "",
             colorSelected:'',
             indexSelect:-1,
@@ -88,9 +84,7 @@ export default {
                 });
             }, 300, this);
         },
-        showPickColor(){
-            this.isShow = true;
-        },
+       
     }
 }
 </script>

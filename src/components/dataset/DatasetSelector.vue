@@ -12,11 +12,12 @@
 			:showDisplayConfig="false"
 			:containerHeight="tableHeight"
 			:getDataUrl="getDataUrl"
+			:showFilter="false"
 			:customAPIResult="customAPIResult"
-			@data-loaded="addCheckboxColumn"
+			@data-loaded="handleDataLoaded"
 			@after-selected-row="changeDatasetSelected"
-			:checkedRows="checkedRows"
-			:customHeaderBtn="customHeaderBtn"
+			:checkedRows="listDatasetSelected"
+			:customHeaderBtn="customHeaderBtn" 
 		/>
 	</v-dialog>
 </template>
@@ -32,6 +33,12 @@ export default {
 	},
 	props:{
         value: {
+            type: Array,
+            default(){
+                return []
+            }
+        },
+		listDatasetSelected: {
             type: Array,
             default(){
                 return []
@@ -59,13 +66,7 @@ export default {
 					res.data.columns.forEach(function(e){
 						e.flex = 1
 					})
-
-					res.data.listObject.forEach(function(e){
-						if(self.value.includes(e.id)){
-							e.checked = true
-							self.checkedRows.push(e)
-						}
-					})
+					
 					return{
 						columns:res.data.columns,
 						listObject: res.data.listObject,
@@ -88,7 +89,7 @@ export default {
 					icon: 'mdi-check',
 					callback(){
 						self.showDialog = false
-						self.$emit('list-dataset-selected', self.value)
+						self.select()
 					}
 				},
 			},
@@ -98,6 +99,15 @@ export default {
 	methods:{
 		show(){
 			this.showDialog = true
+			if(this.$refs.listObject){
+				this.$refs.listObject.setRowChecked()
+			}
+		},
+		handleDataLoaded(){
+			setTimeout(self=>{
+				self.$refs.listObject.addCheckBoxColumn()
+				self.$refs.listObject.setRowChecked()
+			},200, this)
 		},
 		changeDatasetSelected(data){
 			let arr = []
@@ -110,13 +120,13 @@ export default {
 				self.internalChange = false;
 			}, 0, this);
 		},
-		addCheckboxColumn(){
-			setTimeout(self=>{
-				self.$refs.listObject.addCheckBoxColumn()
-			},200, this)
-		},
 		select(){
-			this.$emit('list-dataset-selected' , this.listDatasetSelected)
+			let rows = this.$refs.listObject.getSelectedRows()
+			let arr = []
+			rows.forEach(function(e){
+				arr.push(e.id)
+			})
+			this.$emit('list-dataset-selected', arr)
 		},
 		setOriginValue(value){
 			this.originDatasetIds = util.cloneDeep(value)

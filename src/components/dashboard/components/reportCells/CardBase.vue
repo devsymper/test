@@ -1,5 +1,5 @@
 <template>
-    <div class="symper-card-cell p-1">
+    <div ref="cardBase" class="symper-card-cell p-1">
         <div class="card-delta pb-1 pl-2 pr-1" v-if="viewOptions.compareValue !== false"> 
             <div class="equal " v-if="viewOptions.sign == 'equal'">
                 Equal
@@ -26,6 +26,7 @@
 </template>
 <script>
 
+import { util } from "@/plugins/util";
 export default {
     props:['cellConfigs'],
     computed:{
@@ -64,6 +65,11 @@ export default {
             }
             var h = r * 0x10000 + g * 0x100 + b * 0x1;
             return '#' + ('000000' + h.toString(16)).slice(-6);
+        },
+         printInnerHTML(headerHTML){
+            let bodyHtml = this.$refs.cardBase.innerHTML
+            let domHtml = headerHTML + bodyHtml
+            util.printDOM(domHtml);
         }
     }
 }

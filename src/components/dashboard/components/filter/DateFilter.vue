@@ -69,6 +69,12 @@ export default {
 			return this.dates.join(' ~ ');
 		},
 	},
+	created(){
+		this.max = this.data.max
+		this.min =  this.data.min
+		debugger
+		this.dates = [this.min, this.max]
+	},
 	methods: {
 		applyFilter(){
 			if(this.endDate >= this.startDate){

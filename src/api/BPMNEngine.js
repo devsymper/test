@@ -7,6 +7,7 @@ import {
 } from "../plugins/util";
 
 var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models); // Khởi tạo một đối tượng api với domain của service BPMNE
+let workfloweExtend = new Api(appConfigs.apiDomain.workflowExtend);
 
 let testHeader = {
     Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
@@ -246,5 +247,8 @@ export default {
     // lấy danh sách quy trình theo docId
     getProcessByDocId(docId){
         return bpmneApi.get(appConfigs.apiDomain.bpmne.models +`related-docs/${docId}/workflows?startDoc=true`)
+    },
+    updateDoneTaskInfo(taskId, data){
+		return workfloweExtend.put('tasks/' + taskId, data);
     }
 };

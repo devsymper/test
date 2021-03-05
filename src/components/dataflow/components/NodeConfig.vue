@@ -32,21 +32,22 @@ export default {
 	methods:{
 		handleDatasetSelector(params){
 			this.$set(this.datasetInfor.id, 'content', params.id)
-			this.$set(this.datasetInfor.name, 'content', params.aliasName)
+			this.$set(this.datasetInfor.name, 'content', params.name)
 			this.$set(this.datasetInfor.title, 'content', params.aliasName)
+			this.$set(this.datasetInfor.docId, 'content', params.symperId)
 			this.$emit('dataset-selected' , params)
 		}
 	},
-	data(){
-		return {
-			datasetInfor:{
+	computed: {
+		datasetInfor(){
+			return {
 				id:{
 					title:"ID",
 					content: this.configs.idDataset
 				},
 				name:{
 					title:"Name",
-					content: this.configs.wgName
+					content: this.configs.name
 				},
 				title:{
 					title:"Title",
@@ -55,8 +56,13 @@ export default {
 				docId:{
 					title:"Doc id",
 					content: this.configs.symperDocId
-				},
+				}
 			}
+		}
+	},
+	data(){
+		return {
+			
 		}
 	}
 }

@@ -7,7 +7,7 @@
         </v-card-title>
         <v-card-text style="height:55px!important ">
             <span class="label pt-2 ">{{$t('timesheet.category_task')}}</span>
-        <br/> {{formattedDeleteEvent.category}}
+        <br/> {{getCategoryName(formattedDeleteEvent.category)}}
         </v-card-text>
         <v-card-text style="height:55px" >
             <span class="label pt-2">{{$t('timesheet.task')}}</span>
@@ -53,7 +53,16 @@ export default {
             formattedDeleteEvent: {},
         }
     },
+    computed:{
+        listCategory(){
+           return this.$store.state.timesheet.listCate;
+        }
+    },
     methods: {
+        getCategoryName(evt){
+            let cate = this.listCategory.filter(c=>c.id==evt)[0];
+            return cate.key + "-" + cate.name
+        },
         doDelete() {
             this.onDelete();
             timesheetApi.deleteLogTime({
