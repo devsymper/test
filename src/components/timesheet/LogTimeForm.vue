@@ -401,7 +401,7 @@ export default {
             if(this.categoryTask){
                 let docId = this.listCategory.filter(cate=>cate.id==this.categoryTask.id);
                 if(docId&&docId.length>0){
-                    docId = docId[0].docId
+                    docId = docId[0].docId;
                 }else{
                     docId = -1;
                 }
@@ -480,7 +480,6 @@ export default {
             this.inputs.startTime = val ? this.$moment(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? this.$moment(val.end).format('HH:mm') : "08:40";
             this.duration = this.canculateDurationByStartEnd(this.inputs.startTime,this.inputs.endTime);
-
             this.inputs.date = val ? this.$moment(val.date).format('YYYY-MM-DD') : this.$moment().format('YYYY-MM-DD');
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
@@ -501,15 +500,18 @@ export default {
             this.timeError = '';
             this.cateError = '';
         },
-        // hiển thị button trên log form
+        //Lấy danh sách task từ doc
          getListTaskDoc(docId){
-             const self = this;
+            const self = this;
             documentApi.getListDocumentObject(docId).then(res=>{
                 if(res.status==200){
                     self.listTask=[];
                     res.data.listObject.map(task=>{
-                        self.listTask.push({...task, name:task.task_name});
-                        
+                        self.listTask.push({
+                            ...task, 
+                            name:task.tmg_name,
+                            description:task.tmg_description?task.tmg_description:"Chưa có mô tả"
+                        });
                     })
                 }
             })
