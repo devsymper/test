@@ -40,7 +40,7 @@ export default class Control {
         this.defaultValue = "";
         this.lastUserUpdate = controlProps.userUpdate;
         this.optionValues = {}
-        this.validateMessageType = ['Require','Validate','UniqueDB','MaxLength','MinLength'];
+        this.validateMessageType = ['Require','RequireChange','Validate','UniqueDB','MaxLength','MinLength'];
 
     }
     init() {

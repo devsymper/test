@@ -270,7 +270,9 @@ export default class SymperTable {
                     }}
                 }
             }
-            
+            if(controlInstance.type == 'user'){
+                controlInstance.setMappingUserId();
+            }
             if(this.cols && this.cols.length > 0){
                 if(this.cols[0].name == controlName){
                     continue
@@ -955,6 +957,13 @@ export default class SymperTable {
             ps.update();
         }
         this.tableInstance.autoSizeAll();
+        this.tableInstance.checkRequireChange();
+    }
+    checkRequireChange(){
+        for (let controlName in this.tableControl.controlInTable){
+            let controlInstance = this.tableControl.controlInTable[controlName];
+            controlInstance.checkRequireChangeControl();
+        }
     }
 
     /**
@@ -1029,8 +1038,31 @@ export default class SymperTable {
             }
             
         }
-        else if(event.key == 'Backspace' && (event.shiftKey || event.metaKey)){
-            this.tableInstance.deleteRowSelection(params)
+        
+        if(event.shiftKey || event.metaKey){
+            if(event.key == 'Backspace'){
+                this.tableInstance.deleteRowSelection(params)
+            }
+        }
+        else{
+            let keyPress = event.keyCode;
+            if(keyPress === 8|| keyPress === 46) {
+                let cellRanges = params.api.getCellRanges();
+                cellRanges.forEach(cells => {
+                    let colIds = cells.columns.map(col => col.colId);
+                    let startRowIndex =Math.min( cells.startRow.rowIndex, cells.endRow.rowIndex);
+                    let endRowIndex =Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
+                    this.tableInstance.clearCells(startRowIndex, endRowIndex, colIds);
+                });
+            }
+        }
+    }
+    clearCells(start, end, columns) {
+        for(let i = start; i <= end; i++) {
+            let rowNode = this.gridOptions.api.getRowNode(i);
+            columns.forEach(column => {
+                rowNode.setDataValue(column, '');
+            });
         }
     }
     /**
@@ -1274,6 +1306,13 @@ export default class SymperTable {
             return arr;
         },[])
         return colData
+    }
+    getColDataWithRowId(colName){
+        let colData = [];
+        this.gridOptions.api.forEachNode(node => {
+            colData[node.id] = node.data[colName];
+        });
+        return colData;
     }
     /**
      * Hàm tính tổng 1 cột

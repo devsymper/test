@@ -16,6 +16,10 @@ ValidateCellRenderer.prototype.init = function(params) {
         control.optionValues['Require'][params.rowIndex] = {
             isValid:false
         }
+        control.optionValues['RequireChange'] = {};
+        control.optionValues['RequireChange'][params.node.id] = {
+            isValid:false
+        }
         if(value == ""){
             if(control.isRequiredControl()){
                 this.eGui.innerHTML = dotIcon;
@@ -41,6 +45,18 @@ ValidateCellRenderer.prototype.init = function(params) {
             this.eGui.setAttribute('rowIndex',params.rowIndex);
             this.eGui.setAttribute('data-control',control.name);
             this.eGui.style.height = '100%'
+        }
+        if(control.checkProps('isRequireChange')){
+            if(control.oldValue){
+                if(control.oldValue[params.node.id] == value){
+                    control.optionValues['RequireChange'][params.rowIndex] = {
+                        isValid:true,
+                        msg:'Yêu cầu thay đổi giá trị trường '+control.title
+                    }
+                    this.eGui.innerHTML = dotIcon;
+                }
+            }
+            
         }
         
     }
