@@ -167,6 +167,7 @@ export default {
         return {
             listCategoryColor:[],
             listLogInTime:[],
+            isSettingFilter:false,
             menu:false,
             oldEvents:[],
             isCreate:false,
@@ -425,6 +426,20 @@ export default {
             if(!this.timeView){
                 this.resizeLogtime()
             }
+            if(this.isSettingFilter){
+              this.filterLogList()
+            }
+        },
+        filterLogList(){
+            let eventFilter = [];
+            this.events.map(e=>{
+                this.listCateFilter.map(cate=>{
+                    if(e.category==cate){
+                        eventFilter.push(e)
+                    }
+                })
+            })
+            this.events = eventFilter;
         },
         // lấy log time đầu tiên của mảng
         resizeLogtime(){
@@ -862,9 +877,10 @@ export default {
             calendarShowDate: 'calendarShowDate',
             calendarType: 'calendarType',
             period: 'period',
-            log:'log',
-            objId:'objId',
-            userId:'userId'
+            log: 'log',
+            objId: 'objId',
+            userId: 'userId',
+            listCateFilter:'listCateFilter'
         }),
         weekday() {
             const dayOfWeekMap = {
@@ -903,6 +919,20 @@ export default {
     watch: {
         period(){
             this.load()
+        },
+        listCateFilter(){
+            this.isSettingFilter= true;
+            this.load();
+            // let eventFilter = [];
+            // this.events.map(e=>{
+            //     this.listCateFilter.map(cate=>{
+            //          if(e.category==cate){
+            //              eventFilter.push(e)
+            //          }
+            //     })
+            // })
+            // this.events = eventFilter
+            debugger
         },
         userId(){
             this.getLogByUserId();

@@ -5,6 +5,7 @@ export default {
     calendarType: 'week',
     listCate:[],
     objId:0,
+    listCateFilter:[],
     showListProcess:false,
     showSubmitTask:false,
     calendarStartDate: moment().format('YYYY-MM-DD'),

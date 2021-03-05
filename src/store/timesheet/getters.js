@@ -215,7 +215,7 @@ function getTotalHoursBy(state, getters) {
         let adjustedToday = moment();
 
         if (view === 'timesheet') {
-            _type = state.calendarType.replace('weekday', 'week');
+        _type = state.calendarType.replace('weekday', 'week');
             adjustedToday = adjustedToday.add(state.calendarAdjustment, _type);
         } else if (view === 'manage-timesheet') {
             _type = state.manageTimesheetType.replace('weekday', 'week');

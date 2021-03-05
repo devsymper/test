@@ -1,6 +1,9 @@
 function changeCalendarType(state, type) {
     state.calendarType = type;
 }
+function getFilterCate(state,listCateFilter) {
+    state.listCateFilter = listCateFilter
+}
 function getListColor(state, color) {
     state.listColor = color;
 }
@@ -99,5 +102,6 @@ export {
     adjustManageTimesheet,
     adjustSubmit,
     updateTotalHours,
+    getFilterCate,
     setShowErrorDialog
 }
