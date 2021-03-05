@@ -869,7 +869,9 @@ export default {
     watch: {
         docId(after) {
             this.documentId = after;
-            this.loadDocumentData();
+            if(after){
+                this.loadDocumentData();
+            }
         },
         workflowVariable:{
             deep: true,
@@ -1693,6 +1695,7 @@ export default {
                     this.checkOverrideFormulas(controlName,field);
                     let idField = field.id;
                     let valueInput = field.value;
+                    console.log(valueInput,'valueInputvalueInput');
                     let prepareData = field.prepareData;
                     if(prepareData){
                         isSetEffectedControl = true;
