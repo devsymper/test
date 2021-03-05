@@ -287,6 +287,21 @@ export default {
                 return {}
             }
         },
+        overridePropertiesControls:{
+            type:Object,
+            default(){
+                return {
+                    abc:{
+                        isRequireChange:true,
+                        isRequired:true,
+                    },
+                    input_2:{
+                        isRequireChange:true,
+                        isRequired:true,
+                    }
+                }
+            }
+        },
         /**
          * Tham số truyên vào chỉ ra control nào được nhập liệu
          * vd:['mct','tb1_ma_hang']
@@ -1691,6 +1706,7 @@ export default {
                     let controlName = (allControlNotSetData.includes(controlType) || controlType == 'tabPage') ? field.type : field.properties.name.value;
                     this.checkEditableControl(controlName,field);
                     this.checkOverrideFormulas(controlName,field);
+                    this.checkOverrideProperties(controlName,field);
                     let idField = field.id;
                     let valueInput = field.value;
                     let prepareData = field.prepareData;
@@ -1787,6 +1803,7 @@ export default {
                                 childControlProp.properties.docName = thisCpn.documentName;
                                 thisCpn.checkEditableControl(childControlName,childControlProp);
                                 thisCpn.checkOverrideFormulas(childControlName,childControlProp);
+                                thisCpn.checkOverrideProperties(childControlName,childControlProp);
                                 let childValue = childControlProp.value;
                                 let childPrepareData = childControlProp.prepareData
                                 if(childPrepareData){
@@ -2821,6 +2838,23 @@ export default {
                 }
             }
         },
+        // hàm ghi đè thuộc tính của control
+        checkOverrideProperties(controlName, field){
+            if(Object.keys(this.overridePropertiesControls).length > 0 && Object.keys(this.overridePropertiesControls).includes(controlName)){
+                for(let prop in this.overridePropertiesControls[controlName]){
+                    let propValue = this.overridePropertiesControls[controlName][prop];
+                    if(field.properties[prop]){
+                        field.properties[prop].value = propValue;
+                    }
+                }
+            }
+        },
+        refreshOverrideControls(){
+            for(let control in this.overridePropertiesControls){
+                let controlIns = getControlInstanceFromStore(this.keyInstance, control);
+                controlIns.overrideProperties(this.overridePropertiesControls[control]);
+            }
+        }
         afterFileUpload(data){
             let file = {id:data.id, uid:data.uid, name:data.name, type:data.type, serverPath:data.serverPath, size:data.size}
             let controlIns = this.currentFileControl.controlIns;
