@@ -1,4 +1,5 @@
 <template>
+
 	<div class="w-100" style="height: 100%">
 		<v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
 			<v-tooltip bottom>
@@ -701,6 +702,7 @@ export default {
 						],
 					};
 					let res = await this.submitTask(taskData);
+					this.$emit('re-select-object')
 					this.saveApprovalHistory(value);
 					if (this.reload) {
 						this.$emit('task-submited', res);
@@ -721,6 +723,7 @@ export default {
 						this.reloadDetailTask();
 					}
 					this.loadingAction = false;
+					this.$emit('re-select-object')
 				}
 			} else {
 				this.showDialogAlert = true;

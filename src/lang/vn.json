@@ -1502,7 +1502,7 @@
 			"snackbar":{
 				"title":"Công việc submit thành công",
 				"description":"Bạn có thể hoàn thành công việc bằng cách thực thi ",
-				"action":"Hãy cập nhật bản ghi bằng cách chọn "
+				"action":"Bạn có thể cập nhật bản ghi bằng cách submit lại hoặc chọn "
 			},
 			"notify":{
 				"unClaim":"Hủy nhận công việc thành công",

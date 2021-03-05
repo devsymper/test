@@ -1,5 +1,6 @@
 <template>
     <div class="list-objects h-100" style="overflow: hidden;">
+        <Preloader ref="preLoaderView"/>
         <v-row class="mx-0 h-100">
             <v-col
                 :cols="!sideBySideMode ? 12 : 4"
@@ -297,16 +298,17 @@
                     />
                 </div>
             </v-col>
-
             <v-col
                 :cols="!sideBySideMode ? 0 : 8"
                 :md="!sideBySideMode ? 0 : 9"
                 v-show="sideBySideMode"
-                class="pa-0 ma-0 h-100"
+                class="pa-0 ma-0 h-100  "
                 height="30"
-                style="border-left: 1px solid #e0e0e0;"
+                style="border-left: 1px solid #e0e0e0; "
             >
+		        <Preloader ref="preLoaderViewDetail"/>
                 <taskDetail
+                    ref="taskDetail"
 					:delegationState="delegationState"
                     :parentHeight="listTaskHeight"
                     :currentTask="currentTask"
@@ -341,6 +343,7 @@ import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
 import listTaskApproval from "./featureApproval/List";
 import { taskApi } from "./../../api/task.js";
+import Preloader from '@/components/common/Preloader';
 import infoUser from "./InfoUser";
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
 import TableFilter from "@/components/common/customTable/TableFilter.vue";
@@ -390,7 +393,6 @@ export default {
                   tasks: groups[fromNow]
                 };
             });
-            console.log("taskkkk",groupArraysTask);
             return groupArraysTask;
         },
         stask() {
@@ -423,7 +425,8 @@ export default {
         listTaskApproval,
         infoUser,
         TableFilter,
-        Pagination
+        Pagination,
+        Preloader
     },
     props: {
         compackMode: {
@@ -711,6 +714,7 @@ export default {
                 
                 getDataFromConfig(url, configs, columns, tableFilter, success, 'GET', header);
             }
+            this.$refs.preLoaderView.hide()
         },
       
         searchAutocompleteItems(vl){
@@ -804,6 +808,7 @@ export default {
                 util.getComponentSize(this.$el.parentElement).h - 130;
 		},
 		reSelectObject(){
+            this.$refs.preLoaderView.show()
             this.getData()
 			setTimeout(self=>{
                 let obj = this.groupFlatTasks[this.currentTask.idex].tasks[this.currentTask.idx]
@@ -811,6 +816,7 @@ export default {
 			},2000,this)
 		},
         async selectObject(obj, idx, idex) {
+            this.$refs.preLoaderViewDetail.show()
 			this.currentTask = {
 				obj: obj,
 				idx: idx,
@@ -839,6 +845,9 @@ export default {
                     this.$emit("change-height", "calc(100vh - 88px)");
                 }
             }
+            setTimeout((self) => {
+                self.$refs.preLoaderViewDetail.hide()
+            }, 500, this);
         },
         closeDetail() {
             this.sideBySideMode = false;
