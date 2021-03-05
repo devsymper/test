@@ -175,7 +175,6 @@ function checkDuplicatedXML(currentXML, processKey) {
         }
     });
 }
-
 export const deployProcess = function(self, processData) {
     return new Promise((deployResolve, deployReject) => {
         bpmnApi.getModelData(processData.id).then(async (res) => {

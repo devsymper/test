@@ -10,18 +10,20 @@
         <span class="label pt-2 ">{{$t('timesheet.category_task')}}<span class="color-red"> *</span></span>
         <v-autocomplete 
             v-bind:style="cateError? 'margin-bottom:4px' :''"
-            style="margin-top:2px!important; " 
-           
+            style="margin-top:2px!important; "
+            item-text="fullName"
+            item-value="type"
             v-model="categoryTask" 
-            class="category-task" 
+            class="category-task"
+            return-object
             :items="category" 
             item-color="white" 
             background-color="#f2f2f2">
             <template v-slot:item="data" class="category-task">
                 <!-- <img style='max-height: 40px; max-width: 30px; margin-right:5px' 
                 :src="require('../../assets/icon/AD-IT.png')" /> -->
-            <span style='color:black' >{{ data.item }}
-                <v-icon v-if="data.item === categoryTask " color="success">
+            <span style='color:black' >{{ data.item.fullName }}
+                <v-icon v-if="data.item.id == categoryTask.id" color="success">
                 mdi-check</v-icon></span>
         </template>
         </v-autocomplete >
@@ -112,15 +114,15 @@ export default {
         taskFormWorker:null,
         checkbox:false,
         check:false,
+        showSubmitTask:false,
         nameError: '',
         category:[],
         listUser: [],
         user:''
     }),
     created(){
+        this.category = this.$store.state.timesheet.listCate;
         this.taskFormWorker = new TaskFormWorker();
-        this.getCategory();
-        this.$store.dispatch("app/getAllUsers");
         this.listUser = this.$store.state.app.allUsers;
     },
     watch:{
@@ -134,6 +136,11 @@ export default {
             }
         },
         categoryTask(){
+            if(this.categoryTask.type==1){
+                this.showSubmitTask = true;
+                this.$emit('cancel');
+                this.$store.commit("timesheet/showListProcess", true);
+            }
              if(this.check){
                 if(this.categoryTask==''){
                 }else{
@@ -148,9 +155,6 @@ export default {
         this.taskFormWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
-                case 'getCategory':
-                    self.setCategory(data.dataAfter)
-                    break;
                  case 'createTask':
                     self.checkCreateTask(data.dataAfter)
                     break;
@@ -160,6 +164,9 @@ export default {
         });
     },
     methods: {
+        // showSubmitTaskForm(){
+          
+        // },
         checkCreateTask(check){
              if (check) {
                 this.$emit('loadTask');
@@ -174,15 +181,6 @@ export default {
                     text: "Lỗi"
                 })
              }
-        },
-        setCategory(data){
-            this.category = data;
-        },
-        getCategory(){
-             this.taskFormWorker.postMessage({
-                action:'getCategory',
-                data:{}
-            })
         },
         cancel(){
             this.categoryTask = "";
@@ -241,6 +239,11 @@ export default {
             })
             }
         }
+    },
+    computed:{
+        // category(){
+        //     return this.$store.state.timesheet.listCate
+        // }
     }
 }
 </script>

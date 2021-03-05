@@ -4,6 +4,12 @@ function changeCalendarType(state, type) {
 function getListColor(state, color) {
     state.listColor = color;
 }
+function showSubmitTask(state, showSubmitTask) {
+    state.showSubmitTask = showSubmitTask;
+}
+function showListProcess(state, showListProcess) {
+    state.showListProcess = showListProcess;
+}
 function getListCategory(state, cate) {
     state.listCate = cate;
 }           
@@ -78,12 +84,14 @@ function setShowErrorDialog(state, { msg, show }) {
 export {
     getLogForm,
     updateObjId,
+    showListProcess,
     getListColor,
     getListCategory,
     changeCalendarType,
     updateCalendarStartEnd,
     updateCalendarShowDate,
     updatePeriod,
+    showSubmitTask,
     changeManageTimesheetType,
     changeManageTimesheetRange,
     adjustCalendar,

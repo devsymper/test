@@ -121,7 +121,6 @@ export default {
                 self.inPrintingMode = true;
                 let domHTML = $(self.$el).find('.symper-table-report')[0].outerHTML;
                 domHTML = headerHTML + domHTML;
-                debugger
                 util.printDOM(domHTML);
             }, 500);
         },

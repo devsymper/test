@@ -31,7 +31,7 @@
                     <v-icon>mdi-plus</v-icon> <span class="fw-400"> Tạo task</span>
                 </v-btn>
             </template>
-            <TaskForm @cancel="cancel()"/>
+            <TaskForm  @cancel="cancel()"/>
         </v-dialog>
           <v-btn style="margin-right:-5px" class="ml-1" icon @click="showSearch=!showSearch">
             <i style="font-size:22px" class=" mdi mdi-magnify"></i>
