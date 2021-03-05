@@ -923,16 +923,6 @@ export default {
         listCateFilter(){
             this.isSettingFilter= true;
             this.load();
-            // let eventFilter = [];
-            // this.events.map(e=>{
-            //     this.listCateFilter.map(cate=>{
-            //          if(e.category==cate){
-            //              eventFilter.push(e)
-            //          }
-            //     })
-            // })
-            // this.events = eventFilter
-            debugger
         },
         userId(){
             this.getLogByUserId();

@@ -120,7 +120,6 @@ export default {
         user:''
     }),
     created(){
-        debugger
         this.category = this.$store.state.timesheet.listCate;
         this.taskFormWorker = new TaskFormWorker();
         this.listUser = this.$store.state.app.allUsers;
