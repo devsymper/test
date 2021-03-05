@@ -33,7 +33,7 @@
             </template>
             <TaskForm  @cancel="cancel()"/>
         </v-dialog>
-        <v-menu offset-y full-width :nudge-top="-5"  :close-on-content-click="false">
+        <v-menu offset-y full-width :nudge-top="-5" :close-on-content-click="false">
             <template v-slot:activator="{ on }">
                 <v-btn
                     small
@@ -42,7 +42,8 @@
                     class="ml-2"
                     v-on="on"
                 >
-            <span class="fw-400">Category</span>
+                <v-icon style="color:grey">mdi-filter</v-icon>
+            <span class="fw-400">Loại công việc</span>
           </v-btn>
           </template>
             <SelectFilterListCate :listCate="listCate" class="bg-white" />

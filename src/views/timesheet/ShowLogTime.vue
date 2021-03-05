@@ -35,6 +35,7 @@
             :onCancel="onCancelSave">
         </LogTimeForm>
          <TaskForm @loadTask="loadTask()"
+            @docId="getDocId"
             v-show="showTask&&!showCategory" 
             @cancel="cancelTaskForm()"/>
          <CategoryForm
@@ -131,7 +132,7 @@ export default {
     showListProcess(){
         if(this.showListProcess){
             this.logtimeDialog = false;
-            let docId = [2216];
+            let docId = [this.docId];
             this.getAllProcess(docId);
         }
     },
@@ -157,6 +158,7 @@ export default {
     },
     data() {
         return {
+            docId:-1,
             listProcess:[],
             data: {
                 taskInfo: {},
@@ -228,6 +230,9 @@ export default {
 
     },
     methods: {
+        getDocId(docId){
+            this.docId = docId
+        },
          handleTaskSubmited(){
             this.$store.commit("task/setIsStatusSubmit",true);
         },
