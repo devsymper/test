@@ -149,7 +149,7 @@
                                 :style="{
                                     minHeight: '50px'
                                 }"
-                                @click="selectObject(obj, idx,idex)"
+                                @click="selectObject(obj, idx, idex)"
                                 style="border-bottom: 1px solid #eeeeee!important;"
                             >
                                 <v-col
@@ -309,8 +309,9 @@
                 <taskDetail
 					:delegationState="delegationState"
                     :parentHeight="listTaskHeight"
+                    :currentTask="currentTask"
                     :taskInfo="selectedTask.taskInfo"
-					@reselect-object="reselectObject"
+					@re-select-object="reSelectObject"
                     :originData="selectedTask.originData"
                     :appId="String(selectedTask.originData.symperApplicationId)"
                     :reload="false"
@@ -685,8 +686,6 @@ export default {
             let method = 'GET';
             if (url != "") {
                 let thisCpn = this;
-                // thisCpn.loadingData = true;
-                // let options = this.getOptionForGetList(configs, columns);
                 let emptyOption = false;
                 let header = {};
                 let routeName = this.$getRouteName();
@@ -785,13 +784,6 @@ export default {
             this.$emit("changeObjectType", index);
         },
         handleReachEndList() {
-            // if (
-            //     this.data.length < this.totalObject &&
-            //     this.data.length > 0  && !this.loadingTaskList
-            // ) {
-            //     this.page +=1;
-            //     this.getData();
-            // }
         },
         handleTaskSubmited() {
 			this.sideBySideMode = false;
@@ -811,9 +803,11 @@ export default {
             this.listTaskHeight =
                 util.getComponentSize(this.$el.parentElement).h - 130;
 		},
-		reselectObject(){
+		reSelectObject(){
+            this.getData()
 			setTimeout(self=>{
-				self.selectObject(this.currentTask.obj , this.currentTask.idx, this.currentTask.idex)
+                let obj = this.groupFlatTasks[this.currentTask.idex].tasks[this.currentTask.idx]
+				self.selectObject(obj , self.currentTask.idx, self.currentTask.idex)
 			},2000,this)
 		},
         async selectObject(obj, idx, idex) {

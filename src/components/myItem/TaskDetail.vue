@@ -198,6 +198,12 @@ export default {
 	},
 	name: 'taskDetail',
 	props: {
+		currentTask:{
+			type: Object,
+			default: () => {
+				return {};
+			},
+		},
 		taskInfo: {
 			type: Object,
 			default: () => {
@@ -469,7 +475,7 @@ export default {
 		refreshMyItem(type) {
 			this.modelDialog[type + 'ShowDialog'] = false;
 			setTimeout(self=>{
-				self.$emit('task-submited');
+				self.$emit('re-select-object');
 			},400 , this)
 		},
 		handlerDelegateSuccess() {
