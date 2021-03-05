@@ -2857,7 +2857,7 @@ export default {
                 let controlIns = getControlInstanceFromStore(this.keyInstance, control);
                 controlIns.overrideProperties(this.overridePropertiesControls[control]);
             }
-        }
+        },
         afterFileUpload(data){
             let file = {id:data.id, uid:data.uid, name:data.name, type:data.type, serverPath:data.serverPath, size:data.size}
             let controlIns = this.currentFileControl.controlIns;
