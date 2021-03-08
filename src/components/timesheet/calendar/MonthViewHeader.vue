@@ -11,7 +11,7 @@
                     </div>
                     <div v-on="on" class="fs-12 ">
                         <span v-if="monthEvents[date]">
-                            {{ changeDuration(monthEvents[date].reduce((acc,d) => +d.duration + acc, 0))}}/{{hoursRequired.trim()+'h'}}
+                            {{getSumDuration(monthEvents[date])}}/{{hoursRequired.substr(0,1)+'h'}}
                         </span>
                     </div>
             <!-- màn hình month - thanh trạng thái -->
@@ -27,6 +27,8 @@
         </v-tooltip>
 </template>
 <script>
+import {sumDuration} from './../canculation/Time';
+import {getWidthMonth,getPercentage,getStatusHeader,coloringHeader} from './../canculation/ColorAndWidth';
 export default {
   props: {
     monthEvents:{
@@ -57,63 +59,18 @@ export default {
       },
   },
   methods: {
-      getStatusHeader(color){
-          let result = 'New';
-          switch(color){
-            case 'grey-color':
-                result = 'New'
-                break
-            case 'dark-red-color':
-                result = 'Overload'
-                break
-            case 'green':
-                result = 'Fullload'
-                break
-            case 'dark-yellow-color':
-                result = 'Underload'
-                break
-          }
-          return this.$t('timesheet.status.'+result)
-      },
-      getWidthMonth(event){
-          let width = '0';
-          if(event){
-              width =((event.reduce((acc, d) => +d.duration + acc, 0) / 60) / this.hoursRequired)* 100
-          }
-          if(width>100) width = 100;
-          return width;
-      },
-      coloringHeader(date,hoursRequired,type){
-            let color = 'grey-color';
-            let hour = hoursRequired.trim()
-            if(date){
-                let totalHour =  date.reduce((acc, d) => +d.duration + acc, 0);
-                if(totalHour>hour*60){
-                    color = type=='status'?"dark-red-color":"light-red-color"
-                }else if(totalHour==hour*60){
-                    color =  type=="status"?"green":"dark-sea-green"
-                }
-                else{
-                    color = type=="status"?"dark-yellow-color":"light-yellow-color"
-                }
-            }
-            return color
-        },
-     changeDuration(duration) {
-            let hour = duration / 60;
-            let minutes = duration % 60;
-            if (Math.floor(hour) > 0) {
-                hour = Math.floor(hour) + 'h';
-            } else {
-                hour = ''
-            }
-            if (minutes > 0) {
-                minutes = minutes + 'm';
-            } else {
-                minutes = '';
-            }
-            return hour + minutes
-        },
+    getSumDuration(event){
+    return sumDuration(event)
+    },
+    getStatusHeader(color){
+        return getStatusHeader(color)
+    },
+    getWidthMonth(event){
+        return getWidthMonth(event, this.hoursRequired)
+    },
+    coloringHeader(date,hoursRequired,type){
+        return coloringHeader(date,hoursRequired,type)
+    },
   },
     
 }

@@ -1,6 +1,15 @@
 <template>
 <div class="period-selector d-flex justify-space-between">
     <div class="select-time d-flex justify-start " style="width:50%">
+        <v-btn small depressed="" >Hôm nay</v-btn>
+        <v-btn style="margin-top:-2px" icon @click="pre()">
+            <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+        <!-- <span style="color:#008080; font-weight:430!important">{{totalHours*10/10}}/{{hoursRequired}}</span> -->
+        <span class="ml-1 mt-2">{{startDate.slice(0,5)}} - {{endDate}}</span>
+        <v-btn style="margin-top:-2px" icon @click="next()">
+            <v-icon>mdi-chevron-right </v-icon>
+        </v-btn>
         <!-- <v-menu offset-y>
             <v-list>
                 <v-list-item v-for="(item, index) in items" :key="index">
@@ -8,7 +17,7 @@
                 </v-list-item>
             </v-list>
         </v-menu> -->
-        <v-autocomplete
+        <!-- <v-autocomplete
             style="width:30%"
             v-model="user"
             :items="listUser"
@@ -18,24 +27,17 @@
             item-value="id"              
             class="auto-complete mr-1 "
             dense>
-        </v-autocomplete>
-        <v-btn v-for="action in actions" 
+        </v-autocomplete> -->
+        <!-- <v-btn v-for="action in actions" 
             :key="action.label"  
             :style="{background:action.hover?'#E8E8E8':'#F7F7F7'}" 
             depressed small class="mr-1" color="#F7F7F7" 
             @click="action.action(action.idx)">
             {{format(action.label)}}
-        </v-btn>
+        </v-btn> -->
     </div>
     <div class="d-flex justify-end mt-2">
-        <v-btn style="margin-top:-9px" icon @click="pre()">
-            <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
-        <span style="color:#008080; font-weight:430!important">{{totalHours*10/10}}/{{hoursRequired}}</span>
-        <span class="ml-1">{{$t('timesheet.of')}} {{startDate.slice(0,5)}} - {{endDate}}</span>
-        <v-btn style="margin-top:-9px" icon @click="next()">
-            <v-icon>mdi-chevron-right </v-icon>
-        </v-btn>
+        
     </div>
 </div>
 </template>
