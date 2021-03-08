@@ -1,29 +1,31 @@
 <template>
     <div class="h-100 w-100 d-flex justify-center task-style"> 
         <DocumentSubmit 
-            v-if="showDoTaskComponent && ((action == 'submit'  && statusTask == 'notSubmit' ) || action=='update')"
+            v-if="showDoTaskComponent && (action == 'submit' || action == 'update' )"
             ref="submitComponent"
+            :key="submitCpnKey"
 			:showSnackbarSuccess="false"
-            :docId="Number(docId)"
+            v-bind="taskInfo.action.parameter.documentObjectId ? {} : { docId:  Number(docId)}"
             :workflowVariable="workflowVariable"
             :showSubmitButton="false"
             :appId="Number(appId)"
             :documentObjectTaskId="workflowInfo.documentObjectTaskId"
             :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
             :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
-            :action="action"
-            :documentObjectId="converstNumber(documentObjectId)"
+            :action="taskInfo.action.parameter.documentObjectId ? 'update' : action"
+            :documentObjectId="converstNumber(taskInfo.action.parameter.documentObjectId ? taskInfo.action.parameter.documentObjectId : documentObjectId)"
             :overrideControls="overrideControls"
             @submit-document-error="onSubmitError"
-            @submit-document-success="onSubmitDone">
+            @submit-document-success="onSubmitDone"
+        >
         </DocumentSubmit>
         <Detail 
             class="doc-detail"
             :showCommentInDoc="false"
-            v-else-if="(showDetailDocument && showDoTaskComponent && (action == 'approval')) || statusTask=='done' || statusTask=='submited' "
+            v-else-if="(showDetailDocument && showDoTaskComponent && (action == 'approval')) || statusTask == 'done' || statusTask == 'submited'  "
             :docObjInfo="docObjInfo">
         </Detail>
-        <div style="width:100%" v-else-if="statusTask=='done-noneObj' || action=='submitAdhocTask'">
+        <div style="width:100%" v-else-if="statusTask == 'done-noneObj' || action=='submitAdhocTask'">
             <h3 class="pl-2" style="text-align:left; margin-top:20px; color:#4e4e4e">Mô tả: {{taskInfo.extraLabel}} </h3>
         </div>
         <div v-else-if="action == 'undefined'">
@@ -60,9 +62,7 @@
             :taskInfo="taskInfo"
             :definitionName="definitionName"
         />
-
         <!-- Phần này cần tách thành component riêng -->
-        
         <v-dialog
             :content-class="'dialog-edit-doc h-100'"
             v-model="showUpdateSubmitedDocument"
@@ -101,7 +101,6 @@
                     class="bg-white"
 					:showSnackbarSuccess="false"
                     ref="panelUpdateSubmitedDocument"
-                    :docId="Number(docId)"
                     :appId="Number(appId)"
                     :workflowVariable="workflowVariable"
                     :showSubmitButton="false"
@@ -110,16 +109,16 @@
                     :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
                     :action="'update'"
                     :editableControls="taskInfo.approvalEditableControls"
-                    :documentObjectId="converstNumber(documentObjectId)"
+                    :documentObjectId="converstNumber(docObjInfo.docObjId)"
                     @submit-document-error="onSubmitError"
-                    @submit-document-success="onDocumentUpdateSuccess"/>
+                    @submit-document-success="onDocumentUpdateSuccess"
+                />
             </div>
         </v-dialog>
     </div>
 </template> 
 <script>
 import DocumentSubmit from "@/views/document/submit/Submit.vue";
-import BPMNEngine from '@/api/BPMNEngine';
 import Detail from "@/views/document/detail/Detail";
 import SideBarDetail from "./SideBarDetail";
 import { getProcessInstanceVarsMap } from '@/components/process/processAction';
@@ -150,6 +149,7 @@ export default {
                 docObjId: 0,
             },
             action: 'submit',
+            submitCpnKey: 0,
             workflowVariable: {},
             workflowInfo: {
                 documentObjectWorkflowObjectId: '',
@@ -218,19 +218,18 @@ export default {
             deep: true,
             immediate: true,
             handler: async function (after, before) {
-                console.log(after, before, "after taskInfo change");
-                this.showDoTaskComponent = false;
+                this.submitCpnKey = Date.now()
                 if (this.originData.endTime) {
                     this.statusTask = 'done'
-                }else{
-                    if (this.taskInfo.action && this.taskInfo.action.parameter.documentObjectId) {
+                }else if(this.taskInfo.action){
+                    if (this.taskInfo.action.action != 'submit' && this.taskInfo.action.parameter.documentObjectId) {
                         this.statusTask = 'submited'
                     }else{
                         this.statusTask = 'notSubmit'
+                        this.showDoTaskComponent = true;
                     }
                 }
-
-                if (this.statusTask!='done') {
+                if (this.statusTask != 'done') {
                     if(this.taskInfo.action){
                         if(!this.taskInfo.action.parameter.documentObjectId && this.taskInfo.action.parameter.documentObjectId==0 ){
                             this.statusTask='done-noneObj';
@@ -241,7 +240,6 @@ export default {
                             this.workflowInfo.documentObjectWorkflowId = this.taskInfo.action.parameter.processDefinitionId;
                             this.workflowInfo.documentObjectWorkflowObjectId = this.taskInfo.action.parameter.processInstanceId;
                             this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
-                            // cần activityId  của task truyền vào nữa 
                             let workflowVariable = {};
                             this.taskVarsMap = {};
                             for(let key in varsMap){
@@ -263,7 +261,6 @@ export default {
                                     let approvaledElId = this.taskInfo.targetElement;
                                     let docObjId = 0;
                                     if(approvaledElId == 'DOC_INSTANCE_FROM_STARTING_WORKFLOW'){
-                                        // docObjId = varsMap['doc_INSTANCE_FROM_STARTING_WORKFLOW'];
                                         docObjId = varsMap['docInstanceFromStartingWorkflow'];
                                         docObjId = docObjId ? docObjId : 0;
                                     }else{
@@ -285,7 +282,7 @@ export default {
                     if(this.taskInfo.action.parameter.documentObjectId){
                         this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
                     }else{
-                        this.statusTask='done-noneObj';
+                        this.statusTask = 'done-noneObj';
                     }
                 }
             }
@@ -299,7 +296,8 @@ export default {
         getVarsMap(){
             return this.taskVarsMap;
         },
-        onDocumentUpdateSuccess(){
+        onDocumentUpdateSuccess(data){
+            this.$emit('task-submited', data)
             this.showDetailDocument = false;
             setTimeout((self) => {
                 self.showDetailDocument = true;            
@@ -321,7 +319,6 @@ export default {
 			this.type = data.type;
 			this.fileId = data.id;
             this.$store.commit("kh/changeStatusShowImage", true);
-            
         },
         downloadOrBackupFile(data) {
 			this.downLoadFile(data.fileId);

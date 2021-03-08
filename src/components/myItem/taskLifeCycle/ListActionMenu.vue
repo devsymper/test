@@ -95,7 +95,7 @@ export default {
 			}
 			if(this.userType == 'owner' && this.taskType == 'assign'){
 				this.items.forEach(function(e){
-					if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete' || e.value == 'unClaim'){
+					if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
 						lists.push(e)
 					}
 				})

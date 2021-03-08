@@ -72,7 +72,6 @@ export default {
 	created(){
 		this.max = this.data.max
 		this.min =  this.data.min
-		debugger
 		this.dates = [this.min, this.max]
 	},
 	methods: {

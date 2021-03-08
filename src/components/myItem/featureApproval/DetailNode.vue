@@ -360,22 +360,17 @@ export default {
            
         },
         selectObject(obj, idx){
-            this.selectObj=idx;
-            let desc=JSON.parse(obj.description);
+            this.selectObj = idx;
             let taskInfo = extractTaskInfoFromObject(obj);
             let appId='';
             const objApp = obj.variables.find(element => element.name=='symper_application_id');
             if (objApp) {
                 appId=objApp.value;
             }
-            //this.docObjInfo.docObjId= String(desc.action.parameter.documentObjectId);
             this.$set(this.selectedTask, "originData", obj);
             this.$set(this.selectedTask, "taskInfo", taskInfo);
             this.$set(this.selectedTask, "appId", appId);
-            
-
             this.$emit("changeSideBySide",true);
-
         },
         selectedAllTask(value){
              let allTask=this.listTaskApproval;

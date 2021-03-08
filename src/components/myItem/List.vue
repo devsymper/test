@@ -1,5 +1,6 @@
 <template>
     <div class="list-objects h-100" style="overflow: hidden;">
+        <Preloader ref="preLoaderView"/>
         <v-row class="mx-0 h-100">
             <v-col
                 :cols="!sideBySideMode ? 12 : 4"
@@ -149,7 +150,7 @@
                                 :style="{
                                     minHeight: '50px'
                                 }"
-                                @click="selectObject(obj, idx,idex)"
+                                @click="selectObject(obj, idx, idex)"
                                 style="border-bottom: 1px solid #eeeeee!important;"
                             >
                                 <v-col
@@ -297,20 +298,22 @@
                     />
                 </div>
             </v-col>
-
             <v-col
                 :cols="!sideBySideMode ? 0 : 8"
                 :md="!sideBySideMode ? 0 : 9"
                 v-show="sideBySideMode"
-                class="pa-0 ma-0 h-100"
+                class="pa-0 ma-0 h-100  "
                 height="30"
-                style="border-left: 1px solid #e0e0e0;"
+                style="border-left: 1px solid #e0e0e0; "
             >
+		        <Preloader ref="preLoaderViewDetail"/>
                 <taskDetail
+                    ref="taskDetail"
 					:delegationState="delegationState"
                     :parentHeight="listTaskHeight"
+                    :currentTask="currentTask"
                     :taskInfo="selectedTask.taskInfo"
-					@reselect-object="reselectObject"
+					@re-select-object="reSelectObject"
                     :originData="selectedTask.originData"
                     :appId="String(selectedTask.originData.symperApplicationId)"
                     :reload="false"
@@ -340,6 +343,7 @@ import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
 import listTaskApproval from "./featureApproval/List";
 import { taskApi } from "./../../api/task.js";
+import Preloader from '@/components/common/Preloader';
 import infoUser from "./InfoUser";
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
 import TableFilter from "@/components/common/customTable/TableFilter.vue";
@@ -389,7 +393,6 @@ export default {
                   tasks: groups[fromNow]
                 };
             });
-            console.log("taskkkk",groupArraysTask);
             return groupArraysTask;
         },
         stask() {
@@ -422,7 +425,8 @@ export default {
         listTaskApproval,
         infoUser,
         TableFilter,
-        Pagination
+        Pagination,
+        Preloader
     },
     props: {
         compackMode: {
@@ -685,8 +689,6 @@ export default {
             let method = 'GET';
             if (url != "") {
                 let thisCpn = this;
-                // thisCpn.loadingData = true;
-                // let options = this.getOptionForGetList(configs, columns);
                 let emptyOption = false;
                 let header = {};
                 let routeName = this.$getRouteName();
@@ -712,6 +714,7 @@ export default {
                 
                 getDataFromConfig(url, configs, columns, tableFilter, success, 'GET', header);
             }
+            this.$refs.preLoaderView.hide()
         },
       
         searchAutocompleteItems(vl){
@@ -785,13 +788,6 @@ export default {
             this.$emit("changeObjectType", index);
         },
         handleReachEndList() {
-            // if (
-            //     this.data.length < this.totalObject &&
-            //     this.data.length > 0  && !this.loadingTaskList
-            // ) {
-            //     this.page +=1;
-            //     this.getData();
-            // }
         },
         handleTaskSubmited() {
 			this.sideBySideMode = false;
@@ -811,12 +807,16 @@ export default {
             this.listTaskHeight =
                 util.getComponentSize(this.$el.parentElement).h - 130;
 		},
-		reselectObject(){
+		reSelectObject(){
+            this.$refs.preLoaderView.show()
+            this.getData()
 			setTimeout(self=>{
-				self.selectObject(this.currentTask.obj , this.currentTask.idx, this.currentTask.idex)
+                let obj = this.groupFlatTasks[this.currentTask.idex].tasks[this.currentTask.idx]
+				self.selectObject(obj , self.currentTask.idx, self.currentTask.idex)
 			},2000,this)
 		},
         async selectObject(obj, idx, idex) {
+            this.$refs.preLoaderViewDetail.show()
 			this.currentTask = {
 				obj: obj,
 				idx: idx,
@@ -845,6 +845,9 @@ export default {
                     this.$emit("change-height", "calc(100vh - 88px)");
                 }
             }
+            setTimeout((self) => {
+                self.$refs.preLoaderViewDetail.hide()
+            }, 500, this);
         },
         closeDetail() {
             this.sideBySideMode = false;

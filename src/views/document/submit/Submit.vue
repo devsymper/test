@@ -884,7 +884,9 @@ export default {
     watch: {
         docId(after) {
             this.documentId = after;
-            this.loadDocumentData();
+            if(after){
+                this.loadDocumentData();
+            }
         },
         workflowVariable:{
             deep: true,
@@ -1709,6 +1711,7 @@ export default {
                     this.checkOverrideProperties(controlName,field);
                     let idField = field.id;
                     let valueInput = field.value;
+                    console.log(valueInput,'valueInputvalueInput');
                     let prepareData = field.prepareData;
                     if(prepareData){
                         isSetEffectedControl = true;
@@ -2178,7 +2181,7 @@ export default {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
-					if(this.showSnackbarSuccess){
+					if(thisCpn.showSnackbarSuccess){
 						 thisCpn.$snotify({
 							type: "success",
 							title: "update document success!"
@@ -2854,7 +2857,7 @@ export default {
                 let controlIns = getControlInstanceFromStore(this.keyInstance, control);
                 controlIns.overrideProperties(this.overridePropertiesControls[control]);
             }
-        }
+        },
         afterFileUpload(data){
             let file = {id:data.id, uid:data.uid, name:data.name, type:data.type, serverPath:data.serverPath, size:data.size}
             let controlIns = this.currentFileControl.controlIns;
