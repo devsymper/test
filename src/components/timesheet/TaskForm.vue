@@ -1,93 +1,94 @@
 <template>
-<v-card>
-    <v-card-title class="pt-2 headline lighten-2" 
-    primary-title>
-        <div class="w-100 " style="font-size:18px" >
-            {{$t('timesheet.task_form')}}
+    <v-card>
+        <v-card-title class="pt-2 headline lighten-2" primary-title>
+            <div class="w-100 fs-18 " >
+                {{$t('timesheet.task_form')}}
             </div>
-    </v-card-title>
-    <v-card-text  v-bind:style="cateError? 'height:80px' :'height:60px'" class=" h-65" >
-        <span class="label pt-2 ">{{$t('timesheet.category_task')}}<span class="color-red"> *</span></span>
-        <v-autocomplete 
-            v-bind:style="cateError? 'margin-bottom:4px' :''"
-            style="margin-top:2px!important; " 
-           
-            v-model="categoryTask" 
-            class="category-task" 
-            :items="category" 
-            item-color="white" 
-            background-color="#f2f2f2">
-            <template v-slot:item="data" class="category-task">
-                <!-- <img style='max-height: 40px; max-width: 30px; margin-right:5px' 
-                :src="require('../../assets/icon/AD-IT.png')" /> -->
-            <span style='color:black' >{{ data.item }}
-                <v-icon v-if="data.item === categoryTask " color="success">
-                mdi-check</v-icon></span>
-        </template>
-        </v-autocomplete >
-        <div class="w-100 mb-5" style="height:20px">
-            <span class="red--text" v-show="cateError">{{cateError}}</span>
-        </div>
-    </v-card-text>
-    <v-card-text v-bind:style="nameError? 'height:80px' :'height:60px'">
-        <span class="label pt-2"> {{$t('timesheet.name')}}<span style="color:red"> *</span></span>
-        <div>
-            <input 
-                type="text" 
-                v-model= "name" 
-                class="w-100 input-logform"
-                v-bind:style="nameError? 'margin-bottom:4px' :''">
-        </div>
-        <div class="w-100 mb-5" style="height:20px">
-            <span class="red--text" v-show="nameError">{{nameError}}</span>
-        </div>
-    </v-card-text>
-     <v-card-text class='task-form h-65'>
-        <span class="label pt-2">{{$t('timesheet.assignee')}}</span>
-        <v-autocomplete 
-            class="task mt-2 w-100" 
-            v-model="user"
-             item-text="displayName"    
-            item-value="id" 
-            :items="listUser" 
-            :menu-props="{'nudge-top':-10, 'max-width': 300}" 
-            label="Tìm kiếm">
-                <template v-slot:selection="data">
-                     <SymperAvatar 
-                        class="mr-2" 
-                        style ="height: 20px!important; width: 20px!important;min-width: 30px!important; margin-left:-15px" 
-                        :userId="data.item.id"/>
-                    <v-list-item-content style="margin-left:-10px">
+        </v-card-title>
+        <v-card-text  v-bind:style="cateError? 'height:80px' :'height:60px'" class="h-65" >
+            <span class="label pt-2 ">{{$t('timesheet.category_task')}}<span class="color-red"> *</span></span>
+            <v-autocomplete 
+                v-bind:style="cateError? 'margin-bottom:4px' :''"
+                style="margin-top:2px!important; "
+                item-text="fullName"
+                item-value="id"
+                v-model="categoryTask" 
+                class="category-task"
+                return-object
+                :items="category" 
+                item-color="white" 
+                background-color="#f2f2f2">
+                <template v-slot:item="data" class="category-task">
+                    <!-- <img style='max-height: 40px; max-width: 30px; margin-right:5px' 
+                    :src="require('../../assets/icon/AD-IT.png')" /> -->
+                <span style='color:black' >{{ data.item.fullName }}
+                    <v-icon v-if="data.item.id == categoryTask.id" color="success">
+                    mdi-check</v-icon></span>
+            </template>
+            </v-autocomplete >
+            <div class="w-100 mb-5" style="height:20px">
+                <span class="red--text" v-show="cateError">{{cateError}}</span>
+            </div>
+        </v-card-text>
+        <v-card-text v-bind:style="nameError? 'height:80px' :'height:60px'">
+            <span class="label pt-2"> {{$t('timesheet.name')}}<span style="color:red"> *</span></span>
+            <div>
+                <input 
+                    type="text" 
+                    v-model="name" 
+                    class="w-100 input-logform"
+                    v-bind:style="nameError? 'margin-bottom:4px' :''">
+            </div>
+            <div class="w-100 mb-5" style="height:20px">
+                <span class="red--text" v-show="nameError">{{nameError}}</span>
+            </div>
+        </v-card-text>
+        <v-card-text class='task-form h-65'>
+            <span class="label pt-2">{{$t('timesheet.assignee')}}</span>
+            <v-autocomplete 
+                class="task mt-2 w-100" 
+                v-model="user"
+                item-text="displayName"    
+                item-value="id" 
+                :items="listUser" 
+                :menu-props="{'nudge-top':-10, 'max-width': 300}" 
+                label="Tìm kiếm">
+                    <template v-slot:selection="data">
+                        <SymperAvatar 
+                            class="mr-2" 
+                            style ="height: 20px!important; width: 20px!important;min-width: 30px!important; margin-left:-15px" 
+                            :userId="data.item.id"/>
+                        <v-list-item-content style="margin-left:-10px">
+                            <v-list-item-title >{{data.item.displayName}}</v-list-item-title>
+                        </v-list-item-content>
+                    </template>
+                    <template v-slot:item="data">
+                        <SymperAvatar class="mr-2" style ="height: 30px!important; width: 30px!important;min-width: 30px!important" :userId="data.item.id"/>
+                        <v-list-item-content>
                         <v-list-item-title >{{data.item.displayName}}</v-list-item-title>
-                    </v-list-item-content>
-                </template>
-                <template v-slot:item="data">
-                    <SymperAvatar class="mr-2" style ="height: 30px!important; width: 30px!important;min-width: 30px!important" :userId="data.item.id"/>
-                    <v-list-item-content>
-                    <v-list-item-title >{{data.item.displayName}}</v-list-item-title>
-                    <v-list-item-subtitle class="fs-11 color-grey" >{{data.item.email}}</v-list-item-subtitle>
-                    </v-list-item-content>
-                </template>
-        </v-autocomplete>
-    </v-card-text>
-    <v-card-text>
-        <span class="label pt-2">{{$t('timesheet.description')}}</span>
-        <textarea 
-            class='pl-3' 
-            style="background-color:#f2f2f2"
-            rows="4" cols="44" v-model= "desc">
-        </textarea>
-    </v-card-text>
-    <v-card-actions class="pb-2">
-        <div class= "d-flex justify-end w-100">
-             <v-btn text class="fs-13" width="50"  
-             @click="save()">{{$t('timesheet.save')}}</v-btn>
-             <v-btn  width="50" class='mr-1 fs-13' text @click="cancel()">
-                {{$t('timesheet.cancel')}}
-            </v-btn>
-        </div>
-    </v-card-actions>
-</v-card>
+                        <v-list-item-subtitle class="fs-11 color-grey" >{{data.item.email}}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </template>
+            </v-autocomplete>
+        </v-card-text>
+        <v-card-text>
+            <span class="label pt-2">{{$t('timesheet.description')}}</span>
+            <textarea 
+                class='pl-3' 
+                style="background-color:#f2f2f2"
+                rows="4" cols="44" v-model= "desc">
+            </textarea>
+        </v-card-text>
+        <v-card-actions class="pb-2">
+            <div class= "d-flex justify-end w-100">
+                <v-btn text class="fs-13" width="50"  
+                @click="save()">{{$t('timesheet.save')}}</v-btn>
+                <v-btn  width="50" class='mr-1 fs-13' text @click="cancel()">
+                    {{$t('timesheet.cancel')}}
+                </v-btn>
+            </div>
+        </v-card-actions>
+    </v-card>
 </template>  
 <script>
 import timesheetApi from '../../api/timesheet';
@@ -112,15 +113,15 @@ export default {
         taskFormWorker:null,
         checkbox:false,
         check:false,
+        showSubmitTask:false,
         nameError: '',
         category:[],
         listUser: [],
         user:''
     }),
     created(){
+        this.category = this.$store.state.timesheet.listCate;
         this.taskFormWorker = new TaskFormWorker();
-        this.getCategory();
-        this.$store.dispatch("app/getAllUsers");
         this.listUser = this.$store.state.app.allUsers;
     },
     watch:{
@@ -134,6 +135,12 @@ export default {
             }
         },
         categoryTask(){
+            if(this.categoryTask.type==1){
+                this.showSubmitTask = true;
+                this.$emit('cancel');
+                this.$emit('docId',this.categoryTask.docId);
+                this.$store.commit("timesheet/showListProcess", true);
+            }
              if(this.check){
                 if(this.categoryTask==''){
                 }else{
@@ -141,16 +148,13 @@ export default {
                     this.check = false;
                 }
             }
-        }
+        },
     },
     mounted() {
         const self = this;
         this.taskFormWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
-                case 'getCategory':
-                    self.setCategory(data.dataAfter)
-                    break;
                  case 'createTask':
                     self.checkCreateTask(data.dataAfter)
                     break;
@@ -160,6 +164,9 @@ export default {
         });
     },
     methods: {
+        // showSubmitTaskForm(){
+          
+        // },
         checkCreateTask(check){
              if (check) {
                 this.$emit('loadTask');
@@ -174,15 +181,6 @@ export default {
                     text: "Lỗi"
                 })
              }
-        },
-        setCategory(data){
-            this.category = data;
-        },
-        getCategory(){
-             this.taskFormWorker.postMessage({
-                action:'getCategory',
-                data:{}
-            })
         },
         cancel(){
             this.categoryTask = "";
@@ -241,6 +239,11 @@ export default {
             })
             }
         }
+    },
+    computed:{
+        // category(){
+        //     return this.$store.state.timesheet.listCate
+        // }
     }
 }
 </script>

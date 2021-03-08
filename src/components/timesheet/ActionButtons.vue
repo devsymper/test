@@ -11,7 +11,7 @@
             dense
             label="Search"
             :placeholder="$t('common.search')">
-            <template  v-slot:item="{ item, attrs }">
+            <template  v-slot:item="{item}">
             <v-list-item @click="findStartEnd(item.start_time_at)">
                 <v-list-item-content>
                 <v-list-item-title>
@@ -31,9 +31,24 @@
                     <v-icon>mdi-plus</v-icon> <span class="fw-400"> Tạo task</span>
                 </v-btn>
             </template>
-            <TaskForm @cancel="cancel()"/>
+            <TaskForm  @cancel="cancel()"/>
         </v-dialog>
-          <v-btn style="margin-right:-5px" class="ml-1" icon @click="showSearch=!showSearch">
+        <v-menu offset-y full-width :nudge-top="-5" :close-on-content-click="false">
+            <template v-slot:activator="{ on }">
+                <v-btn
+                    small
+                    depressed
+                    style="height:32px; margin-top:1px"
+                    class="ml-2"
+                    v-on="on"
+                >
+                <v-icon style="color:grey">mdi-filter</v-icon>
+            <span class="fw-400">Loại công việc</span>
+          </v-btn>
+          </template>
+            <SelectFilterListCate :listCate="listCate" class="bg-white" />
+        </v-menu>
+        <v-btn style="margin-right:-5px" class="ml-1" icon @click="showSearch=!showSearch">
             <i style="font-size:22px" class=" mdi mdi-magnify"></i>
         </v-btn>
     </div>
@@ -42,13 +57,26 @@
 <script>
 import TaskForm from "./../../components/timesheet/TaskForm";
 import timesheetApi from "./../../api/timesheet";
-
+import SelectFilterListCate from './../../components/timesheet/form/SelectFilterListCate';
 export default {
+    computed:{
+        listCate(){
+            let listCate = [];
+            this.$store.state.timesheet.listCate.map(cate=>{
+                listCate.push({
+                    ...cate,
+                    selected: true
+                })
+            })
+            return listCate
+        }
+    },
     data: () => ({
         dialog: false,
         searchLogTime:'',
         showSearch:false,
-        list:[]
+        list:[],
+        showFilterCate:true
     }),
     methods: {
         cancel() {
@@ -67,7 +95,6 @@ export default {
                 }
             })
             this.list = list;
-            
         },
           findStartEnd(time){
             this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(time).format('YYYY-MM-DD'));
@@ -75,16 +102,15 @@ export default {
         },
     },
     components:{
-        TaskForm
+        TaskForm,
+        SelectFilterListCate
 
     },
     watch:{
          searchLogTime(){
            this.searchLogTimeList(this.searchLogTime)
        }
-
     },
-
     props: ['type'],
 }
 </script>

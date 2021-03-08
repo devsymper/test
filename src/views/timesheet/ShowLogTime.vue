@@ -34,7 +34,10 @@
             :onSave="onSaveLogTimeEvent"
             :onCancel="onCancelSave">
         </LogTimeForm>
-         <TaskForm @loadTask="loadTask()" v-show="showTask&&showCategory==false" @cancel="cancelTaskForm()"/>
+         <TaskForm @loadTask="loadTask()"
+            @docId="getDocId"
+            v-show="showTask&&!showCategory" 
+            @cancel="cancelTaskForm()"/>
          <CategoryForm
             ref="cate"
             :isAddView="true"
@@ -62,6 +65,32 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <!-- submit task -->
+      <v-dialog
+        class="showTask"
+        style="width:850px;height:1000px"
+        v-model="showSubmitTask"
+      >
+       <div class="bg-white" >
+            <TaskDetail
+                @close-detail="closeTaskSubmit"
+               :taskInfo="data.taskInfo"
+                :originData="data.originData"
+                :parentHeight="800" 
+                :allVariableProcess="variableProcess"
+                @task-submited="handleTaskSubmited"
+            />
+       </div>
+      </v-dialog> 
+      <v-dialog
+        v-model="showListProcess"
+        width="500"
+      >
+       <div class="bg-white">
+          <SelectListProcess @select-process-key="selectProcess" :listProcess="listProcess"/>
+       </div>
+      </v-dialog> 
+    <!-- submit task -->
     <!-- test -->
     <v-dialog v-model="deleteDialog" width="357">
         <DeleteLogView
@@ -82,19 +111,43 @@
 </template>
 
 <script>
+import { runProcessDefinition,extractTaskInfoFromObject,addMoreInfoToTask,test} from '../../components/process/processAction';
 import LogCalendar from "../../components/timesheet/LogCalendar";
 import PeriodSelector from "../../components/timesheet/PeriodSelector";
 import ActionButtons from "../../components/timesheet/ActionButtons";
 import TaskForm from "./../../components/timesheet/TaskForm";
 import CalendarViewMode from "../../components/timesheet/CalendarViewMode";
 import LogTimeForm from "../../components/timesheet/LogTimeForm";
+import SelectListProcess from "../../components/timesheet/form/SelectListProcess";
 import DeleteLogView from "../../components/timesheet/DeleteLogView";
 import CategoryForm from "../../components/timesheet/CategoryForm";
 import timesheetApi from '../../api/timesheet';
+import TaskDetail from "./../../components/myItem/TaskDetail";
+import BPMNEApi from "../../api/BPMNEngine";
+import { getLastestDefinition } from "../../components/process/processAction.js";
+import {getFirstNodeData as handleStartProcess} from '../../components/process/StartProcess';
 
 export default {
+  watch: {
+    showListProcess(){
+        if(this.showListProcess){
+            this.logtimeDialog = false;
+            let docId = [this.docId];
+            this.getAllProcess(docId);
+        }
+    },
+    taskInfo(){
+        this.data = this.taskInfo.data;
+        this.variableProcess = this.taskInfo.variableProcess;
+        this.$store.commit('timesheet/showListProcess', false);
+        this.cancelSave();
+        this.$store.commit('timesheet/showSubmitTask', true);
+    }
+  },
     name: "showLogTime",
     components: {
+        SelectListProcess,
+        TaskDetail,
         "period-selector": PeriodSelector,
         ActionButtons,
         CalendarViewMode,
@@ -105,6 +158,17 @@ export default {
     },
     data() {
         return {
+            docId:-1,
+            listProcess:[],
+            data: {
+                taskInfo: {},
+                originData: {}
+            },
+            definitionModel: {}, // các cấu hình của process definition
+            showTaskDetail:false,
+            //task submit
+            variableProcess:[],
+            //task submit
             monthEvents:{},
             showTask:false,
             showCategory:false,
@@ -112,6 +176,7 @@ export default {
             eventLog:{},
             updateAPICate:false,
             load:false,
+             paramId:'',
             // log form
             dateMonth:'',
             cancelTask:false,
@@ -152,15 +217,51 @@ export default {
     computed:{
         type(){
             return this.$store.state.timesheet.calendarType;
+        },
+        showSubmitTask(){
+            return this.$store.state.timesheet.showSubmitTask
+        },
+        showListProcess(){
+            return this.$store.state.timesheet.showListProcess
+        },
+        taskInfo(){
+            return this.$store.state.process.allTaskInfo
         }
+
     },
     methods: {
-        quickCancel(isCreate){
-            if(isCreate){
-                this.deleteLog();
+        getDocId(docId){
+            this.docId = docId
+        },
+         handleTaskSubmited(){
+            this.$store.commit("task/setIsStatusSubmit",true);
+        },
+        closeTaskSubmit(){
+            this.$store.commit('timesheet/showSubmitTask', false);
+            this.logtimeDialog = true;
+        },
+         getAllProcess(data){
+            this.listProcess = [];
+            let listId = data.join(",");
+            const self = this;
+            BPMNEApi.getProcessByDocId(listId).then(res=>{
+                if(res.status==200){
+                    let id = Object.keys(res.data)[0]; // chỉ có 1 id
+                    res.data[id].map(process=>{
+                        self.listProcess.push(process)
+                    })
+                }
+            })
+        },
+        async selectProcess(process){
+            let defData = await getLastestDefinition(process, true);
+            if(defData.data[0]){
+                 handleStartProcess(defData.data[0].id);
             }
+        },
+        quickCancel(isCreate){
+            isCreate && this.deleteLog();
             this.cancelSave();
-
         },
        changeCateColor(listCateColor, logColor){
            this.$refs.logCalendar.listCategoryColor = listCateColor;
@@ -169,7 +270,6 @@ export default {
                     if(cate.key == e.category_key){
                         if(cate.isShow){
                             e.color = cate.color
-
                         }else{
                             e.color = logColor
                         }
@@ -245,6 +345,12 @@ export default {
         },
         doneCate(){
             this.updateAPICate = false
+        },
+        hideTaskForm(){
+            this.cancelTaskForm()
+            // this.showTask = false;
+            // this.showCategory=false;
+            //  this.cancelTask != this.cancelTask;
         },
         updateAPICategory(){
             this.updateAPICate =true;

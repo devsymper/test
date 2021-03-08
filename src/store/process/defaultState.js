@@ -24,6 +24,11 @@ const defaultState = {
     allDefinitions: {
 
     },
+    // thông tin info của task
+    allTaskInfo:{
+        data:{},
+        variableProcess:[]
+    },
     allProcessModel: [] // danh sách tất cả các workflow modeler 
 };
 
