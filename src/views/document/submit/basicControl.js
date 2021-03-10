@@ -869,17 +869,23 @@ export default class BasicControl extends Control {
         let toolbar = 'undo redo| styleselect| fontselect| lineheight| fontsizeselect| lineheightselect |'+
         ' quickimage table| bold italic underline|'+
         ' alignleft aligncenter alignright alignjustify | git |outdent indent | link';
+        let isShowToolBar = false;
         if(this.checkViewType('submit') || this.checkViewType('update')){ 
             this.ele = $('#sym-submit-'+this.keyInstance).find("#"+this.id);
             isReadOnly = 0;
             selector = '#sym-submit-'+this.keyInstance+" #"+this.id;
+            if(this.controlProperties.isShowHeaderTinyMce.value){
+                isShowToolBar = toolbar;
+                toolbar = false
+            }else{
+                isShowToolBar = false
+            }
         }
         else{
             this.ele = $('#sym-Detail-'+this.keyInstance).find("#"+this.id);
             selector = '#sym-Detail-'+this.keyInstance+" #"+this.id;
             toolbar = false;
         }
-        let isShowToolBar = this.controlProperties.isShowHeaderTinyMce.value?true:false
         tinymce.init({
             toolbar: isShowToolBar,
             menubar: false,
