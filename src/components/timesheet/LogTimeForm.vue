@@ -97,7 +97,7 @@
                 :search-input.sync="search" 
                 item-text="name"    
                 item-value="id"
-                :menu-props="{'nudge-top':-10, 'width': 300}" 
+                :menu-props="{'nudge-top':-10, 'width': 320,'max-width':320,'min-width':320}" 
                 label="Tìm công việc ...">
                 <template v-slot:item="data">
                     <v-list-item-content class="mt-s10" style="margin-bottom:-5px">
@@ -108,6 +108,7 @@
                             <span v-if="data.item.categoryId" class="color-grey">
                                 {{getNameCategory(data.item.categoryId)}}-{{data.item.description!=''?data.item.description:"Chưa có mô tả"}} 
                             </span>
+                            <span  v-else>{{data.item.document_object_id}} - {{data.item.description}} </span>
                         </v-list-item-subtitle>
                     </v-list-item-content>
                 </template>
@@ -430,7 +431,6 @@ export default {
         this.setValueLog(this.newEvent)
     },
     methods: {
-        //
         changeMinutesToHourAndMinutes(duration){
              if(!this.isCaculate){
                 if (duration >= 0) {
