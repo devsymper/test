@@ -228,7 +228,9 @@ import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
 import Detail from './../detail/Detail.vue';
 import DocumentSubmit from "@/views/document/submit/Submit.vue";
-import AutocompleteDoc from './AutocompleteDoc'
+import AutocompleteDoc from './AutocompleteDoc';
+import tinymce from 'tinymce/tinymce';
+
 export default {
     components: {
         "list-items": ListItems,
@@ -595,6 +597,7 @@ export default {
         },
         afterRowSelected(data){
             if(this.$refs.listObject.isShowSidebar()){
+                tinymce.remove();
                 let documentObject = data.data;
                 let event = data.event;
                 if(this.$refs.listObject.hasColumnsChecked){
