@@ -42,6 +42,7 @@
         </VuePerfectScrollbar>
         <side-bar-detail 
             v-if="!isPrint"
+            :isShowSidebar="isShowSidebar"
             ref="sidebarView"
             :keyInstance="keyInstance"
             :sidebarWidth="sidebarWidth"  
@@ -165,6 +166,7 @@ export default {
             contentPrintDocument:null,
             docObjId: null,
             documentId:null,
+            isShowSidebar:false,
             documentSize: null,
             keyInstance: Date.now(),
             contentMargin:'auto',
@@ -318,7 +320,12 @@ export default {
         afterHideSidebar(){
             this.$emit('after-hide-sidebar')
         },
-      
+         toggleSideBar(){
+            this.isShowSidebar = !this.isShowSidebar;
+        },
+        isShow(){
+            return this.isShowSidebar
+        },
         setLayoutFromQuickView(size,margin){
             this.documentSize = size;
             this.contentMargin = margin;

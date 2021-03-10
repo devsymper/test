@@ -1049,8 +1049,8 @@ export default class SymperTable {
                 let cellRanges = params.api.getCellRanges();
                 cellRanges.forEach(cells => {
                     let colIds = cells.columns.map(col => col.colId);
-                    let startRowIndex =Math.min( cells.startRow.rowIndex, cells.endRow.rowIndex);
-                    let endRowIndex =Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
+                    let startRowIndex = Math.min( cells.startRow.rowIndex, cells.endRow.rowIndex);
+                    let endRowIndex = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
                     if(!this.tableInstance.tableControl.controlInTable[colIds].checkProps('isReadOnly')){
                         this.tableInstance.clearCells(startRowIndex, endRowIndex, colIds);
                     }

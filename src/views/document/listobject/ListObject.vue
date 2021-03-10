@@ -565,6 +565,7 @@ export default {
                 this.$refs.viewDetail.setLayoutFromQuickView('21cm','auto')
             }
             else{
+                this.$refs.viewDetail.showSideBar();
                 this.actionPanelWidth = 1117;
                 this.$refs.viewDetail.setLayoutFromQuickView('21cm','unset')
             }
