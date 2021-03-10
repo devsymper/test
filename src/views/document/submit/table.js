@@ -1296,7 +1296,7 @@ export default class Table {
                 this.render();
             },
             // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
-            
+
             afterUpdateSettings(newSettings){
                 if (!thisObj.checkDetailView()){
                     if(thisObj.checkViewType('update') && getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init'){
