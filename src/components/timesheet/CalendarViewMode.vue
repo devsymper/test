@@ -1,70 +1,50 @@
 <template>
-<div class="calendar-viewmode">
-    <v-btn style="float:left" v-if="type !='month'&&timebtn" class="mr-2" icon @click="timeView()">
-        <v-tooltip top>
-                    <!-- màn hình month - header ngày, giờ -->
-            <template v-slot:activator="{ on }">
-                    <v-icon v-on="on">mdi-clock-outline</v-icon>
-            </template>
-            <span>
-                Time view
-            </span>
-        </v-tooltip>
-    </v-btn>       
-    <v-btn style="float:left" class="mr-2" v-if="type !='month'&&!timebtn" icon @click="listView()">
-         <v-tooltip top>
-          <template v-slot:activator="{ on }">
-                    <v-icon v-on="on">mdi-apps</v-icon>
-                </template>
-                <span>
-                    List view
-                </span>
-            </v-tooltip>
-    </v-btn>
-    <span style="padding-right: 10px" v-if="type === 'month'"> </span>
-    <v-select style="float:left" 
+<div class="calendar-viewmode d-flex justify-end">
+    <v-select 
         @change="changeView" 
         :value="type" 
-        class="viewmode mt-0" 
+        class="viewmode mr-1" 
         :menu-props="{'nudge-top':-40}" 
         :items="types" 
-        item-color="white" 
-        label="View" 
-        background-color="#F7F7F7">
+        label="View" >
         <template v-slot:item="data">
             <span class="viewmode-item">{{ format(data.item) }}
-                <v-icon v-if="data.item === type" color="success">
-                    mdi-check</v-icon>
+                <v-icon v-if="data.item === type" color="success"> mdi-check</v-icon>
             </span>
         </template>
         <template v-slot:selection >
-          <span style= "color:black!important; padding-left:4px"> {{format(type)}}</span>
+          <span class="pl-1 color-black"> {{format(type)}}</span>
         </template>
     </v-select>
+     <v-btn 
+        x-small depressed v-for="(view, index) in viewType.filter(v=>v.show&&type!='month')" 
+        :key="index"  
+        @click="switchView(view.name)" 
+        class="h-28px">
+         <v-tooltip top>
+            <template v-slot:activator="{ on }">
+                <v-icon small v-on="on">{{view.icon}}</v-icon>
+            </template>
+            <span> {{view.name}} </span>
+        </v-tooltip>
+    </v-btn>
     <v-menu offset-y nudge-bottom='8' :max-width="280" :min-width="280" :close-on-content-click="false">
         <template v-slot:activator="{ on:menu }">
             <v-tooltip top>
             <template v-slot:activator="{ on:tooltip }">
-                    <v-btn class="mt-1 ml-1 btn" v-on="{ ...tooltip, ...menu }" style="float:right" small text >
+                    <v-btn depressed class="ml-1 h-28px" v-on="{ ...tooltip, ...menu }" x-small  >
                     <v-icon class="mdi-18px">mdi mdi-cog-outline</v-icon>
                 </v-btn>
             </template>
-            <span>
-                Cài đặt
-            </span>
+            <span>Cài đặt</span>
         </v-tooltip>
         </template>
-            <v-tabs centered v-model="tab" color="orange" >
-                <v-tab href="#tab-1" class="tab">
-                    <span class="fs-13">
-                        Logtime
-                    </span>
-                </v-tab>
-                <v-tab href="#tab-2" class="tab">
-                     <span class="fs-13">
-                         Loại c.việc
-                    </span>
-                </v-tab>
+        <v-tabs centered v-model="tab" color="orange" >
+            <v-tab v-for="(item, index) in tabs" :key="index" :href="item.href"> 
+                <span class="fs-13">
+                    {{item.name}}
+                </span>
+            </v-tab>
             </v-tabs>
             <v-tabs-items v-model="tab">
                 <v-tab-item :key="1" :value="'tab-' + 1" >
@@ -81,17 +61,14 @@
                     </div> 
                 </v-tab-item>
             </v-tabs-items>
-       
      </v-menu>
      <v-tooltip top>
         <template v-slot:activator="{ on }">
-                <v-btn class="mt-1 ml-1 btn"  v-on="on" style="float:right" small text @click="$router.push('/category')">
+                <v-btn x-small class="ml-1 h-28px"  v-on="on"  depressed @click="$router.push('/category')">
                 <v-icon class="mdi-18px">mdi mdi-file-tree</v-icon>
             </v-btn>
         </template>
-        <span>
-            {{$t('timesheet.category')}}
-        </span>
+        <span>{{$t('timesheet.category')}}</span>
     </v-tooltip>
     
 </div>
@@ -110,8 +87,16 @@ export default {
   
     data: () => ({
         types: ['day', 'weekday', 'week', 'month'],
-        timebtn:true,
         events:[],
+        viewType:[
+            {name:'List view',icon:'mdi-apps',show:false},
+            {name:'Time view',icon:'mdi-clock-outline',show:true},
+        ],
+        tabs:[
+            {name:"Log time",href:"#tab-1"},
+            {name:" Loại c.việc",href:"#tab-2"},
+
+        ],
         showSearch:false,
         randomColor:false,
         tab:1,
@@ -137,7 +122,8 @@ export default {
         listColor() {
             let listColor = this.$store.state.timesheet.listColor
              if(listColor.detail&&Object.keys(listColor.detail).length> 0){
-                  this.logColor  = listColor.detail.colorLog.color;
+                 debugger
+                  this.logColor  = listColor.detail.colorLog?listColor.detail.colorLog.color:'#F0F8FF';
 
              }else{
                  this.logColor = '#F0F8FF';
@@ -158,7 +144,10 @@ export default {
         CategoryColor
     },
     methods: {
-     
+        switchView(name){
+            this.viewType.map(v=>v.show=!v.show)
+            name=='List view'?this.$emit('time_view'):this.$emit('list_view');
+        },
         setListCateColor(cate){
             this.$store.commit("timesheet/getListCategory", cate )
         },
@@ -199,15 +188,7 @@ export default {
         changeView(_type) {
             this.$store.commit("timesheet/changeCalendarType", _type);
         },
-        timeView() {
-            this.timebtn = false;
-            this.$emit('list_view');
-           
-        },
-        listView() {
-            this.timebtn = true;
-             this.$emit('time_view');
-        },
+     
         format(date) {
             switch (date) {
                 case 'week':
@@ -229,36 +210,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.v-btn:not(.v-btn--round).v-size--small {
-    padding: 0 4px !important;
-}
 
 .calendar-viewmode {
-    height: 30px;
-}
-
-span {
-    font-size: 13px !important;
-    font-family: Roboto !important;
-    font-weight: normal !important;
-}
-
-button {
-    font-weight: normal;
-    font-size: 13px !important;
-    font-family: Roboto !important;
-    color: black;
+    height: 28px;
+    margin-left: -3px;
 }
 
 .viewmode {
-    margin-top:2px!important;
+    background-color:#F7F7F7;
+    margin-top:0px!important;
     width: 125px;
-    float: right;
     padding-top: 0px !important;
-    height: 37px !important;
-    font-size: 13px !important;
+    height: 28px !important;
     border-radius: 2px;
-    padding-left: 0px;
 }
 
 .viewmode ::v-deep .v-input__control .v-input__slot {
@@ -294,11 +258,6 @@ button {
     color: rgba(0, 0, 0, 0.87) !important;
     caret-color: rgba(0, 0, 0, 0.87) !important;
 }
-.btn{
-    height: 32px!important;
-    min-width: 30px!important
-}
-
 .auto-complete ::v-deep .v-list {
     width: 385px !important;
 }

@@ -1,5 +1,5 @@
 <template>
-<div class='log-time h-100 pl-1' >
+<div class=' h-100' >
     <div class="d-flex justify-space-between">
         <period-selector style="width:60%" />
         <div style="width:40%" class="d-flex justify-end">
@@ -425,27 +425,8 @@ export default {
     },
 };
 </script>
-
-<style lang="scss" scoped>
-.log-time {
-    flex: 1;
-    margin: 0.5rem;
-}
-</style>
 <style>
-/* kích thước */
-.h-100{
-    height: 100%!important;
-}
-.w-100{
-    width: 100%!important;
-}
-/* font chữ */
-.font-normal{
-    font-family:Roboto; 
-    font-weight:nomarl
-}
-.fm{
-    font-family:Roboto
+.h-28px{
+    height: 28px!important;
 }
 </style>

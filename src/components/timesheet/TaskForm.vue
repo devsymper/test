@@ -5,10 +5,10 @@
                 {{$t('timesheet.task_form')}}
             </div>
         </v-card-title>
-        <v-card-text  v-bind:style="cateError? 'height:80px' :'height:60px'" class="h-65" >
+        <v-card-text  :style="cateError? 'height:80px' :'height:60px'" class="h-65" >
             <span class="label pt-2 ">{{$t('timesheet.category_task')}}<span class="color-red"> *</span></span>
             <v-autocomplete 
-                v-bind:style="cateError? 'margin-bottom:4px' :''"
+                :style="cateError? 'margin-bottom:4px' :''"
                 style="margin-top:2px!important; "
                 item-text="fullName"
                 item-value="id"
@@ -16,28 +16,25 @@
                 class="category-task"
                 return-object
                 :items="category" 
-                item-color="white" 
                 background-color="#f2f2f2">
                 <template v-slot:item="data" class="category-task">
-                    <!-- <img style='max-height: 40px; max-width: 30px; margin-right:5px' 
-                    :src="require('../../assets/icon/AD-IT.png')" /> -->
-                <span style='color:black' >{{ data.item.fullName }}
-                    <v-icon v-if="data.item.id == categoryTask.id" color="success">
-                    mdi-check</v-icon></span>
-            </template>
+                    <span style='color:black' >{{ data.item.fullName }}
+                        <v-icon v-if="data.item.id == categoryTask.id" color="success">
+                        mdi-check</v-icon></span>
+                </template>
             </v-autocomplete >
             <div class="w-100 mb-5" style="height:20px">
                 <span class="red--text" v-show="cateError">{{cateError}}</span>
             </div>
         </v-card-text>
-        <v-card-text v-bind:style="nameError? 'height:80px' :'height:60px'">
+        <v-card-text :style="nameError? 'height:80px' :'height:60px'">
             <span class="label pt-2"> {{$t('timesheet.name')}}<span style="color:red"> *</span></span>
-            <div>
+            <div class="w-100">
                 <input 
                     type="text" 
                     v-model="name" 
                     class="w-100 input-logform"
-                    v-bind:style="nameError? 'margin-bottom:4px' :''">
+                    :style="nameError? 'margin-bottom:4px' :''">
             </div>
             <div class="w-100 mb-5" style="height:20px">
                 <span class="red--text" v-show="nameError">{{nameError}}</span>
@@ -73,11 +70,11 @@
         </v-card-text>
         <v-card-text>
             <span class="label pt-2">{{$t('timesheet.description')}}</span>
-            <textarea 
-                class='pl-3' 
-                style="background-color:#f2f2f2"
-                rows="4" cols="44" v-model= "desc">
-            </textarea>
+                <textarea 
+                    class='pl-3' 
+                    style="background-color:#f2f2f2"
+                    rows="4" cols="44" v-model= "desc">
+                </textarea>
         </v-card-text>
         <v-card-actions class="pb-2">
             <div class= "d-flex justify-end w-100">
@@ -172,12 +169,12 @@ export default {
                 this.$emit('loadTask');
                 this.cancel();
                 this.$snotify({
-                    title:"success",
+                    type:"success",
                     text: "Thêm thành công"
                 })
              }else{
                  this.$snotify({
-                    title:"error",
+                    type:"error",
                     text: "Lỗi"
                 })
              }
@@ -229,7 +226,7 @@ export default {
              let data = {
                 task: this.name,
                 desc: this.desc,
-                cate: this.categoryTask,
+                cate: this.categoryTask.id,
                 userAssign: this.user,
                 isPublic:this.checkbox==''?1:0
              }
@@ -271,7 +268,6 @@ export default {
 .input-logform {
     float: flex;
     background-color: #f2f2f2;
-    width: 60px;
     height: 32px !important;
     border-radius: 2px;
     padding-left: 12px;
