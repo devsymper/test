@@ -15,10 +15,10 @@
     </list-items>
         <v-dialog 
             v-model="showPanel"
-            max-width="400"
-      >
+            max-width="400" >
        <CategoryForm
-            style="background:white!important; over-flow:hidden"
+            class="bg-white"
+            style="over-flow:hidden"
             ref="category"
             :cate="cate"
             :listDoc="listDoc"

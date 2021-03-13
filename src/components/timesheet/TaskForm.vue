@@ -5,39 +5,36 @@
                 {{$t('timesheet.task_form')}}
             </div>
         </v-card-title>
-        <v-card-text  v-bind:style="cateError? 'height:80px' :'height:60px'" class="h-65" >
+        <v-card-text  :style="cateError? 'height:80px' :'height:60px'" class="h-65" >
             <span class="label pt-2 ">{{$t('timesheet.category_task')}}<span class="color-red"> *</span></span>
             <v-autocomplete 
-                v-bind:style="cateError? 'margin-bottom:4px' :''"
+                :style="cateError? 'margin-bottom:4px' :''"
                 style="margin-top:2px!important; "
                 item-text="fullName"
                 item-value="id"
                 v-model="categoryTask" 
                 class="category-task"
                 return-object
-                :items="category" 
-                item-color="white" 
+                :items="listCategory" 
                 background-color="#f2f2f2">
                 <template v-slot:item="data" class="category-task">
-                    <!-- <img style='max-height: 40px; max-width: 30px; margin-right:5px' 
-                    :src="require('../../assets/icon/AD-IT.png')" /> -->
-                <span style='color:black' >{{ data.item.fullName }}
-                    <v-icon v-if="data.item.id == categoryTask.id" color="success">
-                    mdi-check</v-icon></span>
-            </template>
+                    <span style='color:black' >{{ data.item.fullName }}
+                        <v-icon v-if="data.item.id == categoryTask.id" color="success">
+                        mdi-check</v-icon></span>
+                </template>
             </v-autocomplete >
             <div class="w-100 mb-5" style="height:20px">
                 <span class="red--text" v-show="cateError">{{cateError}}</span>
             </div>
         </v-card-text>
-        <v-card-text v-bind:style="nameError? 'height:80px' :'height:60px'">
+        <v-card-text :style="nameError? 'height:80px' :'height:60px'">
             <span class="label pt-2"> {{$t('timesheet.name')}}<span style="color:red"> *</span></span>
-            <div>
+            <div class="w-100">
                 <input 
                     type="text" 
                     v-model="name" 
                     class="w-100 input-logform"
-                    v-bind:style="nameError? 'margin-bottom:4px' :''">
+                    :style="nameError? 'margin-bottom:4px' :''">
             </div>
             <div class="w-100 mb-5" style="height:20px">
                 <span class="red--text" v-show="nameError">{{nameError}}</span>
@@ -73,11 +70,11 @@
         </v-card-text>
         <v-card-text>
             <span class="label pt-2">{{$t('timesheet.description')}}</span>
-            <textarea 
-                class='pl-3' 
-                style="background-color:#f2f2f2"
-                rows="4" cols="44" v-model= "desc">
-            </textarea>
+                <textarea 
+                    class='pl-3' 
+                    style="background-color:#f2f2f2"
+                    rows="4" cols="44" v-model= "desc">
+                </textarea>
         </v-card-text>
         <v-card-actions class="pb-2">
             <div class= "d-flex justify-end w-100">
@@ -103,6 +100,15 @@ export default {
     components:{
         SymperAvatar
     },
+    props:{
+        category:{
+            type:Object,
+            default(){
+                return {}
+            }
+        },
+
+    },
     name: 'TaskForm',
     data: () => ({
         name: '',
@@ -115,24 +121,27 @@ export default {
         check:false,
         showSubmitTask:false,
         nameError: '',
-        category:[],
+        listCategory:[],
         listUser: [],
         user:''
     }),
     created(){
-        this.category = this.$store.state.timesheet.listCate;
+        this.listCategory = this.$store.state.timesheet.listCate;
         this.taskFormWorker = new TaskFormWorker();
         this.listUser = this.$store.state.app.allUsers;
     },
     watch:{
         name(){
-            if(this.check){
-                if(this.name==''){
-                }else{
-                    this.nameError = '';
-                    this.check = false;
-                }
+            if(this.check&&this.name!=''){
+                this.nameError = '';
+                this.check = false;
             }
+        },
+        category(){
+            if(JSON.stringify(this.categoryTask) != '{}'){
+                this.categoryTask = this.category
+            }
+
         },
         categoryTask(){
             if(this.categoryTask.type==1){
@@ -164,22 +173,13 @@ export default {
         });
     },
     methods: {
-        // showSubmitTaskForm(){
-          
-        // },
         checkCreateTask(check){
              if (check) {
                 this.$emit('loadTask');
                 this.cancel();
-                this.$snotify({
-                    title:"success",
-                    text: "Thêm thành công"
-                })
+                this.$snotifySuccess("Thêm thành công");
              }else{
-                 this.$snotify({
-                    title:"error",
-                    text: "Lỗi"
-                })
+                 this.$snotifyError("Lỗi")
              }
         },
         cancel(){
@@ -215,36 +215,29 @@ export default {
             let self = this;
             this.check = true;
             if(this.name==''&&this.categoryTask==''){
-                 this.nameError = this.$t('timesheet.required_value'); 
-                  this.cateError = this.$t('timesheet.required_value'); 
+                this.nameError = this.$t('timesheet.required_value'); 
+                this.cateError = this.$t('timesheet.required_value'); 
              }
              else if(this.categoryTask==''){
                 this.cateError = this.$t('timesheet.required_value'); 
              }
              else if(this.name==''){
                 this.nameError = this.$t('timesheet.required_value'); 
-             }
-            else{
-             self.saveTaskSymper();
-             let data = {
-                task: this.name,
-                desc: this.desc,
-                cate: this.categoryTask,
-                userAssign: this.user,
-                isPublic:this.checkbox==''?1:0
-             }
-              self.taskFormWorker.postMessage({
-                action:'createTask',
-                data:data
-            })
+             }else{
+                self.saveTaskSymper();
+                let data = {
+                    task: this.name,
+                    desc: this.desc,
+                    cate: this.categoryTask.id,
+                    userAssign: this.user,
+                }
+                self.taskFormWorker.postMessage({
+                    action:'createTask',
+                    data:data
+                })
             }
         }
     },
-    computed:{
-        // category(){
-        //     return this.$store.state.timesheet.listCate
-        // }
-    }
 }
 </script>
 <style lang="scss" scoped>
@@ -271,7 +264,6 @@ export default {
 .input-logform {
     float: flex;
     background-color: #f2f2f2;
-    width: 60px;
     height: 32px !important;
     border-radius: 2px;
     padding-left: 12px;
@@ -317,20 +309,14 @@ export default {
 .task ::v-deep .v-label {
     font-size: 13px;
 }
-.task ::v-deep .v-input__slot:after {
-    border-color: transparent !important;
-      padding-left: 10px;
-}
-
+.task ::v-deep .v-input__slot:after,
 .task ::v-deep .v-input__slot:before {
     border-color: transparent !important;
-      padding-left: 10px;
+    padding-left: 10px;
 }
-
 .task ::v-deep .v-label--active {
     display: none;
 }
-
 .task ::v-deep .v-list {
     width: 385px !important;
 }

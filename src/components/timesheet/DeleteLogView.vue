@@ -47,7 +47,7 @@
 <script>
 import timesheetApi from '../../api/timesheet';
 export default {
-    props: ['deleteEvent', 'onDelete', 'onCancel'],
+    props: ['deleteEvent', 'onDelete'],
     data() {
         return {
             formattedDeleteEvent: {},

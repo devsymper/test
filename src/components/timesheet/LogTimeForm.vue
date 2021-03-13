@@ -97,7 +97,7 @@
                 :search-input.sync="search" 
                 item-text="name"    
                 item-value="id"
-                :menu-props="{'nudge-top':-10, 'width': 300}" 
+                :menu-props="{'nudge-top':-10, 'width': 320,'max-width':320,'min-width':320}" 
                 label="Tìm công việc ...">
                 <template v-slot:item="data">
                     <v-list-item-content class="mt-s10" style="margin-bottom:-5px">
@@ -105,9 +105,10 @@
                             {{data.item.name?data.item.name:'Không có tên'}}
                         </v-list-item-title>
                         <v-list-item-subtitle class="fs-11" >
-                            <span v-if="data.item.categoryId" class="color-grey">
+                            <span v-if="!data.item.tmg_assignee" class="color-grey">
                                 {{getNameCategory(data.item.categoryId)}}-{{data.item.description!=''?data.item.description:"Chưa có mô tả"}} 
                             </span>
+                            <span  v-else>{{data.item.document_object_id}} - {{data.item.description}} </span>
                         </v-list-item-subtitle>
                     </v-list-item-content>
                 </template>
@@ -205,7 +206,7 @@
             </v-col>
         </v-row>
         <!-- <div class="w-100 pb-5" style="margin-top: -15px!important;background:white"> -->
-        <div class="w-100 " style="margin-top:-12px">
+        <div class="w-100 " style="margin-top:-5px">
             <input class="ml-6 mr-1" type="checkbox" id="checkbox" v-model="keepLog">
             <span class="fs-13" >
                 Thêm liên tục
@@ -239,7 +240,7 @@ import CategoryWorker from 'worker-loader!@/worker/timesheet/Category.Worker.js'
 
 export default {
     name: 'LogTimeForm',
-    props: ['formType', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
+    props: ['formType', 'onSave', 'deleteLastEvent', 'update','dateMonth','eventLog','updateAPICategory','cancelTask','cancelCate'],
     data: () => ({
         typeRepeat:'general',//kiểu lặp lại 
         selectRepeat:['Hằng ngày',"Hằng tuần vào thứ 2","Từ thứ 2 đến thứ 7","Tùy chỉnh..."],
@@ -285,7 +286,7 @@ export default {
         timeError: '',
         cateError: '',
         time: null,
-        categoryTask: '',
+        categoryTask: {},
         inputs: {
             date: '',
             duration: '30m',
@@ -405,7 +406,7 @@ export default {
                 }else{
                     docId = -1;
                 }
-                (Number(docId)>0) && this.getListTaskDoc(docId);
+                (Number(docId)>0) && this.getListTaskDoc(docId,this.categoryTask.id);
                 this.filterTaskByCategory();
             }
             if(this.checkNullCate){
@@ -430,7 +431,6 @@ export default {
         this.setValueLog(this.newEvent)
     },
     methods: {
-        //
         changeMinutesToHourAndMinutes(duration){
              if(!this.isCaculate){
                 if (duration >= 0) {
@@ -501,22 +501,7 @@ export default {
             this.cateError = '';
         },
         //Lấy danh sách task từ doc
-         getListTaskDoc(docId){
-            const self = this;
-            documentApi.getListDocumentObject(docId).then(res=>{
-                if(res.status==200){
-                    self.listTask=[];
-                    res.data.listObject.map(task=>{
-                        self.listTask.push({
-                            ...task, 
-                            name:task.tmg_name,
-                            description:task.tmg_description?task.tmg_description:"Chưa có mô tả"
-                        });
-                    })
-                }
-            })
-
-        },
+      
         create_UUID() {
             var dt = new Date().getTime();
             var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
@@ -577,6 +562,7 @@ export default {
         },
         // lấy ra tên của task từ id task
         findNameTask(id){
+            // check nếu id doc
             if(this.listTask.length>0){
                  this.nameTask = this.listTask.filter(x=>x.id==id)[0].name;
                 return this.nameTask
@@ -595,10 +581,69 @@ export default {
         },
         // lọc danh sách task theo id category
         filterTaskByCategory(){
-            if(this.categoryTask){
+            if(this.categoryTask&&this.categoryTask.type!=1){
                 let categoryId = this.categoryTask.id;
                 this.listTask = [...this.items.filter(x=>x.categoryId==categoryId)];
             }
+            if(this.categoryTask&&this.categoryTask.type==1&&this.search){
+                let docId = this.listCategory.filter(cate=>cate.id==this.categoryTask.id)[0].docId;
+                this.searchListTaskDoc(docId,this.categoryTask.id)
+            }
+        },
+        searchListTaskDoc(docId,cateId){
+            const self = this;
+            let userName = this.$store.state.app.endUserInfo.id;
+            let filter = "?filter%5B0%5D%5Bcolumn%5D=tmg_assignee&filter%5B0%5D%5Boperation%5D=and&filter%5B0%5D%5Bconditions%5D%5B0%5D%5Bname%5D=in&filter%5B0%5D%5Bconditions%5D%5B0%5D%5Bvalue%5D%5B0%5D="+userName+"&search="+this.search+"&page=1&pageSize=50"
+            documentApi.getListDocumentObject(docId,filter).then(res=>{
+                if(res.status==200){
+                    self.listTask=[];
+                    res.data.listObject.map(task=>{
+                        self.listTask.push({
+                            ...task, 
+                            name:task.tmg_name,
+                            description:task.tmg_description?task.tmg_description:"Chưa có mô tả",
+                            categoryId:cateId,
+                            id:task.document_object_id
+                        });
+                    })
+                }
+            })
+
+        },
+           getListTaskDoc(docId,cateId){
+            const self = this;
+            let userName = this.$store.state.app.endUserInfo.id;
+            let filter = "?filter%5B0%5D%5Bcolumn%5D=tmg_assignee&filter%5B0%5D%5Boperation%5D=and&filter%5B0%5D%5Bconditions%5D%5B0%5D%5Bname%5D=in&filter%5B0%5D%5Bconditions%5D%5B0%5D%5Bvalue%5D%5B0%5D="+userName+"&page=1&pageSize=50"
+            // let value = [];
+            // value[0] = "test";
+            // let filter = {
+            //     filter:[
+            //         {
+            //             column : "name_assignee",
+            //             operation : "and",
+            //             conditions : [
+            //                 {
+            //                     name : "in",
+            //                     value:value
+            //                 }
+            //             ],
+            //         },
+            //     ]}
+            documentApi.getListDocumentObject(docId,filter).then(res=>{
+                if(res.status==200){
+                    self.listTask=[];
+                    res.data.listObject.map(task=>{
+                        self.listTask.push({
+                            ...task, 
+                            name:task.tmg_name,
+                            description:task.tmg_description?task.tmg_description:"Chưa có mô tả",
+                            categoryId:cateId,
+                            id:task.document_object_id
+                        });
+                    })
+                }
+            })
+
         },
          async getAllTask(nameTask){
             if(nameTask==undefined){
@@ -615,6 +660,7 @@ export default {
                 let name = res.data.listObject;
                 name.map(x=>{
                     x.categoryId = "602e321e-0689-b438-887b-7dce711740c4";
+                    x.key = "HT";
                     x.name = JSON.parse(x.description).content;
                     let extraLabel = JSON.parse(x.description).extraLabel;
                     x.description = 'Mô tả: '+ extraLabel?extraLabel:"Chưa có mô tả";
@@ -648,7 +694,13 @@ export default {
         },
         //lấy danh sách category
         getNameCategory(cateId){
-            return this.listCategory.filter(cate=>cate.id==cateId)[0].key
+            let list = this.listCategory.filter(cate=>cate.id==cateId);
+            if(list.length>0){
+                list = list[0].key
+            }else{
+                list = 'ád'
+            }
+            return list
         },
         getFullNameCategory(cateId){
             this.listCategory.map(cate=>{
@@ -698,16 +750,16 @@ export default {
             this.timeError = "";
             this.task="";
             this.nameTask="";
-            this.task="";
-            this.categoryTask="";
+            this.categoryTask={};
             this.inputs.description="";
             this.repeat = false;
-            this.keepLog = false;
         },
         cancel() {
-            this.onCancel();
+            !this.keepLog && this.deleteLastEvent(); 
             this.$emit('cancel');
-            this.refreshAll()
+            this.refreshAll();
+            this.keepLog = false;
+            
         },
         // type= 0 là plan, 1 là log
         log(type) {
@@ -739,9 +791,9 @@ export default {
                 type: type,
                 date: this.inputs.date,
                 desc: this.inputs.description || "",
-                taskName: this.findNameTask(this.task)
+                taskName: this.findNameTask(this.task)?this.findNameTask(this.task):'Trống'
             }
-            if(!this.repeat){
+            if(!this.repeat){// nếu task không lặp lại 
                 //this.onSave(data);
                 this.$emit('create-log',{...data});
                 this.sendApiCreateLog(data);
@@ -818,7 +870,6 @@ export default {
                         break;
                     }  
             }else{
-
             }
             
         },
@@ -1005,6 +1056,9 @@ button {
 }
 .category-task ::v-deep .v-select__slot{
     padding-left: 10px;
+}
+.task ::v-deep .v-select__slot{
+    padding-left: 0px;
 }
 .task ::v-deep .v-select__slot,
 .task ::v-deep .v-label{

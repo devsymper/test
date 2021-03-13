@@ -14,8 +14,8 @@ export const documentApi = {
     getSmallListDocument(){
         return coreApi.get("documents?pageSize=50");
     },
-    getListDocumentObject(docId) {
-        return coreApi.get("documents/"+docId+"/objects");
+    getListDocumentObject(docId,filter) {
+        return coreApi.get("documents/"+docId+"/objects"+filter);
     },
     getListObjectByMultipleDocument(data) {
         return coreApi.post("documents/objects-by-multiple-document",data,{},{'contentType': 'application/json'});
