@@ -10,12 +10,11 @@ import { documentApi } from "../../../api/Document";
 import { str } from "../../../plugins/utilModules/str";
 import PerfectScrollbar from "perfect-scrollbar";
 import { fileManagementApi } from "@/api/FileManagement";
-
+import 'tinymce/plugins/table';
 import 'tinymce/plugins/media';
 import 'tinymce/plugins/quickbars';
 import { util } from "../../../plugins/util";
 import { getControlInstanceFromStore } from "../common/common";
-
 let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
@@ -867,25 +866,33 @@ export default class BasicControl extends Control {
         this.editor = '';
         let selector = '';
         let self = this;
-        let toolbar = 'undo redo | styleselect | lineheightselect | quickimage | lineheight | fontselect | fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | emoticons |outdent indent | link';
+        let toolbar = 'undo redo| styleselect| fontselect| lineheight| fontsizeselect| lineheightselect |'+
+        ' quickimage table| bold italic underline|'+
+        ' alignleft aligncenter alignright alignjustify | git |outdent indent | link';
+        let isShowToolBar = false;
         if(this.checkViewType('submit') || this.checkViewType('update')){ 
             this.ele = $('#sym-submit-'+this.keyInstance).find("#"+this.id);
             isReadOnly = 0;
             selector = '#sym-submit-'+this.keyInstance+" #"+this.id;
+            if(this.controlProperties.isShowHeaderTinyMce.value){
+                isShowToolBar = toolbar;
+                toolbar = false
+            }else{
+                isShowToolBar = false
+            }
         }
         else{
             this.ele = $('#sym-Detail-'+this.keyInstance).find("#"+this.id);
             selector = '#sym-Detail-'+this.keyInstance+" #"+this.id;
             toolbar = false;
         }
-        let isShowToolBar = this.controlProperties.isShowHeaderTinyMce.value?true:false
-        tinymce.remove();
         tinymce.init({
             toolbar: isShowToolBar,
             menubar: false,
+            quickbars_insert_toolbar:false,
             branding: false,
             readonly: isReadOnly,
-            content_style: "p{ font-family: Roboto; font-size: 13px,color:black; line-height:0}",
+            content_style: "p{ font-family: Roboto; font-size: 11px,color:black}",
             quickbars_selection_toolbar: toolbar,
             plugins: ['quickbars','image'],
             lineheight_formats: "0pt 1pt 2pt 3pt 4pt 5pt 6pt",

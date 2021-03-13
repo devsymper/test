@@ -204,7 +204,6 @@ export default {
     font-weight: 500;
     position: relative;
     top: -5px;
-
 }
 
 .symper-drag-panel-resizer {

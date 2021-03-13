@@ -83,7 +83,8 @@ export default {
             headerHeight:25,
             enableRangeSelection: true,
             rowBuffer: 0,
-            rowSelection:'multiple'
+            rowSelection:'multiple',
+            rowMultiSelectWithClick: true,
         };
         
         this.defaultColDef = {
@@ -286,6 +287,11 @@ export default {
     }
     .content-filter >>> .ag-theme-alpine .ag-cell{
         line-height: 20px!important;
+        font-size:11px!important;
+
+    }
+    .ag-theme-alpine >>> span{
+        font-size:11px!important;
     }
   
 </style>

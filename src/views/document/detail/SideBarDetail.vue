@@ -185,6 +185,10 @@ export default {
 		keyInstance: {
 			default: null
 		},
+		isShowSidebar:{
+			type:Boolean,
+			default:true
+		},
 		sidebarWidth:{
 			type:Number,
 			default:400
@@ -218,6 +222,9 @@ export default {
 		}
 	},
 	watch:{
+		isShowSidebar(){
+			this.isShow = !this.isShow
+		},
 		userId(after){
 			if(!after){
 				return;
