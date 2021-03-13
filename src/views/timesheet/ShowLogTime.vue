@@ -28,13 +28,14 @@
             :formType="formType"
             :cancelTask="cancelTask"
             :cancelCate="cancelCate"
-            :load ="load"
-            @doneCate="doneCate()"
+            @doneCate="updateAPICate=false"
             :update ="update"
             :onSave="onSaveLogTimeEvent"
-            :onCancel="onCancelSave">
+            :deleteLastEvent="deleteLastEvent">
         </LogTimeForm>
-         <TaskForm @loadTask="loadTask()"
+         <TaskForm
+            :category="cate"
+            @loadTask="loadTask()"
             @docId="getDocId"
             v-show="showTask&&!showCategory" 
             @cancel="cancelTaskForm()"/>
@@ -164,6 +165,7 @@ export default {
                 taskInfo: {},
                 originData: {}
             },
+            cate:{},// lưu thông tin category ở log cho task form
             definitionModel: {}, // các cấu hình của process definition
             showTaskDetail:false,
             //task submit
@@ -175,8 +177,6 @@ export default {
             time_view: true,
             eventLog:{},
             updateAPICate:false,
-            load:false,
-             paramId:'',
             // log form
             dateMonth:'',
             cancelTask:false,
@@ -186,7 +186,7 @@ export default {
             formType: 'log',
             update: false,
             onSaveLogTimeEvent: () => null,
-            onCancelSave: () => null,
+            deleteLastEvent: () => null,
             // delete form
             deleteDialog: false,
             check_daily:false,
@@ -239,6 +239,8 @@ export default {
         closeTaskSubmit(){
             this.$store.commit('timesheet/showSubmitTask', false);
             this.logtimeDialog = true;
+            this.$refs.logtime.getListTaskDoc(this.docId,this.$refs.logtime.categoryTask.id);
+
         },
          getAllProcess(data){
             this.listProcess = [];
@@ -296,7 +298,7 @@ export default {
         },
         // khi click ra ngoài log form
         deleteLog(){
-            if(!this.update&&this.type!="month"){
+            if(!this.update&&this.type!="month"&&!this.$refs.logtime.keepLog){
               this.$refs.logCalendar.events.pop()
             }
         },
@@ -343,9 +345,6 @@ export default {
             this.monthEvents = data;
             this.$refs.logCalendar.load()
         },
-        doneCate(){
-            this.updateAPICate = false
-        },
         hideTaskForm(){
             this.cancelTaskForm()
             // this.showTask = false;
@@ -357,7 +356,9 @@ export default {
 
         },
         loadTask(){
-            this.load = true;
+            if(this.$refs.logtime){
+                this.$refs.logtime.getAllTask()
+            }
         },
         cancelTaskForm(){
             this.showTask=false;
@@ -374,7 +375,7 @@ export default {
         showTaskForm(value){
             this.eventLog = value;
             this.showTask=true; 
-          
+            this.cate = value.categoryTask;
         },
          showCategoryForm(value){
             this.eventLog = value;
@@ -400,15 +401,14 @@ export default {
         cancelDelete() {
             this.deleteDialog = false;
         },
-        onCreateTime({logtimeEvent, onSave, onCancel, update}) {
+        onCreateTime({logtimeEvent, onSave, deleteLastEvent, update}) {
             this.logtimeDialog = true;
              this.$store.commit("timesheet/getLogForm", logtimeEvent)
             this.$nextTick(() => {
                 this.update = update;
                 this.logtimeEvent = logtimeEvent;
                 this.onSaveLogTimeEvent = onSave;
-
-                this.onCancelSave = onCancel;
+                this.deleteLastEvent = deleteLastEvent;
             });
             
             if(this.$refs.logtime){

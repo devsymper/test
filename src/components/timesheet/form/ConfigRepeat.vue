@@ -20,7 +20,7 @@
         <div class="fs-13" style="margin-top:-24px;">
             Áp dụng vào
         </div>
-        <div>
+        <div class="mt-1">
             <v-btn @click="selectDay(d.name)" x-small v-for="(d,i) in day" :key="i" class="mr-2" :style="{'background':d.show?'#3CB371':'#f1f3f4'}">
                 {{d.name}}
             </v-btn>

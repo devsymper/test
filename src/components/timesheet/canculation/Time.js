@@ -12,20 +12,21 @@ export const sumDuration = function (_event){
             if(log.end>lastLogEnd){// log sau và log trước có 1 phần trùng nhau
                 if(log.start<lastLogEnd){// trùng nhau
                     // duration += 1;
-                    duration+= Number(moment(moment(lastLogStart,"x").diff(moment(log.end,"x"))).format("mm"))
+                    duration += Number(moment(moment(lastLogStart,"x").diff(moment(log.end,"x"))).format("mm"))
                 }else{// sắp sau nhau
-                    duration +=Number(lastDuration);
+                    duration += Number(lastDuration);
                 }
             }
-        }else{// trường hợp bằng nahu 
+        }else{// trường hợp bằng nhau
             // do cùng log
             if(log.id==lastId){
                 duration = Number(log.duration)
             }else{// khác log
                 if(log.end>lastLogEnd){//lấy log mới
                     duration += Number(log.duration)
-                }else{// lấy log cũ
-                    duration += Number(lastDuration)
+                }else{
+                    // lấy log cũ
+                    duration += 0
                 }
             }
         }

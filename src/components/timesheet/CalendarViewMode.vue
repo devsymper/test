@@ -122,7 +122,6 @@ export default {
         listColor() {
             let listColor = this.$store.state.timesheet.listColor
              if(listColor.detail&&Object.keys(listColor.detail).length> 0){
-                 debugger
                   this.logColor  = listColor.detail.colorLog?listColor.detail.colorLog.color:'#F0F8FF';
 
              }else{

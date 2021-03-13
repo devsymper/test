@@ -15,7 +15,7 @@
                 v-model="categoryTask" 
                 class="category-task"
                 return-object
-                :items="category" 
+                :items="listCategory" 
                 background-color="#f2f2f2">
                 <template v-slot:item="data" class="category-task">
                     <span style='color:black' >{{ data.item.fullName }}
@@ -100,6 +100,15 @@ export default {
     components:{
         SymperAvatar
     },
+    props:{
+        category:{
+            type:Object,
+            default(){
+                return {}
+            }
+        },
+
+    },
     name: 'TaskForm',
     data: () => ({
         name: '',
@@ -112,24 +121,27 @@ export default {
         check:false,
         showSubmitTask:false,
         nameError: '',
-        category:[],
+        listCategory:[],
         listUser: [],
         user:''
     }),
     created(){
-        this.category = this.$store.state.timesheet.listCate;
+        this.listCategory = this.$store.state.timesheet.listCate;
         this.taskFormWorker = new TaskFormWorker();
         this.listUser = this.$store.state.app.allUsers;
     },
     watch:{
         name(){
-            if(this.check){
-                if(this.name==''){
-                }else{
-                    this.nameError = '';
-                    this.check = false;
-                }
+            if(this.check&&this.name!=''){
+                this.nameError = '';
+                this.check = false;
             }
+        },
+        category(){
+            if(JSON.stringify(this.categoryTask) != '{}'){
+                this.categoryTask = this.category
+            }
+
         },
         categoryTask(){
             if(this.categoryTask.type==1){
@@ -161,22 +173,13 @@ export default {
         });
     },
     methods: {
-        // showSubmitTaskForm(){
-          
-        // },
         checkCreateTask(check){
              if (check) {
                 this.$emit('loadTask');
                 this.cancel();
-                this.$snotify({
-                    type:"success",
-                    text: "Thêm thành công"
-                })
+                this.$snotifySuccess("Thêm thành công");
              }else{
-                 this.$snotify({
-                    type:"error",
-                    text: "Lỗi"
-                })
+                 this.$snotifyError("Lỗi")
              }
         },
         cancel(){
@@ -212,36 +215,29 @@ export default {
             let self = this;
             this.check = true;
             if(this.name==''&&this.categoryTask==''){
-                 this.nameError = this.$t('timesheet.required_value'); 
-                  this.cateError = this.$t('timesheet.required_value'); 
+                this.nameError = this.$t('timesheet.required_value'); 
+                this.cateError = this.$t('timesheet.required_value'); 
              }
              else if(this.categoryTask==''){
                 this.cateError = this.$t('timesheet.required_value'); 
              }
              else if(this.name==''){
                 this.nameError = this.$t('timesheet.required_value'); 
-             }
-            else{
-             self.saveTaskSymper();
-             let data = {
-                task: this.name,
-                desc: this.desc,
-                cate: this.categoryTask.id,
-                userAssign: this.user,
-                isPublic:this.checkbox==''?1:0
-             }
-              self.taskFormWorker.postMessage({
-                action:'createTask',
-                data:data
-            })
+             }else{
+                self.saveTaskSymper();
+                let data = {
+                    task: this.name,
+                    desc: this.desc,
+                    cate: this.categoryTask.id,
+                    userAssign: this.user,
+                }
+                self.taskFormWorker.postMessage({
+                    action:'createTask',
+                    data:data
+                })
             }
         }
     },
-    computed:{
-        // category(){
-        //     return this.$store.state.timesheet.listCate
-        // }
-    }
 }
 </script>
 <style lang="scss" scoped>
@@ -313,20 +309,14 @@ export default {
 .task ::v-deep .v-label {
     font-size: 13px;
 }
-.task ::v-deep .v-input__slot:after {
-    border-color: transparent !important;
-      padding-left: 10px;
-}
-
+.task ::v-deep .v-input__slot:after,
 .task ::v-deep .v-input__slot:before {
     border-color: transparent !important;
-      padding-left: 10px;
+    padding-left: 10px;
 }
-
 .task ::v-deep .v-label--active {
     display: none;
 }
-
 .task ::v-deep .v-list {
     width: 385px !important;
 }

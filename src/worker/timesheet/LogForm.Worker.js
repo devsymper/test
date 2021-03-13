@@ -87,6 +87,7 @@ export const getLogTimeList = async function(dateStartEnd){
             category: logTime.categoryId,
             category_key: logTime.key,
             task: logTime.taskId,
+            cloneTaskId:logTime.cloneTaskId,
             desc: logTime.description,
             color:'#F0F8FF',
             type: logTime.type,

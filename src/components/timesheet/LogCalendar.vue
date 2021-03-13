@@ -239,10 +239,11 @@ export default {
          },
         undoCreate(){
             const self = this;
-            this.events = this.events.pop();
+            // this.events = this.events.pop();
+            let docObjId = this.log.docObjId;
             timesheetApi.deleteLogTime({
                 id: this.log.id,
-                docObjId:this.log.docObjId  
+                docObjId: docObjId  
             }).then(res => {
                 if (res.status === 200) {
                     self.load()
@@ -577,7 +578,7 @@ export default {
                 update: update,
                 logtimeEvent: event,
                 onSave: () => this.load(),
-                onCancel: update||this.type=='month' ? () => null : () => this.events.splice(this.events.indexOf(event), 1)
+                deleteLastEvent: update||this.type=='month' ? () => null : () => this.events.splice(this.events.indexOf(event), 1)
             });
         },
         openDeleteLogtime(event) {

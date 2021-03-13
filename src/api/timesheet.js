@@ -69,7 +69,7 @@ export default {
         return api.put('config-remind', data)
     },
     getTask(filter) {
-             return taskApi.get('tasks?sort[0][column]=createTime&sort[0][type]=desc&search=%' + filter + '%&page=1&pageSize=50&variables=symper_last_executor_id%2Csymper_user_id_start_workflow%2Csymper_last_executor_name');
+        return taskApi.get('tasks?sort[0][column]=createTime&sort[0][type]=desc&search=%' + filter + '%&page=1&pageSize=50&variables=symper_last_executor_id%2Csymper_user_id_start_workflow%2Csymper_last_executor_name');
     },
     updateLogTime(data,id) {
         return api.put('log-time-update' + '/' + id, data)
