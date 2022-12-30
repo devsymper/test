@@ -1,0 +1,4 @@
+
+curl -H "Authorization: token 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" https://api.github.com/repos/devsymper/accesscontrol.symper.vn/releases/2.0.2 | jq -r .tag_name |
+xargs -I {} curl -H "Authorization: token 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" -sSL https://github.com/devsymper/accesscontrol.symper.vn/archive/2.0.2.tar.gz |
+tar -xzf - --strip-components=1
