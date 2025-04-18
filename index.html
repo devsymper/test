@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Distributed Tracing Viewer</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+      }
+      svg {
+        border: 1px solid #ccc;
+        margin-top: 20px;
+        overflow: visible; /* Allow labels outside the main area */
+      }
+      .span-rect {
+        fill: steelblue;
+        stroke: black;
+        stroke-width: 0.5;
+        opacity: 0.7;
+        transition: opacity 0.2s ease-in-out;
+      }
+      .span-rect:hover {
+        opacity: 1.0;
+      }
+      .span-label {
+        font-size: 13px;
+        fill: #333;
+        pointer-events: none; /* Prevent text from interfering with hover */
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #ccc;
+        shape-rendering: crispEdges;
+      }
+      .axis text {
+        font-size: 10px;
+        fill: #555;
+      }
+      .tooltip {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: pre-line; /* Preserve line breaks */
+        pointer-events: none; /* Prevent tooltip from blocking mouse events */
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+      }
+      textarea {
+        width: 100%;
+        height: 150px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Trace Timeline</h1>
+    <textarea id="jsonInput">{
+  "results": [
+    {
+      "events": [
+        {
+          "timestamp": 1744703447660,
+          "_baName": null,
+          "_endUserFullName": "Đỗ Đức Phong",
+          "_executionTimeMiliseconds": 710,
+          "exe time (second)": 0.71,
+          "_spanName": "GET https://api.symper.vn/file-service/getFileByObjectIdentifier",
+          "_data": "{\"objectIdentifier\":\"220837f0-1999-11f0-b104-ae605dfe8da7\",\"objectType\":\"task\"}",
+          "error": null
+        },
+        {
+          "timestamp": 1744703447680,
+          "_baName": null,
+          "_endUserFullName": "Đỗ Đức Phong",
+          "_executionTimeMiliseconds": 777,
+          "exe time (second)": 0.777,
+          "_spanName": "GET https://api.symper.vn/comment-service/comment-parent/document-instance/67fdb691-002d-61da-4f84-de9c0af4013d?page=1&pagesize=10",
+          "_data": "{}",
+          "error": null
+        }
+      ]
+    }
+  ]
+}</textarea>
+    <div id="chart"></div>
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+      function renderTrace(jsonData) {
+        const events = jsonData[0].results[0].events;
+
+        if (!events || events.length === 0) {
+          document.getElementById('chart').innerText = 'No trace events found in the data.';
+          return;
+        }
+
+        // Clear previous chart
+        document.getElementById('chart').innerHTML = '';
+
+        // --- Configuration ---
+        const margin = { top: 30, right: 30, bottom: 40, left: 50 }; // Increased left margin for y-axis labels
+        const width = 960 - margin.left - margin.right;
+        const barHeight = 25;
+        const barPadding = 5;
+        const svgHeight = (barHeight + barPadding) * events.length + margin.top + margin.bottom;
+
+        // --- Data Preparation ---
+        const minTimestamp = Math.min(...events.map(d => d.timestamp));
+        const maxTimestamp = Math.max(...events.map(d => d.timestamp + d._executionTimeMiliseconds));
+
+        // --- Scales ---
+        // Time scale (X-axis)
+        const xScale = (timestamp) => {
+          // Normalize timestamp relative to the start and scale to width
+          return ((timestamp - minTimestamp) / (maxTimestamp - minTimestamp)) * width;
+        };
+
+        // Ordinal scale (Y-axis) for span names or indices
+        const yScale = (index) => margin.top + index * (barHeight + barPadding);
+
+        // --- SVG Setup ---
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute('width', width + margin.left + margin.right);
+        svg.setAttribute('height', svgHeight);
+        svg.setAttribute('viewBox', `0 0 ${width + margin.left + margin.right} ${svgHeight}`); // Make it responsive
+
+        const chartGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        chartGroup.setAttribute('transform', `translate(${margin.left}, ${margin.top})`);
+        svg.appendChild(chartGroup);
+
+        document.getElementById('chart').appendChild(svg);
+        const tooltip = document.getElementById('tooltip');
+
+        // --- Draw Spans ---
+        events.forEach((event, i) => {
+          const startX = xScale(event.timestamp);
+          const spanWidth = xScale(event.timestamp + event._executionTimeMiliseconds) - startX;
+          const y = yScale(i) - margin.top; // Adjust y position based on chartGroup translation
+
+          const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+          rect.setAttribute('class', 'span-rect');
+          rect.setAttribute('x', startX);
+          rect.setAttribute('y', y);
+          rect.setAttribute('width', Math.max(1, spanWidth)); // Ensure minimum width of 1px
+          rect.setAttribute('height', barHeight);
+          chartGroup.appendChild(rect);
+
+          // Add Text Label inside or next to the rect
+          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          text.setAttribute('class', 'span-label');
+          text.setAttribute('x', startX + 5); // Position text slightly inside the bar
+          text.setAttribute('y', y + barHeight / 2);
+          text.setAttribute('dy', '.35em'); // Vertical alignment
+          // Truncate long names
+          const maxLabelLength = 80; // Adjust as needed
+          const displayName = event._spanName.length > maxLabelLength
+            ? event._spanName.substring(0, maxLabelLength) + '...'
+            : event._spanName;
+          const relativeEndTime = (event.timestamp + event._executionTimeMiliseconds) - minTimestamp;
+          const relativeStartTime = event.timestamp - minTimestamp;
+          const startTimeSeconds = (relativeStartTime / 1000).toFixed(3);
+          const durationSeconds = (event._executionTimeMiliseconds / 1000).toFixed(3);
+          const endTimeSeconds = (relativeEndTime / 1000).toFixed(3);
+          text.textContent = `${displayName} (start: ${startTimeSeconds}s, dur: ${durationSeconds}s, end: ${endTimeSeconds}s)`;
+          chartGroup.appendChild(text);
+
+          // --- Tooltip Interaction ---
+          rect.addEventListener('mouseover', (e) => {
+            tooltip.style.opacity = 1;
+            tooltip.innerHTML = `
+                        <strong>Span:</strong> ${event._spanName}<br>
+                        <strong>Start Time:</strong> ${new Date(event.timestamp).toISOString()}<br>
+                        <strong>Duration:</strong> <strong>${(event._executionTimeMiliseconds / 1000).toFixed(3)} seconds</strong><br>
+                        <strong>User:</strong> ${event._endUserFullName}<br>
+                        <strong>Data:</strong> ${event._data ? JSON.stringify(JSON.parse(event._data), null, 2) : 'N/A'}<br>
+                        <strong>Error:</strong> ${event.error || 'None'}
+                    `;
+          });
+
+          rect.addEventListener('mousemove', (e) => {
+            // Position tooltip near the cursor
+            tooltip.style.left = `${e.pageX + 15}px`;
+            tooltip.style.top = `${e.pageY + 10}px`;
+          });
+
+          rect.addEventListener('mouseout', () => {
+            tooltip.style.opacity = 0;
+          });
+        });
+
+        // --- Draw Axes ---
+        // X-axis (Time) - Simplified Ticks
+        const axisGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        axisGroup.setAttribute('class', 'axis');
+        axisGroup.setAttribute('transform', `translate(${margin.left}, ${svgHeight - margin.bottom})`); // Position at the bottom
+        svg.appendChild(axisGroup); // Append directly to svg, not chartGroup
+
+        // Axis line
+        const xAxisLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        xAxisLine.setAttribute('x1', 0);
+        xAxisLine.setAttribute('x2', width);
+        xAxisLine.setAttribute('y1', 0);
+        xAxisLine.setAttribute('y2', 0);
+        axisGroup.appendChild(xAxisLine);
+
+        // Add some time ticks (e.g., start, mid, end)
+        const numTicks = 5;
+        const timeRange = maxTimestamp - minTimestamp;
+        for (let i = 0; i <= numTicks; i++) {
+          const tickTime = minTimestamp + (timeRange * i) / numTicks;
+          const tickX = xScale(tickTime);
+
+          // Tick mark
+          const tickMark = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          tickMark.setAttribute('x1', tickX);
+          tickMark.setAttribute('x2', tickX);
+          tickMark.setAttribute('y1', 0);
+          tickMark.setAttribute('y2', 5);
+          axisGroup.appendChild(tickMark);
+
+          // Tick label (relative time in ms)
+          const tickLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          tickLabel.setAttribute('x', tickX);
+          tickLabel.setAttribute('y', 15); // Position below the tick mark
+          tickLabel.setAttribute('text-anchor', 'middle'); // Center the text
+          tickLabel.textContent = `${((tickTime - minTimestamp)).toFixed(0)} ms`;
+          axisGroup.appendChild(tickLabel);
+        }
+
+        // Add X-axis Label
+        const xAxisLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        xAxisLabel.setAttribute('x', width / 2 );
+        xAxisLabel.setAttribute('y', 30); // Position below ticks
+        xAxisLabel.setAttribute('text-anchor', 'middle');
+        xAxisLabel.style.fontSize = '12px';
+        xAxisLabel.style.fill = '#333';
+        xAxisLabel.textContent = `Time elapsed from start (ms)`;
+        axisGroup.appendChild(xAxisLabel);
+      }
+
+      document.getElementById('jsonInput').addEventListener('input', () => {
+        const textareaContent = document.getElementById('jsonInput').value;
+        try {
+          const jsonData = JSON.parse(textareaContent);
+          renderTrace(jsonData);
+        } catch (error) {
+          alert('Invalid JSON data. Please check your input.');
+        }
+      });
+    </script>
+  </body>
+</html>
